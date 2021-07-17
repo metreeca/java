@@ -97,8 +97,9 @@ public final class Values {
 	public static final String Base="app:/";
 
 	public static final IRI Root=iri(Base);
+	public static final IRI Terms=iri(Base, "/terms/");
 
-	public static final Namespace NS=namespace("", Base+"terms#");
+	public static final Namespace NS=namespace("", Terms.stringValue());
 
 
 	public static IRI term(final String name) {
