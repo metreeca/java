@@ -28,6 +28,7 @@
 
 - REST / Added request IRI placeholder to `status(code, details)` response generator method
 - REST / Extended the default secret `vault()` implementation to retrieve parameters also from environment variables
+- XML / Migrated HTML parsing to JSoup
 
 # Fixed
 
