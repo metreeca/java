@@ -19,13 +19,13 @@ package com.metreeca.json;
 import com.metreeca.json.shifts.Path;
 
 import org.eclipse.rdf4j.model.*;
-import org.eclipse.rdf4j.model.vocabulary.DC;
-import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.model.vocabulary.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -68,7 +68,7 @@ public final class Frame {
 		}
 
 		return new Frame(focus, traits.entrySet().stream().collect(toMap(
-				Map.Entry::getKey, e -> unmodifiableSet(new LinkedHashSet<>(e.getValue()))
+				Entry::getKey, e -> unmodifiableSet(new LinkedHashSet<>(e.getValue()))
 		)));
 	}
 
@@ -88,23 +88,29 @@ public final class Frame {
 
 	private static Frame frame(final Value focus, final Collection<Statement> model, final Predicate<Value> visited) {
 		return new Frame(focus, visited.test(focus) || !focus.isResource() ? emptyMap() :
-				Stream.<Map.Entry<IRI, Value>>concat(
+				Stream.<Entry<IRI, Value>>concat(
 
-				model.stream()
-						.filter(pattern(focus, null, null))
-						.map(s -> new SimpleImmutableEntry<>(s.getPredicate(), s.getObject())),
+						model.stream()
+								.filter(pattern(focus, null, null))
+								.map(s -> new SimpleImmutableEntry<>(s.getPredicate(), s.getObject())),
 
-				model.stream()
-						.filter(pattern(null, null, focus))
-						.filter(s -> !visited.test(s.getSubject()))
-						.map(s -> new SimpleImmutableEntry<>(inverse(s.getPredicate()), s.getSubject()))
+						model.stream()
+								.filter(pattern(null, null, focus))
+								.filter(s -> !visited.test(s.getSubject()))
+								.map(s -> new SimpleImmutableEntry<>(inverse(s.getPredicate()), s.getSubject()))
 
-		).collect(groupingBy(Map.Entry::getKey, collectingAndThen(
+				).collect(groupingBy(Entry::getKey, collectingAndThen(
 
-				mapping(entry -> frame(entry.getValue(), model, visited.or(focus::equals)), toSet()),
-				Collections::unmodifiableSet
+						mapping(entry -> entry.getKey().equals(RDF.TYPE)
+										? frame(entry.getValue()) // don't follow inverse type links
+										: frame(entry.getValue(), model, visited.or(focus::equals)),
 
-		))));
+								toSet()
+						),
+
+						Collections::unmodifiableSet
+
+				))));
 	}
 
 
@@ -765,7 +771,7 @@ public final class Frame {
 
 		)).values()));
 
-		if ( merged.isEmpty() ) { return this; } else {
+		if ( merged.isEmpty() ) {return this;} else {
 
 			final Map<IRI, Collection<Frame>> extended=new LinkedHashMap<>(traits);
 
@@ -831,7 +837,7 @@ public final class Frame {
 	}
 
 
-	private String format(final Map.Entry<IRI, Collection<Frame>> trait) {
+	private String format(final Entry<IRI, Collection<Frame>> trait) {
 		return Values.format(trait.getKey())+" : "+format(trait.getValue());
 	}
 

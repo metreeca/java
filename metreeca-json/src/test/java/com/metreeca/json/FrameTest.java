@@ -121,6 +121,19 @@ final class FrameTest {
 			)));
 		}
 
+		@Test void testIgnoreInverseTypeLinks() {
+			assertThat(frame(x, asList(
+
+					statement(x, RDF.TYPE, z),
+					statement(y, RDF.TYPE, z)
+
+			))).isIsomorphicTo(frame(x, singletonList(
+
+					statement(x, RDF.TYPE, z)
+
+			)));
+		}
+
 		@Test void testImportTransitiveStatements() {
 			assertThat(frame(x, asList(
 
