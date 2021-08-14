@@ -49,7 +49,7 @@ import static java.util.regex.Pattern.compile;
 public final class HTMLFormat extends Format<Document> {
 
 	/**
-	 * The default MIME type for HTML message bodies ({@value}).
+	 * The default MIME type for HTML messages ({@value}).
 	 */
 	public static final String MIME="text/html";
 
@@ -187,6 +187,14 @@ public final class HTMLFormat extends Format<Document> {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @return the default MIME type for HTML messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
 
 	/**
 	 * Decodes the HTML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}

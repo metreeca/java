@@ -97,6 +97,14 @@ public final class JSONLDFormat extends Format<Frame> {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for JSON-LD messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes a shape-based query.
 	 *
 	 * @param focus the target IRI fr the decoding process; relative IRIs will be resolved against it

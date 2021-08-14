@@ -56,6 +56,12 @@ import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 public final class RDFFormat extends Format<Collection<Statement>> {
 
 	/**
+	 * The default MIME type for RDF messages ({@value}).
+	 */
+	public static final String MIME="text/turtle";
+
+
+	/**
 	 * Locates a file format service in a registry.
 	 *
 	 * @param registry the registry the file format service is to be located from
@@ -169,9 +175,17 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for RDF messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the RDF {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available, taking into account the RDF serialization format defined by the {@code message}
-	 * {@code Content-Type} header, defaulting to {@code text/turtle}
+	 * body, if one is available, taking into account the RDF serialization format defined by the {@code message} {@code
+	 * Content-Type} header, defaulting to {@code text/turtle}
 	 */
 	@Override public Either<MessageException, Collection<Statement>> decode(final Message<?> message) {
 		return message.body(input()).fold(error -> Left(status(UnsupportedMediaType, "no RDF body")), source -> {

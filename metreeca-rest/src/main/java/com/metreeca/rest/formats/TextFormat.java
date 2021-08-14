@@ -63,9 +63,17 @@ public final class TextFormat extends Format<String> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for textual messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the textual {@code message} body from the input stream supplied by the {@code message}
-	 * {@link InputFormat} body, if one is available, taking into account the {@code message}
-	 * {@linkplain Message#charset() charset}
+	 * {@link InputFormat}
+	 * body, if one is available, taking into account the {@code message} {@linkplain Message#charset() charset}
 	 */
 	@Override public Either<MessageException, String> decode(final Message<?> message) {
 		return message.body(input()).flatMap(source -> {

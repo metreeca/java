@@ -80,6 +80,13 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return the default MIME type for multipart messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
 
 	/**
 	 * Creates a write-only multipart message format.
