@@ -210,17 +210,19 @@ public final class Publisher extends Delegator {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Future<Response> handle(final Request request, final Path root) {
-		return reply(request, root, request.path())
+		return reply(request, root, request.path()).orElseGet(() ->
+				reply(request, root).orElseGet(() ->
+						request.reply(status(NotFound))
+				)
+		);
+	}
 
-				.orElseGet(() -> Optional.of(fallback)
-
-						.filter(path -> !path.isEmpty() && request.route())
-
-						.flatMap(path -> reply(request, root, path))
-
-						.orElseGet(() -> request.reply(status(NotFound)))
-
-				);
+	private Optional<Future<Response>> reply(final Request request, final Path root) {
+		return fallback.isEmpty() || !request.route() ? Optional.empty() : Optional.of(
+				reply(request, root, fallback).orElseGet(() -> // missing expected fallback: redirect to dev server
+						request.reply(status(TemporaryRedirect, fallback))
+				)
+		);
 	}
 
 	private Optional<Future<Response>> reply(final Request request, final Path root, final String path) {

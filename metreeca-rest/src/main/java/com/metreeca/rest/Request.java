@@ -198,7 +198,7 @@ public final class Request extends Message<Request> {
 	 *
 	 * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe} and its {@code
 	 * Accept} header includes a MIME type usually associated with an interactive browser-managed HTTP request (e.g.
-	 * {@code text/html} and its {@link #path() path} doesn't contains a filename extension (e.g. {@code .html}); {@code
+	 * {@code text/html} and its {@link #path() path} doesn't contain a filename extension (e.g. {@code .html}); {@code
 	 * false}, otherwise
 	 */
 	public boolean route() {
