@@ -49,7 +49,7 @@ import static java.util.stream.Collectors.*;
 final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> {
 
 	static Either<Trace, Collection<Statement>> scan(
-			final Shape shape, final Value focus, final Collection<Statement> model
+			final Value focus, final Shape shape, final Collection<Statement> model
 	) {
 		return driver(shape)
 				.map(new JSONLDScanner(focus, singleton(focus), model))

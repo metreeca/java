@@ -39,7 +39,6 @@ import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.JSONLDScanner.scan;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.lang.String.format;
@@ -97,14 +96,6 @@ public final class JSONLDFormat extends Format<Frame> {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * @return the default MIME type for JSON-LD messages ({@value MIME})
-	 */
-	@Override public String mime() {
-		return MIME;
-	}
-
-
-	/**
 	 * Decodes a shape-based query.
 	 *
 	 * @param focus the target IRI fr the decoding process; relative IRIs will be resolved against it
@@ -145,6 +136,38 @@ public final class JSONLDFormat extends Format<Frame> {
 	}
 
 
+	/**
+	 * Validate a JSON-LD model against a shape.
+	 *
+	 * @param focus the target IRI for the validation process
+	 * @param shape the target shape for the validation process
+	 * @param model the JSON-LD model to be validated
+	 *
+	 * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
+	 * from the target {@code focus} according to {@code shape}
+	 *
+	 * @throws NullPointerException if any parameter is null
+	 */
+	public static Either<Trace, Collection<Statement>> validate(
+			final Value focus, final Shape shape, final Collection<Statement> model
+	) {
+
+		if ( shape == null ) {
+			throw new NullPointerException("null shape");
+		}
+
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
+		}
+
+		if ( model == null ) {
+			throw new NullPointerException("null model");
+		}
+
+		return JSONLDScanner.scan(focus, shape, model);
+	}
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private JSONLDFormat() {}
@@ -153,9 +176,17 @@ public final class JSONLDFormat extends Format<Frame> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for JSON-LD messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the JSON-LD {@code message} body from the input stream supplied by the {@code message}
 	 * {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is either missing or  matched by
+	 * body, if one is available and the {@code message} {@code Content-Type} header is either missing or matched by
 	 * {@link JSONFormat#MIMEPattern}
 	 *
 	 * <p><strong>Warning</strong> / Decoding is completely driven by the {@code message}
@@ -188,7 +219,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
 						).decode(jsonReader.readObject());
 
-						return scan(shape, focus, model).fold(
+						return validate(focus, shape, model).fold(
 
 								trace -> Left(status(UnprocessableEntity, trace.toJSON())),
 
@@ -266,7 +297,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
 		final Collection<Statement> model=value.model().collect(toList());
 
-		final Collection<Statement> validated=scan(shape, value.focus(), model).fold(trace -> {
+		final Collection<Statement> validated=validate(value.focus(), shape, model).fold(trace -> {
 
 			throw status(InternalServerError, trace(trace("invalid JSON-LD payload"), trace).toJSON());
 

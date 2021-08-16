@@ -81,14 +81,6 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * @return the default MIME type for multipart messages ({@value MIME})
-	 */
-	@Override public String mime() {
-		return MIME;
-	}
-
-
-	/**
 	 * Creates a write-only multipart message format.
 	 *
 	 * @return a new write-only multipart message format with part/body size limit set to 0, intended for configuring
@@ -142,6 +134,13 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @return the default MIME type for multipart messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
 
 	/**
 	 * Decodes the multipart {@code message} body from the input stream supplied by the {@code message} {@link

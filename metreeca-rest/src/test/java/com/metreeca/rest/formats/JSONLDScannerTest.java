@@ -80,7 +80,7 @@ final class JSONLDScannerTest {
 	@Nested final class Validation {
 
 		private Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
-			return JSONLDScanner.scan(shape, s, asList(model));
+			return JSONLDScanner.scan(s, shape, asList(model));
 		}
 
 
@@ -193,7 +193,7 @@ final class JSONLDScannerTest {
 
 		private Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
 
-			return JSONLDScanner.scan(field(p, shape), s, Arrays
+			return JSONLDScanner.scan(s, field(p, shape), Arrays
 					.stream(values)
 					.map(v -> statement(s, p, v))
 					.collect(toList())
@@ -464,7 +464,7 @@ final class JSONLDScannerTest {
 	@Nested final class Trimming {
 
 		private Collection<Statement> scan(final Shape shape, final Statement... model) {
-			return JSONLDScanner.scan(shape, s, asList(model)).get().orElse(emptySet());
+			return JSONLDScanner.scan(s, shape, asList(model)).get().orElse(emptySet());
 		}
 
 
