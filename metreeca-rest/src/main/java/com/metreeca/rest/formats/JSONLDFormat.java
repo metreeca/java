@@ -295,24 +295,23 @@ public final class JSONLDFormat extends Format<Frame> {
 				);
 
 
-		final Collection<Statement> model=value.model().collect(toList());
+		final Collection<Statement> localized=value.model().filter(statement -> {
 
-		final Collection<Statement> validated=validate(value.focus(), shape, model).fold(trace -> {
+			if ( global ) {return true;} else { // retain only tagged literals with an accepted language
+
+				final String lang=lang(statement.getObject());
+
+				return lang.isEmpty() || langs.contains(lang);
+
+			}
+
+		}).collect(toList());
+
+		final Collection<Statement> validated=validate(value.focus(), shape, localized).fold(trace -> {
 
 			throw status(InternalServerError, trace(trace("invalid JSON-LD payload"), trace).toJSON());
 
 		});
-
-		final Collection<Statement> localized=global ? validated : validated.stream().filter(statement -> {
-
-			// retain only tagged literals with an accepted language
-
-			final String lang=lang(statement.getObject());
-
-			return lang.isEmpty() || langs.contains(lang);
-
-		}).collect(toList());
-
 
 		return message
 
@@ -332,7 +331,7 @@ public final class JSONLDFormat extends Format<Frame> {
 								service(keywords()),
 								mime.equals(MIME) // include context objects for application/ld+json
 
-						).encode(localized));
+						).encode(validated));
 
 					} catch ( final IOException e ) {
 
