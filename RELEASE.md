@@ -24,6 +24,7 @@
 - JSON / Lay down focus `Shift` operators (predicate paths, value mappings, aggregates, …)
 - REST / Added `Handler.route()/asset()` conditional handler factories
 - REST / Added `Format.mime()` default MIME getter
+- REST / Added `Store.has()` test methods
 
 # Improved
 

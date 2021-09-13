@@ -50,6 +50,19 @@ public interface Store {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * Checks a data blob.
+	 *
+	 * @param id the identifier of the data blob to be checked
+	 *
+	 * @return {@code true} if a data blob identified by {@code id} is present; {@code false}, otherwise
+	 *
+	 * @throws NullPointerException     if {@code id} is null
+	 * @throws IllegalArgumentException if {@code id} is not a valid data blob identifier for the backing blob store
+	 * @throws IOException              if an I/O exception occurred while operating on the store
+	 */
+	public boolean has(final String id) throws IOException;
+
+	/**
 	 * Reads a data blob.
 	 *
 	 * @param id the identifier of the data blob to be read
@@ -59,15 +72,23 @@ public interface Store {
 	 * @throws NullPointerException     if {@code id} is null
 	 * @throws IllegalArgumentException if {@code id} is not a valid data blob identifier for the backing blob store
 	 * @throws NoSuchFileException      if {@code id} is not the identifier of an existing data blob
-	 * @throws IOException              if an I/O exception occurs while opening the input stream
+	 * @throws IOException              if an I/O exception occurred while operating on the store
 	 */
 	public InputStream read(final String id) throws IOException;
 
 	/**
 	 * Writes a data blob.
 	 *
-	 * <p>Write operations must be atomic, that is existing data must be made available for {@linkplain #read(String)
-	 * reading} until the operation is completed by closing the output stream.</p>
+	 * <p>Write operations must be atomic, that is:</p>
+	 *
+	 * <ul>
+	 *
+	 *  <li>mltiple write operatinos on the same blob must be serialized;</li>
+	 *
+	 *  <li>existing data must be made available for {@linkplain #read(String) reading} until the operation is
+	 *  completed by closing the output stream.</li>
+	 *
+	 * </ul>
 	 *
 	 * @param id the identifier of the data blob to be written
 	 *
@@ -75,7 +96,7 @@ public interface Store {
 	 *
 	 * @throws NullPointerException     if {@code id} is null
 	 * @throws IllegalArgumentException if {@code id} is not a valid data blob identifier for the backing blob store
-	 * @throws IOException              if an I/O exception occurs while opening the output stream
+	 * @throws IOException              if an I/O exception occurred while operating on the store
 	 */
 	public OutputStream write(final String id) throws IOException;
 
@@ -91,6 +112,9 @@ public interface Store {
 
 		private final Path path=service(storage()).resolve("store");
 
+		@Override public boolean has(final String id) throws IOException {
+			return Files.exists(path.resolve(id));
+		}
 
 		@Override public InputStream read(final String id) throws IOException {
 

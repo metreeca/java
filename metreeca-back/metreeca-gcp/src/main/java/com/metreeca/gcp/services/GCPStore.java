@@ -73,6 +73,15 @@ public final class GCPStore implements Store {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	@Override public boolean has(final String id) throws IOException {
+
+		if ( id == null ) {
+			throw new NullPointerException("null id");
+		}
+
+		return exec(id, this::has);
+	}
+
 	@Override public InputStream read(final String id) throws IOException {
 
 		if ( id == null ) {
@@ -103,6 +112,25 @@ public final class GCPStore implements Store {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean has(final String bucket, final String object) throws IOException {
+
+		if ( bucket == null ) {
+			throw new NullPointerException("null bucket");
+		}
+
+		if ( object == null ) {
+			throw new NullPointerException("null object");
+		}
+
+		try {
+
+			return storage.get(BlobId.of(bucket, object)) != null;
+
+		} catch ( final StorageException e ) {
+			throw new IOException(e);
+		}
+	}
 
 	private InputStream read(final String bucket, final String object) throws IOException {
 
