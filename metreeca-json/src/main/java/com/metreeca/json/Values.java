@@ -585,10 +585,15 @@ public final class Values {
 	}
 
 
-	private static <V, R> Function<V, R> guard(final Function<V, R> mapper) {
-		return v -> {
+	public static <V, R> Function<V, R> guard(final Function<V, R> mapper) {
 
-			try { return mapper.apply(v); } catch ( final RuntimeException e ) { return null; }
+		if ( mapper == null ) {
+			throw new NullPointerException("null mapper");
+		}
+
+		return value -> {
+
+			try {return mapper.apply(value);} catch ( final RuntimeException e ) {return null;}
 
 		};
 	}
