@@ -1,14 +1,14 @@
-@prefix :         <http://www.wikidata.org/> .
-@prefix wd:       <http://www.wikidata.org/entity/> .
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix wdt:      <http://www.wikidata.org/prop/direct/> .
-@prefix xml:      <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
-@prefix schema:   <http://schema.org/> .
-@prefix wikibase: <http://wikiba.se/ontology#> .
+@prefix :       <http://www.wikidata.org/> .
+@prefix wb:     <http://wikiba.se/ontology#> .
+@prefix wd:     <http://www.wikidata.org/entity/> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix wdt:    <http://www.wikidata.org/prop/direct/> .
+@prefix xml:    <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <http://schema.org/> .
 @base <http://www.wikidata.org/> .
 
 <http://www.wikidata.org/>
@@ -103,7 +103,7 @@ wdt:P1549
 #################################################################
 
 ###  http://wikiba.se/ontology#Item
-wikibase:Item
+wb:Item
     rdf:type owl:Class .
 
 

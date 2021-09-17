@@ -50,6 +50,9 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Wikidata mirror.
+ */
 public final class WikidataMirror implements Consumer<Stream<String>>, Function<Stream<String>, Stream<Resource>> {
 
 	public static UnaryOperator<IRI> rewriter(final String external, final String internal) {
@@ -87,6 +90,15 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 	private final Logger logger=service(logger());
 
 
+	/**
+	 * Configures the name of the target item variable.
+	 *
+	 * @param item the name of the variable to be bound to the IRI of matched resources
+	 *
+	 * @return this action
+	 *
+	 * @throws NullPointerException if {@code item} is null
+	 */
 	public WikidataMirror item(final String item) {
 
 		if ( item == null ) {
@@ -167,33 +179,6 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 		this.rewriter=rewriter;
 
 		return this;
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Statement rewrite(final Statement statement) {
-		if ( rewriter.equals(UnaryOperator.identity()) ) { return statement; } else {
-
-			final Resource subject=statement.getSubject();
-			final IRI predicate=statement.getPredicate();
-			final Value object=statement.getObject();
-
-			return statement(
-					subject instanceof IRI ? rewrite((IRI)subject) : subject,
-					rewrite(predicate),
-					object instanceof IRI ? rewrite((IRI)object) : object
-			);
-
-		}
-	}
-
-	private Resource rewrite(final Resource resource) {
-		return resource instanceof IRI ? rewrite((IRI)resource) : resource;
-	}
-
-	private IRI rewrite(final IRI iri) {
-		return rewriter.equals(UnaryOperator.identity()) ? iri : rewriter.apply(iri);
 	}
 
 
@@ -433,6 +418,7 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 			Xtream.from(update) // upload updates
 
 					.map(this::rewrite)
+					.map(this::localize)
 
 					.batch(100_000)
 
@@ -505,6 +491,48 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 
 		);
 
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Statement rewrite(final Statement statement) {
+		if ( rewriter.equals(UnaryOperator.identity()) ) { return statement; } else {
+
+			final Resource subject=statement.getSubject();
+			final IRI predicate=statement.getPredicate();
+			final Value object=statement.getObject();
+
+			return statement(
+					subject instanceof IRI ? rewrite((IRI)subject) : subject,
+					rewrite(predicate),
+					object instanceof IRI ? rewrite((IRI)object) : object
+			);
+
+		}
+	}
+
+	private Resource rewrite(final Resource resource) {
+		return resource instanceof IRI ? rewrite((IRI)resource) : resource;
+	}
+
+	private IRI rewrite(final IRI iri) {
+		return rewriter.equals(UnaryOperator.identity()) ? iri : rewriter.apply(iri);
+	}
+
+
+	private Statement localize(final Statement statement) {
+		return languages.size() > 1 ? statement : literal(statement.getObject())
+
+				.filter(literal -> languages.contains(literal.getLanguage().orElse("")))
+
+				.map(literal -> statement(
+						statement.getSubject(),
+						statement.getPredicate(),
+						literal(literal.stringValue())
+				))
+
+				.orElse(statement);
 	}
 
 }

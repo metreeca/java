@@ -57,11 +57,11 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 	public static final String WD="http://www.wikidata.org/entity/";
 	public static final String WDP="http://www.wikidata.org/prop/";
 	public static final String WDT="http://www.wikidata.org/prop/direct/";
-	public static final String WIKIBASE="http://wikiba.se/ontology#";
+	public static final String WB="http://wikiba.se/ontology#";
 
-	public static final IRI ITEM=iri(WIKIBASE, "Item");
-	public static final IRI PROPERTY=iri(WIKIBASE, "Property");
-	public static final IRI SITELINKS=iri(WIKIBASE, "sitelinks");
+	public static final IRI ITEM=iri(WB, "Item");
+	public static final IRI PROPERTY=iri(WB, "Property");
+	public static final IRI SITELINKS=iri(WB, "sitelinks");
 
 	public static final IRI P31=iri(WDT, "P31"); // instance of
 	public static final IRI P279=iri(WDT, "P279"); // subclass of
