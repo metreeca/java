@@ -32,6 +32,7 @@
 - REST / Added request IRI placeholder to `status(code, details)` response generator method
 - REST / Extended the default secret `vault()` implementation to retrieve parameters also from environment variables
 - REST / Extended `Query` action to handle `jar:` URLs
+- REST / Reduced default items query limit to 100
 - XML / Migrated HTML parsing to JSoup
 
 # Fixed

@@ -49,7 +49,7 @@ public interface Engine {
 	/**
 	 * The default items fetch limit.
 	 */
-	public int ItemsLimit=1_000;
+	public int ItemsLimit=100;
 
 	/**
 	 * Retrieves the items fetch limit ({@value #ItemsLimit}).
