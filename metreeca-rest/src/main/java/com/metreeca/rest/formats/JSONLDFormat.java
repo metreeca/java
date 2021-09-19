@@ -170,7 +170,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private JSONLDFormat() {}
+	private JSONLDFormat() { }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
 		final Collection<Statement> localized=value.model().filter(statement -> {
 
-			if ( global ) {return true;} else { // retain only tagged literals with an accepted language
+			if ( global ) { return true; } else { // retain only tagged literals with an accepted language
 
 				final String lang=lang(statement.getObject());
 

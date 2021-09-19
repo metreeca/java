@@ -143,7 +143,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 		if ( url == null ) {
 			throw new MissingResourceException(
-					format("unknown resource [%s:%s]", clazz.getName(), resource),
+					format("unknown resource <%s:%s>", clazz.getName(), resource),
 					clazz.getName(),
 					resource
 			);

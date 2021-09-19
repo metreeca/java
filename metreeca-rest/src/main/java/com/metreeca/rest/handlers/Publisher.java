@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.*;
 import java.nio.file.*;
+import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.function.*;
 import java.util.regex.Matcher;
@@ -97,6 +98,37 @@ public final class Publisher extends Delegator {
 	/**
 	 * Creates a static content publisher.
 	 *
+	 * @param root the root path of the resource package to be published
+	 *
+	 * @return a new static content publisher for the content retrieved by the {@code Publisher} class loader from
+	 * system
+	 * resources under the {@code root} package
+	 *
+	 * @throws NullPointerException     if {@code root} is null
+	 * @throws MissingResourceException if {@code root} is not available
+	 */
+	public static Publisher publisher(final String root) {
+
+		if ( root == null ) {
+			throw new NullPointerException("null root");
+		}
+
+		final URL url=Publisher.class.getClassLoader().getResource(root);
+
+		if ( url == null ) {
+			throw new MissingResourceException(
+					format("unknown resource <%s>", root),
+					Publisher.class.getName(),
+					root
+			);
+		}
+
+		return publisher(url);
+	}
+
+	/**
+	 * Creates a static content publisher.
+	 *
 	 * <p><strong>Warning</strong> / Only {@code file:} and {@code jar:} URLs are currently supported.</p>
 	 *
 	 * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)})
@@ -118,7 +150,7 @@ public final class Publisher extends Delegator {
 
 			try {
 
-				return new Publisher(Paths.get(root.toURI()));
+				return publisher(Paths.get(root.toURI()));
 
 			} catch ( final URISyntaxException e ) {
 
@@ -141,7 +173,7 @@ public final class Publisher extends Delegator {
 					FileSystems.newFileSystem(URI.create(jar), emptyMap())
 			));
 
-			return new Publisher(filesystem.getPath(entry));
+			return publisher(filesystem.getPath(entry));
 
 		} else {
 

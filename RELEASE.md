@@ -25,6 +25,7 @@
 - REST / Added `Handler.route()/asset()` conditional handler factories
 - REST / Added `Format.mime()` default MIME getter
 - REST / Added `Store.has()` test methods
+- REST / Added `Packer` development server proxy
 
 # Improved
 

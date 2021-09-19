@@ -483,7 +483,7 @@ public final class Request extends Message<Request> {
 	 */
 	public List<String> langs() {
 		return header("Accept-Language")
-				.map((Function<String, List<String>>)Format::langs)
+				.map(Format::langs)
 				.orElse(emptyList());
 	}
 
