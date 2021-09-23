@@ -77,12 +77,15 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 
 	private String item="item";
 
+	private boolean local; // strip language tag if working with a single language
 	private boolean historic;
 
 	private IRI[] contexts={};
+
 	private Set<String> languages=singleton("en");
 
 	private UnaryOperator<IRI> rewriter=UnaryOperator.identity();
+
 
 	private final Graph source=service(Wikidata::Graph);
 	private final Graph target=service(graph());
@@ -129,12 +132,35 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 	}
 
 
+	public WikidataMirror language(final String language) {
+
+		if ( language == null ) {
+			throw new NullPointerException("null language");
+		}
+
+		return language(language, false);
+	}
+
+	public WikidataMirror language(final String language, final boolean local) {
+
+		if ( language == null ) {
+			throw new NullPointerException("null language");
+		}
+
+		this.local=local;
+		this.languages=singleton(language);
+
+		return this;
+	}
+
+
 	public WikidataMirror languages(final String... languages) {
 
 		if ( languages == null || Arrays.stream(languages).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null languages");
 		}
 
+		this.local=false;
 		this.languages=new HashSet<>(asList(languages));
 
 		return this;
@@ -146,6 +172,7 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 			throw new NullPointerException("null languages");
 		}
 
+		this.local=false;
 		this.languages=new HashSet<>(languages);
 
 		return this;
@@ -522,9 +549,9 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 
 
 	private Statement localize(final Statement statement) {
-		return languages.size() > 1 ? statement : literal(statement.getObject())
+		return !local ? statement : literal(statement.getObject())
 
-				.filter(literal -> languages.contains(literal.getLanguage().orElse("")))
+				.filter(literal -> literal.getLanguage().filter(languages::contains).isPresent())
 
 				.map(literal -> statement(
 						statement.getSubject(),
