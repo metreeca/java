@@ -423,7 +423,7 @@ public final class Xtream<T> implements Stream<T> {
 
 			final byte[] buffer=new byte[1024];
 
-			for (int n; (n=input.read(buffer)) >= 0; output.write(buffer, 0, n)) {}
+			for (int n; (n=input.read(buffer)) >= 0; output.write(buffer, 0, n)) { }
 
 			output.flush();
 
@@ -521,7 +521,7 @@ public final class Xtream<T> implements Stream<T> {
 
 			final char[] buffer=new char[1024];
 
-			for (int n; (n=reader.read(buffer)) >= 0; writer.write(buffer, 0, n)) {}
+			for (int n; (n=reader.read(buffer)) >= 0; writer.write(buffer, 0, n)) { }
 
 			writer.flush();
 
@@ -717,7 +717,7 @@ public final class Xtream<T> implements Stream<T> {
 			throw new IllegalArgumentException("negative batch size");
 		}
 
-		return size == 0 ? of(stream.collect(toList()))
+		return size == 0 ? of(stream.collect(Collectors.toList()))
 				: from(StreamSupport.stream(new BatchSpliterator<>(size, stream.spliterator()), stream.isParallel()));
 	}
 
@@ -974,7 +974,7 @@ public final class Xtream<T> implements Stream<T> {
 
 			final Collection<T> batch=new ArrayList<>(size);
 
-			for (int n=0; n < size && base.tryAdvance(batch::add); ++n) {}
+			for (int n=0; n < size && base.tryAdvance(batch::add); ++n) { }
 
 			if ( batch.isEmpty() ) {
 

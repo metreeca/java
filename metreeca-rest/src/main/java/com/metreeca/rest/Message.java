@@ -401,13 +401,22 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
 	 *
 	 * @throws NullPointerException if {@code format} is null
 	 */
+	@SuppressWarnings("unchecked")
 	public <V> Either<MessageException, V> body(final Format<V> format) {
 
 		if ( format == null ) {
 			throw new NullPointerException("null body");
 		}
 
-		return (Either<MessageException, V>)bodies.computeIfAbsent(format, key -> format.decode(this));
+		// ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
+
+		Either<MessageException, ?> body=bodies.get(format);
+
+		if ( body == null ) {
+			bodies.put(format, body=format.decode(this));
+		}
+
+		return (Either<MessageException, V>)body;
 	}
 
 	/**
@@ -452,6 +461,7 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
 	 *
 	 * @throws NullPointerException if either {@code name} or {@code value} is null
 	 */
+	@SuppressWarnings("unchecked")
 	public <V> T map(final Format<? super V> format, final UnaryOperator<V> mapper) {
 
 		if ( format == null ) {
@@ -462,20 +472,27 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
 			throw new NullPointerException("null mapper");
 		}
 
+		// ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
 
-		Optional
+		final Either<MessageException, ?> value=bodies.get(format);
 
-				.ofNullable(bodies.computeIfPresent(format, (key, value) -> value.map(body -> requireNonNull(
+		if ( value != null ) {
 
-						mapper.apply((V)body), "null mapper return value"
+			final Either<MessageException, V> mapped=value.map(body -> requireNonNull(
 
-				))))
+					mapper.apply((V)body), "null mapper return value"
 
-				.ifPresent(result -> result.map(body ->
+			));
 
-						format.encode(self(), (V)body)
+			bodies.put(format, mapped);
 
-				));
+			mapped.map(body ->
+
+					format.encode(self(), body)
+
+			);
+
+		}
 
 		return self();
 	}

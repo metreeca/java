@@ -3,8 +3,10 @@
     <output-path>$PROJECT_DIR$/metreeca-toys/target</output-path>
     <properties id="maven-jee-properties">
       <options>
+        <exploded>false</exploded>
         <module>metreeca-toys</module>
         <packaging>war</packaging>
+        <unpackNestedArchives>false</unpackNestedArchives>
       </options>
     </properties>
     <root id="archive" name="metreeca-toys-0.0.0-SNAPSHOT.war">

@@ -197,7 +197,9 @@ public final class Graph implements AutoCloseable {
 	 *
 	 * <p>Configures the following pre-defined bindings for the target SPARQL operation:</p>
 	 *
-	 * <table summary="pre-defined bindings">
+	 * <table>
+	 *
+	 *     <caption>pre-defined bindings</caption>
 	 *
 	 * <thead>
 	 *
@@ -247,8 +249,7 @@ public final class Graph implements AutoCloseable {
 	 *
 	 * <tr>
 	 * <td>{@code ?user}</td>
-	 * <td>the IRI identifying the {@linkplain Request#user() user} submitting the original
-	 * request or
+	 * <td>the IRI identifying the {@linkplain Request#user() user} submitting the original request or
 	 * {@linkplain RDF#NIL} if no user is authenticated</td>
 	 * </tr>
 	 *
@@ -260,7 +261,9 @@ public final class Graph implements AutoCloseable {
 	 * bindings are
 	 * configured:</p>
 	 *
-	 * <table summary="response bindings">
+	 * <table>
+	 *
+	 *     <caption>response bindings</caption>
 	 *
 	 * <thead>
 	 *

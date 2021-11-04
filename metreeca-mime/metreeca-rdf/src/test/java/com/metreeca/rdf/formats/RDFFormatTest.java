@@ -55,11 +55,12 @@ final class RDFFormatTest {
 	}
 
 
-	@Nested final class Services {
+	@Nested
+	final class Services {
 
-		private final TestService Turtle=new TestService(org.eclipse.rdf4j.rio.RDFFormat.TURTLE);
-		private final TestService RDFXML=new TestService(org.eclipse.rdf4j.rio.RDFFormat.RDFXML);
-		private final TestService Binary=new TestService(org.eclipse.rdf4j.rio.RDFFormat.BINARY);
+		private final RDFFormatTestService Turtle=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.TURTLE);
+		private final RDFFormatTestService RDFXML=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.RDFXML);
+		private final RDFFormatTestService Binary=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.BINARY);
 
 
 		@Test void testServiceScanMimeTypes() {
@@ -102,7 +103,7 @@ final class RDFFormatTest {
 		}
 
 
-		private TestService service(final org.eclipse.rdf4j.rio.RDFFormat fallback, final List<String> types) {
+		private RDFFormatTestService service(final org.eclipse.rdf4j.rio.RDFFormat fallback, final List<String> types) {
 
 			final TestRegistry registry=new TestRegistry();
 
@@ -115,33 +116,14 @@ final class RDFFormatTest {
 
 
 		private final class TestRegistry
-				extends FileFormatServiceRegistry<org.eclipse.rdf4j.rio.RDFFormat, TestService> {
+				extends FileFormatServiceRegistry<org.eclipse.rdf4j.rio.RDFFormat, RDFFormatTestService> {
 
 			private TestRegistry() {
-				super(TestService.class);
+				super(RDFFormatTestService.class);
 			}
 
-			@Override protected org.eclipse.rdf4j.rio.RDFFormat getKey(final TestService service) {
+			@Override protected org.eclipse.rdf4j.rio.RDFFormat getKey(final RDFFormatTestService service) {
 				return service.getFormat();
-			}
-
-		}
-
-		private final class TestService {
-
-			private final org.eclipse.rdf4j.rio.RDFFormat format;
-
-
-			private TestService(final org.eclipse.rdf4j.rio.RDFFormat format) {
-				this.format=format;
-			}
-
-			private org.eclipse.rdf4j.rio.RDFFormat getFormat() {
-				return format;
-			}
-
-			@Override public String toString() {
-				return format.getDefaultMIMEType();
 			}
 
 		}
