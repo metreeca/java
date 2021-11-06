@@ -158,7 +158,6 @@ public final class Field extends Shape {
 			throw new NullPointerException("null keywords");
 		}
 
-
 		return fields(shape).collect(toMap(
 
 				field -> {
@@ -199,9 +198,13 @@ public final class Field extends Shape {
 
 				(x, y) -> {
 
-					throw new IllegalArgumentException(format(
-							"clashing labels for fields <%s>=%s / <%s>=%s", x.label(), x.iri(), y.label(), y.iri()
-					));
+					if ( !x.equals(y) ) {
+						throw new IllegalArgumentException(format(
+								"clashing labels for fields <%s> / <%s>", x, y
+						));
+					}
+
+					return x;
 
 				},
 

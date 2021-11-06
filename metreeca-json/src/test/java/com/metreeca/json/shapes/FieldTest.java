@@ -48,7 +48,7 @@ final class FieldTest {
 	@Nested class Labels {
 
 		@Test void testInspectAnd() {
-			assertThat(Field.labels(and(
+			assertThat(labels(and(
 
 					field(RDF.FIRST),
 					field(RDF.REST)
@@ -57,7 +57,7 @@ final class FieldTest {
 		}
 
 		@Test void testInspectOr() {
-			assertThat(Field.labels(or(
+			assertThat(labels(or(
 
 					field(RDF.FIRST),
 					field(RDF.REST)
@@ -66,7 +66,7 @@ final class FieldTest {
 		}
 
 		@Test void testInspectWhen() {
-			assertThat(Field.labels(when(
+			assertThat(labels(when(
 
 					datatype(RDF.NIL),
 					field(RDF.FIRST),
@@ -76,61 +76,75 @@ final class FieldTest {
 		}
 
 		@Test void testInspectOtherShapes() {
-			assertThat(Field.labels(and())).isEmpty();
+			assertThat(labels(and())).isEmpty();
 		}
 
 
 		@Test void testGuessLabelFromIRI() {
 
-			assertThat(Field.labels(field(RDF.VALUE)))
+			assertThat(labels(field(RDF.VALUE)))
 					.as("direct")
 					.containsKey("value");
 
-			assertThat(Field.labels(field(Values.inverse(RDF.VALUE))))
+			assertThat(labels(field(Values.inverse(RDF.VALUE))))
 					.as("inverse")
 					.containsKey("valueOf");
 
 		}
 
 		@Test void testRetrieveUserDefinedLabel() {
-			assertThat(Field.labels(field("alias", RDF.VALUE)))
+			assertThat(labels(field("alias", RDF.VALUE)))
 					.as("user-defined")
 					.containsKey("alias");
 		}
 
 		@Test void testPreferUserDefinedFields() {
-			assertThat(Field.labels(and(field("alias", RDF.VALUE), field(RDF.VALUE))))
+			assertThat(labels(and(field("alias", RDF.VALUE), field(RDF.VALUE))))
 					.as("user-defined")
 					.containsKey("alias");
 		}
 
 
 		@Test void testReportConflictingFields() {
-			assertThatThrownBy(() -> Field.labels(and(
+			assertThatThrownBy(() -> labels(and(
 					field("alias", RDF.FIRST),
 					field("alias", RDF.REST)
 			))).isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test void testReportConflictingProperties() {
-			assertThatThrownBy(() -> Field.labels(and(field(RDF.VALUE), field(iri("urn:example#value"), and()))))
+			assertThatThrownBy(() -> labels(and(field(RDF.VALUE), field(iri("urn:example#value"), and()))))
 					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test void testReportReservedLabels() {
 
 			assertThatIllegalArgumentException().isThrownBy(() ->
-					Field.labels(field(iri("http://exampe.com/", "@id"), and()))
+					labels(field(iri("http://exampe.com/", "@id"), and()))
 			);
 
 			assertThatIllegalArgumentException().isThrownBy(() ->
-					Field.labels(field("@id", RDF.VALUE))
+					labels(field("@id", RDF.VALUE))
 			);
 
 			assertThatIllegalArgumentException().isThrownBy(() ->
 					labels(field("id", RDF.VALUE), singletonMap("@id", "id"))
 			);
 
+		}
+
+		@Test void testIgnoreCompatibleDuplicates() {
+			assertThat(labels(or(
+
+					and(
+							field(RDF.FIRST),
+							field(RDF.REST)
+					),
+					field(RDF.FIRST)
+
+			))).containsKeys(
+					"first", "rest"
+			);
 		}
 
 	}
