@@ -16,7 +16,6 @@
 
 package com.metreeca.rdf4j.services;
 
-import org.assertj.core.api.Assertions;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +28,8 @@ import static com.metreeca.json.shapes.And.and;
 import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Link.link;
 import static com.metreeca.rdf4j.services.GraphFacts.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -47,7 +48,7 @@ final class GraphFactsTest {
 	@Nested final class Path {
 
 		@Test void testRoot() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					and(all(x), field(p)),
 
@@ -61,7 +62,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testShallow() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					and(all(x), field(p), field(q)),
 
@@ -75,7 +76,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testDeep() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					and(all(x), field(p, field(q, all(y))), field(r)),
 
@@ -90,7 +91,7 @@ final class GraphFactsTest {
 
 
 		@Test void testRootLink() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					link(OWL.SAMEAS, all(x)),
 
@@ -104,7 +105,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testShallowLink() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					field(p, link(OWL.SAMEAS, field(q))),
 
@@ -118,7 +119,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testDeepLink() {
-			Assertions.assertThat(path(
+			assertThat(path(
 
 					field(p, field(q, link(OWL.SAMEAS))),
 
@@ -136,7 +137,7 @@ final class GraphFactsTest {
 	@Nested final class Hook {
 
 		@Test void testRoot() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					and(all(x), field("p", p)),
 
@@ -146,7 +147,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testShallow() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					and(all(x), field("p", p), field("q", q)),
 
@@ -156,7 +157,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testDeep() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					and(all(x), field("p", p, field("q", q, all(y))), field("r", r)),
 
@@ -167,7 +168,7 @@ final class GraphFactsTest {
 
 
 		@Test void testRootDirectLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					link(OWL.SAMEAS, all(x)),
 
@@ -177,7 +178,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testShallowDirectLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					field("p", p, link(OWL.SAMEAS, field("q", q))),
 
@@ -187,7 +188,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testDeepDirectLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					field(p, field("q", q, link(OWL.SAMEAS))),
 
@@ -198,7 +199,7 @@ final class GraphFactsTest {
 
 
 		@Test void testRootInverseLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					link(inverse(OWL.SAMEAS), all(x)),
 
@@ -208,7 +209,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testShallowInverseLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					field("p", p, link(inverse(OWL.SAMEAS), field("q", q))),
 
@@ -218,7 +219,7 @@ final class GraphFactsTest {
 		}
 
 		@Test void testDeepInverseLink() {
-			Assertions.assertThat(hook(
+			assertThat(hook(
 
 					field(p, field("q", q, link(inverse(OWL.SAMEAS)))),
 
