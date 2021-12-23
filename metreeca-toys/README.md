@@ -1,3 +1,3 @@
-# Metreeca/Link Sample
+# Metreeca/Base Sample
 
-Source code for the sample Metreeca/Link app.
+Source code for the sample Metreeca/Base app.

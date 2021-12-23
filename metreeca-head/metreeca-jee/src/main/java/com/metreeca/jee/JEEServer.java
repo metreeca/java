@@ -44,7 +44,7 @@ import static java.util.function.Function.identity;
 /**
  * Java EE Servlet connector.
  *
- * <p>Connects web applications managed by Servlet 3.1 container with resource handlers based on the Metreeca/Link
+ * <p>Connects web applications managed by Servlet 3.1 container with resource handlers based on the Metreeca/Base
  * framework:</p>
  *
  * <ul>
