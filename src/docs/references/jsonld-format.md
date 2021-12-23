@@ -5,7 +5,7 @@ title:    JSON-LD Serialization Reference
 [comment]: <> (excerpt:	JSON-LD serialization format grammar)
 
 
-Metreeca/Link generates and consumes linked data using a compacted/framed [JSON-LD](https://json-ld.org) format, which
+Metreeca/Base generates and consumes linked data using a compacted/framed [JSON-LD](https://json-ld.org) format, which
 streamlines resource descriptions taking into account the constraints specified by a target linked
 data [shape](spec-language.md#shapes).
 

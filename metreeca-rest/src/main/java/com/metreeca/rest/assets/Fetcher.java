@@ -104,7 +104,7 @@ import static java.util.stream.Collectors.toMap;
 				// !!! connection.setIfModifiedSince();
 
 				if ( !request.header("User-Agent").isPresent() ) {
-					connection.addRequestProperty("User-Agent", "Metreeca/Link (https://github.com/metreeca/link)");
+					connection.addRequestProperty("User-Agent", "metreeca/base (https://github.com/metreeca/base)");
 				}
 
 				if ( !request.header("Accept-Encoding").isPresent() ) {

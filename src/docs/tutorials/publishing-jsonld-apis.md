@@ -5,7 +5,7 @@ title:      Publishing Model‑Driven REST/JSON-LD APIs
 [comment]: <> (excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing)
 
 
-This example-driven tutorial introduces the main building blocks of the Metreeca/Link model-driven REST/JSON framework.
+This example-driven tutorial introduces the main building blocks of the Metreeca/Base model-driven REST/JSON framework.
 Basic familiarity with [linked data](https://www.w3.org/standards/semanticweb/data) concepts
 and [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) APIs is required.
 
@@ -26,12 +26,12 @@ You may try out the examples using your favorite API testing tool or working fro
 or `wget`.
 
 A Maven project with the code for the complete sample app is available
-on [GitHub](https://github.com/metreeca/link/tree/main/metreeca-toys): [download](https://downgit.github.io/#/home?url=https://github.com/metreeca/link/tree/main/metreeca-toys&fileName=metreeca%E2%A7%B8link%20sample)
+on [GitHub](https://github.com/metreeca/base/tree/main/metreeca-toys): [download](https://downgit.github.io/#/home?url=https://github.com/metreeca/base/tree/main/metreeca-toys&fileName=metreeca%E2%A7%B8link%20sample)
 it to your workspace, open in your favorite IDE, compile and launch a local instance of the server.
 
 # Getting Started
 
-To get started, set up a Maven Java 1.8 project, importing the BOM module for Metreeca/Link:
+To get started, set up a Maven Java 1.8 project, importing the BOM module for Metreeca/Base:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -59,7 +59,7 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-link</artifactId>
+				<artifactId>metreeca-base</artifactId>
 				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -72,7 +72,7 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 </project>
 ```
 
-Then, add the required dependencies for the Metreeca/Link [connectors](../javadocs/) for the target deployment server and
+Then, add the required dependencies for the Metreeca/Base [connectors](../javadocs/) for the target deployment server and
 the target graph storage option; in this tutorial we will deploy to a Servlet 3.1 container with an RDF4J Memory store,
 so we add:
 
@@ -112,7 +112,7 @@ so we add:
 </dependencies>
 ```
 
-Note that the Metreeca/Link BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
+Note that the Metreeca/Base BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
 specify version numbers explicitly.
 
 Finally, define a minimal server stub like:
@@ -151,7 +151,7 @@ HTTP/1.1 200
 
 The [context](../javadocs/?com/metreeca/rest/Context.html) argument handled to the app loader lambda manages the shared
 system-provided assets and can be used to customize them and to run app initialization tasks.
-Copy [BIRT.ttl](https://github.com/metreeca/link/tree/main/metreeca-toys/src/main/resources/com/metreeca/birt/BIRT.ttl)
+Copy [BIRT.ttl](https://github.com/metreeca/base/tree/main/metreeca-toys/src/main/resources/com/metreeca/birt/BIRT.ttl)
 to the `src/main/resources/` directory and extend the stub as follows:
 
 ```java
@@ -822,7 +822,7 @@ We'll now complete the product catalog, adding:
 - postprocessing scripts for updating server-managed properties and perform other housekeeping tasks when resources are
   created or modified.
 
-Copy [ProductsCreate.ql](https://github.com/metreeca/link/tree/main/metreeca-toys/src/main/resources/com/metreeca/toys/ProductsCreate.ql)
+Copy [ProductsCreate.ql](https://github.com/metreeca/base/tree/main/metreeca-toys/src/main/resources/com/metreeca/toys/ProductsCreate.ql)
 to the `src/main/resources/` directory and extend `Products` as follows:
 
 ```diff
