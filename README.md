@@ -100,15 +100,12 @@ Content-Length: 12
 Hello world!
 ```
 
-4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how to [publish](http://metreeca.github.
-   io/base/tutorials/publishing-jsonld-apis) and [consume](https://metreeca.github.
-   io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD APIs…
+4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how to [publish](http://metreeca.github.io/base/tutorials/publishing-jsonld-apis) and [consume](https://metreeca.github.io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD APIs…
 
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
-  idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended idea
 
 # License
 
