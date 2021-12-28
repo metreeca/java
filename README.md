@@ -2,23 +2,37 @@
 
 # Metreeca/Base
 
-Metreeca/Base is a model-driven Java framework for rapid REST/JSON-LD backend development.
+Metreeca/Base is modular Java framework for rapid model-driven REST/JSON-LD server development.
 
-Its engine automatically converts high-level declarative JSON-LD models into extended REST APIs supporting CRUD
+Its engines automatically convert high-level declarative JSON-LD models into extended REST APIs supporting CRUD
 operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers from
 low-level chores and completely shielding frontend developers from linked data technicalities.
 
-Metreeca/Base is server and storage-agnostic and may be easily connected to your solution of choice.
+While providing a floor-to-ceiling development solution, its modules are loosely coupled and may be easily plugged as a
+specialized component into your framework of choice.
+
+# Modules
+
+|    area | javadocs                                                     | description                             |
+| ------: | :----------------------------------------------------------- | :-------------------------------------- |
+|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-json) | shape-based JSON modelling framework    |
+|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework  |
+|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities           |
+|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                |
+|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/metreeca-jse) | Java SE HTTP server connector          |
+|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/metreeca-jee) | Servlet 3.1 containers connector        |
+| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j) | RDF4J-based SPARQL repository connector |
 
 # Getting Started
 
 1. Add the framework to your Maven configuration
 
 ```xml
+
 <project>
 
-    <dependencyManagement>
-        <dependencies>
+	<dependencyManagement>
+		<dependencies>
 
             <dependency>
                 <groupId>com.metreeca</groupId>
@@ -86,24 +100,14 @@ Content-Length: 12
 Hello world!
 ```
 
-4. Delve into the the [docs](https://metreeca.github.io/link/) to learn how to [publish](http://metreeca.github.io/link/tutorials/publishing-jsonld-apis) and [consume](https://metreeca.github.io/link/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD APIs…
-
-# Modules
-
-|    area | javadocs                                                     | description                             |
-| ------: | :----------------------------------------------------------- | :-------------------------------------- |
-|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-json) | shape-based JSON modelling framework    |
-|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework  |
-|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities           |
-|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                |
-|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/metreeca-jse) | Jave SE  HTTP server connector          |
-|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/metreeca-jee) | Servlet 3.1 containers connector        |
-| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j) | RDF4J-based SPARQL repository connector |
+4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how to [publish](http://metreeca.github.
+   io/base/tutorials/publishing-jsonld-apis) and [consume](https://metreeca.github.
+   io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD APIs…
 
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [conversation](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
   idea
 
 # License
