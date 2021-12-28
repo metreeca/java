@@ -8,8 +8,7 @@ Its engines automatically convert high-level declarative JSON-LD models into ext
 operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers from
 low-level chores and completely shielding frontend developers from linked data technicalities.
 
-While providing a floor-to-ceiling development solution, its modules are loosely coupled and may be easily plugged as a
-specialized component into your framework of choice.
+While collectively providing a floor-to-ceiling JSON-LD server development solution, its modules are loosely coupled and may be easily plugged as a specialized component into your framework of choice.
 
 # Modules
 
