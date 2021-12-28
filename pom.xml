@@ -26,8 +26,8 @@
 	<version>0.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Metreeca REST/JSON Framework</name>
-	<description>A lightweight Java framework enabling rapid development of model-driven REST/JSON-LD APIs.</description>
+	<name>Metreeca REST/JSON-LD Framework</name>
+	<description>A modular Java framework for rapid model-driven REST/JSON-LD server development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
 
@@ -78,7 +78,7 @@
 
 		<site>
 			<id>github-pages</id>
-			<url>https://metreeca.github.io/link/reports</url>
+			<url>https://metreeca.github.io/base/</url>
 		</site>
 
 	</distributionManagement>
@@ -408,12 +408,6 @@
 
 					<!-- !!! replace with shared assets (see https://stackoverflow.com/questions/30507476#30668813) -->
 					<!--<stylesheetfile>${maven.multiModuleProjectDirectory}/docs/assets/javadocs.css</stylesheetfile>-->
-
-					<links>
-
-						<link>http://docs.rdf4j.org/javadoc/latest/</link>
-
-					</links>
 
 					<tags>
 						<tag>
