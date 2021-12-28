@@ -1,14 +1,25 @@
 ---
-title:      How To Alias Resources
+title:  "How To Alias Resources"
+parent: "How To…"
 ---
 
-Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints: the [Aliaser](../javadocs/com/metreeca/rest/wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting requests to canonical resources located by a custom alias resolver.
+<details open markdown="block">
+  <summary>Table of Contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
 
-The following samples present typical setups built on the same data used in the [tutorials](../tutorials/publishing-jsonld-apis.md) and a custom name-based product resolver.
+Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints:
+the [Aliaser](../javadocs/com/metreeca/rest/wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting
+requests to canonical resources located by a custom alias resolver.
+
+The following samples present typical setups built on the same data used in
+the [tutorials](../tutorials/publishing-jsonld-apis.md) and a custom name-based product resolver.
 
 ```java
-private Optional<String> byname(final RepositoryConnection connection, final String name) {
-    return stream(connection.getStatements(null, RDFS.LABEL, literal(name)))
+private Optional<String> byname(final RepositoryConnection connection,final String name){
+		return stream(connection.getStatements(null,RDFS.LABEL,literal(name)))
 		.map(Statement::getSubject)
 		.filter(resource->connection.hasStatement(resource,RDF.TYPE,Toys.Product,true))
 		.map(Value::stringValue)

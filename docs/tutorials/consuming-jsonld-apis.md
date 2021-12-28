@@ -1,8 +1,16 @@
 ---
-title:    Consuming Model‑Driven REST/JSON-LD APIs
+title:  "Consuming Model‑Driven REST/JSON-LD APIs"
+parent: "Tutorials"
 ---
 
 [comment]: <> (excerpt:  Hands-on guided tour of model-driven lREST/JSON-LD APIs features)
+
+<details open markdown="block">
+  <summary>Table of Contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
 
 
 This example-driven tutorial introduces the main client-facing features of the Metreeca/Base model-driven REST/JSON
@@ -64,7 +72,7 @@ Linked data REST APIs published by Metreeca/Base API engine support controlled r
 underlying graph storage layer.
 
 User authorization and user-specific content generation are performed according
-to [role‑based](../references/spec-language.md#parameters) rules integrated in the linked data model driving the API
+to [role‑based](../reference/spec-language.md#parameters) rules integrated in the linked data model driving the API
 publishing process.
 
 ## Resources
@@ -95,7 +103,7 @@ Content-Type: application/json;charset=UTF-8
 }
 ```
 
-Metreeca/Base produces and accepts an idiomatic [compacted/framed](../references/jsonld-format.md) JSON-LD format, which
+Metreeca/Base produces and accepts an idiomatic [compacted/framed](../reference/jsonld-format.md) JSON-LD format, which
 streamlines resource descriptions taking into account the constraints described in the associated linked data models.
 
 To include context information, specify the `application/ld+json` MIME type in the `Accept` HTTP request header.
@@ -198,7 +206,7 @@ Linked data REST APIs published by Metreeca/Base API engine support controlled w
 underlying graph storage layer.
 
 User authorization and user-specific content validation are performed according
-to [role‑based](../references/spec-language.md#parameters) rules integrated in the linked data model driving the API
+to [role‑based](../reference/spec-language.md#parameters) rules integrated in the linked data model driving the API
 publishing process.
 
 ## Creating Resources
@@ -351,7 +359,7 @@ effort.
 
 To retrieve a digest description of collection items matching a set of facet filters, perform a `GET` operation on the
 URL identifying the collection, appending a URL-encoded JSON query
-object [describing the filters](../references/faceted-search.md) to be applied.
+object [describing the filters](../reference/faceted-search.md) to be applied.
 
 ```json
 {
@@ -396,8 +404,8 @@ Note that collection descriptions are omitted from faceted search results.
 ## Sorting and Pagination
 
 Faceted search results may be sorted and paginated
-including [sorting criteria](../references/faceted-search.md#items-query)
-and [pagination limits](../references/faceted-search.md#items-query) in the JSON query object.
+including [sorting criteria](../reference/faceted-search.md#items-query)
+and [pagination limits](../reference/faceted-search.md#items-query) in the JSON query object.
 
 ```json
 {
@@ -412,8 +420,8 @@ and [pagination limits](../references/faceted-search.md#items-query) in the JSON
 ## Facet Stats and Options
 
 The faceted search engine supports also introspection queries for
-retrieving [facet stats](../references/faceted-search.md#stats-query)  and
-available [facet options](../references/faceted-search.md#items-query).
+retrieving [facet stats](../reference/faceted-search.md#stats-query)  and
+available [facet options](../reference/faceted-search.md#items-query).
 
 To retrieve datatype, count and range stats for a facet, taking into account applied filters, specify the target property
 path in the faceted search query object.

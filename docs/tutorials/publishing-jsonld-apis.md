@@ -1,9 +1,16 @@
 ---
-title:      Publishing Model‑Driven REST/JSON-LD APIs
+title:  "Publishing Model‑Driven REST/JSON-LD APIs"
+parent: "Tutorials"
 ---
 
 [comment]: <> (excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing)
 
+<details open markdown="block">
+  <summary>Table of Contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
 
 This example-driven tutorial introduces the main building blocks of the Metreeca/Base model-driven REST/JSON framework.
 Basic familiarity with [linked data](https://www.w3.org/standards/semanticweb/data) concepts
@@ -39,35 +46,35 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
-	<artifactId>sample</artifactId>
-	<version>1.0</version>
-	<packaging>war</packaging>
+  <groupId>com.example</groupId>
+  <artifactId>sample</artifactId>
+  <version>1.0</version>
+  <packaging>war</packaging>
 
-	<properties>
+  <properties>
 
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
 
-	</properties>
+  </properties>
 
-	<dependencyManagement>
+  <dependencyManagement>
 
-		<dependencies>
+    <dependencies>
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+      <dependency>
+        <groupId>com.metreeca</groupId>
+        <artifactId>metreeca-base</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-		</dependencies>
+    </dependencies>
 
-	</dependencyManagement>
+  </dependencyManagement>
 
 </project>
 ```
@@ -80,34 +87,34 @@ so we add:
 
 <dependencies>
 
-	<dependency>
-		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-jee</artifactId>
-	</dependency>
+  <dependency>
+    <groupId>com.metreeca</groupId>
+    <artifactId>metreeca-jee</artifactId>
+  </dependency>
 
-	<dependency>
-		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-rdf4j</artifactId>
-	</dependency>
-
-
-	<dependency>
-		<groupId>org.eclipse.rdf4j</groupId>
-		<artifactId>rdf4j-repository-sail</artifactId>
-	</dependency>
-
-	<dependency>
-		<groupId>org.eclipse.rdf4j</groupId>
-		<artifactId>rdf4j-sail-memory</artifactId>
-	</dependency>
+  <dependency>
+    <groupId>com.metreeca</groupId>
+    <artifactId>metreeca-rdf4j</artifactId>
+  </dependency>
 
 
-	<dependency>
-		<groupId>javax.servlet</groupId>
-		<artifactId>javax.servlet-api</artifactId>
-		<version>3.1.0</version>
-		<scope>provided</scope>
-	</dependency>
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-repository-sail</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-sail-memory</artifactId>
+  </dependency>
+
+
+  <dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+    <scope>provided</scope>
+  </dependency>
 
 </dependencies>
 ```
@@ -121,15 +128,15 @@ Finally, define a minimal server stub like:
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox.get(() ->
+  public Sample() {
+    delegate(toolbox -> toolbox.get(() ->
 
-				server().wrap(request -> request.reply(response ->
-						response.status(OK)
-				))
+        server().wrap(request -> request.reply(response ->
+            response.status(OK)
+        ))
 
-		));
-	}
+    ));
+  }
 
 }
 ```
@@ -157,31 +164,31 @@ to the `src/main/resources/` directory and extend the stub as follows:
 ```java
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-				.exec(() -> service(graph()).exec(connection -> {
-					try {
+        .exec(() -> service(graph()).exec(connection -> {
+          try {
 
-						connection.add(
-								Sample.class.getResourceAsStream("Toys.ttl"),
-								"https://example.com/", RDFFormat.TURTLE
-						);
+            connection.add(
+                Sample.class.getResourceAsStream("Toys.ttl"),
+                "https://example.com/", RDFFormat.TURTLE
+            );
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				}))
+          } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+          }
+        }))
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.wrap(request -> request.reply(status(OK)))
+            .wrap(request -> request.reply(status(OK)))
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -197,24 +204,24 @@ Complex initialization tasks can be easily factored to a dedicated class:
 ```java
 public final class Toys implements Runnable {
 
-	public static final String Base="https://example.com/";
-	public static final String Namespace=Base+"terms#";
+  public static final String Base="https://example.com/";
+  public static final String Namespace=Base+"terms#";
 
-	@Override
-	public void run() {
-		service(graph()).exec(connection -> {
-			if ( !connection.hasStatement(null, null, null, false) ) {
-				try {
+  @Override
+  public void run() {
+    service(graph()).exec(connection -> {
+      if ( !connection.hasStatement(null, null, null, false) ) {
+        try {
 
-					connection.setNamespace("demo", Namespace);
-					connection.add(getClass().getResourceAsStream("Toys.ttl"), Base, TURTLE);
+          connection.setNamespace("demo", Namespace);
+          connection.add(getClass().getResourceAsStream("Toys.ttl"), Base, TURTLE);
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			}
-		});
-	}
+        } catch ( final IOException e ) {
+          throw new UncheckedIOException(e);
+        }
+      }
+    });
+  }
 
 }
 ```
@@ -223,20 +230,20 @@ public final class Toys implements Runnable {
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-				.exec(new Toys())
+        .exec(new Toys())
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.wrap(request -> request.reply(status(OK)))
+            .wrap(request -> request.reply(status(OK)))
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -258,51 +265,51 @@ Requests are dispatched to their final handlers through a hierarchy of wrappers 
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-				.exec(new Toys())
+        .exec(new Toys())
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.with(preprocessor(request -> request.base(Toys.Base)))
+            .with(preprocessor(request -> request.base(Toys.Base)))
 
-						.wrap(router()
+            .wrap(router()
 
-								.path("/products/*", router()
+                .path("/products/*", router()
 
-										.path("/", router().get(request -> request.reply(response -> response
-												.status(OK)
-												.body(rdf(), service(graph()).exec(connection -> {
-													return stream(connection.getStatements(
-															null, RDF.TYPE, iri(Toys.Namespace, "Product")
-													))
-															.map(Statement::getSubject)
-															.map(p -> statement(
-																	iri(request.item()), LDP.CONTAINS, p)
-															)
-															.collect(toList());
-												}))))
-										)
+                    .path("/", router().get(request -> request.reply(response -> response
+                        .status(OK)
+                        .body(rdf(), service(graph()).exec(connection -> {
+                          return stream(connection.getStatements(
+                              null, RDF.TYPE, iri(Toys.Namespace, "Product")
+                          ))
+                              .map(Statement::getSubject)
+                              .map(p -> statement(
+                                  iri(request.item()), LDP.CONTAINS, p)
+                              )
+                              .collect(toList());
+                        }))))
+                    )
 
-										.path("/{code}", router().get(request -> request.reply(response -> response
-												.status(OK)
-												.body(rdf(), service(graph()).exec(connection -> {
-													return asList(connection.getStatements(
-															iri(request.item()), null, null
-													));
-												}))))
-										)
+                    .path("/{code}", router().get(request -> request.reply(response -> response
+                        .status(OK)
+                        .body(rdf(), service(graph()).exec(connection -> {
+                          return asList(connection.getStatements(
+                              iri(request.item()), null, null
+                          ));
+                        }))))
+                    )
 
-								)
+                )
 
-						)
+            )
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -358,26 +365,26 @@ Again, complex handlers can be easily factored to dedicated classes:
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-				.exec(new Toys())
+        .exec(new Toys())
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.with(preprocessor(request -> request.base(Toys.Base)))
+            .with(preprocessor(request -> request.base(Toys.Base)))
 
-						.wrap(router()
+            .wrap(router()
 
-								.path("/products/*", new Products())
+                .path("/products/*", new Products())
 
-						)
+            )
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -385,40 +392,40 @@ public final class Sample extends JEEServer {
 ```java
 public final class Products extends Delegator {
 
-	public static final IRI Product=iri(Toys.Namespace, "Product");
+  public static final IRI Product=iri(Toys.Namespace, "Product");
 
-	public Products() {
-		delegate(router()
+  public Products() {
+    delegate(router()
 
-				.path("/", router()
-						.get(request -> request.reply(response -> response
-								.status(OK)
-								.body(rdf(), service(graph()).exec(connection -> {
-									return stream(connection.getStatements(
-											null, RDF.TYPE, Product
-									))
-											.map(Statement::getSubject)
-											.map(product -> statement(
-													iri(request.item()), LDP.CONTAINS, product
-											))
-											.collect(toList());
-								}))
-						))
-				)
+        .path("/", router()
+            .get(request -> request.reply(response -> response
+                .status(OK)
+                .body(rdf(), service(graph()).exec(connection -> {
+                  return stream(connection.getStatements(
+                      null, RDF.TYPE, Product
+                  ))
+                      .map(Statement::getSubject)
+                      .map(product -> statement(
+                          iri(request.item()), LDP.CONTAINS, product
+                      ))
+                      .collect(toList());
+                }))
+            ))
+        )
 
-				.path("/{code}", router()
-						.get(request -> request.reply(response -> response
-								.status(OK)
-								.body(rdf(), service(graph()).exec(connection -> {
-									return asList(connection.getStatements(
-											iri(request.item()), null, null
-									));
-								}))
-						))
-				)
+        .path("/{code}", router()
+            .get(request -> request.reply(response -> response
+                .status(OK)
+                .body(rdf(), service(graph()).exec(connection -> {
+                  return asList(connection.getStatements(
+                      iri(request.item()), null, null
+                  ));
+                }))
+            ))
+        )
 
-		);
-	}
+    );
+  }
 
 }
 ```
@@ -447,27 +454,27 @@ request [focus item](../javadocs/?com/metreeca/rest/Request.html#item--).
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-+				.set(engine(), GraphEngine::new)
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
++        .set(engine(), GraphEngine::new)
 
-				.exec(new Toys())
+        .exec(new Toys())
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.with(preprocessor(request -> request.base(Toys.Base)))
+            .with(preprocessor(request -> request.base(Toys.Base)))
 
-						.wrap(router()
+            .wrap(router()
 
-								.path("/products/*", new Products())
+                .path("/products/*", new Products())
 
-						)
+            )
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -487,28 +494,28 @@ items exposing only `rdf:type`, `rdfs:label`  and `rdfs:comment` properties.
 ```java
 public final class Products extends Delegator {
 
-	public Products() {
-		delegate(driver(
+  public Products() {
+    delegate(driver(
 
-				field(RDF.TYPE),
-				field(RDFS.LABEL),
-				field(RDFS.COMMENT)
+        field(RDF.TYPE),
+        field(RDFS.LABEL),
+        field(RDFS.COMMENT)
 
-		).wrap(router()
+    ).wrap(router()
 
-				.path("/", router()
-						.get(relator())
-						.post(creator())
-				)
+        .path("/", router()
+            .get(relator())
+            .post(creator())
+        )
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+        .path("/*", router()
+            .get(relator())
+            .put(updater())
+            .delete(deleter())
+        )
 
-		));
-	}
+    ));
+  }
 
 }
 ```
@@ -516,8 +523,8 @@ public final class Products extends Delegator {
 The [Driver](../javadocs/index.html?com/metreeca/rest/wrappers/Driver.html) wrapper associated a linked data model to
 incoming requests, driving the operations of nested actors and other model-aware handlers.
 
-Linked data models are defined with a shape-based [specification language](../references/spec-language.md), assembling
-shape [building blocks](../references/spec-language.md#shapes) using a simple Java DSL.
+Linked data models are defined with a shape-based [specification language](../reference/spec-language.md), assembling
+shape [building blocks](../reference/spec-language.md#shapes) using a simple Java DSL.
 
 As soon as the server is redeployed, the updated REST API exposes only the data specified in the driving model.
 
@@ -546,47 +553,47 @@ We'll now refine the initial barebone model, exposing more properties and detail
 ```java
 public final class Toys implements Runnable {
 
-	public static final String Base="https://example.com/";
-	public static final String Namespace=Base+"terms#";
+  public static final String Base="https://example.com/";
+  public static final String Namespace=Base+"terms#";
 
-	public static final IRI staff=toys("staff");
+  public static final IRI staff=toys("staff");
 
-	public static final IRI Order=toys("Order");
-	public static final IRI Product=toys("Product");
-	public static final IRI ProductLine=toys("ProductLine");
+  public static final IRI Order=toys("Order");
+  public static final IRI Product=toys("Product");
+  public static final IRI ProductLine=toys("ProductLine");
 
-	public static final IRI amount=toys("amount");
-	public static final IRI buy=toys("buy");
-	public static final IRI code=toys("code");
-	public static final IRI customer=toys("customer");
-	public static final IRI line=toys("line");
-	public static final IRI product=toys("product");
-	public static final IRI order=toys("order");
-	public static final IRI scale=toys("scale");
-	public static final IRI sell=toys("sell");
-	public static final IRI size=toys("size");
-	public static final IRI status=toys("status");
-	public static final IRI stock=toys("stock");
-	public static final IRI vendor=toys("vendor");
-
-
-	private static IRI toys(final String name) {
-		return iri(Namespace, name);
-	}
+  public static final IRI amount=toys("amount");
+  public static final IRI buy=toys("buy");
+  public static final IRI code=toys("code");
+  public static final IRI customer=toys("customer");
+  public static final IRI line=toys("line");
+  public static final IRI product=toys("product");
+  public static final IRI order=toys("order");
+  public static final IRI scale=toys("scale");
+  public static final IRI sell=toys("sell");
+  public static final IRI size=toys("size");
+  public static final IRI status=toys("status");
+  public static final IRI stock=toys("stock");
+  public static final IRI vendor=toys("vendor");
 
 
-	@Override
-	public void run() {
-		service(graph()).exec(connection -> {
-			try {
+  private static IRI toys(final String name) {
+    return iri(Namespace, name);
+  }
 
-				connection.add(Toys.class.getResourceAsStream("Toys.ttl"), Base, RDFFormat.TURTLE);
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		});
-	}
+  @Override
+  public void run() {
+    service(graph()).exec(connection -> {
+      try {
+
+        connection.add(Toys.class.getResourceAsStream("Toys.ttl"), Base, RDFFormat.TURTLE);
+
+      } catch ( final IOException e ) {
+        throw new UncheckedIOException(e);
+      }
+    });
+  }
 
 }
 ```
@@ -594,66 +601,66 @@ public final class Toys implements Runnable {
 ```java
 public final class Products extends Delegator {
 
-	public Products() {
-		delegate(driver(or(relate(), role(Toys.staff)).then(
+  public Products() {
+    delegate(driver(or(relate(), role(Toys.staff)).then(
 
-				filter(clazz(Toys.Product)),
+        filter(clazz(Toys.Product)),
 
-				field(RDF.TYPE, exactly(Toys.Product)),
+        field(RDF.TYPE, exactly(Toys.Product)),
 
-				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-			field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+        field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+      field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-			server(field(Toys.code, required())),
+      server(field(Toys.code, required())),
 
-			field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+      field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-					relate(field(RDFS.LABEL, required()))
+          relate(field(RDFS.LABEL, required()))
 
-			),
+      ),
 
-			field(Toys.scale, required(),
-					datatype(XSD.STRING),
-					pattern("1:[1-9][0-9]{1,2}")
-			),
+      field(Toys.scale, required(),
+          datatype(XSD.STRING),
+          pattern("1:[1-9][0-9]{1,2}")
+      ),
 
-			field(Toys.vendor, required(),
-					datatype(XSD.STRING),
-					maxLength(50)
-			),
+      field(Toys.vendor, required(),
+          datatype(XSD.STRING),
+          maxLength(50)
+      ),
 
-			field("price", Toys.sell, required(),
-					datatype(XSD.DECIMAL),
-					minExclusive(literal(0.0)),
-					maxExclusive(literal(1_000.0))
-			),
+      field("price", Toys.sell, required(),
+          datatype(XSD.DECIMAL),
+          minExclusive(literal(0.0)),
+          maxExclusive(literal(1_000.0))
+      ),
 
-			role(Toys.staff).then(field(Toys.buy, required(),
-					datatype(XSD.DECIMAL),
-					minInclusive(literal(0.0)),
-					maxInclusive(literal(1_000.0))
-			)),
+      role(Toys.staff).then(field(Toys.buy, required(),
+          datatype(XSD.DECIMAL),
+          minInclusive(literal(0.0)),
+          maxInclusive(literal(1_000.0))
+      )),
 
-			server().then(field(Toys.stock, required(),
-					datatype(XSD.INTEGER),
-					minInclusive(literal(0)),
-					maxExclusive(literal(10_000))
-			))
+      server().then(field(Toys.stock, required(),
+          datatype(XSD.INTEGER),
+          minInclusive(literal(0)),
+          maxExclusive(literal(10_000))
+      ))
 
-	)).wrap(router()
+  )).wrap(router()
 
-			.path("/", router()
-					.get(relator())
-					.post(creator())
-			)
+      .path("/", router()
+          .get(relator())
+          .post(creator())
+      )
 
-			.path("/*", router()
-					.get(relator())
-					.put(updater())
-					.delete(deleter())
-			)
+      .path("/*", router()
+          .get(relator())
+          .put(updater())
+          .delete(deleter())
+      )
 
-	));
+  ));
   }
 
 }
@@ -700,7 +707,7 @@ where a property is known to occur at most once and so on.
 ## Parameterizing Models
 
 The`filter()` and `server()` guards in the extended model also introduce the concept
-of [parametric](../references/spec-language.md#parameters) model.
+of [parametric](../reference/spec-language.md#parameters) model.
 
 The `filter` guard states that nested constraints ae to be used only selecting existing resources to be exposed as
 container members and not for extracting outgoing data and validating incoming data.
@@ -711,7 +718,7 @@ incoming data and not for selecting existing resources to be exposed as containe
 The `server` guard states that guarded properties are server-managed and will be considered only when retrieving or
 deleting resources, but won't be accepted as valid content on resource creation and updating.
 
-In the most general form, models may be parameterized on for different [axes](../references/spec-language.md#parameters).
+In the most general form, models may be parameterized on for different [axes](../reference/spec-language.md#parameters).
 Constraints specified outside parametric sections are unconditionally enabled.
 
 ## Controlling Access
@@ -730,10 +737,10 @@ views.
 
 ```java
 role(Toys.staff).then(field(Toys.buy,required(),
-		datatype(XSD.DECIMAL),
-		minInclusive(literal(0.0)),
-		maxInclusive(literal(1_000.0))
-		))
+    datatype(XSD.DECIMAL),
+    minInclusive(literal(0.0)),
+    maxInclusive(literal(1_000.0))
+    ))
 ```
 
 This `role` guard states that the `toys:buy` price will be visible only if the request is performed by a user in
@@ -745,29 +752,29 @@ User roles are usually granted to requests by authentication/authorization wrapp
 @WebFilter(urlPatterns="/*")
 public final class Sample extends JEEServer {
 
-	public Sample() {
-		delegate(toolbox -> toolbox
+  public Sample() {
+    delegate(toolbox -> toolbox
 
-				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-				.set(engine(), GraphEngine::new)
+        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+        .set(engine(), GraphEngine::new)
 
-				.exec(new Toys())
+        .exec(new Toys())
 
-				.get(() -> server()
+        .get(() -> server()
 
-						.with(preprocessor(request -> request.base(Toys.Base)))
+            .with(preprocessor(request -> request.base(Toys.Base)))
 
-+						.with(bearer("secret", Toys.staff))
++            .with(bearer("secret", Toys.staff))
 
-						.wrap(router()
+            .wrap(router()
 
-								.path("/products/*", new Products())
+                .path("/products/*", new Products())
 
-						)
+            )
 
-				)
-		);
-	}
+        )
+    );
+  }
 
 }
 ```
@@ -827,29 +834,29 @@ to the `src/main/resources/` directory and extend `Products` as follows:
 ```diff
 public final class Products extends Delegator {
 
-	public Products() {
-		delegate(driver(or(relate(), role(Toys.staff)).then(
-				
-				// …
-				
-		)).wrap(router()
+  public Products() {
+    delegate(driver(or(relate(), role(Toys.staff)).then(
+        
+        // …
+        
+    )).wrap(router()
 
-				.path("/", router()
-						.get(relator())
-+						.post(creator()
-+								.slug(new ProductsSlug())
-+								.with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
-+						)
-				)
+        .path("/", router()
+            .get(relator())
++            .post(creator()
++                .slug(new ProductsSlug())
++                .with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
++            )
+        )
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+        .path("/*", router()
+            .get(relator())
+            .put(updater())
+            .delete(deleter())
+        )
 
-		));
-	}
+    ));
+  }
 
 }
 ```
