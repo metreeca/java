@@ -1,5 +1,5 @@
 ---
-title:      "Shape Specification Language Reference"
+title:  "Shape Specification Language Reference"
 parent: "Reference"
 ---
 
