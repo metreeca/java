@@ -1,8 +1,16 @@
 ---
-title:      REST Faceted Search Reference
+title:      "REST Faceted Search Reference"
+parent: "Reference"
 ---
 
 [comment]: <> (excerpt:    REST faceted search queries and serialization)
+
+<details open markdown="block">
+  <summary>Table of Contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
 
 
 REST/JSON-LD APIs published with the Metreeca/Base framework support engine-managed faceted search capabilities, driven

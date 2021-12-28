@@ -25,9 +25,7 @@
             <element id="module-output" name="metreeca-json" />
           </element>
           <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.1.4" />
-          <element id="archive" name="metreeca-rdf4j-0.0.0-SNAPSHOT.jar">
-            <element id="module-output" name="metreeca-rdf4j" />
-          </element>
+          <element id="library" level="project" name="Maven: com.metreeca:metreeca-rdf4j:0.0.0-SNAPSHOT" />
           <element id="archive" name="metreeca-rdf-0.0.0-SNAPSHOT.jar">
             <element id="module-output" name="metreeca-rdf" />
           </element>

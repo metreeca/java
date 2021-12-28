@@ -1,8 +1,16 @@
 ---
-title:      Shape Specification Language Reference
+title:      "Shape Specification Language Reference"
+parent: "Reference"
 ---
 
 [comment]: <> (excerpt:    Shape-based data modelling language semantics and components)
+
+<details open markdown="block">
+  <summary>Table of Contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
 
 
 Most framework services are driven by declarative linked data models defined using a [shape](#shapes)-based specification
