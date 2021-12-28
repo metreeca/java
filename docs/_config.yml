@@ -2,10 +2,10 @@ repository: metreeca/base # local testing (https://help.github.com/articles/repo
 
 exclude: [ Gemfile, Gemfile.lock ]
 
-title: "Metreeca/Base v1.0.1"
+title: "Metreeca/Base"
 
 remote_theme: pmarsceill/just-the-docs
 
 aux_links:
-  "Releases":
-    - "https://github.com/metreeca/base/releases"
+  "v1.0.1":
+    - "https://github.com/metreeca/base/"
