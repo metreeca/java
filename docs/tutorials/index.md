@@ -1,3 +1,5 @@
 ---
-title: Tutorials nav_order: 2 has_children: true
+title: "Tutorials"
+has_children: "true"
+nav_order: 2
 ---

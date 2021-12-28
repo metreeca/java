@@ -1,5 +1,5 @@
 ---
-title:    "JSON-LD Serialization Reference"
+title:  "JSON-LD Serialization Reference"
 parent: "Reference"
 ---
 

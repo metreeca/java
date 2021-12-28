@@ -1,5 +1,6 @@
 ---
-title: Overview nav_order: 1
+title: "Overview"
+nav_order: 1
 ---
 
 Metreeca/Base is modular Java framework for rapid model-driven REST/JSON-LD server development.

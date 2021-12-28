@@ -1,5 +1,5 @@
 ---
-title:      "REST Faceted Search Reference"
+title:  "REST Faceted Search Reference"
 parent: "Reference"
 ---
 
