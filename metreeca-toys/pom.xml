@@ -24,11 +24,11 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-base</artifactId>
-		<version>0.55.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<artifactId>metreeca-toys</artifactId>
-	<version>0.55.0</version>
+	<version>1.0.1</version>
 	<packaging>war</packaging>
 
 	<name>Metreeca/Base Sample</name>
