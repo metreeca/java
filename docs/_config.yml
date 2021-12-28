@@ -1,0 +1,11 @@
+repository: metreeca/base # local testing (https://help.github.com/articles/repository-metadata-on-github-pages/)
+
+exclude: [ Gemfile, Gemfile.lock ]
+
+title: "Metreeca/Base"
+
+remote_theme: pmarsceill/just-the-docs
+
+aux_links:
+  "Releases":
+    - "https://github.com/metreeca/base/releases"
