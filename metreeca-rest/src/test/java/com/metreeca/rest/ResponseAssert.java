@@ -16,14 +16,13 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.rest.formats.TextFormat;
-
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
+import static com.metreeca.rest.formats.TextFormat.text;
 
 import static java.util.function.Function.identity;
 
@@ -63,7 +62,7 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 
 			builder.append('\n');
 
-			final String text=response.body(TextFormat.text()).fold(e -> "", identity());
+			final String text=response.body(text()).fold(e -> "", identity());
 
 			if ( !text.isEmpty() ) {
 

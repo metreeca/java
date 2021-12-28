@@ -17,7 +17,7 @@
 package com.metreeca.jee;
 
 import com.metreeca.rest.*;
-import com.metreeca.rest.assets.Loader;
+import com.metreeca.rest.services.Loader;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -30,12 +30,13 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.metreeca.rest.assets.Logger.logger;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
+import static com.metreeca.rest.services.Logger.logger;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
@@ -48,10 +49,10 @@ import static java.util.function.Function.identity;
  *
  * <ul>
  *
- * <li>initializes and cleans the {@linkplain Context context} managing shared assets required by resource handlers;
+ * <li>initializes and cleans the {@linkplain Toolbox toolbox} managing shared services required by resource handlers;
  * </li>
  *
- * <li>intercepts HTTP requests and handles them using a  {@linkplain Handler handler} loaded from the context;</li>
+ * <li>intercepts HTTP requests and handles them using a {@linkplain Handler handler} loaded from the toolbox;</li>
  *
  * <li>forwards HTTP requests to the enclosing web application if no response is committed by REST handlers.</li>
  *
@@ -59,29 +60,34 @@ import static java.util.function.Function.identity;
  */
 public abstract class JEEServer implements Filter {
 
-	private final Context context=new Context();
+	private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
 
-	private final Supplier<Handler> handler() { return () -> request -> request.reply(identity()); }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private final Toolbox toolbox=new Toolbox();
 
 
 	/**
-	 * Configures the delegate handler.
+	 * Configures the delegate handler factory.
 	 *
-	 * @param factory a handler factory; takes as argument a shared asset context (which may configured with additional
-	 *                application-specific assets as a side effect) and must return a non-null handler to be used as
-	 *                entry point for serving requests
+	 * @param factory the delegate handler factory; takes as argument a shared service manager (which may configured
+	 *                   with
+	 *                additional application-specific services as a side effect) and must return a non-null handler
+	 *                to be
+	 *                used as entry point for serving requests
 	 *
 	 * @return this server
 	 *
-	 * @throws NullPointerException if {@code factory} is null or returns null values
+	 * @throws NullPointerException if {@code factory} is null or returns a null value
 	 */
-	protected JEEServer delegate(final Function<Context, Handler> factory) {
+	protected JEEServer delegate(final Function<Toolbox, Handler> factory) {
 
 		if ( factory == null ) {
 			throw new NullPointerException("null factory");
 		}
 
-		context.set(handler(), () -> requireNonNull(factory.apply(context), "null handler"));
+		toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
 
 		return this;
 	}
@@ -95,12 +101,12 @@ public abstract class JEEServer implements Filter {
 
 		try {
 
-			this.context
+			toolbox
 
-					.set(Context.storage(), () -> storage(context))
+					.set(Toolbox.storage(), () -> storage(context))
 					.set(Loader.loader(), () -> loader(context))
 
-					.get(handler()); // force handler loading during filter initialization
+					.get(delegate()); // force handler loading during filter initialization
 
 		} catch ( final Throwable t ) {
 
@@ -108,7 +114,7 @@ public abstract class JEEServer implements Filter {
 
 				t.printStackTrace(new PrintWriter(message));
 
-				this.context.get(logger()).error(this, "error during initialization: "+message);
+				toolbox.get(logger()).error(this, "error during initialization: "+message);
 
 				context.log("error during initialization", t);
 
@@ -120,7 +126,7 @@ public abstract class JEEServer implements Filter {
 
 			} finally {
 
-				this.context.clear();
+				this.toolbox.clear();
 
 			}
 
@@ -129,7 +135,7 @@ public abstract class JEEServer implements Filter {
 
 	@Override public void destroy() {
 
-		context.clear();
+		toolbox.clear();
 
 	}
 
@@ -167,7 +173,7 @@ public abstract class JEEServer implements Filter {
 
 		try {
 
-			context.exec(() -> context.get(handler())
+			toolbox.exec(() -> toolbox.get(delegate())
 					.handle(request((HttpServletRequest)request))
 					.accept(_response -> response((HttpServletResponse)response, _response))
 			);
@@ -179,7 +185,7 @@ public abstract class JEEServer implements Filter {
 		} catch ( final RuntimeException e ) {
 
 			if ( !e.toString().toLowerCase(Locale.ROOT).contains("broken pipe") ) {
-				context.get(logger()).error(this, "unhandled exception", e);
+				toolbox.get(logger()).error(this, "unhandled exception", e);
 			}
 
 		}
@@ -201,7 +207,13 @@ public abstract class JEEServer implements Filter {
 				.query(query != null ? query : "");
 
 		for (final Map.Entry<String, String[]> parameter : http.getParameterMap().entrySet()) {
-			request.parameters(parameter.getKey(), asList(parameter.getValue()));
+
+			final String key=parameter.getKey();
+			final String[] value=parameter.getValue();
+
+			if ( nonNull(key) && nonNull(value) ) { // ;( possibly null header names…
+				request.parameters(key, asList(value));
+			}
 		}
 
 		for (final String name : list(http.getHeaderNames())) {

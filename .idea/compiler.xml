@@ -19,6 +19,7 @@
       <module name="Base" target="1.8" />
       <module name="mark-maven-plugin" target="1.8" />
       <module name="metreeca-back" target="1.8" />
+      <module name="metreeca-base" target="1.8" />
       <module name="metreeca-core" target="1.8" />
       <module name="metreeca-feed" target="1.8" />
       <module name="metreeca-gate" target="1.8" />

@@ -16,13 +16,11 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.Query;
-import com.metreeca.json.Shape;
+import com.metreeca.json.*;
 import com.metreeca.json.shapes.Or;
 import com.metreeca.rest.*;
 
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.*;
 
 import java.io.*;
 import java.util.*;
@@ -30,18 +28,17 @@ import java.util.function.Supplier;
 
 import javax.json.*;
 
+import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Trace.trace;
 import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.lang;
-import static com.metreeca.rest.Context.asset;
 import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
-import static com.metreeca.rest.assets.Logger.logger;
+import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.JSONLDScanner.scan;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.lang.String.format;
@@ -53,7 +50,7 @@ import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
 /**
  * Model-driven JSON-LD message format.
  */
-public final class JSONLDFormat extends Format<Collection<Statement>> {
+public final class JSONLDFormat extends Format<Frame> {
 
 	/**
 	 * The default MIME type for JSON-LD messages ({@value}).
@@ -72,19 +69,19 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 
 
 	/**
-	 * Retrieves the default JSON-LD shape asset factory.
+	 * Retrieves the default JSON-LD shape service factory.
 	 *
-	 * @return the default shape factory, which returns an {@linkplain Or#or() empty disjunction}, that is a shape
-	 * the always fails to validate
+	 * @return the default shape factory, which returns an {@linkplain Or#or() empty disjunction}, that is a shape the
+	 * always fails to validate
 	 */
 	public static Supplier<Shape> shape() {
 		return Or::or;
 	}
 
 	/**
-	 * Retrieves the default JSON-LD keywords asset factory.
+	 * Retrieves the default JSON-LD keywords service factory.
 	 *
-	 * <p>The keywords asset maps JSON-LD {@code @keywords} to user-defined aliases.</p>
+	 * <p>The keywords service maps JSON-LD {@code @keywords} to user-defined aliases.</p>
 	 *
 	 * @return the default keywords factory, which returns an empty map
 	 */
@@ -125,7 +122,7 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 
 		try {
 
-			return Right(new JSONLDParser(focus, shape, asset(keywords())).parse(query));
+			return Right(new JSONLDParser(focus, shape, service(keywords())).parse(query));
 
 		} catch ( final JsonException e ) {
 
@@ -139,22 +136,63 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 	}
 
 
+	/**
+	 * Validate a JSON-LD model against a shape.
+	 *
+	 * @param focus the target IRI for the validation process
+	 * @param shape the target shape for the validation process
+	 * @param model the JSON-LD model to be validated
+	 *
+	 * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
+	 * from the target {@code focus} according to {@code shape}
+	 *
+	 * @throws NullPointerException if any parameter is null
+	 */
+	public static Either<Trace, Collection<Statement>> validate(
+			final Value focus, final Shape shape, final Collection<Statement> model
+	) {
+
+		if ( shape == null ) {
+			throw new NullPointerException("null shape");
+		}
+
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
+		}
+
+		if ( model == null ) {
+			throw new NullPointerException("null model");
+		}
+
+		return JSONLDScanner.scan(focus, shape, model);
+	}
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private JSONLDFormat() {}
+	private JSONLDFormat() { }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for JSON-LD messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the JSON-LD {@code message} body from the input stream supplied by the {@code message}
-	 * {@link InputFormat} body, if one is available and the {@code message} {@code Content-Type} header is either
-	 * missing or  matched by {@link JSONFormat#MIMEPattern}
+	 * {@link InputFormat}
+	 * body, if one is available and the {@code message} {@code Content-Type} header is either missing or matched by
+	 * {@link JSONFormat#MIMEPattern}
 	 *
 	 * <p><strong>Warning</strong> / Decoding is completely driven by the {@code message}
 	 * {@linkplain JSONLDFormat#shape() shape attribute}: embedded {@code @context} objects are ignored.</p>
 	 */
-	@Override public Either<MessageException, Collection<Statement>> decode(final Message<?> message) {
+	@Override public Either<MessageException, Frame> decode(final Message<?> message) {
 		return message
 
 				.header("Content-Type")
@@ -170,8 +208,8 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 					) {
 
 						final IRI focus=iri(message.item());
-						final Shape shape=message.attribute(shape());
-						final Map<String, String> keywords=asset(keywords());
+						final Shape shape=message.get(shape());
+						final Map<String, String> keywords=service(keywords());
 
 						final Collection<Statement> model=new JSONLDDecoder(
 
@@ -181,13 +219,12 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 
 						).decode(jsonReader.readObject());
 
-						return scan(shape, focus, model).fold(
+						return validate(focus, shape, model).fold(
+
 								trace -> Left(status(UnprocessableEntity, trace.toJSON())),
-								value -> value.size() == model.size() ? Right(value) : Left(status(UnprocessableEntity,
-										trace(value.stream().filter(s -> !model.contains(s))
-												.map(s -> format("statement <%s> is out of shape envelop", format(s)))
-										).toJSON()
-								))
+
+								value -> Right(frame(focus, model)) // use model to include inferred statements
+
 						);
 
 					} catch ( final JsonException e ) {
@@ -215,8 +252,8 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 
 	/**
 	 * Configures {@code message} {@code Content-Type} header to {@value JSONFormat#MIME}, unless already defined, and
-	 * encodes the JSON-LD model {@code value} into the output stream accepted by the {@code message}
-	 * {@link OutputFormat} body.
+	 * encodes the JSON-LD model {@code value} into the output stream accepted by the {@code message} {@link
+	 * OutputFormat} body.
 	 *
 	 * <p>If the originating {@code message} {@linkplain Message#request() request} includes an {@code Accept-Language}
 	 * header, a suitably {@linkplain Shape#localize localized} version of the message shape is used in the conversion
@@ -225,7 +262,21 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 	 * <p><strong>Warning</strong> / {@code @context} objects generated from the {@code message}
 	 * {@linkplain JSONLDFormat#shape() shape attribute} are embedded only if {@code Content-Type} is {@value MIME}.</p>
 	 */
-	@Override public <M extends Message<M>> M encode(final M message, final Collection<Statement> value) {
+	@Override public <M extends Message<M>> M encode(final M message, final Frame value) {
+
+		final String item=message.item();
+		final Value focus=value.focus();
+
+		if ( !focus.isIRI() || !focus.stringValue().equals(item) ) {
+			throw new IllegalArgumentException(format(
+					"message item <%s> and frame focus %s don't match", item, format(focus)
+			));
+		}
+
+		final Shape shape=message.get(shape());
+		final List<String> langs=message.request().langs();
+
+		final boolean global=langs.isEmpty() || langs.contains("*");
 
 		final String mime=message
 
@@ -243,52 +294,51 @@ public final class JSONLDFormat extends Format<Collection<Statement>> {
 
 				);
 
-		final List<String> langs=message.request().langs();
+
+		final Collection<Statement> localized=value.model().filter(statement -> {
+
+			if ( global ) { return true; } else { // retain only tagged literals with an accepted language
+
+				final String lang=lang(statement.getObject());
+
+				return lang.isEmpty() || langs.contains(lang);
+
+			}
+
+		}).collect(toList());
+
+		final Collection<Statement> validated=validate(value.focus(), shape, localized).fold(trace -> {
+
+			throw status(InternalServerError, trace(trace("invalid JSON-LD payload"), trace).toJSON());
+
+		});
 
 		return message
 
 				.header("~Content-Type", mime)
 
 				.body(output(), output -> {
+
 					try (
 							final Writer writer=new OutputStreamWriter(output, message.charset());
 							final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
 					) {
 
-						final IRI focus=iri(message.item());
-						final Shape shape=message.attribute(shape());
-						final Map<String, String> keywords=asset(keywords());
-
-						final Collection<Statement> model=scan(shape, focus, value).fold(trace -> {
-
-							asset(logger()).error(this, format("invalid JSON-LD payload %s", trace.toJSON()));
-
-							throw new RuntimeException("invalid JSON-LD payload");
-
-						});
-
 						jsonWriter.writeObject(new JSONLDEncoder(
 
-								focus,
+								iri(item),
 								shape.localize(langs),
-								keywords,
-								mime.equals(MIME) // include context objects for application/ld+json?
+								service(keywords()),
+								mime.equals(MIME) // include context objects for application/ld+json
 
-						).encode(langs.isEmpty() || langs.contains("*") ? model : model.stream().filter(statement -> {
-
-							// retain only tagged literals with an accepted language
-
-							final String lang=lang(statement.getObject());
-
-							return lang == null || langs.contains(lang);
-
-						}).collect(toList())));
+						).encode(validated));
 
 					} catch ( final IOException e ) {
 
 						throw new UncheckedIOException(e);
 
 					}
+
 				});
 	}
 

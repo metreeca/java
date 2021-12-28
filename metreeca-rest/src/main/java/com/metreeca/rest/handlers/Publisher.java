@@ -22,16 +22,17 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.*;
 import java.nio.file.*;
+import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Context.asset;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
+import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.handlers.Router.router;
 
@@ -97,6 +98,42 @@ public final class Publisher extends Delegator {
 	/**
 	 * Creates a static content publisher.
 	 *
+	 * @param root the absolute root path of the resource package to be published
+	 *
+	 * @return a new static content publisher for the content retrieved by the {@code Publisher} class loader from
+	 * system
+	 * resources under the {@code root} package
+	 *
+	 * @throws NullPointerException     if {@code root} is null
+	 * @throws IllegalArgumentException if {@code root} doesn't include a leading slash
+	 * @throws MissingResourceException if {@code root} is not available
+	 */
+	public static Publisher publisher(final String root) {
+
+		if ( root == null ) {
+			throw new NullPointerException("null root");
+		}
+
+		if ( !root.startsWith("/") ) {
+			throw new IllegalArgumentException(format("relative root path <%s>", root));
+		}
+
+		final URL url=Publisher.class.getResource(root); // ;(gae) ClassLoader always returns null
+
+		if ( url == null ) {
+			throw new MissingResourceException(
+					format("unknown resource <%s>", root),
+					Publisher.class.getName(),
+					root
+			);
+		}
+
+		return publisher(url);
+	}
+
+	/**
+	 * Creates a static content publisher.
+	 *
 	 * <p><strong>Warning</strong> / Only {@code file:} and {@code jar:} URLs are currently supported.</p>
 	 *
 	 * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)})
@@ -118,7 +155,7 @@ public final class Publisher extends Delegator {
 
 			try {
 
-				return new Publisher(Paths.get(root.toURI()));
+				return publisher(Paths.get(root.toURI()));
 
 			} catch ( final URISyntaxException e ) {
 
@@ -134,14 +171,14 @@ public final class Publisher extends Delegator {
 			final String jar=path.substring(0, separator);
 			final String entry=path.substring(separator+1);
 
-			// load the filesystem from the asset manager to have it automatically closed
+			// load the filesystem from the service toolbox to have it automatically closed
 			// !!! won't handle multiple publishers from the same filesystem
 
-			final FileSystem filesystem=asset(supplier(() ->
+			final FileSystem filesystem=service(supplier(() ->
 					FileSystems.newFileSystem(URI.create(jar), emptyMap())
 			));
 
-			return new Publisher(filesystem.getPath(entry));
+			return publisher(filesystem.getPath(entry));
 
 		} else {
 
@@ -210,17 +247,19 @@ public final class Publisher extends Delegator {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Future<Response> handle(final Request request, final Path root) {
-		return reply(request, root, request.path())
+		return reply(request, root, request.path()).orElseGet(() ->
+				reply(request, root).orElseGet(() ->
+						request.reply(status(NotFound))
+				)
+		);
+	}
 
-				.orElseGet(() -> Optional.of(fallback)
-
-						.filter(path -> !path.isEmpty() && request.route())
-
-						.flatMap(path -> reply(request, root, path))
-
-						.orElseGet(() -> request.reply(status(NotFound)))
-
-				);
+	private Optional<Future<Response>> reply(final Request request, final Path root) {
+		return fallback.isEmpty() || !request.route() ? Optional.empty() : Optional.of(
+				reply(request, root, fallback).orElseGet(() -> // missing expected fallback: redirect to dev server
+						request.reply(status(TemporaryRedirect, fallback))
+				)
+		);
 	}
 
 	private Optional<Future<Response>> reply(final Request request, final Path root, final String path) {

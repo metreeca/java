@@ -20,6 +20,7 @@ import com.metreeca.rest.*;
 
 import java.io.*;
 import java.util.regex.Pattern;
+
 import javax.json.*;
 import javax.json.stream.JsonParsingException;
 
@@ -30,6 +31,7 @@ import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.util.Collections.singletonMap;
+
 import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
 
 
@@ -131,6 +133,14 @@ public final class JSONFormat extends Format<JsonObject> {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @return the default MIME type for JSON messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
 
 	/**
 	 * Decodes the JSON {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}

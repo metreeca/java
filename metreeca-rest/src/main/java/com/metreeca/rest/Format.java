@@ -24,9 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Context.input;
 import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.MessageException.status;
+import static com.metreeca.rest.Toolbox.input;
 import static com.metreeca.rest.Xtream.entry;
 
 import static java.lang.Float.parseFloat;
@@ -49,7 +49,10 @@ import static java.util.stream.Collectors.toMap;
  */
 public abstract class Format<V> {
 
-	private static final String MIMEDefault="application/octet-stream";
+	/**
+	 * The default MIME type ({@value}).
+	 */
+	public static final String MIMEDefault="application/octet-stream";
 
 
 	private static final Pattern QualityPattern=Pattern.compile("(?:\\s*;\\s*q\\s*=\\s*(\\d*(?:\\.\\d+)?))?");
@@ -91,8 +94,8 @@ public abstract class Format<V> {
 	 *
 	 * @param path the path of the resource whose MIME type is to be guessed
 	 *
-	 * @return the well-known MIME type associated with the extension of the {@code path} filename or
-	 * {@value MIMEDefault}, if {@code path} doesn't include an extension or no well-known MIME type is defined
+	 * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
+	 * MIMEDefault}, if {@code path} doesn't include an extension or no well-known MIME type is defined
 	 *
 	 * @throws NullPointerException if {@code path} is null
 	 */
@@ -179,6 +182,18 @@ public abstract class Format<V> {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Retrieves the default MIME type.
+	 *
+	 * <p>The default implementation returns the {@value MIMEDefault} type.</p>
+	 *
+	 * @return the default MIME type for this format
+	 */
+	public String mime() {
+		return MIMEDefault;
+	}
+
 
 	/**
 	 * Decodes a message body.

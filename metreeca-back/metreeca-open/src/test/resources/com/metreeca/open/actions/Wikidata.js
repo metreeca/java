@@ -16,6 +16,8 @@
 
 // wikidata support functions for google sheets
 
+const language="en";
+
 const searches={};
 const entities={};
 
@@ -43,7 +45,7 @@ function search(key) { // !!! check return status // !!! purge cache
 		+`?action=wbsearchentities`
 		+`&format=json`
 		+`&search=${encodeURIComponent(key)}`
-		+`&language=en`
+		+`&language=${language}`
 		+`&strictlanguage=1`
 		+`&type=item`
 		+`&limit=1`
@@ -57,14 +59,14 @@ function entity(qid) { // !!! check return status // !!! purge cache
 		+`&format=json`
 		+`&ids=${qid}`
 		+`&props=aliases%7Clabels%7Cdescriptions`
-		+`&languages=en`
+		+`&languages=${language}`
 	).getContentText()).entities[qid]);
 }
 
 function value(v) {
-	return ((v || {}).en || {}).value || "";
+	return ((v || {}).language || {}).value || "";
 }
 
 function values(v) {
-	return ((v || {}).en || []).map(e => e.value).join(", ");
+	return ((v || {}).language || []).map(e => e.value).join(", ");
 }

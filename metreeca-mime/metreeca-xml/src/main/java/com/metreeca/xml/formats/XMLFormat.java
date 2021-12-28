@@ -24,14 +24,15 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import java.io.*;
+import java.util.regex.Pattern;
+
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.util.regex.Pattern;
 
 import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.Either.Right;
@@ -40,6 +41,7 @@ import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
+
 import static java.util.regex.Pattern.compile;
 
 
@@ -200,9 +202,17 @@ public final class XMLFormat extends Format<Document> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for XML messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the XML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by
-	 * {@link #MIMEPattern}, taking into account the {@code message} {@linkplain Message#charset() charset}
+	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
+	 * taking into account the {@code message} {@linkplain Message#charset() charset}
 	 */
 	@Override public Either<MessageException, Document> decode(final Message<?> message) {
 		return message.header("Content-Type").filter(MIMEPattern.asPredicate())

@@ -16,14 +16,15 @@
 
 package com.metreeca.rest.actions;
 
-import com.metreeca.rest.Context;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.assets.Logger;
+import com.metreeca.rest.services.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static com.metreeca.rest.Toolbox.service;
 
 import static java.lang.String.format;
 
@@ -37,7 +38,7 @@ public final class Query implements Function<String, Optional<Request>> {
 
 	private final Function<Request, Request> customizer;
 
-	private final Logger logger=Context.asset(Logger.logger());
+	private final Logger logger=service(Logger.logger());
 
 
 	/**
@@ -71,10 +72,10 @@ public final class Query implements Function<String, Optional<Request>> {
 	 *
 	 * @param resource the textual URI of the target resource
 	 *
-	 * @return a optional GET or possibly customized request for the given resource {@code resource}, if it was not
-	 * null and successfully parsed into absolute {@linkplain Request#base() base}, {@linkplain Request#path() path}
-	 * and {@linkplain Request#query() query} components; an empty optional, otherwise, logging an error to the
-	 * {@linkplain Logger#logger() shared event logger}
+	 * @return a optional GET or possibly customized request for the given resource {@code resource}, if it was not null
+	 * and successfully parsed into absolute {@linkplain Request#base() base}, {@linkplain Request#path() path} and
+	 * {@linkplain Request#query() query} components; an empty optional, otherwise, logging an error to the {@linkplain
+	 * Logger#logger() shared event logger}
 	 */
 	@Override public Optional<Request> apply(final String resource) {
 		return Optional.ofNullable(resource)
@@ -95,22 +96,78 @@ public final class Query implements Function<String, Optional<Request>> {
 
 				.filter(URI::isAbsolute)
 
-				.map(uri -> new Request()
+				.map(uri -> request(uri)
 
 						.method(Request.GET)
 
-						.base(uri.getScheme()+":"+Optional
-								.ofNullable(uri.getRawAuthority())
-								.map(s -> "//"+s+"/")
-								.orElse("/")
-						)
-
-						.path(Optional.ofNullable(uri.getRawPath()).orElse("/"))
 						.query(Optional.ofNullable(uri.getRawQuery()).orElse(""))
 
+						.map(customizer)
+
+				);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Request request(final URI uri) {
+		switch ( uri.getScheme() ) {
+
+			case "http":
+			case "https":
+
+				return httpx(uri);
+
+			case "file":
+
+				return file(uri);
+
+			case "jar":
+
+				return jar(uri);
+
+			default:
+
+				return wild(uri);
+
+		}
+	}
+
+
+	private Request httpx(final URI uri) {
+		return new Request()
+
+				.base(uri.getScheme()+":"+Optional
+						.ofNullable(uri.getRawAuthority())
+						.map(s -> "//"+s+"/")
+						.orElse("/")
 				)
 
-				.map(customizer);
+				.path(Optional.ofNullable(uri.getRawPath()).orElse("/"));
+	}
+
+	private Request file(final URI uri) {
+		return new Request()
+				.base("file:/")
+				.path(uri.getRawSchemeSpecificPart());
+	}
+
+	private Request jar(final URI uri) {
+
+		final String part=uri.getRawSchemeSpecificPart();
+		final int bang=part.indexOf("!/");
+
+		if ( bang < 0 ) {
+			throw new IllegalArgumentException(format("missing '!/' {%s}", uri));
+		}
+
+		return new Request()
+				.base("jar:"+part.substring(0, bang+2))
+				.path(part.substring(bang+1));
+	}
+
+	private Request wild(final URI uri) {
+		throw new UnsupportedOperationException(format("unsupported uri scheme {%s}", uri));
 	}
 
 }

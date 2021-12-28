@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf4j.actions;
 
-import com.metreeca.rdf4j.assets.Graph;
-import com.metreeca.rest.assets.Logger;
+import com.metreeca.rdf4j.services.Graph;
+import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.Operation;
@@ -25,11 +25,13 @@ import org.eclipse.rdf4j.query.Operation;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Context.asset;
-import static com.metreeca.rest.assets.Logger.time;
-import static java.lang.String.format;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.services.Logger.time;
+
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
 import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
+
+import static java.lang.String.format;
 
 /**
  * SPARQL tuple query action.
@@ -38,7 +40,7 @@ import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
  */
 public final class TupleQuery extends Action<TupleQuery> implements Function<String, Stream<BindingSet>> {
 
-	private final Logger logger=asset(Logger.logger());
+	private final Logger logger=service(Logger.logger());
 
 
 	/**
@@ -50,17 +52,15 @@ public final class TupleQuery extends Action<TupleQuery> implements Function<Str
 	 * target graph} after {@linkplain #configure(Operation) configuring} it; null or empty queries are silently ignored
 	 */
 	@Override public Stream<BindingSet> apply(final String query) {
-		return query == null || query.isEmpty() ? Stream.empty() : graph().exec(connection -> {
-			return time(() -> // bindings must be retrieved inside txn
+		return query == null || query.isEmpty() ? Stream.empty() : graph().query(connection -> time(() ->
 
-					asList(configure(connection.prepareTupleQuery(SPARQL, query, base())).evaluate()).parallelStream()
+				asList(configure(connection.prepareTupleQuery(SPARQL, query, base())).evaluate()).parallelStream()
 
-			).apply((t, v) ->
+		).apply((t, v) ->
 
-					logger.info(this, format("executed in <%,d> ms", t))
+				logger.info(this, format("executed in <%,d> ms", t))
 
-			);
-		});
+		));
 	}
 
 }

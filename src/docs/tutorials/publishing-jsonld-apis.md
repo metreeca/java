@@ -122,9 +122,9 @@ Finally, define a minimal server stub like:
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context.get(() ->
+		delegate(toolbox -> toolbox.get(() ->
 
-				gateway().wrap(request -> request.reply(response ->
+				server().wrap(request -> request.reply(response ->
 						response.status(OK)
 				))
 
@@ -138,7 +138,7 @@ The stub configures the application to handle any resource using a
 barebone [handler](../javadocs/?com/metreeca/rest/Handler.html) always replying to
 incoming [requests](../javadocs/?com/metreeca/rest/Request.html) with
 a [response](../javadocs/?com/metreeca/rest/Response.html) including a `200` HTTP status code. The
-standard [Gateway](../javadocs/?com/metreeca/rest/wrappers/Gateway.html) wrapper provides default pre/postprocessing
+standard [Server](../javadocs/?com/metreeca/rest/wrappers/Server.html) wrapper provides default pre/postprocessing
 services and shared error handling.
 
 Compile and deploy the web app to your favorite servlet container and try your first request:
@@ -149,8 +149,8 @@ Compile and deploy the web app to your favorite servlet container and try your f
 HTTP/1.1 200
 ```
 
-The [context](../javadocs/?com/metreeca/rest/Context.html) argument handled to the app loader lambda manages the shared
-system-provided assets and can be used to customize them and to run app initialization tasks.
+The [toolbox](../javadocs/?com/metreeca/rest/Toolbox.html) argument handled to the app loader lambda manages the shared
+system-provided services and can be used to customize them and to run app initialization tasks.
 Copy [BIRT.ttl](https://github.com/metreeca/base/tree/main/metreeca-toys/src/main/resources/com/metreeca/birt/BIRT.ttl)
 to the `src/main/resources/` directory and extend the stub as follows:
 
@@ -158,16 +158,16 @@ to the `src/main/resources/` directory and extend the stub as follows:
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
 				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-				.exec(() -> asset(graph()).exec(connection -> {
+				.exec(() -> service(graph()).exec(connection -> {
 					try {
 
-			  connection.add(
-					  Sample.class.getResourceAsStream("Toys.ttl"),
-					  "https://example.com/", RDFFormat.TURTLE
+						connection.add(
+								Sample.class.getResourceAsStream("Toys.ttl"),
+								"https://example.com/", RDFFormat.TURTLE
 						);
 
 					} catch ( final IOException e ) {
@@ -175,7 +175,7 @@ public final class Sample extends JEEServer {
 					}
 				}))
 
-				.get(() -> gateway()
+				.get(() -> server()
 
 						.wrap(request -> request.reply(status(OK)))
 
@@ -186,11 +186,11 @@ public final class Sample extends JEEServer {
 }
 ```
 
-Here we are customizing the shared system-wide [graph](../javadocs/?com/metreeca/rdf4j/assets/Graph.html) database as an
-ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
+Here we are customizing the shared system-wide [graph](../javadocs/?com/metreeca/rdf4j/services/Graph.html) database as
+an ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
 
-The static [Context.asset()](../javadocs/?com/metreeca/rest/Context.html#asset-java.util.function.Supplier-) locator
-method provides access to shared assets.
+The static [Toolbox.service()](../javadocs/?com/metreeca/rest/Toolbox.html#service-java.util.function.Supplier-) locator
+method provides access to shared services.
 
 Complex initialization tasks can be easily factored to a dedicated class:
 
@@ -202,14 +202,14 @@ public final class Toys implements Runnable {
 
 	@Override
 	public void run() {
-		asset(graph()).exec(connection -> {
+		service(graph()).exec(connection -> {
 			if ( !connection.hasStatement(null, null, null, false) ) {
 				try {
 
-			connection.setNamespace("demo", Namespace);
-			connection.add(getClass().getResourceAsStream("Toys.ttl"), Base, TURTLE);
+					connection.setNamespace("demo", Namespace);
+					connection.add(getClass().getResourceAsStream("Toys.ttl"), Base, TURTLE);
 
-		} catch ( final IOException e ) {
+				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
 			}
@@ -224,13 +224,13 @@ public final class Toys implements Runnable {
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
-			.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-			.exec(new Toys())
+				.exec(new Toys())
 
-			.get(() -> gateway()
+				.get(() -> server()
 
 						.wrap(request -> request.reply(status(OK)))
 
@@ -259,26 +259,26 @@ Requests are dispatched to their final handlers through a hierarchy of wrappers 
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
-			.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-			.exec(new Toys())
+				.exec(new Toys())
 
-			.get(() -> gateway()
+				.get(() -> server()
 
-					.with(preprocessor(request -> request.base(Toys.Base)))
+						.with(preprocessor(request -> request.base(Toys.Base)))
 
-					.wrap(router()
+						.wrap(router()
 
 								.path("/products/*", router()
 
 										.path("/", router().get(request -> request.reply(response -> response
 												.status(OK)
-												.body(rdf(), asset(graph()).exec(connection -> {
-							return stream(connection.getStatements(
-									null, RDF.TYPE, iri(Toys.Namespace, "Product")
-							))
+												.body(rdf(), service(graph()).exec(connection -> {
+													return stream(connection.getStatements(
+															null, RDF.TYPE, iri(Toys.Namespace, "Product")
+													))
 															.map(Statement::getSubject)
 															.map(p -> statement(
 																	iri(request.item()), LDP.CONTAINS, p)
@@ -289,7 +289,7 @@ public final class Sample extends JEEServer {
 
 										.path("/{code}", router().get(request -> request.reply(response -> response
 												.status(OK)
-												.body(rdf(), asset(graph()).exec(connection -> {
+												.body(rdf(), service(graph()).exec(connection -> {
 													return asList(connection.getStatements(
 															iri(request.item()), null, null
 													));
@@ -359,17 +359,17 @@ Again, complex handlers can be easily factored to dedicated classes:
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
-			.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-			.exec(new Toys())
+				.exec(new Toys())
 
-			.get(() -> gateway()
+				.get(() -> server()
 
-					.with(preprocessor(request -> request.base(Toys.Base)))
+						.with(preprocessor(request -> request.base(Toys.Base)))
 
-					.wrap(router()
+						.wrap(router()
 
 								.path("/products/*", new Products())
 
@@ -393,7 +393,7 @@ public final class Products extends Delegator {
 				.path("/", router()
 						.get(request -> request.reply(response -> response
 								.status(OK)
-								.body(rdf(), asset(graph()).exec(connection -> {
+								.body(rdf(), service(graph()).exec(connection -> {
 									return stream(connection.getStatements(
 											null, RDF.TYPE, Product
 									))
@@ -409,7 +409,7 @@ public final class Products extends Delegator {
 				.path("/{code}", router()
 						.get(request -> request.reply(response -> response
 								.status(OK)
-								.body(rdf(), asset(graph()).exec(connection -> {
+								.body(rdf(), service(graph()).exec(connection -> {
 									return asList(connection.getStatements(
 											iri(request.item()), null, null
 									));
@@ -438,8 +438,7 @@ request [focus item](../javadocs/?com/metreeca/rest/Request.html#item--).
 
 | actor                                                        | action                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Relator](../javadocs/?com/metreeca/rest/handlers/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource |
-| [Browser](../javadocs/?com/metreeca/rest/handlers/Browser.html) | container browsing / retrieves the digest RDF description of the contained resources; supports extended [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
+| [Relator](../javadocs/?com/metreeca/rest/handlers/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended collection [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
 | [Creator](../javadocs/?com/metreeca/rest/handlers/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
 | [Updater](../javadocs/?com/metreeca/rest/handlers/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
 | [Deleter](../javadocs/?com/metreeca/rest/handlers/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |
@@ -449,14 +448,14 @@ request [focus item](../javadocs/?com/metreeca/rest/Request.html#item--).
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
 				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 +				.set(engine(), GraphEngine::new)
 
 				.exec(new Toys())
 
-				.get(() -> gateway()
+				.get(() -> server()
 
 						.with(preprocessor(request -> request.base(Toys.Base)))
 
@@ -498,7 +497,7 @@ public final class Products extends Delegator {
 		).wrap(router()
 
 				.path("/", router()
-						.get(browser())
+						.get(relator())
 						.post(creator())
 				)
 
@@ -578,7 +577,7 @@ public final class Toys implements Runnable {
 
 	@Override
 	public void run() {
-		asset(graph()).exec(connection -> {
+		service(graph()).exec(connection -> {
 			try {
 
 				connection.add(Toys.class.getResourceAsStream("Toys.ttl"), Base, RDFFormat.TURTLE);
@@ -603,59 +602,59 @@ public final class Products extends Delegator {
 				field(RDF.TYPE, exactly(Toys.Product)),
 
 				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-				field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+			field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-				server(field(Toys.code, required())),
+			server(field(Toys.code, required())),
 
-				field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+			field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-						relate(field(RDFS.LABEL, required()))
+					relate(field(RDFS.LABEL, required()))
 
-				),
+			),
 
-				field(Toys.scale, required(),
-						datatype(XSD.STRING),
-						pattern("1:[1-9][0-9]{1,2}")
-				),
+			field(Toys.scale, required(),
+					datatype(XSD.STRING),
+					pattern("1:[1-9][0-9]{1,2}")
+			),
 
-				field(Toys.vendor, required(),
-						datatype(XSD.STRING),
-						maxLength(50)
-				),
+			field(Toys.vendor, required(),
+					datatype(XSD.STRING),
+					maxLength(50)
+			),
 
-				field("price", Toys.sell, required(),
-						datatype(XSD.DECIMAL),
-						minExclusive(literal(decimal(0))),
-						maxExclusive(literal(decimal(1000)))
-				),
+			field("price", Toys.sell, required(),
+					datatype(XSD.DECIMAL),
+					minExclusive(literal(0.0)),
+					maxExclusive(literal(1_000.0))
+			),
 
-				role(Toys.staff).then(field(Toys.buy, required(),
-						datatype(XSD.DECIMAL),
-						minInclusive(literal(decimal(0))),
-						maxInclusive(literal(decimal(1000)))
-				)),
+			role(Toys.staff).then(field(Toys.buy, required(),
+					datatype(XSD.DECIMAL),
+					minInclusive(literal(0.0)),
+					maxInclusive(literal(1_000.0))
+			)),
 
-				server().then(field(Toys.stock, required(),
-						datatype(XSD.INTEGER),
-						minInclusive(literal(integer(0))),
-						maxExclusive(literal(integer(10_000)))
-				))
+			server().then(field(Toys.stock, required(),
+					datatype(XSD.INTEGER),
+					minInclusive(literal(0)),
+					maxExclusive(literal(10_000))
+			))
 
-		)).wrap(router()
+	)).wrap(router()
 
-				.path("/", router()
-						.get(browser())
-						.post(creator())
-				)
+			.path("/", router()
+					.get(relator())
+					.post(creator())
+			)
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+			.path("/*", router()
+					.get(relator())
+					.put(updater())
+					.delete(deleter())
+			)
 
-		));
-	}
+	));
+  }
 
 }
 ```
@@ -732,8 +731,8 @@ views.
 ```java
 role(Toys.staff).then(field(Toys.buy,required(),
 		datatype(XSD.DECIMAL),
-		minInclusive(literal(decimal(0))),
-		maxInclusive(literal(decimal(1000)))
+		minInclusive(literal(0.0)),
+		maxInclusive(literal(1_000.0))
 		))
 ```
 
@@ -747,14 +746,14 @@ User roles are usually granted to requests by authentication/authorization wrapp
 public final class Sample extends JEEServer {
 
 	public Sample() {
-		delegate(context -> context
+		delegate(toolbox -> toolbox
 
 				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 				.set(engine(), GraphEngine::new)
 
 				.exec(new Toys())
 
-				.get(() -> gateway()
+				.get(() -> server()
 
 						.with(preprocessor(request -> request.base(Toys.Base)))
 
@@ -836,8 +835,9 @@ public final class Products extends Delegator {
 		)).wrap(router()
 
 				.path("/", router()
-						.get(browser())
-+						.post(creator(new ProductsSlug())
+						.get(relator())
++						.post(creator()
++								.slug(new ProductsSlug())
 +								.with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
 +						)
 				)
@@ -857,26 +857,22 @@ public final class Products extends Delegator {
 ```java
 public final class ProductsSlug implements Function<Request, String> {
 
-	private final Graph graph=asset(graph());
+	private final Graph graph=service(graph());
 
 	@Override
 	public String apply(final Request request) {
 		return graph.exec(connection -> {
 
-			final Value scale=request.body(jsonld()).get()
-			  .flatMap(model -> new LinkedHashModel(model)
-					  .filter(null, Toys.scale, null)
-					  .objects()
-							.stream()
-							.findFirst()
-					)
-					.orElse(literal("1:1"));
+			final Value scale=literal(request.body(jsonld()).get()
+					.flatMap(frame -> frame.string(Toys.scale))
+					.orElse("1:1")
+			);
 
 			int serial=0;
 
-		try ( final RepositoryResult<Statement> matches=connection.getStatements(
-				null, Toys.scale, scale
-		) ) {
+			try ( final RepositoryResult<Statement> matches=connection.getStatements(
+					null, Toys.scale, scale
+			) ) {
 				for (; matches.hasNext(); matches.next()) { ++serial; }
 			}
 
@@ -884,9 +880,9 @@ public final class ProductsSlug implements Function<Request, String> {
 
 			do {
 				code=String.format("S%s_%d", scale.stringValue().substring(2), serial);
-	  } while ( connection.hasStatement(
-			  null, Toys.code, literal(code), true
-	  ) );
+			} while ( connection.hasStatement(
+					null, Toys.code, literal(code), true
+			) );
 
 			return code;
 
@@ -922,7 +918,8 @@ The *ProductsCreate.ql* SPARQL Update postprocessing script updates server-manag
 properties after a new product is added to the catalog.
 
 SPARQL Update postprocessing scripts are executed after the state-mutating HTTP request is successfully completed, with
-some [pre-defined bindings](../javadocs/?com/metreeca/rdf/assets/Graph.html#configure-M-O-java.util.function.BiConsumer...-)
+some [pre-defined bindings](../javadocs/?com/metreeca/rdf/services/Graph.html#configure-M-O-java.util.function.
+BiConsumer...-)
 like the `$this` variable holding the IRI of the targe resource either as derived from the HTTP request or as defined by
 the `Location` HTTP header after a POST request.
 

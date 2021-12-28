@@ -76495,3 +76495,91 @@ Many extras including rigging, long boats, pilot house, anchors, etc. Comes with
 <products/S24_3432> :customer <customers/282> .
 
 <customers/282> :product <products/S24_3432> .
+
+
+
+<employees/1370>
+  :report "2021-03-06T04:12:02Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1989-08-17"^^xsd:date .
+
+<employees/1166>
+  :report "2021-08-17T14:35:21Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1991-08-19"^^xsd:date .
+
+<employees/1611>
+  :report "2021-01-01T00:01:00Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1990-08-18"^^xsd:date .
+
+<employees/1504>
+  :report "2021-11-26T21:54:49Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1991-08-18"^^xsd:date .
+
+<employees/1165>
+  :report "2021-01-01T00:00:00Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1991-08-18"^^xsd:date .
+
+<employees/1323>
+  :report "2021-06-14T11:29:14Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1980-03-07"^^xsd:date .
+
+<employees/1401>
+  :report "2021-09-20T17:42:30Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1995-10-23"^^xsd:date .
+
+<employees/1337>
+  :report "2021-11-25T21:52:46Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1994-10-22"^^xsd:date .
+
+<employees/1621>
+  :report "2021-02-05T03:09:01Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1982-04-09"^^xsd:date .
+
+<employees/1286>
+  :report "2021-01-02T01:03:00Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1995-10-23"^^xsd:date .
+
+<employees/1216>
+  :report "2021-05-11T09:22:08Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1976-01-03"^^xsd:date .
+
+<employees/1612>
+  :report "2021-06-14T11:29:14Z"^^xsd:dateTime;
+  :active false;
+  :birthdate "1991-08-19"^^xsd:date .
+
+<employees/1188>
+  :report "2021-08-18T14:37:22Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1988-07-16"^^xsd:date .
+
+<employees/1501>
+  :report "2021-07-16T13:33:18Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1978-02-04"^^xsd:date .
+
+<employees/1702>
+  :report "2021-06-14T11:28:13Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1997-11-26"^^xsd:date .
+
+<employees/1619>
+  :report "2021-02-03T02:05:00Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1998-12-27"^^xsd:date .
+
+<employees/1625>
+  :report "2021-06-13T10:27:12Z"^^xsd:dateTime;
+  :active true;
+  :birthdate "1982-04-09"^^xsd:date .
+

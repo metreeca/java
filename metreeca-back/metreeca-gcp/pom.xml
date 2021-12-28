@@ -37,8 +37,9 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rest</artifactId>
+			<artifactId>metreeca-jse</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>com.google.cloud</groupId>
@@ -48,6 +49,11 @@
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-secretmanager</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-datastore</artifactId>
 		</dependency>
 
 	</dependencies>

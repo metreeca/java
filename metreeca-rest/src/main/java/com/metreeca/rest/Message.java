@@ -20,7 +20,8 @@ import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -42,8 +43,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @param <T> the self-bounded message type supporting fluent setters
  */
-@SuppressWarnings("unchecked")
-public abstract class Message<T extends Message<T>> {
+public abstract class Message<T extends Message<T>> extends Setup<T> {
 
 	private static final Pattern CharsetPattern=Pattern.compile(
 			";\\s*charset\\s*=\\s*(?<charset>[-\\w]+)\\b"
@@ -52,12 +52,8 @@ public abstract class Message<T extends Message<T>> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Map<Supplier<?>, Object> attributes=new LinkedHashMap<>();
 	private final Map<String, List<String>> headers=new LinkedHashMap<>();
 	private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
-
-
-	private T self() { return (T)this; }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,82 +185,6 @@ public abstract class Message<T extends Message<T>> {
 
 		bodies.clear();
 		bodies.putAll(message.bodies);
-
-		return self();
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Retrieves message attribute.
-	 *
-	 * @param name the name for the attribute to be retrieved; must return a non-null default value for the attribute
-	 * @param <V>  the type of the attribute to be retrieved
-	 *
-	 * @return the value of message attribute associated with {@code name}
-	 *
-	 * @throws NullPointerException if {@code name} is null
-	 */
-	public <V> V attribute(final Supplier<V> name) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		return (V)attributes.computeIfAbsent(name, _key -> requireNonNull(_key.get(), "null name value"));
-	}
-
-	/**
-	 * Configures message attribute.
-	 *
-	 * @param name  the name for the attribute to be configured; must return a non-null default value for the attribute
-	 * @param value the attribute value to be associated with {@code name}
-	 * @param <V>   the type of the attribute to be configured
-	 *
-	 * @return this message
-	 *
-	 * @throws NullPointerException if either {@code name} or {@code value} is null
-	 */
-	public <V> T attribute(final Supplier<V> name, final V value) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		if ( value == null ) {
-			throw new NullPointerException("null value");
-		}
-
-		attributes.put(name, value);
-
-		return self();
-	}
-
-
-	/**
-	 * Updates message attribute.
-	 *
-	 * @param name   the name for the attribute to be updated; must return a non-null default value for the attribute
-	 * @param mapper a function mapping from the current to the updated value of the {@code name} attribute; must return
-	 *               a non-null value
-	 * @param <V>    the type of the attribute to be updated
-	 *
-	 * @return this message
-	 *
-	 * @throws NullPointerException if either {@code name} or {@code value} is null
-	 */
-	public <V> T map(final Supplier<V> name, final UnaryOperator<V> mapper) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
-
-		attributes.computeIfPresent(name, (key, value) -> mapper.apply((V)value));
 
 		return self();
 	}
@@ -481,13 +401,22 @@ public abstract class Message<T extends Message<T>> {
 	 *
 	 * @throws NullPointerException if {@code format} is null
 	 */
+	@SuppressWarnings("unchecked")
 	public <V> Either<MessageException, V> body(final Format<V> format) {
 
 		if ( format == null ) {
 			throw new NullPointerException("null body");
 		}
 
-		return (Either<MessageException, V>)bodies.computeIfAbsent(format, key -> format.decode(this));
+		// ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
+
+		Either<MessageException, ?> body=bodies.get(format);
+
+		if ( body == null ) {
+			bodies.put(format, body=format.decode(this));
+		}
+
+		return (Either<MessageException, V>)body;
 	}
 
 	/**
@@ -532,6 +461,7 @@ public abstract class Message<T extends Message<T>> {
 	 *
 	 * @throws NullPointerException if either {@code name} or {@code value} is null
 	 */
+	@SuppressWarnings("unchecked")
 	public <V> T map(final Format<? super V> format, final UnaryOperator<V> mapper) {
 
 		if ( format == null ) {
@@ -542,20 +472,27 @@ public abstract class Message<T extends Message<T>> {
 			throw new NullPointerException("null mapper");
 		}
 
+		// ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
 
-		Optional
+		final Either<MessageException, ?> value=bodies.get(format);
 
-				.ofNullable(bodies.computeIfPresent(format, (key, value) -> value.map(body -> requireNonNull(
+		if ( value != null ) {
 
-						mapper.apply((V)body), "null mapper return value"
+			final Either<MessageException, V> mapped=value.map(body -> requireNonNull(
 
-				))))
+					mapper.apply((V)body), "null mapper return value"
 
-				.ifPresent(result -> result.map(body ->
+			));
 
-						format.encode(self(), (V)body)
+			bodies.put(format, mapped);
 
-				));
+			mapped.map(body ->
+
+					format.encode(self(), body)
+
+			);
+
+		}
 
 		return self();
 	}

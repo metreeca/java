@@ -34,30 +34,30 @@ specialized component into your framework of choice.
 	<dependencyManagement>
 		<dependencies>
 
-            <dependency>
-                <groupId>com.metreeca</groupId>
+			<dependency>
+				<groupId>com.metreeca</groupId>
                 <artifactId>metreeca-base</artifactId>
-                <version>${link.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+				<version>${link.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 
-        </dependencies>
-    </dependencyManagement>
+		</dependencies>
+	</dependencyManagement>
 
-    <dependencies>
+	<dependencies>
 
-        <dependency> <!-- server connector -->
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-jse</artifactId>
-        </dependency>
+		<dependency> <!-- server connector -->
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-jse</artifactId>
+		</dependency>
 
-        <dependency> <!-- storage connector -->
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-rdf4j</artifactId>
-        </dependency>
+		<dependency> <!-- storage connector -->
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-rdf4j</artifactId>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
 </project>
 ```
@@ -72,18 +72,18 @@ import static com.metreeca.rest.formats.TextFormat.text;
 
 public final class Hello {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(context -> request ->
-            request.reply(response -> response
-                .status(OK)
-                .body(text(), "Hello world!")
-            )
-        )
+				.delegate(context -> request ->
+						request.reply(response -> response
+								.status(OK)
+								.body(text(), "Hello world!")
+						)
+				)
 
-        .start();
-  }
+				.start();
+	}
 
 }
 ```
@@ -100,12 +100,16 @@ Content-Length: 12
 Hello world!
 ```
 
-4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how to [publish](http://metreeca.github.io/base/tutorials/publishing-jsonld-apis) and [consume](https://metreeca.github.io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD APIs…
+4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how
+   to [publish](http://metreeca.github.io/base/tutorials/publishing-jsonld-apis)
+   and [consume](https://metreeca.github.io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD
+   APIs…
 
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
+  idea
 
 # License
 

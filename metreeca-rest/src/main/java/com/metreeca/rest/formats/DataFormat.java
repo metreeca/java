@@ -61,6 +61,14 @@ public final class DataFormat extends Format<byte[]> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * @return the default MIME type for binary messages ({@value MIME})
+	 */
+	@Override public String mime() {
+		return MIME;
+	}
+
+
+	/**
 	 * Decodes the binary {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
 	 * body, if one is available
 	 */
@@ -86,7 +94,7 @@ public final class DataFormat extends Format<byte[]> {
 				.header("~Content-Type", MIME)
 				.header("~Content-Length", valueOf(value.length))
 
-				.body(output(), output -> { Xtream.data(output, value); });
+				.body(output(), output -> Xtream.data(output, value));
 	}
 
 }

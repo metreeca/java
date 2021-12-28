@@ -17,52 +17,77 @@
 package com.metreeca.rest.operators;
 
 
+import com.metreeca.json.*;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
-import com.metreeca.rest.assets.Engine;
+import com.metreeca.rest.formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
+import com.metreeca.rest.services.Engine;
 
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static com.metreeca.json.Frame.frame;
+import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
+import static com.metreeca.json.Values.md5;
 import static com.metreeca.json.shapes.Guard.Create;
 import static com.metreeca.json.shapes.Guard.Detail;
-import static com.metreeca.rest.Context.asset;
+import static com.metreeca.rest.Response.Created;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.Xtream.encode;
-import static com.metreeca.rest.assets.Engine.engine;
-import static com.metreeca.rest.assets.Engine.throttler;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+import static com.metreeca.rest.formats.JSONLDFormat.shape;
+import static com.metreeca.rest.services.Engine.engine;
 
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
-import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
  * Model-driven resource creator.
  *
- * <p>Performs:</p>
+ * <p>Handles creation requests on the linked data collection identified by the request {@linkplain Request#item()
+ * focus item}:</p>
  *
  * <ul>
  *
- * <li>{@linkplain Guard#Role role}-based request shape redaction and shape-based
- * {@linkplain Engine#throttler(Object, Object) authorization}, considering shapes enabled by the
- * {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
+ * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * user {@linkplain Request#roles() roles};</li>
  *
- * <li>shape-driven request payload validation;</li>
+ * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
  *
- * <li>resource {@linkplain #creator(Function) slug} generation;</li>
+ * <li>validates the {@link JSONLDFormat JSON-LD} request body against the request shape; malformed or invalid
+ * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
+ * status code;</li>
  *
- * <li>engine assisted resource {@linkplain Engine#create(Request) creation}.</li>
+ * <li>generates a unique IRI for the resource to be created on the basis on the stem of the the request IRI and
+ * the value of the {@code Slug} request header, if one is found, or a random id, otherwise;</li>
+ *
+ * <li>rewrites the request body to the assigned IRI and stores it with the assistance of the shared linked data
+ * {@linkplain Engine#create(Frame, Shape) engine}; the target collection identified by the request focus item is
+ * connected to the newly created resource according to the filtering constraints in the request shape.</li>
  *
  * </ul>
  *
- * <p>All operations are executed inside a single {@linkplain Engine engine transaction}.</p>
+ * <p>On successful completion, generates a response including:</p>
+ *
+ * <ul>
+ *
+ * <li>a {@value Response#Created} status code;</li>
+ *
+ * <li>a {@code Location} HTTP response header advertising the IRI of the newly created resource.</li>
+ *
+ * </ul>
  */
 public final class Creator extends Delegator {
 
@@ -72,66 +97,75 @@ public final class Creator extends Delegator {
 	 * @return a new resource creator
 	 */
 	public static Creator creator() {
-		return creator(request -> randomUUID().toString());
+		return new Creator();
 	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Function<Request, String> slug=request -> md5();
+
+	private final Engine engine=service(engine());
+
+
+	private Creator() {
+		delegate(rewrite().wrap(create()).with( // rewrite immediately before handler, after custom wrappers
+				keeper(Create, Detail)
+		));
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/**
-	 * Creates a resource creator.
+	 * Configures the slug generator.
 	 *
 	 * @param slug a function mapping from the creation request to the identifier to be assigned to the newly created
 	 *             resource; must return a non-null non-clashing value
 	 *
-	 * @return a new resource creator
+	 * @return this creator handler
 	 *
-	 * @throws NullPointerException if {@code slug} is null
+	 * @throws NullPointerException if {@code slug} is null or returns null values
 	 */
-	public static Creator creator(final Function<Request, String> slug) {
+	public Creator slug(final Function<Request, String> slug) {
 
 		if ( slug == null ) {
 			throw new NullPointerException("null slug");
 		}
 
-		return new Creator(slug);
+		this.slug=slug;
+
+		return this;
 	}
 
 	/**
-	 * Creates a resource creator.
+	 * Configures the slug generator.
 	 *
-	 * @param <T>    the type of the message body to be inspected during slug generation
-	 * @param format the format of the message body to be inspected during slug generation
-	 * @param slug   a function mapping from the creation request and its payload to the identifier to be assigned to
-	 *                 the
-	 *               newly created resource; must return a non-null non-clashing value
+	 * @param slug a function mapping from the creation request and its {@linkplain JSONLDFormat JSON-LD} payload to the
+	 *             identifier to be assigned to the newly created resource; must return a non-null non-clashing value
 	 *
-	 * @return a new resource creator
+	 * @return this creator handler
 	 *
-	 * @throws NullPointerException if either {@code format} or {@code slug} is null
+	 * @throws NullPointerException if {@code slug} is null or returns null values
 	 */
-	public static <T> Creator creator(
-			final Format<T> format, final BiFunction<? super Request, ? super T, String> slug
-	) {
-		return new Creator(request -> request.body(format).fold(error -> "", value -> slug.apply(request, value)));
+	public Creator slug(final BiFunction<? super Request, ? super Frame, String> slug) {
+
+		if ( slug == null ) {
+			throw new NullPointerException("null slug");
+		}
+
+		this.slug=request -> slug.apply(request, request.body(jsonld()).fold(
+				error -> frame(iri(request.item())),
+				value -> value
+		));
+
+		return this;
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Creator(final Function<Request, String> slug) {
-
-		final Engine engine=asset(engine());
-
-		delegate(wrapper(slug).wrap(engine::create) // immediately around handler after custom wrappers
-
-				.with(engine)
-				.with(throttler(Create, Detail))
-
-		);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Wrapper wrapper(final Function<Request, String> slug) {
+	private Wrapper rewrite() {
 		return handler -> request -> {
 
 			final String name=encode( // encode slug as IRI path component
@@ -143,29 +177,58 @@ public final class Creator extends Delegator {
 
 			return handler.handle(request
 					.path(request.path()+name)
-					.map(jsonld(), model -> rewrite(target, source, model))
+					.map(jsonld(), frame -> rewrite(target, source, frame))
 			);
+		};
+	}
+
+	private Handler create() {
+		return request -> {
+
+			final IRI item=iri(request.item());
+			final Shape shape=request.get(shape());
+
+			return request.body(jsonld()).fold(request::reply, frame -> engine.create(frame, shape)
+
+					.map(Frame::focus)
+
+					.map(focus -> request.reply(response -> response.status(Created).header("Location", Optional
+							.of(focus)
+							.filter(Value::isIRI)
+							.map(IRI.class::cast)
+							.map(Values::path) // root-relative to support relocation
+							.orElse(focus.stringValue())
+					)))
+
+					.orElseThrow(() ->
+							new IllegalStateException(format("existing resource identifier %s", format(item)))
+					)
+
+			);
+
 		};
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Collection<Statement> rewrite(final IRI target, final IRI source, final Collection<Statement> model) {
-		return model.stream().map(statement -> rewrite(target, source, statement)).collect(toList());
+	private Frame rewrite(final IRI target, final IRI source, final Frame frame) {
+		return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.traits()));
 	}
 
-	private Statement rewrite(final IRI target, final IRI source, final Statement statement) {
-		return statement(
-				rewrite(target, source, statement.getSubject()),
-				rewrite(target, source, statement.getPredicate()),
-				rewrite(target, source, statement.getObject()),
-				rewrite(target, source, statement.getContext())
-		);
+	private Value rewrite(final Value target, final Value source, final Value focus) {
+		return source.equals(focus) ? target : focus;
 	}
 
-	private <T extends Value> T rewrite(final T target, final T source, final T value) {
-		return source.equals(value) ? target : value;
+	private Map<IRI, Collection<Frame>> rewrite(
+			final IRI target, final IRI source, final Map<IRI, Collection<Frame>> traits
+	) {
+		return traits.entrySet().stream().collect(toMap(Map.Entry::getKey, entry ->
+				unmodifiableSet((Set<Frame>)entry.getValue().stream()
+						.map(frame -> rewrite(target, source, frame))
+						.collect(toCollection(LinkedHashSet::new))
+				)
+		));
 	}
 
 }

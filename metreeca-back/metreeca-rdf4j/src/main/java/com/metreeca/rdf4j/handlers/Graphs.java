@@ -18,10 +18,9 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.json.Shape;
 import com.metreeca.json.Values;
-import com.metreeca.rdf4j.assets.Graph;
+import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
-import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -39,13 +38,14 @@ import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.statement;
 import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
-import static com.metreeca.rdf4j.assets.Graph.txn;
 import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.InternalServerError;
+import static com.metreeca.rest.Xtream.task;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
+import static com.metreeca.rest.handlers.Router.router;
 
 import static java.lang.String.format;
 
@@ -81,7 +81,7 @@ public final class Graphs extends Endpoint<Graphs> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Graphs() {
-		delegate(Router.router()
+		delegate(router()
 				.get(this::get)
 				.put(this::put)
 				.delete(this::delete)
@@ -116,7 +116,7 @@ public final class Graphs extends Endpoint<Graphs> {
 				final IRI focus=iri(request.item());
 				final Collection<Statement> model=new ArrayList<>();
 
-				graph().exec(connection -> {
+				graph().query(task(connection -> {
 					try ( final RepositoryResult<Resource> contexts=connection.getContextIDs() ) {
 						while ( contexts.hasNext() ) {
 
@@ -127,23 +127,24 @@ public final class Graphs extends Endpoint<Graphs> {
 
 						}
 					}
-				});
+				}));
 
 				request.reply(response -> response.status(Response.OK)
-						.attribute(JSONLDFormat.shape(), GraphsShape)
+						.set(JSONLDFormat.shape(), GraphsShape)
 						.body(rdf(), model)
 				).accept(consumer);
 
 			} else {
 
 				final RDFWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-						RDFWriterRegistry.getInstance(), RDFFormat.TURTLE, mimes(accept));
+						RDFWriterRegistry.getInstance(), RDFFormat.TURTLE, mimes(accept)
+				);
 
 				final RDFFormat format=factory.getRDFFormat();
 
 				final Resource context=target.isEmpty() ? null : iri(target);
 
-				graph().exec(connection -> {
+				graph().query(task(connection -> {
 					request.reply(response -> response.status(Response.OK)
 
 							.header("Content-Type", format.getDefaultMIMEType())
@@ -154,7 +155,7 @@ public final class Graphs extends Endpoint<Graphs> {
 							.body(output(), output -> { connection.export(factory.getWriter(output), context); })
 
 					).accept(consumer);
-				});
+				}));
 			}
 		};
 	}
@@ -188,7 +189,7 @@ public final class Graphs extends Endpoint<Graphs> {
 						// handling
 				);
 
-				graph().exec(txn(connection -> { // binary format >> no rewriting
+				graph().update(task(connection -> { // binary format >> no rewriting
 					try ( final InputStream input=request.body(input()).fold(e -> Xtream.input(), Supplier::get) ) {
 
 						final boolean exists=exists(connection, context);
@@ -246,7 +247,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
 				final Resource context=target.isEmpty() ? null : iri(target);
 
-				graph().exec(txn(connection -> {
+				graph().update(task(connection -> {
 					try {
 
 						final boolean exists=exists(connection, context);
@@ -302,7 +303,7 @@ public final class Graphs extends Endpoint<Graphs> {
 						RDFParserRegistry.getInstance(), RDFFormat.TURTLE, mimes(content) // !!! review fallback
 				);
 
-				graph().exec(txn(connection -> { // binary format >> no rewriting
+				graph().update(task(connection -> { // binary format >> no rewriting
 					try ( final InputStream input=request.body(input()).fold(e -> Xtream.input(),
 							Supplier::get) ) {
 

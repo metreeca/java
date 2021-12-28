@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static com.metreeca.json.Values.AbsoluteIRIPattern;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 
@@ -45,13 +47,16 @@ public final class Request extends Message<Request> {
 	public static final String TRACE="TRACE"; // https://tools.ietf.org/html/rfc7231#section-4.3.8
 
 
+	private static final Pattern HTMLPattern=Pattern.compile("\\btext/x?html\\b");
+	private static final Pattern FilePattern=Pattern.compile("\\.\\w+$");
+
 	private static final Collection<String> Safe=new HashSet<>(asList(
 			GET, HEAD, OPTIONS, TRACE // https://tools.ietf.org/html/rfc7231#section-4.2.1
 	));
 
-	private static final Pattern SchemePattern=Pattern.compile("^[a-zA-Z][-+.a-zA-Z0-9]*:");
-	private static final Pattern HTMLPattern=Pattern.compile("\\btext/x?html\\b");
-	private static final Pattern FilePattern=Pattern.compile("\\.\\w+$");
+	private static final Collection<String> Remote=new HashSet<>(asList(
+			"feed:", "ftp:", "http:", "https", "imap", "ldap:", "ldaps", "message:", "pop:", "s3:"
+	));
 
 
 	public static Map<String, List<String>> search(final String query) {
@@ -101,9 +106,10 @@ public final class Request extends Message<Request> {
 	private Object user;
 	private Set<Object> roles=emptySet();
 
-	private String method="";
+	private String method=GET;
 	private String base=Values.Base;
 	private String path="/";
+	private String item=base;
 	private String query="";
 
 	private final Map<String, List<String>> parameters=new LinkedHashMap<>();
@@ -112,13 +118,13 @@ public final class Request extends Message<Request> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Retrieves the focus item IRI of this request.
+	 * Retrieves the focus IRI of this request.
 	 *
 	 * @return the absolute IRI obtained by concatenating {@linkplain #base() base} and {@linkplain #path() path} for
 	 * this request
 	 */
 	@Override public String item() {
-		return base+path.substring(1);
+		return item;
 	}
 
 	/**
@@ -165,6 +171,17 @@ public final class Request extends Message<Request> {
 	}
 
 	/**
+	 * Checks if this request is remote.
+	 *
+	 * @return {@code true} if the {@link #item() focus IRI} of this request is based on a remote dereferenceable
+	 * <a href="https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml#uri-schemes-1">URI scheme</a>; {@code
+	 * false} otherwise
+	 */
+	public boolean remote() {
+		return Remote.stream().anyMatch(item::startsWith);
+	}
+
+	/**
 	 * Checks if this request targets a collection.
 	 *
 	 * @return {@code true} if the {@link #path()} of this request includes a trailing slash; {@code false} otherwise
@@ -181,7 +198,7 @@ public final class Request extends Message<Request> {
 	 *
 	 * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe} and its {@code
 	 * Accept} header includes a MIME type usually associated with an interactive browser-managed HTTP request (e.g.
-	 * {@code text/html} and its {@link #path() path} doesn't contains a filename extension (e.g. {@code .html}); {@code
+	 * {@code text/html} and its {@link #path() path} doesn't contain a filename extension (e.g. {@code .html}); {@code
 	 * false}, otherwise
 	 */
 	public boolean route() {
@@ -361,7 +378,7 @@ public final class Request extends Message<Request> {
 			throw new NullPointerException("null base");
 		}
 
-		if ( !SchemePattern.matcher(base).find() ) {
+		if ( !AbsoluteIRIPattern.matcher(base).matches() ) {
 			throw new IllegalArgumentException("not an absolute base IRI");
 		}
 
@@ -370,6 +387,7 @@ public final class Request extends Message<Request> {
 		}
 
 		this.base=base;
+		this.item=base+path.substring(1);
 
 		return this;
 	}
@@ -407,6 +425,7 @@ public final class Request extends Message<Request> {
 		}
 
 		this.path=path;
+		this.item=base+path.substring(1);
 
 		return this;
 	}
@@ -464,7 +483,7 @@ public final class Request extends Message<Request> {
 	 */
 	public List<String> langs() {
 		return header("Accept-Language")
-				.map((Function<String, List<String>>)Format::langs)
+				.map(Format::langs)
 				.orElse(emptyList());
 	}
 

@@ -76,22 +76,27 @@ public final class Guard extends Shape {
 	/*
 	 * Marks shapes as server-defined read-only.
 	 */
-	public static Shape server(final Shape... shapes) { return task(Relate, Delete).then(shapes); }
+	public static Shape server(final Shape... shapes) {return task(Relate, Delete).then(shapes);}
 
 	/*
 	 * Marks shapes as client-defined write-once.
 	 */
-	public static Shape client(final Shape... shapes) { return task(Create, Relate, Delete).then(shapes); }
+	public static Shape client(final Shape... shapes) {return task(Create, Relate, Delete).then(shapes);}
+
+	/*
+	 * Marks shapes as hidden server-stored.
+	 */
+	public static Shape hidden(final Shape... shapes) {return task().then(shapes);}
 
 
-	public static Shape digest(final Shape... shapes) { return view(Digest).then(shapes); }
+	public static Shape digest(final Shape... shapes) {return view(Digest).then(shapes);}
 
-	public static Shape detail(final Shape... shapes) { return view(Detail).then(shapes); }
+	public static Shape detail(final Shape... shapes) {return view(Detail).then(shapes);}
 
 
-	public static Shape filter(final Shape... shapes) { return mode(Filter).then(shapes); }
+	public static Shape filter(final Shape... shapes) {return mode(Filter).then(shapes);}
 
-	public static Shape convey(final Shape... shapes) { return mode(Convey).then(shapes); }
+	public static Shape convey(final Shape... shapes) {return mode(Convey).then(shapes);}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

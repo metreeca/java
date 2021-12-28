@@ -22,13 +22,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.metreeca</groupId>
-	<artifactId>metreeca-link</artifactId>
+	<artifactId>metreeca-base</artifactId>
 	<version>0.55.0</version>
 	<packaging>pom</packaging>
 
-	<name>Metreeca REST/JSON Framework</name>
-	<description>A lightweight Java framework enabling rapid development of model-driven REST/JSON APIs.</description>
-	<url>https://github.com/metreeca/link</url>
+	<name>Metreeca REST/JSON-LD Framework</name>
+	<description>A modular Java framework for rapid model-driven REST/JSON-LD server development</description>
+	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
 
 	<organization>
@@ -54,14 +54,14 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:metreeca/link.git</connection>
-		<developerConnection>scm:git:git@github.com:metreeca/link.git</developerConnection>
-		<url>https://github.com/metreeca/link</url>
+		<connection>scm:git:git@github.com:metreeca/base.git</connection>
+		<developerConnection>scm:git:git@github.com:metreeca/base.git</developerConnection>
+		<url>https://github.com/metreeca/base</url>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/metreeca/link/issues</url>
+		<url>https://github.com/metreeca/base/issues</url>
 	</issueManagement>
 
 	<distributionManagement>
@@ -78,7 +78,7 @@
 
 		<site>
 			<id>github-pages</id>
-			<url>https://metreeca.github.io/link/reports</url>
+			<url>https://metreeca.github.io/base/</url>
 		</site>
 
 	</distributionManagement>
@@ -205,7 +205,7 @@
 			<dependency> <!-- https://search.maven.org/artifact/org.eclipse.rdf4j/rdf4j-bom -->
 				<groupId>org.eclipse.rdf4j</groupId>
 				<artifactId>rdf4j-bom</artifactId>
-				<version>3.6.1</version>
+				<version>3.6.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -213,7 +213,7 @@
 			<dependency> <!-- https://search.maven.org/artifact/com.google.cloud/libraries-bom -->
 				<groupId>com.google.cloud</groupId>
 				<artifactId>libraries-bom</artifactId>
-				<version>19.0.0</version>
+				<version>19.2.1</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -229,11 +229,12 @@
 
 			<!-- Test Harness -->
 
-			<dependency> <!-- https://search.maven.org/artifact/org.junit.jupiter/junit-jupiter-engine -->
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-engine</artifactId>
+			<dependency>  <!-- https://search.maven.org/artifact/org.junit.jupiter/junit-bom -->
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
 				<version>5.7.1</version>
-				<scope>test</scope>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency> <!-- https://search.maven.org/artifact/org.assertj/assertj-core -->
@@ -252,7 +253,7 @@
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
+			<artifactId>junit-jupiter-api</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -408,12 +409,6 @@
 					<!-- !!! replace with shared assets (see https://stackoverflow.com/questions/30507476#30668813) -->
 					<!--<stylesheetfile>${maven.multiModuleProjectDirectory}/docs/assets/javadocs.css</stylesheetfile>-->
 
-					<links>
-
-						<link>http://docs.rdf4j.org/javadoc/latest/</link>
-
-					</links>
-
 					<tags>
 						<tag>
 							<name>apiNote</name>
@@ -523,7 +518,7 @@
 
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.1.2</version>
 
 				<reportSets>
 
@@ -580,6 +575,7 @@
 
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.2.0</version>
 
 						<executions>
 

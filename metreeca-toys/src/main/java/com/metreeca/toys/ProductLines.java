@@ -28,11 +28,7 @@ import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Guard.*;
 import static com.metreeca.json.shapes.MaxLength.maxLength;
 import static com.metreeca.json.shapes.Or.or;
-import static com.metreeca.rdf4j.assets.Graph.query;
-import static com.metreeca.rest.Wrapper.postprocessor;
-import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.operators.Browser.browser;
 import static com.metreeca.rest.operators.Relator.relator;
 import static com.metreeca.rest.wrappers.Driver.driver;
 
@@ -58,21 +54,7 @@ public final class ProductLines extends Delegator {
 		)).wrap(router()
 
 				.path("/", router()
-						.get(browser()
-								.with(postprocessor(jsonld(), query(""
-										+"prefix : <terms#>\n"
-										+"\n"
-										+"construct { ?line :size ?size } where {\n"
-										+"\n"
-										+"\t{ select ?line (count(distinct ?product) as ?size) {\n"
-										+"\t\n"
-										+"\t\t?line a :ProductLine; :product ?product;\n"
-										+"\t\t\n"
-										+"\t} group by ?line }\n"
-										+"\t\n"
-										+"}"
-								)))
-						))
+						.get(relator()))
 
 				.path("/{}", router()
 						.get(relator())

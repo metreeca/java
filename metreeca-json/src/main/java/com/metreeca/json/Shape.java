@@ -37,6 +37,7 @@ import static com.metreeca.json.shapes.Range.range;
 import static com.metreeca.json.shapes.When.when;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 
 
@@ -114,7 +115,7 @@ public abstract class Shape {
 	 */
 	public Set<Statement> outline(final Value... focus) {
 
-		if ( focus == null || Arrays.stream(focus).anyMatch(Objects::isNull) ) {
+		if ( focus == null || stream(focus).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null focus");
 		}
 
@@ -145,7 +146,7 @@ public abstract class Shape {
 	 */
 	public Shape localize(final String... tags) {
 
-		if ( tags == null || Arrays.stream(tags).anyMatch(Objects::isNull) ) {
+		if ( tags == null || stream(tags).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null tags");
 		}
 
@@ -210,7 +211,7 @@ public abstract class Shape {
 			throw new NullPointerException("null axis");
 		}
 
-		if ( values == null || Arrays.stream(values).anyMatch(Objects::isNull) ) {
+		if ( values == null || stream(values).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null values");
 		}
 
@@ -256,11 +257,10 @@ public abstract class Shape {
 	/**
 	 * Extracts the filtering form of this shape.
 	 *
-	 * @param anchor a target resource filtering matches will be linked to
+	 * @param anchor a target value filtering matches will be linked to
 	 *
 	 * @return a copy of this shape where constraint shapes are retained only inside {@linkplain Guard#filter(Shape...)
-	 * filtering} {@linkplain #then(Shape...) conditional} shapes, extended to link matches to the {@code anchor}
-	 * resource
+	 * filtering} {@linkplain #then(Shape...) conditional} shapes, extended to link matches to the {@code anchor} value
 	 *
 	 * @throws NullPointerException if {@code anchor} is null
 	 */
@@ -274,7 +274,7 @@ public abstract class Shape {
 
 				// container: connect to the anchor using ldp:contains, unless otherwise specified in the shape
 
-				? shape.empty() ? and(field(inverse(Contains), focus()), shape) : shape
+				? shape.empty() ? and(field(inverse(Contains), all(focus())), shape) : shape
 
 				// resource: constraint to the anchor
 
@@ -305,21 +305,20 @@ public abstract class Shape {
 	/**
 	 * Resolve focus values in this shape.
 	 *
-	 * @param base the base IRI focus values should be resolved against
+	 * @param focus the value {@linkplain Focus focus} values should be resolved against
 	 *
-	 * @return a copy of this shape where {@linkplain Focus focus} values are replaced by absolute IRIs by resolving
-	 * them
-	 * against {@code base}
+	 * @return a copy of this shape where focus values are replaced with the value obtained by resolving them against
+	 * {@code focus}
 	 *
-	 * @throws IllegalArgumentException if {@code base} is null
+	 * @throws IllegalArgumentException if {@code focus} is null
 	 */
-	public Shape resolve(final IRI base) {
+	public Shape resolve(final Value focus) {
 
-		if ( base == null ) {
-			throw new NullPointerException("null base");
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
 		}
 
-		return map(new ShapeResolver(base));
+		return map(new ShapeResolver(focus));
 	}
 
 
@@ -335,7 +334,7 @@ public abstract class Shape {
 	 */
 	public final Shape then(final Shape... shapes) {
 
-		if ( shapes == null || Arrays.stream(shapes).anyMatch(Objects::isNull) ) {
+		if ( shapes == null || stream(shapes).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null shapes");
 		}
 

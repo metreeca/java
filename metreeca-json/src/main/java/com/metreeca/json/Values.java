@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -82,6 +83,7 @@ public final class Values {
 	);
 
 	private static final char[] HexDigits="0123456789abcdef".toCharArray();
+	private static final int NameLengthLimit=80; // log args length limit
 
 
 	//// Constants /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,8 +97,9 @@ public final class Values {
 	public static final String Base="app:/";
 
 	public static final IRI Root=iri(Base);
+	public static final IRI Terms=iri(Base, "/terms/");
 
-	public static final Namespace NS=namespace("", Base+"terms#");
+	public static final Namespace NS=namespace("", Terms.stringValue());
 
 
 	public static IRI term(final String name) {
@@ -234,6 +237,28 @@ public final class Values {
 	}
 
 
+	public static String root(final IRI resource) {
+		return Optional.ofNullable(resource)
+				.map(Value::stringValue)
+				.map(IRIPattern::matcher)
+				.filter(Matcher::matches)
+				.map(matcher -> Optional.ofNullable(matcher.group("schemeall")).orElse("")
+						+Optional.ofNullable(matcher.group("hostall")).orElse("")
+						+"/"
+				)
+				.orElse(Base);
+	}
+
+	public static String path(final IRI resource) {
+		return Optional.ofNullable(resource)
+				.map(Value::stringValue)
+				.map(IRIPattern::matcher)
+				.filter(Matcher::matches)
+				.map(matcher -> matcher.group("pathall"))
+				.orElse("/");
+	}
+
+
 	public static String text(final Value value) {
 		return value == null ? null : value.stringValue();
 	}
@@ -243,11 +268,68 @@ public final class Values {
 				: value instanceof BNode ? BNodeType
 				: value instanceof IRI ? IRIType
 				: value instanceof Literal ? ((Literal)value).getDatatype()
-				: null; // unexpected
+				: ValueType;
 	}
 
 	public static String lang(final Value value) {
-		return value instanceof Literal ? ((Literal)value).getLanguage().orElse(null) : null;
+		return value instanceof Literal ? ((Literal)value).getLanguage().orElse("") : "";
+	}
+
+
+	//// Identifiers ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public static String uuid() {
+		return randomUUID().toString();
+	}
+
+	public static String uuid(final String text) {
+		return text == null ? null : uuid(text.getBytes(UTF_8));
+	}
+
+	public static String uuid(final byte[] data) {
+		return data == null ? null : nameUUIDFromBytes(data).toString();
+	}
+
+
+	public static String md5() {
+
+		final byte[] bytes=new byte[16];
+
+		ThreadLocalRandom.current().nextBytes(bytes);
+
+		return hex(bytes);
+	}
+
+	public static String md5(final String text) {
+		return text == null ? null : md5(text.getBytes(UTF_8));
+	}
+
+	public static String md5(final byte[] data) {
+		try {
+
+			return data == null ? null : hex(MessageDigest.getInstance("MD5").digest(data));
+
+		} catch ( final NoSuchAlgorithmException unexpected ) {
+			throw new InternalError(unexpected);
+		}
+	}
+
+
+	public static String hex(final byte[] bytes) {
+		if ( bytes == null ) { return null; } else {
+
+			final char[] hex=new char[bytes.length*2];
+
+			for (int i=0, l=bytes.length; i < l; ++i) {
+
+				final int b=bytes[i]&0xFF;
+
+				hex[2*i]=HexDigits[b >>> 4];
+				hex[2*i+1]=HexDigits[b&0x0F];
+			}
+
+			return new String(hex);
+		}
 	}
 
 
@@ -302,22 +384,6 @@ public final class Values {
 	}
 
 
-	public static Value value(final Object object) {
-		return object == null ? null
-
-				: object instanceof Value ? (Value)object
-
-				: object instanceof URI ? iri((URI)object)
-				: object instanceof URL ? iri((URL)object)
-
-				: literal(object);
-	}
-
-	private static <V extends Value> V value(final Class<?> type) {
-		throw new IllegalArgumentException(String.format("unsupported object type <%s>", type.getName()));
-	}
-
-
 	public static BNode bnode() {
 		return factory.createBNode();
 	}
@@ -334,17 +400,6 @@ public final class Values {
 
 	public static IRI iri() {
 		return factory.createIRI("urn:uuid:", uuid());
-	}
-
-	public static IRI iri(final Object object) {
-		return object == null ? null
-
-				: object instanceof IRI ? (IRI)object
-
-				: object instanceof URI ? iri((URI)object)
-				: object instanceof URL ? iri((URL)object)
-
-				: value(object.getClass());
 	}
 
 	public static IRI iri(final URI uri) {
@@ -369,56 +424,80 @@ public final class Values {
 	}
 
 
-	public static Literal literal(final Object object) {
-		return object == null ? null
-
-				: object instanceof Literal ? (Literal)object
-
-				: object instanceof Boolean ? literal(((Boolean)object).booleanValue())
-
-				: object instanceof Byte ? literal(((Byte)object).byteValue())
-				: object instanceof Short ? literal(((Short)object).shortValue())
-				: object instanceof Integer ? literal(((Integer)object).intValue())
-				: object instanceof Long ? literal(((Long)object).longValue())
-				: object instanceof Float ? literal(((Float)object).floatValue())
-				: object instanceof Double ? literal(((Double)object).doubleValue())
-				: object instanceof BigInteger ? literal((BigInteger)object)
-				: object instanceof BigDecimal ? literal((BigDecimal)object)
-
-				: object instanceof TemporalAccessor ? literal((TemporalAccessor)object)
-				: object instanceof TemporalAmount ? literal((TemporalAmount)object)
-
-				: object instanceof byte[] ? literal((byte[])object)
-
-				: value(object.getClass());
-	}
-
 	public static Literal literal(final boolean value) {
 		return factory.createLiteral(value);
 	}
 
+
+	public static Literal literal(final Number value) {
+		return literal(value, false);
+	}
+
+	public static Literal literal(final Number value, final boolean strict) {
+		return value == null ? null
+
+				: value instanceof Byte ? literal(value.byteValue(), strict)
+				: value instanceof Short ? literal(value.shortValue(), strict)
+				: value instanceof Integer ? literal(value.intValue(), strict)
+				: value instanceof Long ? literal(value.longValue(), strict)
+
+				: value instanceof Float ? literal(value.floatValue(), strict)
+				: value instanceof Double ? literal(value.doubleValue(), strict)
+
+				: value instanceof BigInteger ? literal((BigInteger)value)
+				: value instanceof BigDecimal ? literal((BigDecimal)value)
+
+				: null;
+	}
+
 	public static Literal literal(final byte value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final byte value, final boolean strict) {
+		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
 	}
 
 	public static Literal literal(final short value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final short value, final boolean strict) {
+		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
 	}
 
 	public static Literal literal(final int value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final int value, final boolean strict) {
+		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
 	}
 
 	public static Literal literal(final long value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final long value, final boolean strict) {
+		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
 	}
 
 	public static Literal literal(final float value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final float value, final boolean strict) {
+		return strict || Float.isInfinite(value) || Float.isNaN(value) ?
+				factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
 	}
 
 	public static Literal literal(final double value) {
-		return factory.createLiteral(value);
+		return literal(value, false);
+	}
+
+	public static Literal literal(final double value, final boolean strict) {
+		return strict || Double.isInfinite(value) || Double.isNaN(value) ?
+				factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
 	}
 
 	public static Literal literal(final BigInteger value) {
@@ -428,6 +507,7 @@ public final class Values {
 	public static Literal literal(final BigDecimal value) {
 		return value == null ? null : factory.createLiteral(value);
 	}
+
 
 	public static Literal literal(final String value) {
 		return value == null ? null : factory.createLiteral(value);
@@ -458,37 +538,29 @@ public final class Values {
 	}
 
 
-	///// Converters //////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Converters ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public static Optional<Resource> resource(final Value value) {
+		return Optional.ofNullable(value).filter(Value::isResource).map(Resource.class::cast);
+	}
+
+	public static Optional<BNode> bnode(final Value value) {
+		return Optional.ofNullable(value).filter(Value::isBNode).map(BNode.class::cast);
+	}
 
 	public static Optional<IRI> iri(final Value value) {
-		return Optional.ofNullable(value).filter(IRI.class::isInstance).map(IRI.class::cast);
+		return Optional.ofNullable(value).filter(Value::isIRI).map(IRI.class::cast);
 	}
 
 	public static Optional<Literal> literal(final Value value) {
-		return Optional.ofNullable(value).filter(Literal.class::isInstance).map(Literal.class::cast);
+		return Optional.ofNullable(value).filter(Value::isLiteral).map(Literal.class::cast);
 	}
 
 
-	public static Optional<Boolean> _boolean(final Value value) {
-		return literal(value).map(Literal::booleanValue);
+	public static Optional<Boolean> bool(final Value value) {
+		return literal(value).map(guard(Literal::booleanValue));
 	}
 
-
-	public static Optional<Integer> _int(final Value value) {
-		return literal(value).map(guard(Literal::intValue));
-	}
-
-	public static Optional<Long> _long(final Value value) {
-		return literal(value).map(guard(Literal::longValue));
-	}
-
-	public static Optional<Float> __float(final Value value) {
-		return literal(value).map(guard(Literal::floatValue));
-	}
-
-	public static Optional<Double> _double(final Value value) {
-		return literal(value).map(guard(Literal::doubleValue));
-	}
 
 	public static Optional<BigInteger> integer(final Value value) {
 		return literal(value).map(guard(Literal::integerValue));
@@ -496,6 +568,11 @@ public final class Values {
 
 	public static Optional<BigDecimal> decimal(final Value value) {
 		return literal(value).map(guard(Literal::decimalValue));
+	}
+
+
+	public static Optional<String> string(final Value value) {
+		return literal(value).map(guard(Literal::stringValue));
 	}
 
 
@@ -508,15 +585,15 @@ public final class Values {
 	}
 
 
-	public static Optional<String> string(final Value value) {
-		return literal(value).map(Literal::stringValue);
-	}
+	public static <V, R> Function<V, R> guard(final Function<V, R> mapper) {
 
+		if ( mapper == null ) {
+			throw new NullPointerException("null mapper");
+		}
 
-	private static <V, R> Function<V, R> guard(final Function<V, R> mapper) {
-		return v -> {
+		return value -> {
 
-			try { return mapper.apply(v); } catch ( final RuntimeException e ) { return null; }
+			try {return mapper.apply(value);} catch ( final RuntimeException e ) {return null;}
 
 		};
 	}
@@ -542,10 +619,18 @@ public final class Values {
 
 	public static String format(final Value value) {
 		return value == null ? null
+				: value instanceof Focus ? format((Focus)value)
 				: value instanceof BNode ? format((BNode)value)
 				: value instanceof IRI ? format((IRI)value)
-				: value instanceof Focus ? format((Focus)value)
 				: format((Literal)value);
+	}
+
+	public static String format(final Frame frame) {
+		return frame == null ? null : frame.toString();
+	}
+
+	public static String format(final Focus focus) {
+		return focus == null ? null : "{"+focus.stringValue()+"}";
 	}
 
 	public static String format(final BNode bnode) {
@@ -559,10 +644,6 @@ public final class Values {
 		);
 	}
 
-	public static String format(final Focus focus) {
-		return focus == null ? null : "{"+focus.stringValue()+"}";
-	}
-
 	public static String format(final Literal literal) {
 		if ( literal == null ) { return null; } else {
 
@@ -571,113 +652,27 @@ public final class Values {
 			try {
 
 				return type.equals(XSD.BOOLEAN) ? String.valueOf(literal.booleanValue())
+
 						: type.equals(XSD.INTEGER) ? String.valueOf(literal.integerValue())
 						: type.equals(XSD.DECIMAL) ? literal.decimalValue().toPlainString()
+
 						: type.equals(XSD.DOUBLE) ? exponential.get().format(literal.doubleValue())
 						: type.equals(XSD.STRING) ? quote(literal.getLabel())
 
 						: literal.getLanguage()
-						.map(lang -> format(literal.getLabel(), lang))
-						.orElseGet(() -> format(literal.getLabel(), type));
+						.map(lang -> quote(literal.getLabel())+'@'+lang)
+						.orElseGet(() -> quote(literal.getLabel())+"^^"+format(type));
 
 			} catch ( final IllegalArgumentException ignored ) {
 
-				return format(literal.getLabel(), type);
+				return quote(literal.getLabel())+"^^"+format(type);
 
 			}
 		}
 	}
 
 
-	private static String format(final CharSequence label, final String lang) {
-		return quote(label)+'@'+lang;
-	}
-
-	private static String format(final CharSequence label, final IRI type) {
-		return quote(label)+"^^"+format(type);
-	}
-
-
-	//// Helpers ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public static String uuid() {
-		return randomUUID().toString();
-	}
-
-	public static String uuid(final String text) {
-		return text == null ? null : uuid(text.getBytes(UTF_8));
-	}
-
-	public static String uuid(final byte[] data) {
-		return data == null ? null : nameUUIDFromBytes(data).toString();
-	}
-
-
-	public static String md5() {
-
-		final byte[] bytes=new byte[16];
-
-		ThreadLocalRandom.current().nextBytes(bytes);
-
-		return hex(bytes);
-	}
-
-	public static String md5(final String text) {
-		return text == null ? null : md5(text.getBytes(UTF_8));
-	}
-
-	public static String md5(final byte[] data) {
-		try {
-
-			return data == null ? null : hex(MessageDigest.getInstance("MD5").digest(data));
-
-		} catch ( final NoSuchAlgorithmException unexpected ) {
-			throw new InternalError(unexpected);
-		}
-	}
-
-
-	public static BigInteger integer(final long value) {
-		return BigInteger.valueOf(value);
-	}
-
-	public static BigInteger integer(final Number value) {
-		return value == null ? null
-				: value instanceof BigInteger ? (BigInteger)value
-				: value instanceof BigDecimal ? ((BigDecimal)value).toBigInteger()
-				: BigInteger.valueOf(value.longValue());
-	}
-
-
-	public static BigDecimal decimal(final double value) {
-		return BigDecimal.valueOf(value);
-	}
-
-	public static BigDecimal decimal(final Number value) {
-		return value == null ? null
-				: value instanceof BigInteger ? new BigDecimal((BigInteger)value)
-				: value instanceof BigDecimal ? (BigDecimal)value
-				: BigDecimal.valueOf(value.doubleValue());
-	}
-
-
-	public static String hex(final byte[] bytes) {
-		if ( bytes == null ) { return null; } else {
-
-			final char[] hex=new char[bytes.length*2];
-
-			for (int i=0, l=bytes.length; i < l; ++i) {
-
-				final int b=bytes[i]&0xFF;
-
-				hex[2*i]=HexDigits[b >>> 4];
-				hex[2*i+1]=HexDigits[b&0x0F];
-			}
-
-			return new String(hex);
-		}
-	}
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static String quote(final CharSequence text) {
 
@@ -724,6 +719,21 @@ public final class Values {
 		}
 
 		return NewlinePattern.matcher(text).replaceAll("\n\t");
+	}
+
+	/**
+	 * Clips a string.
+	 *
+	 * @param string the string to be clipped
+	 *
+	 * @return the input {@code string} clipped to a maximum length limit, or {@code null} if {@code string} is null
+	 */
+	public static String clip(final String string) {
+		return string == null || string.isEmpty() ? "?"
+				: string.indexOf('\n') >= 0 ? clip(string.substring(0, string.indexOf('\n')))
+				: string.length() > NameLengthLimit ?
+				string.substring(0, NameLengthLimit/2)+" … "+string.substring(string.length()-NameLengthLimit/2)
+				: string;
 	}
 
 

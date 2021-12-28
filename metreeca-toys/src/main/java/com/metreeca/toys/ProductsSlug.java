@@ -16,37 +16,32 @@
 
 package com.metreeca.toys;
 
-import com.metreeca.rdf4j.assets.Graph;
+import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Request;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
-import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.repository.RepositoryResult;
 
 import java.util.function.Function;
 
 import static com.metreeca.json.Values.literal;
-import static com.metreeca.rdf4j.assets.Graph.graph;
-import static com.metreeca.rest.Context.asset;
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 
 public final class ProductsSlug implements Function<Request, String> {
 
-	private final Graph graph=asset(graph());
+	private final Graph graph=service(graph());
 
 	@Override
 	public String apply(final Request request) {
-		return graph.exec(connection -> {
+		return graph.query(connection -> {
 
-			final Value scale=request.body(jsonld()).get()
-					.flatMap(model -> new LinkedHashModel(model)
-							.filter(null, Toys.scale, null)
-							.objects()
-							.stream()
-							.findFirst()
-					)
-					.orElse(literal("1:1"));
+			final Value scale=literal(request.body(jsonld()).get()
+					.flatMap(frame -> frame.string(Toys.scale))
+					.orElse("1:1")
+			);
 
 			int serial=0;
 

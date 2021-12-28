@@ -17,7 +17,7 @@
 package com.metreeca.open.actions;
 
 import com.metreeca.json.Frame;
-import com.metreeca.rdf4j.assets.Graph;
+import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.*;
 import com.metreeca.rest.formats.JSONFormat;
@@ -28,17 +28,18 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 
-import javax.json.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.json.*;
+
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.literal;
 import static com.metreeca.rest.formats.JSONFormat.json;
+
 import static java.lang.Double.parseDouble;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
@@ -56,11 +57,11 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 	public static final String WD="http://www.wikidata.org/entity/";
 	public static final String WDP="http://www.wikidata.org/prop/";
 	public static final String WDT="http://www.wikidata.org/prop/direct/";
-	public static final String WIKIBASE="http://wikiba.se/ontology#";
+	public static final String WB="http://wikiba.se/ontology#";
 
-	public static final IRI ITEM=iri(WIKIBASE, "Item");
-	public static final IRI PROPERTY=iri(WIKIBASE, "Property");
-	public static final IRI SITELINKS=iri(WIKIBASE, "sitelinks");
+	public static final IRI ITEM=iri(WB, "Item");
+	public static final IRI PROPERTY=iri(WB, "Property");
+	public static final IRI SITELINKS=iri(WB, "sitelinks");
 
 	public static final IRI P31=iri(WDT, "P31"); // instance of
 	public static final IRI P279=iri(WDT, "P279"); // subclass of
@@ -127,8 +128,8 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 
 	private Frame match(final JsonObject match) {
 		return frame(iri(match.getString("concepturi")))
-				.set(RDFS.LABEL).value(literal(string(match.get("label"))))
-				.set(RDFS.COMMENT).value(literal(string(match.get("description"))));
+				.string(RDFS.LABEL, string(match.get("label")))
+				.string(RDFS.COMMENT, string(match.get("description")));
 	}
 
 	private String string(final JsonValue value) {

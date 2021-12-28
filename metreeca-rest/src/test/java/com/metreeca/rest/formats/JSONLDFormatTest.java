@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 
 import javax.json.Json;
 
+import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Shape.required;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.shapes.And.and;
@@ -45,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 
 final class JSONLDFormatTest {
@@ -59,7 +59,7 @@ final class JSONLDFormatTest {
 
 
 	private void exec(final Runnable task) {
-		new Context().exec(task).clear();
+		new Toolbox().exec(task).clear();
 	}
 
 
@@ -70,7 +70,7 @@ final class JSONLDFormatTest {
 
 					.header("Content-Type", MIME)
 
-					.attribute(shape(), field(direct, required()))
+					.set(shape(), field(direct, required()))
 
 					.body(input(), () -> new ByteArrayInputStream(json.getBytes(UTF_8)));
 		}
@@ -78,7 +78,7 @@ final class JSONLDFormatTest {
 		private Future<Response> response(final Request request) {
 			return request.reply(response -> request.body(jsonld()).fold(
 					response::map,
-					model -> response.status(OK).attribute(shape(), request.attribute(shape())).body(jsonld(), model)
+					model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)
 			));
 		}
 
@@ -93,18 +93,6 @@ final class JSONLDFormatTest {
 					)
 			);
 		}
-
-		@Test void test() {
-			exec(() -> request("{ \"direct\": 1, \"other\": 2 }")
-
-					.map(this::response)
-
-					.accept(response -> assertThat(response)
-							.hasStatus(BadRequest)
-					)
-			);
-		}
-
 
 		@Test void testReportInvalidPayload() {
 			exec(() -> request("{}")
@@ -133,7 +121,7 @@ final class JSONLDFormatTest {
 
 			return response.status(OK)
 
-					.attribute(shape(), and(
+					.set(shape(), and(
 
 							field(direct, required(),
 									field(nested, required())
@@ -143,14 +131,14 @@ final class JSONLDFormatTest {
 
 					))
 
-					.body(jsonld(), asList(
+					.body(jsonld(), frame(item, asList(
 
 							statement(item, direct, bnode),
 							statement(bnode, nested, item),
 							statement(bnode, reverse, item),
 							statement(item, outlier, bnode)
 
-					));
+					)));
 		}
 
 
@@ -204,7 +192,7 @@ final class JSONLDFormatTest {
 		}
 
 		@Test void testGenerateJSONLDContextObjects() {
-			new Context()
+			new Toolbox()
 
 					.set(keywords(), () -> singletonMap("@id", "id"))
 
@@ -271,18 +259,22 @@ final class JSONLDFormatTest {
 					.base(base)
 					.header("Accept-Language", "en")
 
-					.reply(response -> response.status(OK)
+					.reply(response -> {
 
-							.attribute(shape(), field(direct, localized()))
+						final IRI item=iri(response.item());
 
-							.body(jsonld(), asList(
+						return response.status(OK)
 
-									statement(iri(response.item()), direct, literal("one", "en")),
-									statement(iri(response.item()), direct, literal("uno", "it")),
-									statement(iri(response.item()), direct, literal("ein", "de"))
+								.set(shape(), field(direct, localized()))
 
-							))
-					)
+								.body(jsonld(), frame(item, asList(
+
+										statement(item, direct, literal("one", "en")),
+										statement(item, direct, literal("uno", "it")),
+										statement(item, direct, literal("ein", "de"))
+
+								)));
+					})
 
 					.accept(response -> assertThat(response)
 							.hasBody(json(), json -> assertThat(json)
@@ -295,7 +287,7 @@ final class JSONLDFormatTest {
 		@Test void testReportInvalidPayload() {
 			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request()
 
-					.reply(response -> response(response).body(jsonld(), emptySet()))
+					.reply(response -> response(response).body(jsonld(), frame(iri(response.item()))))
 
 					.accept(response -> response.body(output()).accept(e -> {},
 							target -> target.accept(new ByteArrayOutputStream())
