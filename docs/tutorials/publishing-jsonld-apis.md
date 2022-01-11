@@ -3,7 +3,7 @@ title:  "Publishing Model‑Driven REST/JSON-LD APIs"
 parent: "Tutorials"
 ---
 
-[comment]: <> (excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing)
+[comment]: <> "excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing"
 
 <details open markdown="block">
   <summary>Table of Contents</summary>
@@ -29,7 +29,7 @@ API development process focusing on the task of publishing
 the [Product](https://demo.metreeca.com/self/#endpoint=https://demo.metreeca.com/toys/sparql&collection=https://demo.metreeca.com/toys/terms#Product)
 catalog.
 
-You may try out the examples using your favorite API testing tool or working from the command line with toos like `curl`
+You may try out the examples using your favorite API testing tool or working from the command line with tools like `curl`
 or `wget`.
 
 A Maven project with the code for the complete sample app is available
@@ -51,7 +51,6 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
   <groupId>com.example</groupId>
   <artifactId>sample</artifactId>
   <version>1.0</version>
-  <packaging>war</packaging>
 
   <properties>
 
@@ -67,7 +66,7 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
       <dependency>
         <groupId>com.metreeca</groupId>
         <artifactId>metreeca-base</artifactId>
-        <version>${project.version}</version>
+        <version>${metreeca-base.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -79,11 +78,77 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 </project>
 ```
 
-Then, add the required dependencies for the Metreeca/Base [connectors](../javadocs/) for the target deployment server and
-the target graph storage option; in this tutorial we will deploy to a Servlet 3.1 container with an RDF4J Memory store,
-so we add:
+Then, add the required dependencies for the Metreeca/Base [connectors](../#modules) for the target deployment server and
+the target graph storage option; in this tutorial we’ll use an RDF4J Memory store deploying either to an embedded server
+or to a Servlet 3.1 container.
+
+Note that the Metreeca/Base BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
+specify version numbers explicitly.
+
+## Embedded Server
+
+Add the following dependencies to your Maven project:
 
 ```xml
+import com.metreeca.jse.JSEServer;
+
+		import static com.metreeca.rest.Response.OK;
+		import static com.metreeca.rest.wrappers.Server.server;
+
+		public final class Server {
+
+		public static void main(final String... args) {
+		new JSEServer()
+
+		.delegate(toolbox -> toolbox.get(() ->
+
+		server().wrap(request -> request.reply(response ->
+		response.status(OK)
+		))
+
+		))
+
+		.start();
+		}
+
+		}
+```
+
+Then, define in the `src/main/java` folder a minimal server stub like:
+
+```java
+import com.metreeca.jse.JSEServer;
+
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.wrappers.Server.server;
+
+public final class Server {
+
+  public static void main(final String... args) {
+    new JSEServer()
+
+        .delegate(toolbox -> toolbox.get(() ->
+
+            server().wrap(request -> request.reply(response ->
+                response.status(OK)
+            ))
+
+        ))
+
+        .start();
+  }
+
+}
+```
+
+Compile and and launch the application.
+
+## Servlet Filter
+
+Add the following definitions and dependencies to your Maven project:
+
+```xml
+<packaging>war</packaging>
 
 <dependencies>
 
@@ -119,16 +184,31 @@ so we add:
 </dependencies>
 ```
 
-Note that the Metreeca/Base BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
-specify version numbers explicitly.
+Copy [`web.xml`](toys/web.xml) to the `src/main/webapp` folder.
 
-Finally, define a minimal server stub like:
+```xml
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+</web-app>
+```
+
+Then, define a minimal server stub like:
 
 ```java
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
+import com.metreeca.jee.JEEServer;
 
-  public Sample() {
+import javax.servlet.annotation.WebFilter;
+
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.wrappers.Server.server;
+
+@WebFilter(urlPatterns="/*")
+public final class Server extends JEEServer {
+
+  public Server() {
     delegate(toolbox -> toolbox.get(() ->
 
         server().wrap(request -> request.reply(response ->
@@ -141,14 +221,19 @@ public final class Sample extends JEEServer {
 }
 ```
 
-The stub configures the application to handle any resource using a
-barebone [handler](../javadocs/?com/metreeca/rest/Handler.html) always replying to
-incoming [requests](../javadocs/?com/metreeca/rest/Request.html) with
-a [response](../javadocs/?com/metreeca/rest/Response.html) including a `200` HTTP status code. The
-standard [Server](../javadocs/?com/metreeca/rest/wrappers/Server.html) wrapper provides default pre/postprocessing
-services and shared error handling.
+Compile and deploy the web app to your favorite servlet container.
 
-Compile and deploy the web app to your favorite servlet container and try your first request:
+## Test Connection
+
+Both stubs configure the application to handle any resource using a
+barebone [handler](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Handler.html) always
+replying to incoming [requests](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html)
+with a [response](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Response.html) including
+a `200` HTTP status code. The
+standard [Server](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/wrappers/Server.html)
+wrapper provides default pre/postprocessing services and shared error handling.
+
+The server should now be up and running and you can try your first request:
 
 ```shell
 % curl --include 'http://localhost:8080/'
@@ -156,163 +241,248 @@ Compile and deploy the web app to your favorite servlet container and try your f
 HTTP/1.1 200
 ```
 
-The [toolbox](../javadocs/?com/metreeca/rest/Toolbox.html) argument handled to the app loader lambda manages the shared
-system-provided services and can be used to customize them and to run app initialization tasks.
-Copy [BIRT.ttl](https://github.com/metreeca/base/tree/main/metreeca-toys/src/main/resources/com/metreeca/birt/BIRT.ttl)
-to the `src/main/resources/` directory and extend the stub as follows:
+From now on, we will extend the embedded server version, but the code applies with minor tweaks to the servlet versions
+as well.
+
+## Sample Data
+
+The [toolbox](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Toolbox.html) argument handled
+to the app loader lambda manages the shared system-provided services and can be used to customize them and to run app
+initialization tasks. Copy [`toys.ttl`](toys/toys.ttl)
+to the `src/main/resources/` folder, extend the stub as follows and relaunch the application:
 
 ```java
-public final class Sample extends JEEServer {
+import com.metreeca.jse.JSEServer;
+import com.metreeca.rdf4j.services.Graph;
 
-  public Sample() {
-    delegate(toolbox -> toolbox
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
-        .exec(() -> service(graph()).exec(connection -> {
-          try {
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.wrappers.Server.server;
 
-            connection.add(
-                Sample.class.getResourceAsStream("Toys.ttl"),
-                "https://example.com/", RDFFormat.TURTLE
-            );
+public final class Server {
 
-          } catch ( final IOException e ) {
-            throw new UncheckedIOException(e);
-          }
-        }))
+  public static void main(final String... args) {
+    new JSEServer()
 
-        .get(() -> server()
+        .delegate(toolbox -> toolbox
 
-            .wrap(request -> request.reply(status(OK)))
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-        )
-    );
+            .exec(() -> service(graph()).update(connection -> {
+              try {
+
+                connection.add(
+                    Toys.class.getResourceAsStream("toys.ttl"),
+                    "https://example.com/", RDFFormat.TURTLE
+                );
+
+                return null;
+
+              } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+              }
+            }))
+
+            .get(() ->
+                server().wrap(request -> request.reply(response ->
+                    response.status(OK)
+                ))
+
+            ))
+
+        .start();
   }
 
 }
 ```
 
-Here we are customizing the shared system-wide [graph](../javadocs/?com/metreeca/rdf4j/services/Graph.html) database as
-an ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
+Here we are customizing the shared
+system-wide [graph](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html)
+database as an ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
 
-The static [Toolbox.service()](../javadocs/?com/metreeca/rest/Toolbox.html#service-java.util.function.Supplier-) locator
-method provides access to shared services.
+The
+static [Toolbox.service()](https://javadoc.io/static/com.metreeca/metreeca-rest/1.0.1/com/metreeca/rest/Toolbox.html#service(java.util.function.Supplier))
+locator method provides access to shared services.
 
-Complex initialization tasks can be easily factored to a dedicated class:
+Complex initialization tasks can be easily factored to a dedicated loader class:
 
 ```java
+import com.metreeca.jse.JSEServer;
+import com.metreeca.rdf4j.services.Graph;
+
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
+
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.wrappers.Server.server;
+
+public final class Server {
+
+  public static void main(final String... args) {
+    new JSEServer()
+
+        .delegate(toolbox -> toolbox
+
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+
+            .exec(new Toys())
+
+            .get(() ->
+                server().wrap(request -> request.reply(response ->
+                    response.status(OK)
+                ))
+
+            ))
+
+        .start();
+  }
+
+}
+```
+
+```java
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Toolbox.service;
+
+import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
+
 public final class Toys implements Runnable {
 
   public static final String Base="https://example.com/";
   public static final String Namespace=Base+"terms#";
 
+
   @Override
   public void run() {
-    service(graph()).exec(connection -> {
+
+    service(graph()).update(connection -> {
       if ( !connection.hasStatement(null, null, null, false) ) {
         try {
 
-          connection.setNamespace("demo", Namespace);
-          connection.add(getClass().getResourceAsStream("Toys.ttl"), Base, TURTLE);
+          connection.setNamespace("toys", Namespace);
+          connection.add(getClass().getResourceAsStream("toys.ttl"), Base, TURTLE);
 
         } catch ( final IOException e ) {
           throw new UncheckedIOException(e);
         }
       }
+
+      return this;
+
     });
   }
 
 }
 ```
 
+# Handling Requests
+
+Requests are dispatched to their final handlers through a hierarchy of wrappers and delegating handlers.
+
 ```java
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
+import com.metreeca.jse.JSEServer;
+import com.metreeca.rdf4j.services.Graph;
 
-  public Sample() {
-    delegate(toolbox -> toolbox
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.vocabulary.LDP;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+import static com.metreeca.json.Values.iri;
+import static com.metreeca.json.Values.statement;
+import static com.metreeca.rdf.formats.RDFFormat.rdf;
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.Wrapper.preprocessor;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.wrappers.Server.server;
 
-        .exec(new Toys())
+import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
+import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
 
-        .get(() -> server()
+import static java.util.stream.Collectors.toList;
 
-            .wrap(request -> request.reply(status(OK)))
+public final class Server {
 
+  public static void main(final String... args) {
+    new JSEServer()
+
+        .delegate(toolbox -> toolbox
+
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+
+            .exec(new Toys())
+
+            .get(() -> server()
+
+                .with(preprocessor(request -> request.base(Toys.Base)))
+
+                .wrap(router()
+
+                    .path("/products/*", router()
+
+                        .path("/", router().get(request -> request.reply(response -> response
+                            .status(OK)
+                            .body(rdf(), service(graph()).query(connection ->
+                                stream(connection.getStatements(
+                                    null, RDF.TYPE, iri(Toys.Namespace, "Product")
+                                ))
+                                    .map(Statement::getSubject)
+                                    .map(p -> statement(
+                                        iri(request.item()), LDP.CONTAINS, p)
+                                    )
+                                    .collect(toList())
+                            ))
+                        )))
+
+                        .path("/{code}",
+                            router().get(request -> request.reply(response -> response
+                                .status(OK)
+                                .body(rdf(), service(graph()).query(connection ->
+                                    asList(connection.getStatements(
+                                            iri(request.item()), null, null
+                                        )
+                                    ))
+                                ))
+                            )
+                        )
+
+                    )
+
+                )
+
+            )
         )
-    );
+
+        .start();
   }
 
 }
 ```
 
-[Wrappers](../javadocs/?com/metreeca/rest/Wrapper.html) inspect and possibly alter incoming requests and outgoing
-responses before they are forwarded to wrapped handlers and returned to wrapping containers.
+[Wrappers](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html) inspect and possibly
+alter incoming requests and outgoing responses before they are forwarded to wrapped handlers and returned to wrapping
+containers.
 
 The preprocessor rebases RDF payloads from the external network-visible server base (`http://localhost:8080/`) to an
 internal canonical base (`https://demo.metreeca.com/`), ensuring data portability between development and production
 environments and making it possible to load the static RDF dataset during server initialization, while the external and
 possibly request-dependent base is not yet known. When external and internal bases match, as in production, rewriting is
 effectively disabled avoiding any performance hit.
-
-# Handling Requests
-
-Requests are dispatched to their final handlers through a hierarchy of wrappers and delegating handlers.
-
-```java
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
-
-  public Sample() {
-    delegate(toolbox -> toolbox
-
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-
-        .exec(new Toys())
-
-        .get(() -> server()
-
-            .with(preprocessor(request -> request.base(Toys.Base)))
-
-            .wrap(router()
-
-                .path("/products/*", router()
-
-                    .path("/", router().get(request -> request.reply(response -> response
-                        .status(OK)
-                        .body(rdf(), service(graph()).exec(connection -> {
-                          return stream(connection.getStatements(
-                              null, RDF.TYPE, iri(Toys.Namespace, "Product")
-                          ))
-                              .map(Statement::getSubject)
-                              .map(p -> statement(
-                                  iri(request.item()), LDP.CONTAINS, p)
-                              )
-                              .collect(toList());
-                        }))))
-                    )
-
-                    .path("/{code}", router().get(request -> request.reply(response -> response
-                        .status(OK)
-                        .body(rdf(), service(graph()).exec(connection -> {
-                          return asList(connection.getStatements(
-                              iri(request.item()), null, null
-                          ));
-                        }))))
-                    )
-
-                )
-
-            )
-
-        )
-    );
-  }
-
-}
-```
 
 ```shell
 % curl --include 'http://localhost:8080/products/S18_4409'
@@ -336,8 +506,8 @@ Content-Type: text/turtle;charset=UTF-8
 
 ## Request Routing
 
-[Routers](../javadocs/?com/metreeca/rest/handlers/Router.html) dispatch requests on the basis of
-the [request path](../javadocs/?com/metreeca/rest/Request.html#path--) and
+[Routers](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/handlers/Router.html) dispatch
+requests on the basis of the [request path](../javadocs/?com/metreeca/rest/Request.html#path--) and
 the [request method](../javadocs/?com/metreeca/rest/Request.html#method--), ignoring leading path segments possibly
 already matched by wrapping routers.
 
@@ -362,76 +532,109 @@ opportunity to handle the request.
 Again, complex handlers can be easily factored to dedicated classes:
 
 ```java
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
+import com.metreeca.jse.JSEServer;
+import com.metreeca.rdf4j.services.Graph;
 
-  public Sample() {
-    delegate(toolbox -> toolbox
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Wrapper.preprocessor;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.wrappers.Server.server;
 
-        .exec(new Toys())
+public final class Server {
 
-        .get(() -> server()
+  public static void main(final String... args) {
+    new JSEServer()
 
-            .with(preprocessor(request -> request.base(Toys.Base)))
+        .delegate(toolbox -> toolbox
 
-            .wrap(router()
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-                .path("/products/*", new Products())
+            .exec(new Toys())
+
+            .get(() -> server()
+
+                .with(preprocessor(request -> request.base(Toys.Base)))
+
+                .wrap(router()
+
+                    .path("/products/*", new Products())
+
+                )
 
             )
-
         )
-    );
+
+        .start();
   }
 
 }
 ```
 
 ```java
+import com.metreeca.rest.handlers.Delegator;
+
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.vocabulary.LDP;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+
+import static com.metreeca.json.Values.iri;
+import static com.metreeca.json.Values.statement;
+import static com.metreeca.rdf.formats.RDFFormat.rdf;
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.handlers.Router.router;
+
+import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
+import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
+
+import static java.util.stream.Collectors.toList;
+
 public final class Products extends Delegator {
 
   public static final IRI Product=iri(Toys.Namespace, "Product");
 
+
   public Products() {
     delegate(router()
 
-        .path("/", router()
-            .get(request -> request.reply(response -> response
-                .status(OK)
-                .body(rdf(), service(graph()).exec(connection -> {
-                  return stream(connection.getStatements(
-                      null, RDF.TYPE, Product
-                  ))
-                      .map(Statement::getSubject)
-                      .map(product -> statement(
-                          iri(request.item()), LDP.CONTAINS, product
-                      ))
-                      .collect(toList());
-                }))
+        .path("/", router().get(request -> request.reply(response -> response
+            .status(OK)
+            .body(rdf(), service(graph()).query(connection ->
+                stream(connection.getStatements(
+                    null, RDF.TYPE, Product
+                ))
+                    .map(Statement::getSubject)
+                    .map(p -> statement(
+                        iri(request.item()), LDP.CONTAINS, p)
+                    )
+                    .collect(toList())
             ))
-        )
+        )))
 
-        .path("/{code}", router()
-            .get(request -> request.reply(response -> response
+        .path("/{code}",
+            router().get(request -> request.reply(response -> response
                 .status(OK)
-                .body(rdf(), service(graph()).exec(connection -> {
-                  return asList(connection.getStatements(
-                      iri(request.item()), null, null
-                  ));
-                }))
-            ))
+                .body(rdf(), service(graph()).query(connection ->
+                    asList(connection.getStatements(
+                            iri(request.item()), null, null
+                        )
+                    ))
+                ))
+            )
         )
-
     );
   }
-
 }
 ```
 
-The [Delegator](../javadocs/?com/metreeca/rest/handlers/Delegator.html) abstract handler provides a convenient way of
-packaging complex handlers assembled as a combination of other handlers and wrappers.
+The [Delegator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/handlers/Delegator.html)
+abstract handler provides a convenient way of packaging complex handlers assembled as a combination of other handlers and
+wrappers.
 
 # Model-Driven Handlers
 
@@ -445,35 +648,51 @@ request [focus item](../javadocs/?com/metreeca/rest/Request.html#item--).
 
 | actor                                                        | action                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Relator](../javadocs/?com/metreeca/rest/handlers/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended collection [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
-| [Creator](../javadocs/?com/metreeca/rest/handlers/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
-| [Updater](../javadocs/?com/metreeca/rest/handlers/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
-| [Deleter](../javadocs/?com/metreeca/rest/handlers/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |
+| [Relator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended collection [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
+| [Creator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
+| [Updater](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
+| [Deleter](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |
 
-```diff
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
+```java
+import com.metreeca.jse.JSEServer;
+import com.metreeca.rdf4j.services.Graph;
+import com.metreeca.rdf4j.services.GraphEngine;
 
-  public Sample() {
-    delegate(toolbox -> toolbox
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-+        .set(engine(), GraphEngine::new)
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Wrapper.preprocessor;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.services.Engine.engine;
+import static com.metreeca.rest.wrappers.Server.server;
 
-        .exec(new Toys())
+public final class Server {
 
-        .get(() -> server()
+  public static void main(final String... args) {
+    new JSEServer()
 
-            .with(preprocessor(request -> request.base(Toys.Base)))
+        .delegate(toolbox -> toolbox
 
-            .wrap(router()
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+            .set(engine(), GraphEngine::new) // <<< add this line <<<
 
-                .path("/products/*", new Products())
+            .exec(new Toys())
+
+            .get(() -> server()
+
+                .with(preprocessor(request -> request.base(Toys.Base)))
+
+                .wrap(router()
+
+                    .path("/products/*", new Products())
+
+                )
 
             )
-
         )
-    );
+
+        .start();
   }
 
 }
@@ -492,6 +711,19 @@ Let's start by defining a barebone model stating that all resources of class `Pr
 items exposing only `rdf:type`, `rdfs:label`  and `rdfs:comment` properties.
 
 ```java
+import com.metreeca.rest.handlers.Delegator;
+
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
+
+import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.operators.Creator.creator;
+import static com.metreeca.rest.operators.Deleter.deleter;
+import static com.metreeca.rest.operators.Relator.relator;
+import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.wrappers.Driver.driver;
+
 public final class Products extends Delegator {
 
   public Products() {
@@ -520,8 +752,9 @@ public final class Products extends Delegator {
 }
 ```
 
-The [Driver](../javadocs/index.html?com/metreeca/rest/wrappers/Driver.html) wrapper associated a linked data model to
-incoming requests, driving the operations of nested actors and other model-aware handlers.
+The [Driver](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/wrappers/Driver.html) wrapper
+associated a linked data model to incoming requests, driving the operations of nested actors and other model-aware
+handlers.
 
 Linked data models are defined with a shape-based [specification language](../reference/spec-language.md), assembling
 shape [building blocks](../reference/spec-language.md#shapes) using a simple Java DSL.
@@ -551,6 +784,17 @@ Content-Type: application/json;charset=UTF-8
 We'll now refine the initial barebone model, exposing more properties and detailing properties roles and constraints.
 
 ```java
+import org.eclipse.rdf4j.model.IRI;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import static com.metreeca.json.Values.iri;
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Toolbox.service;
+
+import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
+
 public final class Toys implements Runnable {
 
   public static final String Base="https://example.com/";
@@ -581,17 +825,23 @@ public final class Toys implements Runnable {
     return iri(Namespace, name);
   }
 
-
   @Override
   public void run() {
-    service(graph()).exec(connection -> {
-      try {
 
-        connection.add(Toys.class.getResourceAsStream("Toys.ttl"), Base, RDFFormat.TURTLE);
+    service(graph()).update(connection -> {
+      if ( !connection.hasStatement(null, null, null, false) ) {
+        try {
 
-      } catch ( final IOException e ) {
-        throw new UncheckedIOException(e);
+          connection.setNamespace("toys", Namespace);
+          connection.add(getClass().getResourceAsStream("toys.ttl"), Base, TURTLE);
+
+        } catch ( final IOException e ) {
+          throw new UncheckedIOException(e);
+        }
       }
+
+      return this;
+
     });
   }
 
@@ -599,6 +849,29 @@ public final class Toys implements Runnable {
 ```
 
 ```java
+import com.metreeca.rest.handlers.Delegator;
+
+import org.eclipse.rdf4j.model.vocabulary.*;
+
+import static com.metreeca.json.Values.literal;
+import static com.metreeca.json.shapes.Clazz.clazz;
+import static com.metreeca.json.shapes.Datatype.datatype;
+import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.json.shapes.MaxExclusive.maxExclusive;
+import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.json.shapes.MaxLength.maxLength;
+import static com.metreeca.json.shapes.MinExclusive.minExclusive;
+import static com.metreeca.json.shapes.MinInclusive.minInclusive;
+import static com.metreeca.json.shapes.Or.or;
+import static com.metreeca.json.shapes.Pattern.pattern;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.operators.Creator.creator;
+import static com.metreeca.rest.operators.Deleter.deleter;
+import static com.metreeca.rest.operators.Relator.relator;
+import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.wrappers.Driver.driver;
+
 public final class Products extends Delegator {
 
   public Products() {
@@ -609,58 +882,58 @@ public final class Products extends Delegator {
         field(RDF.TYPE, exactly(Toys.Product)),
 
         field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-      field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+        field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-      server(field(Toys.code, required())),
+        server(field(Toys.code, required())),
 
-      field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+        field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-          relate(field(RDFS.LABEL, required()))
+            relate(field(RDFS.LABEL, required()))
 
-      ),
+        ),
 
-      field(Toys.scale, required(),
-          datatype(XSD.STRING),
-          pattern("1:[1-9][0-9]{1,2}")
-      ),
+        field(Toys.scale, required(),
+            datatype(XSD.STRING),
+            pattern("1:[1-9][0-9]{1,2}")
+        ),
 
-      field(Toys.vendor, required(),
-          datatype(XSD.STRING),
-          maxLength(50)
-      ),
+        field(Toys.vendor, required(),
+            datatype(XSD.STRING),
+            maxLength(50)
+        ),
 
-      field("price", Toys.sell, required(),
-          datatype(XSD.DECIMAL),
-          minExclusive(literal(0.0)),
-          maxExclusive(literal(1_000.0))
-      ),
+        field("price", Toys.sell, required(),
+            datatype(XSD.DECIMAL),
+            minExclusive(literal(0.0)),
+            maxExclusive(literal(1_000.0))
+        ),
 
-      role(Toys.staff).then(field(Toys.buy, required(),
-          datatype(XSD.DECIMAL),
-          minInclusive(literal(0.0)),
-          maxInclusive(literal(1_000.0))
-      )),
+        role(Toys.staff).then(field(Toys.buy, required(),
+            datatype(XSD.DECIMAL),
+            minInclusive(literal(0.0)),
+            maxInclusive(literal(1_000.0))
+        )),
 
-      server().then(field(Toys.stock, required(),
-          datatype(XSD.INTEGER),
-          minInclusive(literal(0)),
-          maxExclusive(literal(10_000))
-      ))
+        server().then(field(Toys.stock, required(),
+            datatype(XSD.INTEGER),
+            minInclusive(literal(0)),
+            maxExclusive(literal(10_000))
+        ))
 
-  )).wrap(router()
+    )).wrap(router()
 
-      .path("/", router()
-          .get(relator())
-          .post(creator())
-      )
+        .path("/", router()
+            .get(relator())
+            .post(creator())
+        )
 
-      .path("/*", router()
-          .get(relator())
-          .put(updater())
-          .delete(deleter())
-      )
+        .path("/*", router()
+            .get(relator())
+            .put(updater())
+            .delete(deleter())
+        )
 
-  ));
+    ));
   }
 
 }
@@ -748,32 +1021,35 @@ the `toys:staff` role.
 
 User roles are usually granted to requests by authentication/authorization wrappers, like in the following naive sample:
 
-```diff
-@WebFilter(urlPatterns="/*")
-public final class Sample extends JEEServer {
+```java
+public final class Server {
 
-  public Sample() {
-    delegate(toolbox -> toolbox
+  public static void main(final String... args) {
+    new JSEServer()
 
-        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-        .set(engine(), GraphEngine::new)
+        .delegate(toolbox -> toolbox
 
-        .exec(new Toys())
+            .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+            .set(engine(), GraphEngine::new)
 
-        .get(() -> server()
+            .exec(new Toys())
 
-            .with(preprocessor(request -> request.base(Toys.Base)))
+            .get(() -> server()
 
-+            .with(bearer("secret", Toys.staff))
+                .with(preprocessor(request -> request.base(Toys.Base)))
 
-            .wrap(router()
+                .with(bearer("secret", Toys.staff)) // <<< add this line <<<
 
-                .path("/products/*", new Products())
+                .wrap(router()
+
+                    .path("/products/*", new Products())
+
+                )
 
             )
-
         )
-    );
+
+        .start();
   }
 
 }
@@ -816,7 +1092,7 @@ Content-Type: application/json;charset=UTF-8
 % curl --include --request DELETE \
     'http://localhost:8080/products/S18_4409'
     
-HTTP/1.1 403 Forbidden # << user not authenticated in the `toys:staff` role
+HTTP/1.1  401 Unauthorized # << user not authenticated in the `toys:staff` role
 
 ```
 
@@ -828,82 +1104,8 @@ We'll now complete the product catalog, adding:
 - postprocessing scripts for updating server-managed properties and perform other housekeeping tasks when resources are
   created or modified.
 
-Copy [ProductsCreate.ql](https://github.com/metreeca/base/tree/main/metreeca-toys/src/main/resources/com/metreeca/toys/ProductsCreate.ql)
+Copy [`ProductsCreate.ql`](toys/ProductsCreate.ql)
 to the `src/main/resources/` directory and extend `Products` as follows:
-
-```diff
-public final class Products extends Delegator {
-
-  public Products() {
-    delegate(driver(or(relate(), role(Toys.staff)).then(
-        
-        // …
-        
-    )).wrap(router()
-
-        .path("/", router()
-            .get(relator())
-+            .post(creator()
-+                .slug(new ProductsSlug())
-+                .with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
-+            )
-        )
-
-        .path("/*", router()
-            .get(relator())
-            .put(updater())
-            .delete(deleter())
-        )
-
-    ));
-  }
-
-}
-```
-
-```java
-public final class ProductsSlug implements Function<Request, String> {
-
-	private final Graph graph=service(graph());
-
-	@Override
-	public String apply(final Request request) {
-		return graph.exec(connection -> {
-
-			final Value scale=literal(request.body(jsonld()).get()
-					.flatMap(frame -> frame.string(Toys.scale))
-					.orElse("1:1")
-			);
-
-			int serial=0;
-
-			try ( final RepositoryResult<Statement> matches=connection.getStatements(
-					null, Toys.scale, scale
-			) ) {
-				for (; matches.hasNext(); matches.next()) { ++serial; }
-			}
-
-			String code="";
-
-			do {
-				code=String.format("S%s_%d", scale.stringValue().substring(2), serial);
-			} while ( connection.hasStatement(
-					null, Toys.code, literal(code), true
-			) );
-
-			return code;
-
-		});
-	}
-
-}
-```
-
-The slug generator assigns newly created resources a unique identifier based on their scale.
-
-!!! warning "Slug Synchronization"
-Real-world slug generators depending on shared state would take care that operations are synchronized among different
-transactions in order to prevent the creation of duplicate identifiers.
 
 ```sparql
 prefix toys: <terms#>
@@ -920,6 +1122,163 @@ insert { $this toys:code $name } where {};
 
 insert { $this toys:stock 0 } where {};
 ```
+
+```java
+import com.metreeca.rest.Toolbox;
+import com.metreeca.rest.handlers.Delegator;
+
+import org.eclipse.rdf4j.model.vocabulary.*;
+
+import static com.metreeca.json.Values.literal;
+import static com.metreeca.json.shapes.Clazz.clazz;
+import static com.metreeca.json.shapes.Datatype.datatype;
+import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.json.shapes.MaxExclusive.maxExclusive;
+import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.json.shapes.MaxLength.maxLength;
+import static com.metreeca.json.shapes.MinExclusive.minExclusive;
+import static com.metreeca.json.shapes.MinInclusive.minInclusive;
+import static com.metreeca.json.shapes.Or.or;
+import static com.metreeca.json.shapes.Pattern.pattern;
+import static com.metreeca.rdf4j.services.Graph.update;
+import static com.metreeca.rest.Toolbox.text;
+import static com.metreeca.rest.Wrapper.postprocessor;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.operators.Creator.creator;
+import static com.metreeca.rest.operators.Deleter.deleter;
+import static com.metreeca.rest.operators.Relator.relator;
+import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.wrappers.Driver.driver;
+
+public final class Products extends Delegator {
+
+  public Products() {
+    delegate(driver(or(relate(), role(Toys.staff)).then(
+
+        filter(clazz(Toys.Product)),
+
+        field(RDF.TYPE, exactly(Toys.Product)),
+
+        field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+        field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+
+        server(field(Toys.code, required())),
+
+        field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+
+            relate(field(RDFS.LABEL, required()))
+
+        ),
+
+        field(Toys.scale, required(),
+            datatype(XSD.STRING),
+            pattern("1:[1-9][0-9]{1,2}")
+        ),
+
+        field(Toys.vendor, required(),
+            datatype(XSD.STRING),
+            maxLength(50)
+        ),
+
+        field("price", Toys.sell, required(),
+            datatype(XSD.DECIMAL),
+            minExclusive(literal(0.0)),
+            maxExclusive(literal(1_000.0))
+        ),
+
+        role(Toys.staff).then(field(Toys.buy, required(),
+            datatype(XSD.DECIMAL),
+            minInclusive(literal(0.0)),
+            maxInclusive(literal(1_000.0))
+        )),
+
+        server().then(field(Toys.stock, required(),
+            datatype(XSD.INTEGER),
+            minInclusive(literal(0)),
+            maxExclusive(literal(10_000))
+        ))
+
+    )).wrap(router()
+
+        .path("/", router()
+            .get(relator())
+            .post(creator()
+                .slug(new ProductsSlug())
+                .with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
+            ))
+
+        .path("/*", router()
+            .get(relator())
+            .put(updater())
+            .delete(deleter())
+        )
+
+    ));
+  }
+
+}
+```
+
+```java
+import com.metreeca.rdf4j.services.Graph;
+import com.metreeca.rest.Request;
+
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.repository.RepositoryResult;
+
+import java.util.function.Function;
+
+import static com.metreeca.rdf4j.services.Graph.graph;
+import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+
+import static org.eclipse.rdf4j.model.util.Values.literal;
+
+public final class ProductsSlug implements Function<Request, String> {
+
+  private final Graph graph=service(graph());
+
+  @Override
+  public String apply(final Request request) {
+    return graph.update(connection -> {
+
+      final Value scale=literal(request.body(jsonld()).get()
+          .flatMap(frame -> frame.string(Toys.scale))
+          .orElse("1:1")
+      );
+
+      int serial=0;
+
+      try ( final RepositoryResult<Statement> matches=connection.getStatements(
+          null, Toys.scale, scale
+      ) ) {
+        for (; matches.hasNext(); matches.next()) { ++serial; }
+      }
+
+      String code="";
+
+      do {
+        code=String.format("S%s_%d", scale.stringValue().substring(2), serial);
+      } while ( connection.hasStatement(
+          null, Toys.code, literal(code), true
+      ) );
+
+      return code;
+
+    });
+  }
+
+}
+```
+
+The slug generator assigns newly created resources a unique identifier based on their scale.
+
+> :warning:
+>
+> Real-world slug generators depending on shared state would take care that operations are synchronized among different
+> transactions in order to prevent the creation of duplicate identifiers.
 
 The *ProductsCreate.ql* SPARQL Update postprocessing script updates server-managed `toys:code` and `toys:stock`
 properties after a new product is added to the catalog.
@@ -962,6 +1321,6 @@ Accept-Language: en
 To complete your tour of the framework:
 
 - walk through the [consuming tutorial](consuming-jsonld-apis.md) to learn how to interact with model-driven REST APIs to
-  power client apps like the demo [online product catalog](https://demo.metreeca.com/apps/shop/);
-- explore the [framework](../javadocs/?overview-summary.html) to learn how to develop your own custom wrappers and
-  handlers and to extend your server with additional services.
+  power client apps like the demo [online product catalog](https://demo.metreeca.com/toys/);
+- explore the [framework](../#modules) to learn how to develop your own custom wrappers and handlers and to extend your
+  server with additional services.
