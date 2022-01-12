@@ -352,6 +352,36 @@
 
 			</plugin>
 
+			<plugin> <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+
+				<configuration>
+
+					<tags>
+						<tag>
+							<name>apiNote</name>
+							<placement>a</placement>
+							<head>API Note:</head>
+						</tag>
+						<tag>
+							<name>implSpec</name>
+							<placement>a</placement>
+							<head>Implementation Specification:</head>
+						</tag>
+						<tag>
+							<name>implNote</name>
+							<placement>a</placement>
+							<head>Implementation Note:</head>
+						</tag>
+					</tags>
+
+				</configuration>
+
+			</plugin>
+
 			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
 
 				<groupId>org.apache.maven.plugins</groupId>
