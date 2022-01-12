@@ -23,7 +23,7 @@
 
 	<groupId>com.metreeca</groupId>
 	<artifactId>metreeca-base</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
 	<name>Metreeca REST/JSON-LD Framework</name>
@@ -116,13 +116,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -130,13 +130,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -146,13 +146,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-xml</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 
@@ -161,13 +161,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jee</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jse</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 
@@ -176,19 +176,19 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf4j</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-open</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-gcp</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 
 
