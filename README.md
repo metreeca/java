@@ -113,4 +113,5 @@ Hello world!
 
 # License
 
-This project is licensed under the Apache 2.0 License – see [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/base/blob/main/LICENSE)
+file for details.
