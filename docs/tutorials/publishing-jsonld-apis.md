@@ -46,34 +46,34 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example</groupId>
-  <artifactId>sample</artifactId>
-  <version>1.0</version>
+	<groupId>com.example</groupId>
+	<artifactId>sample</artifactId>
+	<version>1.0</version>
 
-  <properties>
+	<properties>
 
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 
-  </properties>
+	</properties>
 
-  <dependencyManagement>
+	<dependencyManagement>
 
-    <dependencies>
+		<dependencies>
 
-      <dependency>
-        <groupId>com.metreeca</groupId>
-        <artifactId>metreeca-base</artifactId>
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-base</artifactId>
         <version>${metreeca-base.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 
-    </dependencies>
+		</dependencies>
 
-  </dependencyManagement>
+	</dependencyManagement>
 
 </project>
 ```
@@ -90,28 +90,30 @@ specify version numbers explicitly.
 Add the following dependencies to your Maven project:
 
 ```xml
-import com.metreeca.jse.JSEServer;
 
-		import static com.metreeca.rest.Response.OK;
-		import static com.metreeca.rest.wrappers.Server.server;
+<dependencies>
 
-		public final class Server {
+	<dependency>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-jse</artifactId>
+	</dependency>
 
-		public static void main(final String... args) {
-		new JSEServer()
+	<dependency>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-rdf4j</artifactId>
+	</dependency>
 
-		.delegate(toolbox -> toolbox.get(() ->
+	<dependency>
+		<groupId>org.eclipse.rdf4j</groupId>
+		<artifactId>rdf4j-repository-sail</artifactId>
+	</dependency>
 
-		server().wrap(request -> request.reply(response ->
-		response.status(OK)
-		))
+	<dependency>
+		<groupId>org.eclipse.rdf4j</groupId>
+		<artifactId>rdf4j-sail-memory</artifactId>
+	</dependency>
 
-		))
-
-		.start();
-		}
-
-		}
+</dependencies>
 ```
 
 Then, define in the `src/main/java` folder a minimal server stub like:
@@ -156,24 +158,24 @@ Add the following definitions and dependencies to your Maven project:
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-jee</artifactId>
   </dependency>
-
+  
   <dependency>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-rdf4j</artifactId>
   </dependency>
-
-
+  
+  
   <dependency>
     <groupId>org.eclipse.rdf4j</groupId>
     <artifactId>rdf4j-repository-sail</artifactId>
   </dependency>
-
+  
   <dependency>
     <groupId>org.eclipse.rdf4j</groupId>
     <artifactId>rdf4j-sail-memory</artifactId>
   </dependency>
-
-
+  
+  
   <dependency>
     <groupId>javax.servlet</groupId>
     <artifactId>javax.servlet-api</artifactId>
@@ -187,6 +189,7 @@ Add the following definitions and dependencies to your Maven project:
 Copy [`web.xml`](toys/web.xml) to the `src/main/webapp` folder.
 
 ```xml
+
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
@@ -208,15 +211,15 @@ import static com.metreeca.rest.wrappers.Server.server;
 @WebFilter(urlPatterns="/*")
 public final class Server extends JEEServer {
 
-  public Server() {
-    delegate(toolbox -> toolbox.get(() ->
+	public Server() {
+		delegate(toolbox -> toolbox.get(() ->
 
-        server().wrap(request -> request.reply(response ->
-            response.status(OK)
-        ))
+				server().wrap(request -> request.reply(response ->
+						response.status(OK)
+				))
 
-    ));
-  }
+		));
+	}
 
 }
 ```
@@ -299,7 +302,7 @@ public final class Server {
             ))
 
         .start();
-  }
+	}
 
 }
 ```
@@ -360,29 +363,29 @@ import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
 public final class Toys implements Runnable {
 
-  public static final String Base="https://example.com/";
-  public static final String Namespace=Base+"terms#";
+	public static final String Base="https://example.com/";
+	public static final String Namespace=Base+"terms#";
 
 
-  @Override
-  public void run() {
+	@Override
+	public void run() {
 
     service(graph()).update(connection -> {
-      if ( !connection.hasStatement(null, null, null, false) ) {
-        try {
+			if ( !connection.hasStatement(null, null, null, false) ) {
+				try {
 
           connection.setNamespace("toys", Namespace);
           connection.add(getClass().getResourceAsStream("toys.ttl"), Base, TURTLE);
 
-        } catch ( final IOException e ) {
-          throw new UncheckedIOException(e);
-        }
-      }
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			}
 
       return this;
 
     });
-  }
+	}
 
 }
 ```
@@ -469,7 +472,7 @@ public final class Server {
         )
 
         .start();
-  }
+	}
 
 }
 ```
@@ -507,9 +510,10 @@ Content-Type: text/turtle;charset=UTF-8
 ## Request Routing
 
 [Routers](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/handlers/Router.html) dispatch
-requests on the basis of the [request path](../javadocs/?com/metreeca/rest/Request.html#path--) and
-the [request method](../javadocs/?com/metreeca/rest/Request.html#method--), ignoring leading path segments possibly
-already matched by wrapping routers.
+requests on the basis of
+the [request path](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#path()) and
+the [request method](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html##method()),
+ignoring leading path segments possibly already matched by wrapping routers.
 
 Requests are forwarded to a registered handler if their path is matched by an associated pattern defined by a sequence of
 steps according to the following rules:
@@ -519,7 +523,7 @@ steps according to the following rules:
 | `/`          | `/`                  | empty / matches only the empty step                          |
 | `/<step>`    | `/<step>`            | literal / matches step verbatim                              |
 | `/{}`        | `/<step>`            | wildcard / matches a single step                             |
-| `/{<key>}`   | `/<step>`            | placeholder / match a single path step, adding the matched `<key>`/`<step>` entry to request [parameters](../javadocs/?com/metreeca/rest/Request.html#parameters—); the matched `<step>` name is URL-decoded before use |
+| `/{<key>}`   | `/<step>`            | placeholder / match a single path step, adding the matched `<key>`/`<step>` entry to request [parameters](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#parameters()); the matched `<step>` name is URL-decoded before use |
 | `/*`         | `/<step>[/<step>/…]` | prefix / matches one or more trailing steps                  |
 
 Registered path patterns are tested in order of definition.
@@ -568,7 +572,7 @@ public final class Server {
         )
 
         .start();
-  }
+	}
 
 }
 ```
@@ -596,11 +600,11 @@ import static java.util.stream.Collectors.toList;
 
 public final class Products extends Delegator {
 
-  public static final IRI Product=iri(Toys.Namespace, "Product");
+	public static final IRI Product=iri(Toys.Namespace, "Product");
 
 
-  public Products() {
-    delegate(router()
+	public Products() {
+		delegate(router()
 
         .path("/", router().get(request -> request.reply(response -> response
             .status(OK)
@@ -613,12 +617,12 @@ public final class Products extends Delegator {
                         iri(request.item()), LDP.CONTAINS, p)
                     )
                     .collect(toList())
-            ))
+						))
         )))
 
         .path("/{code}",
             router().get(request -> request.reply(response -> response
-                .status(OK)
+								.status(OK)
                 .body(rdf(), service(graph()).query(connection ->
                     asList(connection.getStatements(
                             iri(request.item()), null, null
@@ -627,8 +631,8 @@ public final class Products extends Delegator {
                 ))
             )
         )
-    );
-  }
+		);
+	}
 }
 ```
 
@@ -644,7 +648,7 @@ and idiomatic [compacted/framed](../references/jsonld -format) JSON-LD payloads,
 the [REST APIs interaction tutorial](consuming-jsonld-apis.md).
 
 Actors provide default shape-driven implementations for CRUD actions on resources and containers identified by the
-request [focus item](../javadocs/?com/metreeca/rest/Request.html#item--).
+request [focus item](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#item()).
 
 | actor                                                        | action                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -693,7 +697,7 @@ public final class Server {
         )
 
         .start();
-  }
+	}
 
 }
 ```
@@ -701,9 +705,9 @@ public final class Server {
 Actors delegate transaction management, data validation and trimming and CRUD operations to a customizable engine.
 
 CRUD perations are performed on the graph neighbourhood of the target target item(s)  matched by
-the  [shape](../javadocs/?com/metreeca/form/Shape.html)
-model [associated](../javadocs/?com/metreeca/rest/Message.html#shape--) to the request, after redaction according to the
-request user roles and to actor-specific task, area and mode parameters.
+the  [shape](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/Shape.html)
+model associated to the request, after redaction according to the request user roles and to actor-specific task, area and
+mode parameters.
 
 ## Defining Models
 
@@ -726,28 +730,28 @@ import static com.metreeca.rest.wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-  public Products() {
-    delegate(driver(
+	public Products() {
+		delegate(driver(
 
-        field(RDF.TYPE),
-        field(RDFS.LABEL),
-        field(RDFS.COMMENT)
+				field(RDF.TYPE),
+				field(RDFS.LABEL),
+				field(RDFS.COMMENT)
 
-    ).wrap(router()
+		).wrap(router()
 
-        .path("/", router()
-            .get(relator())
-            .post(creator())
-        )
+				.path("/", router()
+						.get(relator())
+						.post(creator())
+				)
 
-        .path("/*", router()
-            .get(relator())
-            .put(updater())
-            .delete(deleter())
-        )
+				.path("/*", router()
+						.get(relator())
+						.put(updater())
+						.delete(deleter())
+				)
 
-    ));
-  }
+		));
+	}
 
 }
 ```
@@ -797,36 +801,36 @@ import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
 public final class Toys implements Runnable {
 
-  public static final String Base="https://example.com/";
-  public static final String Namespace=Base+"terms#";
+	public static final String Base="https://example.com/";
+	public static final String Namespace=Base+"terms#";
 
-  public static final IRI staff=toys("staff");
+	public static final IRI staff=toys("staff");
 
-  public static final IRI Order=toys("Order");
-  public static final IRI Product=toys("Product");
-  public static final IRI ProductLine=toys("ProductLine");
+	public static final IRI Order=toys("Order");
+	public static final IRI Product=toys("Product");
+	public static final IRI ProductLine=toys("ProductLine");
 
-  public static final IRI amount=toys("amount");
-  public static final IRI buy=toys("buy");
-  public static final IRI code=toys("code");
-  public static final IRI customer=toys("customer");
-  public static final IRI line=toys("line");
-  public static final IRI product=toys("product");
-  public static final IRI order=toys("order");
-  public static final IRI scale=toys("scale");
-  public static final IRI sell=toys("sell");
-  public static final IRI size=toys("size");
-  public static final IRI status=toys("status");
-  public static final IRI stock=toys("stock");
-  public static final IRI vendor=toys("vendor");
+	public static final IRI amount=toys("amount");
+	public static final IRI buy=toys("buy");
+	public static final IRI code=toys("code");
+	public static final IRI customer=toys("customer");
+	public static final IRI line=toys("line");
+	public static final IRI product=toys("product");
+	public static final IRI order=toys("order");
+	public static final IRI scale=toys("scale");
+	public static final IRI sell=toys("sell");
+	public static final IRI size=toys("size");
+	public static final IRI status=toys("status");
+	public static final IRI stock=toys("stock");
+	public static final IRI vendor=toys("vendor");
 
 
-  private static IRI toys(final String name) {
-    return iri(Namespace, name);
-  }
+	private static IRI toys(final String name) {
+		return iri(Namespace, name);
+	}
 
-  @Override
-  public void run() {
+	@Override
+	public void run() {
 
     service(graph()).update(connection -> {
       if ( !connection.hasStatement(null, null, null, false) ) {
@@ -842,8 +846,8 @@ public final class Toys implements Runnable {
 
       return this;
 
-    });
-  }
+		});
+	}
 
 }
 ```
@@ -874,12 +878,12 @@ import static com.metreeca.rest.wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-  public Products() {
-    delegate(driver(or(relate(), role(Toys.staff)).then(
+	public Products() {
+		delegate(driver(or(relate(), role(Toys.staff)).then(
 
-        filter(clazz(Toys.Product)),
+				filter(clazz(Toys.Product)),
 
-        field(RDF.TYPE, exactly(Toys.Product)),
+				field(RDF.TYPE, exactly(Toys.Product)),
 
         field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
         field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
@@ -1010,10 +1014,10 @@ views.
 
 ```java
 role(Toys.staff).then(field(Toys.buy,required(),
-    datatype(XSD.DECIMAL),
-    minInclusive(literal(0.0)),
-    maxInclusive(literal(1_000.0))
-    ))
+		datatype(XSD.DECIMAL),
+		minInclusive(literal(0.0)),
+		maxInclusive(literal(1_000.0))
+		))
 ```
 
 This `role` guard states that the `toys:buy` price will be visible only if the request is performed by a user in
@@ -1050,7 +1054,7 @@ public final class Server {
         )
 
         .start();
-  }
+	}
 
 }
 ```
@@ -1201,21 +1205,21 @@ public final class Products extends Delegator {
 
     )).wrap(router()
 
-        .path("/", router()
-            .get(relator())
+				.path("/", router()
+						.get(relator())
             .post(creator()
                 .slug(new ProductsSlug())
                 .with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
             ))
 
-        .path("/*", router()
-            .get(relator())
-            .put(updater())
-            .delete(deleter())
-        )
+				.path("/*", router()
+						.get(relator())
+						.put(updater())
+						.delete(deleter())
+				)
 
-    ));
-  }
+		));
+	}
 
 }
 ```
@@ -1284,22 +1288,21 @@ The *ProductsCreate.ql* SPARQL Update postprocessing script updates server-manag
 properties after a new product is added to the catalog.
 
 SPARQL Update postprocessing scripts are executed after the state-mutating HTTP request is successfully completed, with
-some [pre-defined bindings](../javadocs/?com/metreeca/rdf/services/Graph.html#configure-M-O-java.util.function.
-BiConsumer...-)
+some [pre-defined bindings](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html#configure(M,O,java.util.function.BiConsumer...))
 like the `$this` variable holding the IRI of the targe resource either as derived from the HTTP request or as defined by
 the `Location` HTTP header after a POST request.
 
 Request and response RDF payloads may also
-be [pre](../javadocs/?com/metreeca/rest/Wrapper.html#preprocessor-java.util.function.Function-)
-and [post](../javadocs/?com/metreeca/rest/Wrapper.html#postprocessor-java.util.function.Function-)-processed using custom
-filtering functions.
+be [pre](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html#preprocessor(java.util.function.Function))
+and [post](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html#postprocessor(java.util.function.Function))
+using custom filtering functions.
 
 # Localization
 
 Multi-lingual content retrieval is fully supported,
 with [compact rendering](https://www.w3.org/TR/json-ld11/#language-indexing) for shapes including
-either [`localized()`](../javadocs/?com/metreeca/json/shapes/Localized.html)
-or  [`lang()`](../javadocs/?com/metreeca/json/shapes/Lang.html) constraints.
+either [`localized()`](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/shapes/Localized.html)
+or  [`lang()`](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/shapes/Lang.html) constraints.
 
 Retrieved localizations may be limited to a predefined set of language tags using a `convey` language constraint, like
 for instance:

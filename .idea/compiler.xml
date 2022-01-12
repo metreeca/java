@@ -8,7 +8,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="metreeca-rdf4j" />
         <module name="metreeca-jse" />
-        <module name="metreeca-toys" />
         <module name="metreeca-jee" />
         <module name="metreeca-json" />
         <module name="metreeca-rest" />
