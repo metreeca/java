@@ -90,28 +90,30 @@ specify version numbers explicitly.
 Add the following dependencies to your Maven project:
 
 ```xml
-import com.metreeca.jse.JSEServer;
 
-		import static com.metreeca.rest.Response.OK;
-		import static com.metreeca.rest.wrappers.Server.server;
+<dependencies>
 
-		public final class Server {
+	<dependency>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-jse</artifactId>
+	</dependency>
 
-		public static void main(final String... args) {
-		new JSEServer()
+	<dependency>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-rdf4j</artifactId>
+	</dependency>
 
-		.delegate(toolbox -> toolbox.get(() ->
+	<dependency>
+		<groupId>org.eclipse.rdf4j</groupId>
+		<artifactId>rdf4j-repository-sail</artifactId>
+	</dependency>
 
-		server().wrap(request -> request.reply(response ->
-		response.status(OK)
-		))
+	<dependency>
+		<groupId>org.eclipse.rdf4j</groupId>
+		<artifactId>rdf4j-sail-memory</artifactId>
+	</dependency>
 
-		))
-
-		.start();
-		}
-
-		}
+</dependencies>
 ```
 
 Then, define in the `src/main/java` folder a minimal server stub like:
@@ -163,7 +165,6 @@ Add the following definitions and dependencies to your Maven project:
 	<artifactId>metreeca-rdf4j</artifactId>
 </dependency>
 
-
 <dependency>
 	<groupId>org.eclipse.rdf4j</groupId>
 	<artifactId>rdf4j-repository-sail</artifactId>
@@ -173,8 +174,7 @@ Add the following definitions and dependencies to your Maven project:
 	<groupId>org.eclipse.rdf4j</groupId>
 	<artifactId>rdf4j-sail-memory</artifactId>
 </dependency>
-
-
+  
 <dependency>
 	<groupId>javax.servlet</groupId>
 	<artifactId>javax.servlet-api</artifactId>
