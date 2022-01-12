@@ -90,7 +90,6 @@ specify version numbers explicitly.
 Add the following dependencies to your Maven project:
 
 ```xml
-
 <dependencies>
 
 	<dependency>
@@ -164,7 +163,6 @@ Add the following definitions and dependencies to your Maven project:
     <artifactId>metreeca-rdf4j</artifactId>
   </dependency>
   
-  
   <dependency>
     <groupId>org.eclipse.rdf4j</groupId>
     <artifactId>rdf4j-repository-sail</artifactId>
@@ -174,7 +172,6 @@ Add the following definitions and dependencies to your Maven project:
     <groupId>org.eclipse.rdf4j</groupId>
     <artifactId>rdf4j-sail-memory</artifactId>
   </dependency>
-  
   
   <dependency>
     <groupId>javax.servlet</groupId>
