@@ -18,7 +18,7 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.rdf.schemes.Schema;
+import com.metreeca.rdf.schemas.Schema;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;

@@ -18,4 +18,4 @@
  * Well-known RDF vocabularies
  */
 
-package com.metreeca.rdf.schemes;
+package com.metreeca.rdf.schemas;

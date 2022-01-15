@@ -19,7 +19,7 @@
 package com.metreeca.rdf4j.actions;
 
 import com.metreeca.json.Values;
-import com.metreeca.rdf.schemes.Schema;
+import com.metreeca.rdf.schemas.Schema;
 import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.*;
