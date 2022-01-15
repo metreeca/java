@@ -180,32 +180,19 @@ public final class Frame {
 		});
 	}
 
+	public String skolemize(final IRI... traits) {
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public Frame refocus(final IRI focus) {
-
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
+		if ( traits == null || Arrays.stream(traits).anyMatch(Objects::isNull) ) {
+			throw new NullPointerException("null traits");
 		}
 
-		return frame(focus, model()
-				.map(statement -> rewrite(this.focus, focus, statement))
-				.collect(toList())
+		return md5(Arrays.stream(traits)
+				.map(this::value)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.map(Value::stringValue)
+				.collect(joining("\n"))
 		);
-	}
-
-
-	private Statement rewrite(final Value source, final IRI target, final Statement statement) {
-		return statement(
-				rewrite(source, target, statement.getSubject()),
-				rewrite(source, target, statement.getPredicate()),
-				rewrite(source, target, statement.getObject())
-		);
-	}
-
-	private <V> V rewrite(final Value source, final V target, final V value) {
-		return value.equals(source) ? target : value;
 	}
 
 
