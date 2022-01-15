@@ -19,6 +19,7 @@
 package com.metreeca.rdf4j.actions;
 
 import com.metreeca.json.Values;
+import com.metreeca.rdf.schemes.Schema;
 import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.*;
@@ -130,7 +131,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 		final String vocabulary=types.stream().findFirst().map(IRI::getNamespace).orElse(Terms.stringValue());
 
-		Stream<Statement> model=types.stream().map(type -> statement(id, RDF.TYPE, type));
+		Stream<Statement> model=types.stream().map(type -> statement(id, RDF.TYPE, Schema.normalize(type)));
 
 		final Collection<Element> visited=new HashSet<>(singleton(element));
 		final Queue<Element> pending=Stream.concat(children(element), attribute(element, ItemRef).stream()
@@ -167,17 +168,16 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 				final Entry<Resource, Stream<Statement>> value=item(current, ids);
 
 				model=Stream.concat(model, props.stream()
-						.map(prop -> statement(id, prop, value.getKey()))
+						.map(prop -> statement(id, Schema.normalize(prop), Schema.normalize(value.getKey())))
 				);
 
 				model=Stream.concat(model, value.getValue());
 
 			} else {
 
-
 				model=Stream.concat(model, value(current).stream()
 						.flatMap(value -> props.stream()
-								.map(prop -> statement(id, prop, value)))
+								.map(prop -> statement(id, Schema.normalize(prop), Schema.normalize(value))))
 				);
 
 				pending.addAll(children(current).collect(toList()));

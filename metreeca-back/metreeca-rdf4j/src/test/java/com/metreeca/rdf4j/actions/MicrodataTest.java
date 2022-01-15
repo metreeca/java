@@ -377,7 +377,7 @@ final class MicrodataTest {
 		}
 
 
-		// If the element is a meta element The value is the value of the element's content attribute, if any, or the
+		// If the element is a meta element, the value is the value of the element's content attribute, if any, or the
 		// empty string if there is no such attribute.
 
 		@Test void testScanMeta() {
