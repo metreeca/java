@@ -15,5 +15,3 @@
 RDF4J / Upgraded to RDF4J 3.7.4
 
 # Fixed
-
-- Base / Broken version numbers in maven BOM

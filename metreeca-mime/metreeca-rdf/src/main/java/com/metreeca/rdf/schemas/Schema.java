@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rdf.schemes;
+package com.metreeca.rdf.schemas;
 
 import com.metreeca.json.Shape;
 
@@ -191,6 +191,27 @@ public final class Schema {
 
 
 	/**
+	 * Creates a location shape.
+	 *
+	 * @param labels additional constraints for textual labels (e.g. localized names)
+	 *
+	 * @return a location shape including {@code labels} constraints for textual labels
+	 *
+	 * @throws NullPointerException if {@code labels} is nul or contains null elements
+	 */
+	public static Shape Location(final Shape... labels) {
+
+		if ( labels == null || Arrays.stream(labels).anyMatch(Objects::isNull) ) {
+			throw new NullPointerException("null labels");
+		}
+
+		return or(
+				Place(labels),
+				VirtualLocation(labels)
+		);
+	}
+
+	/**
 	 * Creates a place shape.
 	 *
 	 * @param labels additional constraints for textual labels (e.g. localized names)
@@ -204,6 +225,7 @@ public final class Schema {
 		if ( labels == null || Arrays.stream(labels).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null labels");
 		}
+
 		return and(Thing(labels),
 
 				field(address, optional(), PostalAddress(labels)),
@@ -257,6 +279,16 @@ public final class Schema {
 
 		return and(Thing(labels));
 	}
+
+
+	//// ContactPoints /////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public static final IRI ContactPoint=term("ContactPoint");
+
+
+	public static IRI email=term("email");
+	public static IRI telephone=term("telephone");
+	public static IRI faxNumber=term("faxNumber");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
