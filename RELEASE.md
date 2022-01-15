@@ -2,6 +2,8 @@
 
 # Added
 
+- RDF4J / HTML microdata parsing action
+
 # Improved
 
 # Fixed
