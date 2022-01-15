@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
  *
  * <p>For both {@linkplain #read(String) read} and {@linkplain #write(String) write} operations, blob identifiers not
  * matching a full GCS URI (i.e. {@code gs://{bucket}/{object}}) or link URL (i.e. {@code
- * https://storage.cloud.google.com/{bucket}/{object}) are interpreted as object names in the default project bucket
- * (i.e. {@code {project}.appspot.com}}.</p>
+ * https://storage.cloud.google.com/{bucket}/{object}}) are interpreted as object names in the default project bucket
+ * (i.e. {@code {project}.appspot.com}).</p>
  *
  * @see <a href="https://cloud.google.com/storage/docs">Google Cloud Plaform - Storage</a>
  */
