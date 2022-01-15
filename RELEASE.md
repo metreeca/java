@@ -2,6 +2,7 @@
 
 # Added
 
+- REST / Resource retrieval action
 - REST / Shape-based frame validation action
 - REST / JSONPath processing action
 - RDF / Default text localization action
