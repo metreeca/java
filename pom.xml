@@ -385,7 +385,24 @@
 					</tags>
 
 					<links>
+
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
+
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
+
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
+
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
+						<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>
+
 						<link>https://rdf4j.org/javadoc/latest/</link>
+
 					</links>
 
 				</configuration>

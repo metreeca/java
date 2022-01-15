@@ -2,6 +2,7 @@
 
 # Added
 
+- REST / Shape-based frame validation action
 - RDF4J / HTML microdata parsing action
 
 # Improved
