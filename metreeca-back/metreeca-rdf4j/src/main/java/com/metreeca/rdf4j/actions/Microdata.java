@@ -51,7 +51,7 @@ import static java.util.stream.Collectors.toList;
  *
  * <p>Converts microdata annotations in an XML document into a stream of equivalent RDF statements.</p>
  *
- * @see <a href="// https://html.spec.whatwg.org/multipage/microdata.html>HTML Living Standard - § 5 Microdata</a>
+ * @see <a href="https://html.spec.whatwg.org/multipage/microdata.html">HTML Living Standard - § 5 Microdata</a>
  */
 public final class Microdata implements Function<Node, Stream<Statement>> {
 
