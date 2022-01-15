@@ -46,7 +46,11 @@ public final class Validate implements Function<Frame, Optional<Frame>> {
 
 
 	/**
-	 * @param shape
+	 * Creates a shape-based validation action.
+	 *
+	 * @param shape the shape frames are to be validated against
+	 *
+	 * @throws NullPointerException if {@code shape} is null
 	 */
 	public Validate(final Shape shape) {
 
