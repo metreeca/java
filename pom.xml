@@ -209,7 +209,7 @@
 			<dependency> <!-- https://search.maven.org/artifact/org.eclipse.rdf4j/rdf4j-bom -->
 				<groupId>org.eclipse.rdf4j</groupId>
 				<artifactId>rdf4j-bom</artifactId>
-				<version>3.6.2</version>
+				<version>3.7.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -384,6 +384,10 @@
 						</tag>
 					</tags>
 
+					<links>
+						<link>https://rdf4j.org/javadoc/latest/</link>
+					</links>
+
 				</configuration>
 
 			</plugin>
@@ -412,7 +416,7 @@
 
 			</plugin>
 
-			<plugin>
+			<plugin> <!-- https://coderplus.github.io/copy-rename-maven-plugin/ -->
 
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>
@@ -437,7 +441,42 @@
 
 					</execution>
 				</executions>
+
 			</plugin>
+
+			<!--<plugin> &lt;!&ndash; https://github.com/metreeca/mark &ndash;&gt;
+
+				<groupId>com.metreeca</groupId>
+				<artifactId>mark-maven-plugin</artifactId>
+				<version>0.5.0</version>
+
+				<inherited>false</inherited>
+
+				<configuration>
+
+					<target>docs</target>
+					<assets>@/docs</assets>
+
+					<options>
+						<markdown-smart-links>true</markdown-smart-links>
+						<markdown-external-links>true</markdown-external-links>
+					</options>
+
+				</configuration>
+
+				<executions>
+					<execution>
+
+						<goals>
+							<goal>clean</goal>
+							<goal>build</goal>
+							<goal>check</goal>
+						</goals>
+
+					</execution>
+				</executions>
+
+			</plugin>-->
 
 		</plugins>
 
