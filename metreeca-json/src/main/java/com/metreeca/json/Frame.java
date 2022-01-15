@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,6 +178,34 @@ public final class Frame {
 			});
 
 		});
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public Frame refocus(final IRI focus) {
+
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
+		}
+
+		return frame(focus, model()
+				.map(statement -> rewrite(this.focus, focus, statement))
+				.collect(toList())
+		);
+	}
+
+
+	private Statement rewrite(final Value source, final IRI target, final Statement statement) {
+		return statement(
+				rewrite(source, target, statement.getSubject()),
+				rewrite(source, target, statement.getPredicate()),
+				rewrite(source, target, statement.getObject())
+		);
+	}
+
+	private <V> V rewrite(final Value source, final V target, final V value) {
+		return value.equals(source) ? target : value;
 	}
 
 
