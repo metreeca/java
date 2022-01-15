@@ -148,13 +148,7 @@ public final class Schema {
 				field(isAccessibleForFree, optional(), datatype(XSD.BOOLEAN)),
 				field(eventStatus, optional(), datatype(IRIType)),
 
-				field(location, optional(), or(
-
-						Place(labels),
-						PostalAddress(labels),
-						VirtualLocation(labels)
-
-				)),
+				field(location, optional(), Location(labels)),
 
 				field(eventAttendanceMode, multiple(), datatype(IRIType)),
 
@@ -206,8 +200,11 @@ public final class Schema {
 		}
 
 		return or(
+
 				Place(labels),
+				PostalAddress(labels),
 				VirtualLocation(labels)
+
 		);
 	}
 
@@ -253,11 +250,11 @@ public final class Schema {
 
 		return and(Thing(labels),
 
-				field(addressCountry, datatype(XSD.DECIMAL)),
-				field(addressRegion, datatype(XSD.STRING)),
-				field(addressLocality, datatype(XSD.STRING)),
-				field(postalCode, datatype(XSD.STRING)),
-				field(streetAddress, datatype(XSD.STRING))
+				field(addressCountry, optional(), datatype(XSD.DECIMAL)),
+				field(addressRegion, optional(), datatype(XSD.STRING)),
+				field(addressLocality, optional(), datatype(XSD.STRING)),
+				field(postalCode, optional(), datatype(XSD.STRING)),
+				field(streetAddress, optional(), datatype(XSD.STRING))
 
 		);
 	}
