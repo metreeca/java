@@ -133,8 +133,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 		Stream<Statement> model=types.stream().map(type -> statement(id, RDF.TYPE, type));
 
 		final Collection<Element> visited=new HashSet<>(singleton(element));
-		final Queue<Element> pending=Stream.concat(children(element), attribute(element, ItemRef)
-				.map(Stream::of).orElseGet(Stream::empty) // !!! ;(jdk11) .stream()
+		final Queue<Element> pending=Stream.concat(children(element), attribute(element, ItemRef).stream()
 
 				.flatMap(refs -> Arrays.stream(SpacePattern.split(refs)))
 
@@ -176,8 +175,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 			} else {
 
 
-				model=Stream.concat(model, value(current)
-						.map(Stream::of).orElseGet(Stream::empty) // !!! ;(jdk11) .stream()
+				model=Stream.concat(model, value(current).stream()
 						.flatMap(value -> props.stream()
 								.map(prop -> statement(id, prop, value)))
 				);
@@ -247,7 +245,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 		final AtomicReference<String> vocabulary=new AtomicReference<>();
 		final Set<IRI> types=ConcurrentHashMap.newKeySet();
 
-		return attribute(element, ItemType).map(Stream::of).orElseGet(Stream::empty) // !!! ;(jdk11) .stream()
+		return attribute(element, ItemType).stream()
 
 				.flatMap(type -> Arrays.stream(SpacePattern.split(type)))
 
@@ -296,7 +294,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 		final Set<IRI> props=ConcurrentHashMap.newKeySet();
 
-		return attribute(element, ItemProp).map(Stream::of).orElseGet(Stream::empty) // !!! ;(jdk11) .stream()
+		return attribute(element, ItemProp).stream()
 
 				.flatMap(type -> Arrays.stream(SpacePattern.split(type)))
 
