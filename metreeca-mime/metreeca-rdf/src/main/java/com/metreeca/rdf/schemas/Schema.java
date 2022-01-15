@@ -184,7 +184,7 @@ public final class Schema {
 	public static IRI addressRegion=term("addressRegion");
 	public static IRI addressLocality=term("addressLocality");
 
-	public static IRI postalCode=term("vpostalCode");
+	public static IRI postalCode=term("postalCode");
 	public static IRI streetAddress=term("streetAddress");
 
 
