@@ -39,7 +39,7 @@ import static com.metreeca.json.shapes.Or.or;
 /**
  * Schema.org RDF vocabulary.
  *
- * @see <a href="https://schema.org/>Schema.org</a>
+ * @see <a href="https://schema.org/">Schema.org</a>
  */
 public final class Schema {
 
