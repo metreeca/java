@@ -30,7 +30,7 @@ import static com.metreeca.json.Values.literal;
 import static com.metreeca.json.Values.statement;
 
 /**
- * RDF default localization.
+ * RDF default text localization.
  *
  * <p>Assigns a default language tag to untagged string object values associated to a specific set of predicates
  * identifying human-readable textual values.</p>
