@@ -3,6 +3,7 @@
 # Added
 
 - REST / Shape-based frame validation action
+- REST / JSONPath processing action
 - RDF / Default text localization action
 - RDF / Schema.org namespace support
 - RDF4J / HTML microdata parsing action
