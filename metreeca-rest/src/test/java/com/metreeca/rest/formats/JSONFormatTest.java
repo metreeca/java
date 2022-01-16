@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@ import com.metreeca.rest.Request;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
+
 import javax.json.Json;
 import javax.json.JsonObject;
-import java.io.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

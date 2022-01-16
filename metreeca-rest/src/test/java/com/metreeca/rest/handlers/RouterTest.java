@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.handlers.Router.router;
+
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
