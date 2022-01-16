@@ -131,7 +131,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 		final String vocabulary=types.stream().findFirst().map(IRI::getNamespace).orElse(Terms.stringValue());
 
-		Stream<Statement> model=types.stream().map(type -> statement(id, RDF.TYPE, Schema.normalize(type)));
+		Stream<Statement> model=types.stream().map(type -> statement(id, RDF.TYPE, normalize(type)));
 
 		final Collection<Element> visited=new HashSet<>(singleton(element));
 		final Queue<Element> pending=Stream.concat(children(element), attribute(element, ItemRef).stream()
@@ -168,7 +168,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 				final Entry<Resource, Stream<Statement>> value=item(current, ids);
 
 				model=Stream.concat(model, props.stream()
-						.map(prop -> statement(id, Schema.normalize(prop), Schema.normalize(value.getKey())))
+						.map(prop -> statement(id, normalize(prop), normalize(value.getKey())))
 				);
 
 				model=Stream.concat(model, value.getValue());
@@ -177,7 +177,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 				model=Stream.concat(model, value(current).stream()
 						.flatMap(value -> props.stream()
-								.map(prop -> statement(id, Schema.normalize(prop), Schema.normalize(value))))
+								.map(prop -> statement(id, normalize(prop), normalize(value))))
 				);
 
 				pending.addAll(children(current).collect(toList()));
@@ -493,4 +493,14 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 		return ids;
 	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static Value normalize(final Value value) {
+		return value.isIRI() ? normalize((IRI)value) : value;
+	}
+
+	private static IRI normalize(final IRI iri) {
+		return iri.getNamespace().equals(Schema.NamespaceLegacy) ? iri(Schema.Namespace, iri.getLocalName()) : iri;
+	}
 }
