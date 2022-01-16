@@ -180,6 +180,12 @@ public final class Frame {
 		});
 	}
 
+
+	public String skolemize() {
+
+		return md5(focus.stringValue());
+	}
+
 	public String skolemize(final IRI... traits) {
 
 		if ( traits == null || Arrays.stream(traits).anyMatch(Objects::isNull) ) {
