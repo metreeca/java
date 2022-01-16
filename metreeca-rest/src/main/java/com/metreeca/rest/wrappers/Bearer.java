@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,13 @@ public final class Bearer implements Wrapper {
 	/**
 	 * Creates a key-based bearer token authenticator.
 	 *
-	 * @param key   the fixed key to be presented as bearer token
+	 * @param key   the fixed key to be presented as bearer token; will match no request if empty
 	 * @param roles a collection of values uniquely identifying the roles to be {@linkplain Request#role(Object...)
 	 *              assigned} to the request user on successful {@code key} validation
 	 *
 	 * @return a new key-based bearer token authenticator
 	 *
-	 * @throws NullPointerException     if {@code roles} is null or contains a {@code null} value
-	 * @throws IllegalArgumentException if {@code key} is empty
+	 * @throws NullPointerException if {@code roles} is null or contains a {@code null} value
 	 */
 	public static Bearer bearer(final String key, final Object... roles) {
 
@@ -57,17 +56,13 @@ public final class Bearer implements Wrapper {
 			throw new NullPointerException("null key");
 		}
 
-		if ( key.isEmpty() ) {
-			throw new IllegalArgumentException("empty key");
-		}
-
 		if ( roles == null || Stream.of(roles).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null roles");
 		}
 
-		return new Bearer((token, request) -> token.equals(key)
-				? Optional.of(request.roles(roles))
-				: Optional.empty()
+		return new Bearer(key.isEmpty()
+				? (token, request) -> Optional.empty()
+				: (token, request) -> token.equals(key) ? Optional.of(request.roles(roles)) : Optional.empty()
 		);
 	}
 
@@ -82,7 +77,7 @@ public final class Bearer implements Wrapper {
 	 *
 	 * @throws NullPointerException if {@code authenticator} is null
 	 */
-	public static Bearer bearer(final BiFunction<String, Request, Optional<Request>> authenticator) {
+	public static Bearer bearer(final BiFunction<? super String, ? super Request, Optional<Request>> authenticator) {
 
 		if ( authenticator == null ) {
 			throw new NullPointerException("null authenticator");
@@ -94,10 +89,10 @@ public final class Bearer implements Wrapper {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final BiFunction<? super String, Request, Optional<Request>> authenticator;
+	private final BiFunction<? super String, ? super Request, Optional<Request>> authenticator;
 
 
-	private Bearer(final BiFunction<? super String, Request, Optional<Request>> authenticator) {
+	private Bearer(final BiFunction<? super String, ? super Request, Optional<Request>> authenticator) {
 		this.authenticator=authenticator;
 	}
 
