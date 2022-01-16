@@ -316,6 +316,26 @@
 
 			</plugin>
 
+			<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin -->
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+
+				<executions>
+					<execution>
+
+						<id>attach-sources</id>
+
+						<goals>
+							<goal>jar</goal>
+						</goals>
+
+					</execution>
+				</executions>
+
+			</plugin>
+
 			<plugin> <!-- https://maven.apache.org/plugins/maven-compiler-plugin -->
 
 				<groupId>org.apache.maven.plugins</groupId>
@@ -355,89 +375,6 @@
 					</archive>
 
 				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-
-				<executions>
-					<execution>
-
-						<id>attach-sources</id>
-
-						<goals>
-							<goal>jar</goal>
-						</goals>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
-
-				<configuration>
-
-					<tags>
-						<tag>
-							<name>apiNote</name>
-							<placement>a</placement>
-							<head>API Note:</head>
-						</tag>
-						<tag>
-							<name>implSpec</name>
-							<placement>a</placement>
-							<head>Implementation Specification:</head>
-						</tag>
-						<tag>
-							<name>implNote</name>
-							<placement>a</placement>
-							<head>Implementation Note:</head>
-						</tag>
-					</tags>
-
-					<links>
-
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
-
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
-
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
-
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
-
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
-						<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>
-
-						<link>https://rdf4j.org/javadoc/latest/</link>
-
-					</links>
-
-				</configuration>
-
-				<executions>
-					<execution>
-
-						<id>attach-javadocs</id>
-
-						<goals>
-							<goal>jar</goal>
-						</goals>
-
-					</execution>
-				</executions>
 
 			</plugin>
 
@@ -569,6 +506,69 @@
 
 			<build>
 				<plugins>
+
+					<plugin> <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
+
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.2.0</version>
+
+						<configuration>
+
+							<tags>
+								<tag>
+									<name>apiNote</name>
+									<placement>a</placement>
+									<head>API Note:</head>
+								</tag>
+								<tag>
+									<name>implSpec</name>
+									<placement>a</placement>
+									<head>Implementation Specification:</head>
+								</tag>
+								<tag>
+									<name>implNote</name>
+									<placement>a</placement>
+									<head>Implementation Note:</head>
+								</tag>
+							</tags>
+
+							<links>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>
+
+								<link>https://rdf4j.org/javadoc/latest/</link>
+
+							</links>
+
+						</configuration>
+
+						<executions>
+							<execution>
+
+								<id>attach-javadocs</id>
+
+								<goals>
+									<goal>jar</goal>
+								</goals>
+
+							</execution>
+						</executions>
+
+					</plugin>
 
 					<plugin> <!-- http://maven.apache.org/plugins/maven-gpg-plugin/ -->
 
