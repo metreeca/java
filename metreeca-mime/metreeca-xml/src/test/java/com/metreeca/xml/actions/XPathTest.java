@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static com.metreeca.xml.actions.XPath.decode;
-import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.assertj.core.api.Assertions.assertThat;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 final class XPathTest {

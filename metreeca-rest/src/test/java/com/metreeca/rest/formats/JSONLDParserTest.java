@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.metreeca.rest.formats;
 
 import com.metreeca.json.Query;
 import com.metreeca.json.Shape;
+import com.metreeca.json.queries.Terms;
 import com.metreeca.json.queries.*;
 
 import org.eclipse.rdf4j.model.IRI;

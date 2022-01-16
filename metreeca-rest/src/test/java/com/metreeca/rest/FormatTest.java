@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import org.junit.jupiter.api.Test;
 
 import static com.metreeca.rest.Format.mime;
 import static com.metreeca.rest.Format.mimes;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
 
 final class FormatTest {
 

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright © 2013-2022 Metreeca srl
  *

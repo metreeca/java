@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2021 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import com.metreeca.rest.Xtream;
 
 import org.w3c.dom.*;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -30,7 +27,12 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.*;
+
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 /**
