@@ -96,7 +96,7 @@ final class OrTest {
 		}
 
 
-		@Test void testCollapseFromAbstractDeriveDatatypes() {
+		@Test void testCollapseFromAbstractDerivedDatatypes() {
 			assertThat(or(datatype(Values.IRIType), datatype(Values.ResourceType)))
 					.isEqualTo(datatype(Values.ResourceType));
 		}
@@ -154,7 +154,7 @@ final class OrTest {
 			assertThat(or(
 
 					field(RDF.VALUE),
-					field(Values.inverse(RDF.VALUE))
+					field(inverse(RDF.VALUE))
 
 			).map(new Shape.Probe<Collection<Shape>>() {
 
@@ -163,7 +163,7 @@ final class OrTest {
 			})).containsExactly(
 
 					field(RDF.VALUE),
-					field(Values.inverse(RDF.VALUE))
+					field(inverse(RDF.VALUE))
 
 			);
 		}

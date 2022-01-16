@@ -333,19 +333,32 @@ abstract class GraphFacts {
 			final IRI iri=field.iri();
 			final Shape shape=field.shape();
 
-			return list(
+			return shape.map(new Shape.Probe<>() {
 
-					space(edge(var(anchor), text(iri), indent(list(", ", Stream.concat(
+				@Override public Scribe probe(final Or or) { // push field inside union
+					return space(union(or.shapes().stream().map(s ->
+							block(space(field(label, iri, s).map(TreeProbe.this)))
+					)));
+				}
 
-							Stream.of(var(label)), // filtering/projection hook
+				@Override protected Scribe probe(final Shape shape) {
+					return list(
 
-							all(shape).orElseGet(Collections::emptySet).stream().map(Scribe::text)
+							space(edge(var(anchor), text(iri), indent(list(", ", Stream.concat(
 
-					))))),
+									Stream.of(var(label)), // filtering/projection hook
 
-					space(shape.map(new TreeProbe(label, required)))
+									all(shape).orElseGet(Collections::emptySet).stream().map(Scribe::text)
 
-			).map(scribe -> required ? scribe : space(optional(scribe)));
+							))))),
+
+							space(shape.map(new TreeProbe(label, required)))
+
+					).map(scribe -> required ? scribe : space(optional(scribe)));
+				}
+
+			});
+
 		}
 
 		@Override public Scribe probe(final Link link) {
@@ -370,7 +383,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public Scribe probe(final Or or) {
-			return space(union(or.shapes().stream().map(s -> block(space(s.map(this)))).toArray(Scribe[]::new)));
+			return space(union(or.shapes().stream().map(s -> block(space(s.map(this))))));
 		}
 
 
