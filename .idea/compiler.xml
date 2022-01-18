@@ -16,6 +16,7 @@
         <module name="metreeca-open" />
         <module name="metreeca-rdf" />
         <module name="metreeca-gcp" />
+        <module name="metreeca-text" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -38,6 +39,7 @@
       <module name="metreeca-rdf" target="11" />
       <module name="metreeca-rdf4j" target="11" />
       <module name="metreeca-rest" target="11" />
+      <module name="metreeca-text" target="11" />
       <module name="metreeca-toys" target="1.8" />
       <module name="metreeca-tree" target="1.8" />
       <module name="metreeca-xml" target="11" />

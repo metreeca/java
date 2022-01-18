@@ -101,6 +101,7 @@
 
 		<module>metreeca-json</module>
 		<module>metreeca-rest</module>
+		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
@@ -537,6 +538,7 @@
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
