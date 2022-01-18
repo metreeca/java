@@ -101,6 +101,7 @@
 
 		<module>metreeca-json</module>
 		<module>metreeca-rest</module>
+		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
@@ -136,6 +137,20 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
+				<version>1.0.2</version>
+				<type>test-jar</type>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-text</artifactId>
+				<version>1.0.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-text</artifactId>
 				<version>1.0.2</version>
 				<type>test-jar</type>
 			</dependency>
@@ -537,6 +552,7 @@
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
