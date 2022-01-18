@@ -142,6 +142,20 @@
 			</dependency>
 
 
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-text</artifactId>
+				<version>0.2.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-text</artifactId>
+				<version>0.2.0</version>
+				<type>test-jar</type>
+			</dependency>
+
+
 			<!-- Data Connectors -->
 
 			<dependency>
