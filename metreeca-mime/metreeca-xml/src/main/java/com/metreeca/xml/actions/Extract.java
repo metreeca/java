@@ -17,7 +17,6 @@
 package com.metreeca.xml.actions;
 
 import com.metreeca.rest.Xtream;
-import com.metreeca.rest.actions.Clean;
 
 import org.w3c.dom.*;
 
@@ -26,6 +25,8 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import static com.metreeca.rest.Xtream.normalize;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingDouble;
@@ -131,7 +132,7 @@ public final class Extract implements Function<Node, Optional<Node>> {
 
 		} else if ( node instanceof Text ) {
 
-			final double length=Clean.normalize(node.getTextContent()).length();
+			final double length=normalize(node.getTextContent()).length();
 
 			set(node, "xchars", length*length);
 

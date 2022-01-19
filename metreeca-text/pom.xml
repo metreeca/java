@@ -33,33 +33,15 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-json</artifactId>
+		</dependency>
+
 		<dependency> <!-- https://search.maven.org/artifact/org.apache.opennlp/opennlp -->
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-tools</artifactId>
-			<version>1.9.2</version>
-		</dependency>
-
-
-		<!-- !!! decouple -->
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rest</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rdf</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rdf4j</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-open</artifactId>
+			<version>1.9.3</version>
 		</dependency>
 
 	</dependencies>

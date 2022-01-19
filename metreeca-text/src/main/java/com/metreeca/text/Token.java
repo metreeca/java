@@ -16,15 +16,14 @@
 
 package com.metreeca.text;
 
-import com.metreeca.rest.actions.Clean;
+
+import com.metreeca.text.actions.Normalize;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import static com.metreeca.rest.actions.Clean.normalize;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -75,14 +74,10 @@ public final class Token implements Range {
 			throw new NullPointerException("null entries");
 		}
 
-		final Collection<String> set=entries.stream()
+		final Normalize normalize=new Normalize().space(true).lower(true);
+		final Collection<String> set=entries.stream().map(normalize).collect(toSet());
 
-				.map(Clean::normalize)
-				.map(Clean::lower)
-
-				.collect(toSet());
-
-		return token -> set.contains(Clean.lower(normalize(token.text(false))));
+		return token -> set.contains(normalize.apply(token.text(false)));
 	}
 
 

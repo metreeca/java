@@ -22,14 +22,12 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
 
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.literal;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableSet;
 
 /**
  * RDF vocabulary for describing textual annotations.
@@ -37,17 +35,19 @@ import static java.util.Collections.unmodifiableSet;
 public final class Notes {
 
 	/**
-	 * Default languages.
-	 */
-	public static final Set<String> Languages=unmodifiableSet(new LinkedHashSet<>(asList("", "en")));
-
-	/**
 	 * Default entity labels.
 	 */
-	public static final Collection<IRI> Labels=unmodifiableSet(new HashSet<>(asList(
+	public static final Collection<IRI> Labels=Set.of(
 			RDFS.LABEL,
 			SKOS.PREF_LABEL, SKOS.ALT_LABEL, SKOS.HIDDEN_LABEL
-	)));
+	);
+
+	/**
+	 * Default languages.
+	 */
+	public static final Set<String> Languages=Set.of(
+			"", "en"
+	);
 
 
 	public static final String Base="app://text.metreeca.com/";
@@ -72,6 +72,10 @@ public final class Notes {
 	public static Frame reference(
 			final IRI iri, final IRI document, final Value detail, final Match<Chunk, Frame> match
 	) {
+
+		if ( iri == null ) {
+			throw new NullPointerException("null iri");
+		}
 
 		if ( document == null ) {
 			throw new NullPointerException("null document");

@@ -17,10 +17,8 @@
 package com.metreeca.text.linkers;
 
 import com.metreeca.json.Frame;
-import com.metreeca.rest.Xtream;
-import com.metreeca.rest.actions.Clean;
-import com.metreeca.rest.services.Logger;
 import com.metreeca.text.*;
+import com.metreeca.text.actions.Normalize;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
@@ -29,31 +27,26 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.metreeca.json.Frame.frame;
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.services.Logger.time;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.*;
 
+/**
+ * Graph-driven entity linker
+ */
 public final class GraphLinker implements Function<Chunk, Stream<Match<Chunk, Frame>>> {
 
 	private Function<Chunk, Stream<Chunk>> finder=chunk -> chunk.tokens().stream().map(Chunk::new); // !!! default?
 
 	private Function<Token, String> reader=token -> token.text(token.isUpper());
-	private Function<String, String> normalizer=new Clean().space(true).marks(true).smart(true);
+	private Function<String, String> normalizer=new Normalize().space(true).marks(true).smart(true);
 
 	private Function<Stream<String>, Stream<Match<String, Frame>>> matcher=anchors -> Stream.empty(); // !!! default?
-
-
-	private final Logger logger=service(logger());
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,71 +137,61 @@ public final class GraphLinker implements Function<Chunk, Stream<Match<Chunk, Fr
 	@Override public Stream<Match<Chunk, Frame>> apply(final Chunk chunk) {
 		if ( chunk == null || chunk.tokens().isEmpty() ) { return Stream.empty(); } else {
 
-			return time(() -> {
+			final List<Chunk> targets=chunk
+					.map(finder)
+					.collect(toList());
 
-				final List<Chunk> targets=chunk
-						.map(finder)
-						.collect(toList());
+			final List<Token> tokens=chunk.tokens().stream()
+					.map(token -> token.root(reader.andThen(normalizer).apply(token)))
+					.collect(toList());
 
-				final List<Token> tokens=chunk.tokens().stream()
-						.map(token -> token.root(reader.andThen(normalizer).apply(token)))
-						.collect(toList());
+			return matcher // match targets to candidates
 
-				return Xtream
+					.apply(targets.stream()
+							.map(Chunk::text)// extract target anchors
+							.map(normalizer)
+							.distinct()
+					)
 
-						.from(targets)
+					.map(match -> match.source(normalizer.apply(match.source()))) // normalize labels
+					.distinct()
 
-						.map(Chunk::text)// extract target anchors
-						.map(normalizer)
-						.distinct()
+					.flatMap(match -> // look for complete anchors
+							anchor(match.source(), tokens).map(match::source)
+					)
 
-						.pipe(matcher) // match targets to candidates
+					// make sure the complete anchor includes at least one of the original partial anchors
+					// to prevent matching tokens like 'is' if the text includes 'Iceland'
 
-						.map(match -> match.source(normalizer.apply(match.source()))) // normalize labels
-						.distinct()
+					.filter(match -> targets.stream().anyMatch(target -> match.source().contains(target)))
 
-						.flatMap(match -> // look for complete anchors
-								anchor(match.source(), tokens).map(match::source)
-						)
+					.sorted(Comparator // prefer longer anchors
+							.<Match<Chunk, Frame>>comparingInt(match -> match.source().length())
+							.reversed()
+					)
 
-						// make sure the complete anchor includes at least one of the original partial anchors
-						// to prevent matching tokens like 'is' if the text includes 'Iceland'
+					.filter(new Pruner((x, y) -> // remove partially overlapping anchors
+							!x.source().matches(y.source()) && x.source().intersects(y.source())
+					))
 
-						.filter(match -> targets.stream().anyMatch(target -> match.source().contains(target)))
+					.collect(collectingAndThen(toList(), matches -> weight(matches).stream())) // compute local rank
 
-						.sorted(Comparator // prefer longer anchors
-								.<Match<Chunk, Frame>>comparingInt(match -> match.source().length())
-								.reversed()
-						)
+					.sorted(Comparator // prefer weightier anchors
+							.<Match<Chunk, Frame>>comparingDouble(Match::weight)
+							.reversed()
+					)
 
-						.prune((x, y) -> // remove partially overlapping anchors
-								!x.source().matches(y.source()) && x.source().intersects(y.source())
-						)
+					.filter(new Pruner((x, y) -> // retain only the weightiest match for each anchor
+							x.source().intersects(y.source())
+					))
 
-						.batch(toList())
+					// retain only minimal identifying infos
 
-						.bagMap(this::weight) // compute local rank
-
-						.sorted(Comparator // prefer weightier anchors
-								.<Match<Chunk, Frame>>comparingDouble(Match::weight)
-								.reversed()
-						)
-
-						.prune((x, y) -> // retain only the weightiest match for each anchor
-								x.source().intersects(y.source())
-						)
-
-						// retain only minimal identifying infos
-
-						.map(match -> match.target(frame(match.target().focus())
-								.values(RDF.TYPE, match.target().values(RDF.TYPE))
-								.values(RDFS.LABEL, match.target().values(RDFS.LABEL))
-								.values(RDFS.COMMENT, match.target().values(RDFS.COMMENT))
-						));
-
-			}).apply((t, v) -> logger.info(this, format(
-					"processed <%,d> chars in <%,d> ms (<%,d> chars/s)", chunk.length(), t, 1000L*chunk.length()/t
-			)));
+					.map(match -> match.target(frame(match.target().focus())
+							.values(RDF.TYPE, match.target().values(RDF.TYPE))
+							.values(RDFS.LABEL, match.target().values(RDFS.LABEL))
+							.values(RDFS.COMMENT, match.target().values(RDFS.COMMENT))
+					));
 
 		}
 	}
@@ -250,13 +233,14 @@ public final class GraphLinker implements Function<Chunk, Stream<Match<Chunk, Fr
 
 		final DoubleUnaryOperator weight=transform(min, max, 0.0, 0.1);
 
-		final Map<Value, Set<Value>> resources=Xtream // resources to alternatives for the same anchor
+		final Map<Value, Set<Value>> resources=matches.stream() // resources to alternatives for the same anchor
 
-				.from(matches)
+				.collect(groupingBy(
+						match -> match.source().text(),
+						mapping(match -> match.target().focus(), toSet())
+				))
 
-				.groupBy(match -> match.source().text(), mapping(match -> match.target().focus(), toSet()))
-
-				.map(Map.Entry::getValue)
+				.values().stream()
 
 				.flatMap(entities -> entities.stream().flatMap(x ->
 						entities.stream().map(y ->
@@ -315,6 +299,29 @@ public final class GraphLinker implements Function<Chunk, Stream<Match<Chunk, Fr
 		final double q=(xmax > xmin) ? ymin-p*xmin : ymax;
 
 		return v -> p*v+q;
+
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final class Pruner implements Predicate<Match<Chunk, Frame>> {
+
+		private final BiPredicate<Match<Chunk, Frame>, Match<Chunk, Frame>> clash;
+
+		private final Collection<Match<Chunk, Frame>> matches=new ArrayList<>();
+
+
+		private Pruner(final BiPredicate<Match<Chunk, Frame>, Match<Chunk, Frame>> clash) {
+			this.clash=clash;
+		}
+
+
+		@Override public boolean test(final Match<Chunk, Frame> x) {
+			synchronized ( matches ) {
+				return matches.stream().noneMatch(y -> clash.test(x, y)) && matches.add(x);
+			}
+		}
 
 	}
 

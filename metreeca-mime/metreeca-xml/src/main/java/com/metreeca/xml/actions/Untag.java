@@ -21,7 +21,7 @@ import org.w3c.dom.*;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static com.metreeca.rest.actions.Clean.normalize;
+import static com.metreeca.rest.Xtream.normalize;
 
 /**
  * X/HTML to Markdown conversion.
