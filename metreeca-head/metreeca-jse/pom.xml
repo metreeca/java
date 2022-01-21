@@ -31,7 +31,7 @@
 	<version>0.2.0</version>
 
 	<name>Metreeca Java SE Server Connector</name>
-	<description>Connector kit for Jave SE internal HTTP server.</description>
+	<description>Connector kit for Java SE internal HTTP server.</description>
 
 	<dependencies>
 

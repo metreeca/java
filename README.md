@@ -108,8 +108,7 @@ Hello world!
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
-  idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
 
 # License
 
