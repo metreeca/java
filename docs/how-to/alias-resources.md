@@ -1,14 +1,6 @@
 ---
-title:  "How To Alias Resources"
-parent: "How To…"
+title:  How To Alias Resources
 ---
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
 
 Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints:
 the [Aliaser](../javadocs/com/metreeca/rest/wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting

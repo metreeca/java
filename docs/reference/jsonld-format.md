@@ -1,16 +1,8 @@
 ---
-title:  "JSON-LD Serialization Reference"
-parent: "Reference"
+title:  Idiomatic JSON-LD Serialization
 ---
 
 [comment]: <> (excerpt:	JSON-LD serialization format grammar)
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
 
 
 Metreeca/Base generates and consumes linked data using a compacted/framed [JSON-LD](https://json-ld.org) format, which

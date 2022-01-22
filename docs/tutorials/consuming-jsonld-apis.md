@@ -1,17 +1,8 @@
 ---
-title:  "Consuming Model‑Driven REST/JSON-LD APIs"
-parent: "Tutorials"
+title:  Consuming Model‑Driven REST/JSON-LD APIs
 ---
 
 [comment]: <> (excerpt:  Hands-on guided tour of model-driven lREST/JSON-LD APIs features)
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
 
 This example-driven tutorial introduces the main client-facing features of the Metreeca/Base model-driven REST/JSON
 framework. Basic familiarity with [linked data](https://www.w3.org/standards/semanticweb/data) concepts
@@ -33,10 +24,6 @@ catalog.
 
 You may try out the examples using your favorite API testing tool or working from the command line with toos like `curl`
 or `wget`.
-
-A Maven project with the code for the complete sample app is available
-on [GitHub](https://github.com/metreeca/base/tree/main/metreeca-toys): [download](https://downgit.github.io/#/home?url=https://github.com/metreeca/base/tree/main/metreeca-toys&fileName=metreeca%E2%A7%B8link%20sample)
-it to your workspace, open in your favorite IDE, compile and launch a local instance of the server.
 
 # Model-Driven APIs
 

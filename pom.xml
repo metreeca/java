@@ -21,37 +21,20 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.metreeca</groupId>
+	<parent>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-root</artifactId>
+		<version>0.1.1</version>
+	</parent>
+
 	<artifactId>metreeca-base</artifactId>
 	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
-	<name>Metreeca REST/JSON-LD Framework</name>
-	<description>A modular Java framework for rapid model-driven REST/JSON-LD server development</description>
+	<name>Metreeca/Base</name>
+	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
-
-	<organization>
-		<name>Metreeca</name>
-		<url>https://www.metreeca.com/</url>
-	</organization>
-
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<name>Metreeca</name>
-			<email>info@metreeca.com</email>
-			<organization>Metreeca</organization>
-			<organizationUrl>https://www.metreeca.com/</organizationUrl>
-		</developer>
-	</developers>
 
 	<scm>
 		<connection>scm:git:git@github.com:metreeca/base.git</connection>
@@ -63,39 +46,6 @@
 		<system>GitHub</system>
 		<url>https://github.com/metreeca/base/issues</url>
 	</issueManagement>
-
-	<distributionManagement>
-
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/releases</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-
-		<site>
-			<id>github-pages</id>
-			<url>https://metreeca.github.io/base/</url>
-		</site>
-
-	</distributionManagement>
-
-	<properties>
-
-		<java.version>11</java.version>
-		<maven.version>3.6</maven.version>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<maven.deploy.skip>true</maven.deploy.skip> <!-- ossrh public artifact deployment -->
-		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-
-		<timestamp>${maven.build.timestamp}</timestamp> <!-- ;( not directly available to filtered resources -->
-
-	</properties>
 
 	<modules>
 
@@ -268,20 +218,6 @@
 
 	<dependencies>
 
-		<!-- Shared Testing Dependencies -->
-
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
@@ -292,173 +228,20 @@
 
 	<build>
 
-		<resources>
-
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-
-		</resources>
-
 		<plugins>
 
-			<plugin> <!-- https://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M3</version>
-
-				<executions>
-					<execution>
-
-						<id>enforce-maven</id>
-
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>${maven.version}</version>
-								</requireMavenVersion>
-							</rules>
-						</configuration>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-
-				<executions>
-					<execution>
-
-						<id>attach-sources</id>
-
-						<goals>
-							<goal>jar</goal>
-						</goals>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-compiler-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-
-				<configuration>
-
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-
-				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-jar-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-
-				<configuration>
-
-					<archive>
-
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-
-						<manifestEntries>
-							<Built-By>${project.organization.name}</Built-By>
-							<Built-On>${maven.build.timestamp}</Built-On>
-							<Implementation-Version>${project.version}</Implementation-Version>
-						</manifestEntries>
-
-					</archive>
-
-				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-site-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.9.1</version>
-
-				<configuration>
-
-					<skipDeploy>true</skipDeploy> <!-- github deployment -->
-
-					<stagingDirectory>${maven.multiModuleProjectDirectory}/docs/reports</stagingDirectory>
-
-				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://coderplus.github.io/copy-rename-maven-plugin/ -->
-
-				<groupId>com.coderplus.maven.plugins</groupId>
-				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0</version>
-
-				<executions>
-					<execution>
-
-						<id>copy-readme</id>
-						<phase>pre-site</phase>
-
-						<inherited>false</inherited>
-
-						<goals>
-							<goal>copy</goal>
-						</goals>
-
-						<configuration>
-							<sourceFile>README.md</sourceFile>
-							<destinationFile>docs/index.md</destinationFile>
-						</configuration>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
-			<!--<plugin> &lt;!&ndash; https://github.com/metreeca/mark &ndash;&gt;
+			<plugin>
 
 				<groupId>com.metreeca</groupId>
 				<artifactId>mark-maven-plugin</artifactId>
-				<version>0.5.0</version>
+				<version>0.7.1</version>
 
 				<inherited>false</inherited>
 
 				<configuration>
 
-					<target>docs</target>
-					<assets>@/docs</assets>
-
 					<options>
+						<index>README.md</index>
 						<markdown-smart-links>true</markdown-smart-links>
 						<markdown-external-links>true</markdown-external-links>
 					</options>
@@ -477,42 +260,12 @@
 					</execution>
 				</executions>
 
-			</plugin>-->
+			</plugin>
+
 
 		</plugins>
 
 	</build>
-
-	<reporting>
-		<plugins>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-project-info-reports-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.1.2</version>
-
-				<reportSets>
-
-					<reportSet>
-
-						<reports>
-							<report>index</report>
-							<report>dependencies</report>
-						</reports>
-
-						<configuration>
-							<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-						</configuration>
-
-					</reportSet>
-
-				</reportSets>
-
-			</plugin>
-
-		</plugins>
-	</reporting>
 
 	<profiles>
 		<profile>
@@ -526,7 +279,6 @@
 
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0</version>
 
 						<configuration>
 
@@ -570,60 +322,6 @@
 
 							</links>
 
-						</configuration>
-
-						<executions>
-							<execution>
-
-								<id>attach-javadocs</id>
-
-								<goals>
-									<goal>jar</goal>
-								</goals>
-
-							</execution>
-						</executions>
-
-					</plugin>
-
-					<plugin> <!-- http://maven.apache.org/plugins/maven-gpg-plugin/ -->
-
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.0.1</version>
-
-						<configuration>
-							<executable>gpg</executable>
-							<passphraseServerId>gpg.metreeca</passphraseServerId>
-						</configuration>
-
-						<executions>
-							<execution>
-
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-
-								<goals>
-									<goal>sign</goal>
-								</goals>
-
-							</execution>
-						</executions>
-
-					</plugin>
-
-					<plugin> <!-- https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin -->
-
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
-
-						<extensions>true</extensions>
-
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
 						</configuration>
 
 					</plugin>
