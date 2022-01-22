@@ -1,17 +1,8 @@
 ---
-title:  "Shape Specification Language Reference"
-parent: "Reference"
+title:  Shape Specification Language
 ---
 
 [comment]: <> (excerpt:    Shape-based data modelling language semantics and components)
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
 
 Most framework services are driven by declarative linked data models defined using a [shape](#shapes)-based specification
 language.
@@ -31,13 +22,21 @@ automate a range of different tasks in the lifecycle of linked data REST APIs.
 
 # Shapes
 
-Linked data [shapes](../javadocs/com/metreeca/json/Shape.html) define the expected structure of RDF resource descriptions in terms of **constraints** imposed on members of a **focus set** of JSON-LD values and on the values of their properties.
+Linked data [shapes](../javadocs/com/metreeca/json/Shape.html) define the expected structure of RDF resource descriptions
+in terms of **constraints** imposed on members of a **focus set** of JSON-LD values and on the values of their
+properties.
 
-**Primitive** shapes specify declarative constraints to be meet by the focus set and its member values. **Composite** shapes recursively assemble other shapes into tree-structured complex constraints.
+**Primitive** shapes specify declarative constraints to be meet by the focus set and its member values. **Composite**
+shapes recursively assemble other shapes into tree-structured complex constraints.
 
-Linked data selection tasks identify the set of nodes in a graph whose descriptions are consistent with a possibly composite shape. Selection results are reported either as a graph or a structured report according to the choosen [query](faceted-search.md#queries) type.
+Linked data selection tasks identify the set of nodes in a graph whose descriptions are consistent with a possibly
+composite shape. Selection results are reported either as a graph or a structured report according to the
+choosen [query](faceted-search.md#queries) type.
 
-Linked data validation tasks verify that the description of an initial focus set is consistent with the constraints specified by a possibly composite shape. During the process, derived focus sets connected by [structural constraints](#structural-constraints) may be recursively validated. Validation results are reported as a structured [focus validation trace](../javadocs/com/metreeca/json/Trace.html).
+Linked data validation tasks verify that the description of an initial focus set is consistent with the constraints
+specified by a possibly composite shape. During the process, derived focus sets connected
+by [structural constraints](#structural-constraints) may be recursively validated. Validation results are reported as a
+structured [focus validation trace](../javadocs/com/metreeca/json/Trace.html).
 
 ## Value Constraints
 
@@ -103,9 +102,12 @@ Composite shapes specifying logical combinations of shapes.
 
 # Parameters
 
-The combined use of conditional (`when`) and parametric (`guard`)  constraints supports the definition of **parametric** shapes, which specify different sets of constraints according to the current externally-assigned value of parametric **axis** variables.
+The combined use of conditional (`when`) and parametric (`guard`)  constraints supports the definition of **parametric**
+shapes, which specify different sets of constraints according to the current externally-assigned value of parametric **
+axis** variables.
 
-Parametric axes may be specified for arbitrary custom variables, but the system relies on four pre‑defined parametric variables to support fine‑grained access control rules and role‑dependent read/write resource views.
+Parametric axes may be specified for arbitrary custom variables, but the system relies on four pre‑defined parametric
+variables to support fine‑grained access control rules and role‑dependent read/write resource views.
 
 Common combinations of parametric shapes on these axes are directly available as shorthand shapes.
 
@@ -123,7 +125,9 @@ or using the shorthand [then](../javadocs/com/metreeca/json/Shape.html#then-com.
 
 ## Role Axis
 
-Parametric guards for the [role](../javadocs/com/metreeca/json/shapes/Guard.html#role-java.lang.Object...-) axis selectively enable target shapes according to the roles of the (possibly authenticated) user performing HTTP/S operations on target linked data resources.
+Parametric guards for the [role](../javadocs/com/metreeca/json/shapes/Guard.html#role-java.lang.Object...-) axis
+selectively enable target shapes according to the roles of the (possibly authenticated) user performing HTTP/S operations
+on target linked data resources.
 
 | shorthand | usage context |
 |-------|-------------|
@@ -131,7 +135,9 @@ Parametric guards for the [role](../javadocs/com/metreeca/json/shapes/Guard.html
 
 ## Task Axis
 
-Parametric guards for the [task](../javadocs/com/metreeca/json/shapes/Guard.html#task-java.lang.Object...-) axis selectively enable target shapes according to the method of the HTTP/S operations performed on target linked data resources.
+Parametric guards for the [task](../javadocs/com/metreeca/json/shapes/Guard.html#task-java.lang.Object...-) axis
+selectively enable target shapes according to the method of the HTTP/S operations performed on target linked data
+resources.
 
 | shorthand                                                    | HTTP/S method   | usage context                                                |
 | ------------------------------------------------------------ | --------------- | ------------------------------------------------------------ |
@@ -144,7 +150,8 @@ Parametric guards for the [task](../javadocs/com/metreeca/json/shapes/Guard.html
 
 ## View Axis
 
-Parametric guards for the [view](../javadocs/com/metreeca/json/shapes/Guard.html#view-java.lang.Object...-) axis selectively enable target shapes according to the usage context.
+Parametric guards for the [view](../javadocs/com/metreeca/json/shapes/Guard.html#view-java.lang.Object...-) axis
+selectively enable target shapes according to the usage context.
 
 | shorthand                                                    | usage context                                                |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -153,7 +160,8 @@ Parametric guards for the [view](../javadocs/com/metreeca/json/shapes/Guard.html
 
 ## Mode Axis
 
-Parametric guards for the [mode](../javadocs/com/metreeca/json/shapes/Guard.html#mode-java.lang.Object...-) axis selectively enable target shapes according to the usage pattern.
+Parametric guards for the [mode](../javadocs/com/metreeca/json/shapes/Guard.html#mode-java.lang.Object...-) axis
+selectively enable target shapes according to the usage pattern.
 
 | shorthand                                                    | usage pattern                                                |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |

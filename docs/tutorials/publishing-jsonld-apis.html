@@ -16,7 +16,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
-	<head><title>&quot;Publishing Model‑Driven REST/JSON-LD APIs&quot; | Metreeca/Base</title>
+	<head><title>Publishing Model‑Driven REST/JSON-LD APIs | Metrecaa/Base</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="../index.svg">
@@ -28,9 +28,9 @@
 	</head>
 	<body><input id="toggle" type="checkbox">
 		<nav>
-			<header><a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(../index.svg)"></a><a href="/">Metreeca/Base</a><label for="toggle"></label>
+			<header><a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(../index.svg)"></a><a href="/">Metrecaa/Base</a><label for="toggle"></label>
 			</header>
-			<section><a href="https://github.com/metreeca/base">v1.0.2</a><h1><a href="#getting-started">Getting
+			<section><a href="https://github.com/metreeca/base">v0.2.0</a><h1><a href="#getting-started">Getting
 				Started</a></h1><h2><a href="#embedded-server">Embedded Server</a></h2><h2><a href="#servlet-filter">Servlet
 				Filter</a></h2><h2><a href="#test-connection">Test Connection</a></h2><h2><a href="#sample-data">Sample
 				Data</a></h2><h1><a href="#handling-requests">Handling Requests</a></h1><h2><a href="#request-routing">Request
@@ -42,23 +42,16 @@
 		</nav>
 		<main>
 			<header><a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(../index.svg)"></a>
-				<button title="SCroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)">&quot;Publishing
-					Model‑Driven REST/JSON-LD APIs&quot;
+				<button title="SCroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)">Publishing
+					Model‑Driven REST/JSON-LD APIs
 				</button>
 				<label for="toggle"></label></header>
-			<section>
-				<details open markdown="block">
-					<summary>Table of Contents</summary>
-					{: .text-delta }
-					1. TOC
-					{:toc}
-				</details>
-				<p>This example-driven tutorial introduces the main building blocks of the Metreeca/Base model-driven
-					REST/JSON framework.
-					Basic familiarity with <a href="https://www.w3.org/standards/semanticweb/data" target="_blank">linked
-						data</a> concepts
-					and <a href="https://en.wikipedia.org/wiki/Representational_state_transfer" target="_blank">REST</a>
-					APIs is required.</p>
+			<section><p>This example-driven tutorial introduces the main building blocks of the Metreeca/Base
+				model-driven REST/JSON framework.
+				Basic familiarity with <a href="https://www.w3.org/standards/semanticweb/data" target="_blank">linked
+					data</a> concepts
+				and <a href="https://en.wikipedia.org/wiki/Representational_state_transfer" target="_blank">REST</a> APIs
+				is required.</p>
 				<p>In the following sections you will learn how to use the framework to publish linked data resources
 					through REST/JSON-LD
 					APIs that automatically support CRUD operations, faceted search, data validation and fine‑grained
@@ -79,11 +72,6 @@
 				<p>You may try out the examples using your favorite API testing tool or working from the command line
 					with tools like <code>curl</code>
 					or <code>wget</code>.</p>
-				<p>A Maven project with the code for the complete sample app is available
-					on <a href="https://github.com/metreeca/base/tree/main/metreeca-toys" target="_blank">GitHub</a>:
-					<a href="https://downgit.github.io/#/home?url=https://github.com/metreeca/base/tree/main/metreeca-toys&amp;fileName=metreeca%E2%A7%B8link%20sample" target="_blank">download</a>
-					it to your workspace, open in your favorite IDE, compile and launch a local instance of the server.
-				</p>
 				<h1 id="getting-started">Getting Started</h1>
 				<p>To get started, set up a Maven Java 1.8 project, importing the BOM module for Metreeca/Base:</p>
 				<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
@@ -111,7 +99,7 @@
 			&lt;dependency&gt;
 				&lt;groupId&gt;com.metreeca&lt;/groupId&gt;
 				&lt;artifactId&gt;metreeca-base&lt;/artifactId&gt;
-        &lt;version&gt;${metreeca-base.version}&lt;/version&gt;
+				&lt;version&gt;0.2.0&lt;/version&gt;
 				&lt;type&gt;pom&lt;/type&gt;
 				&lt;scope&gt;import&lt;/scope&gt;
 			&lt;/dependency&gt;
@@ -132,7 +120,8 @@
 					specify version numbers explicitly.</p>
 				<h2 id="embedded-server">Embedded Server</h2>
 				<p>Add the following dependencies to your Maven project:</p>
-				<pre><code class="language-xml">&lt;dependencies&gt;
+				<pre><code class="language-xml">
+&lt;dependencies&gt;
 
 	&lt;dependency&gt;
 		&lt;groupId&gt;com.metreeca&lt;/groupId&gt;
@@ -164,57 +153,62 @@ import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox.get(() -&gt;
+				.delegate(toolbox -&gt; toolbox.get(() -&gt;
 
-            server().wrap(request -&gt; request.reply(response -&gt;
-                response.status(OK)
-            ))
+						server().wrap(request -&gt; request.reply(response -&gt;
+								response.status(OK)
+						))
 
-        ))
+				))
 
-        .start();
-  }
+				.start();
+	}
 
 }
 </code></pre>
-				<p>Compile and and launch the application.</p>
+				<p>Compile and launch the application.</p>
 				<h2 id="servlet-filter">Servlet Filter</h2>
 				<p>Add the following definitions and dependencies to your Maven project:</p>
-				<pre><code class="language-xml">&lt;packaging&gt;war&lt;/packaging&gt;
+				<pre><code class="language-xml">
+&lt;project&gt;
 
-&lt;dependencies&gt;
+	&lt;packaging&gt;war&lt;/packaging&gt;
 
-  &lt;dependency&gt;
-    &lt;groupId&gt;com.metreeca&lt;/groupId&gt;
-    &lt;artifactId&gt;metreeca-jee&lt;/artifactId&gt;
-  &lt;/dependency&gt;
-  
-  &lt;dependency&gt;
-    &lt;groupId&gt;com.metreeca&lt;/groupId&gt;
-    &lt;artifactId&gt;metreeca-rdf4j&lt;/artifactId&gt;
-  &lt;/dependency&gt;
-  
-  &lt;dependency&gt;
-    &lt;groupId&gt;org.eclipse.rdf4j&lt;/groupId&gt;
-    &lt;artifactId&gt;rdf4j-repository-sail&lt;/artifactId&gt;
-  &lt;/dependency&gt;
-  
-  &lt;dependency&gt;
-    &lt;groupId&gt;org.eclipse.rdf4j&lt;/groupId&gt;
-    &lt;artifactId&gt;rdf4j-sail-memory&lt;/artifactId&gt;
-  &lt;/dependency&gt;
-  
-  &lt;dependency&gt;
-    &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
-    &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
-    &lt;version&gt;3.1.0&lt;/version&gt;
-    &lt;scope&gt;provided&lt;/scope&gt;
-  &lt;/dependency&gt;
+	&lt;dependencies&gt;
 
-&lt;/dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.metreeca&lt;/groupId&gt;
+			&lt;artifactId&gt;metreeca-jee&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;com.metreeca&lt;/groupId&gt;
+			&lt;artifactId&gt;metreeca-rdf4j&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.eclipse.rdf4j&lt;/groupId&gt;
+			&lt;artifactId&gt;rdf4j-repository-sail&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.eclipse.rdf4j&lt;/groupId&gt;
+			&lt;artifactId&gt;rdf4j-sail-memory&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+			&lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+			&lt;version&gt;3.1.0&lt;/version&gt;
+			&lt;scope&gt;provided&lt;/scope&gt;
+		&lt;/dependency&gt;
+
+	&lt;/dependencies&gt;
+
+&lt;/project&gt;
 </code></pre>
 				<p>Copy <a href="toys/web.xml"><code>web.xml</code></a> to the <code>src/main/webapp</code> folder.</p>
 				<pre><code class="language-xml">
@@ -297,36 +291,36 @@ import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
 
-            .exec(() -&gt; service(graph()).update(connection -&gt; {
-              try {
+						.exec(() -&gt; service(graph()).update(connection -&gt; {
+							try {
 
-                connection.add(
-                    Toys.class.getResourceAsStream(&quot;toys.ttl&quot;),
-                    &quot;https://example.com/&quot;, RDFFormat.TURTLE
-                );
+								connection.add(
+										Toys.class.getResourceAsStream(&quot;toys.ttl&quot;),
+										&quot;https://example.com/&quot;, RDFFormat.TURTLE
+								);
 
-                return null;
+								return null;
 
-              } catch ( final IOException e ) {
-                throw new UncheckedIOException(e);
-              }
-            }))
+							} catch ( final IOException e ) {
+								throw new UncheckedIOException(e);
+							}
+						}))
 
-            .get(() -&gt;
-                server().wrap(request -&gt; request.reply(response -&gt;
-                    response.status(OK)
-                ))
+						.get(() -&gt;
+								server().wrap(request -&gt; request.reply(response -&gt;
+										response.status(OK)
+								))
 
-            ))
+						))
 
-        .start();
+				.start();
 	}
 
 }
@@ -353,24 +347,24 @@ import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
 
-            .exec(new Toys())
+						.exec(new Toys())
 
-            .get(() -&gt;
-                server().wrap(request -&gt; request.reply(response -&gt;
-                    response.status(OK)
-                ))
+						.get(() -&gt;
+								server().wrap(request -&gt; request.reply(response -&gt;
+										response.status(OK)
+								))
 
-            ))
+						))
 
-        .start();
-  }
+				.start();
+	}
 
 }
 </code></pre>
@@ -391,21 +385,21 @@ public final class Toys implements Runnable {
 	@Override
 	public void run() {
 
-    service(graph()).update(connection -&gt; {
+		service(graph()).update(connection -&gt; {
 			if ( !connection.hasStatement(null, null, null, false) ) {
 				try {
 
-          connection.setNamespace(&quot;toys&quot;, Namespace);
-          connection.add(getClass().getResourceAsStream(&quot;toys.ttl&quot;), Base, TURTLE);
+					connection.setNamespace(&quot;toys&quot;, Namespace);
+					connection.add(getClass().getResourceAsStream(&quot;toys.ttl&quot;), Base, TURTLE);
 
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
 			}
 
-      return this;
+			return this;
 
-    });
+		});
 	}
 
 }
@@ -439,57 +433,57 @@ import static java.util.stream.Collectors.toList;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
 
-            .exec(new Toys())
+						.exec(new Toys())
 
-            .get(() -&gt; server()
+						.get(() -&gt; server()
 
-                .with(preprocessor(request -&gt; request.base(Toys.Base)))
+								.with(preprocessor(request -&gt; request.base(Toys.Base)))
 
-                .wrap(router()
+								.wrap(router()
 
-                    .path(&quot;/products/*&quot;, router()
+										.path(&quot;/products/*&quot;, router()
 
-                        .path(&quot;/&quot;, router().get(request -&gt; request.reply(response -&gt; response
-                            .status(OK)
-                            .body(rdf(), service(graph()).query(connection -&gt;
-                                stream(connection.getStatements(
-                                    null, RDF.TYPE, iri(Toys.Namespace, &quot;Product&quot;)
-                                ))
-                                    .map(Statement::getSubject)
-                                    .map(p -&gt; statement(
-                                        iri(request.item()), LDP.CONTAINS, p)
-                                    )
-                                    .collect(toList())
-                            ))
-                        )))
+												.path(&quot;/&quot;, router().get(request -&gt; request.reply(response -&gt; response
+														.status(OK)
+														.body(rdf(), service(graph()).query(connection -&gt;
+																stream(connection.getStatements(
+																		null, RDF.TYPE, iri(Toys.Namespace, &quot;Product&quot;)
+																))
+																		.map(Statement::getSubject)
+																		.map(p -&gt; statement(
+																				iri(request.item()), LDP.CONTAINS, p)
+																		)
+																		.collect(toList())
+														))
+												)))
 
-                        .path(&quot;/{code}&quot;,
-                            router().get(request -&gt; request.reply(response -&gt; response
-                                .status(OK)
-                                .body(rdf(), service(graph()).query(connection -&gt;
-                                    asList(connection.getStatements(
-                                            iri(request.item()), null, null
-                                        )
-                                    ))
-                                ))
-                            )
-                        )
+												.path(&quot;/{code}&quot;,
+														router().get(request -&gt; request.reply(response -&gt; response
+																.status(OK)
+																.body(rdf(), service(graph()).query(connection -&gt;
+																		asList(connection.getStatements(
+																						iri(request.item()), null, null
+																				)
+																		))
+																))
+														)
+												)
 
-                    )
+										)
 
-                )
+								)
 
-            )
-        )
+						)
+				)
 
-        .start();
+				.start();
 	}
 
 }
@@ -601,29 +595,29 @@ import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
 
-            .exec(new Toys())
+						.exec(new Toys())
 
-            .get(() -&gt; server()
+						.get(() -&gt; server()
 
-                .with(preprocessor(request -&gt; request.base(Toys.Base)))
+								.with(preprocessor(request -&gt; request.base(Toys.Base)))
 
-                .wrap(router()
+								.wrap(router()
 
-                    .path(&quot;/products/*&quot;, new Products())
+										.path(&quot;/products/*&quot;, new Products())
 
-                )
+								)
 
-            )
-        )
+						)
+				)
 
-        .start();
+				.start();
 	}
 
 }
@@ -656,31 +650,31 @@ public final class Products extends Delegator {
 	public Products() {
 		delegate(router()
 
-        .path(&quot;/&quot;, router().get(request -&gt; request.reply(response -&gt; response
-            .status(OK)
-            .body(rdf(), service(graph()).query(connection -&gt;
-                stream(connection.getStatements(
-                    null, RDF.TYPE, Product
-                ))
-                    .map(Statement::getSubject)
-                    .map(p -&gt; statement(
-                        iri(request.item()), LDP.CONTAINS, p)
-                    )
-                    .collect(toList())
+				.path(&quot;/&quot;, router().get(request -&gt; request.reply(response -&gt; response
+						.status(OK)
+						.body(rdf(), service(graph()).query(connection -&gt;
+								stream(connection.getStatements(
+										null, RDF.TYPE, Product
+								))
+										.map(Statement::getSubject)
+										.map(p -&gt; statement(
+												iri(request.item()), LDP.CONTAINS, p)
+										)
+										.collect(toList())
 						))
-        )))
+				)))
 
-        .path(&quot;/{code}&quot;,
-            router().get(request -&gt; request.reply(response -&gt; response
+				.path(&quot;/{code}&quot;,
+						router().get(request -&gt; request.reply(response -&gt; response
 								.status(OK)
-                .body(rdf(), service(graph()).query(connection -&gt;
-                    asList(connection.getStatements(
-                            iri(request.item()), null, null
-                        )
-                    ))
-                ))
-            )
-        )
+								.body(rdf(), service(graph()).query(connection -&gt;
+										asList(connection.getStatements(
+														iri(request.item()), null, null
+												)
+										))
+								))
+						)
+				)
 		);
 	}
 }
@@ -756,30 +750,30 @@ import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
-            .set(engine(), GraphEngine::new) // &lt;&lt;&lt; add this line &lt;&lt;&lt;
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(engine(), GraphEngine::new) // &lt;&lt;&lt; add this line &lt;&lt;&lt;
 
-            .exec(new Toys())
+						.exec(new Toys())
 
-            .get(() -&gt; server()
+						.get(() -&gt; server()
 
-                .with(preprocessor(request -&gt; request.base(Toys.Base)))
+								.with(preprocessor(request -&gt; request.base(Toys.Base)))
 
-                .wrap(router()
+								.wrap(router()
 
-                    .path(&quot;/products/*&quot;, new Products())
+										.path(&quot;/products/*&quot;, new Products())
 
-                )
+								)
 
-            )
-        )
+						)
+				)
 
-        .start();
+				.start();
 	}
 
 }
@@ -912,19 +906,19 @@ public final class Toys implements Runnable {
 	@Override
 	public void run() {
 
-    service(graph()).update(connection -&gt; {
-      if ( !connection.hasStatement(null, null, null, false) ) {
-        try {
+		service(graph()).update(connection -&gt; {
+			if ( !connection.hasStatement(null, null, null, false) ) {
+				try {
 
-          connection.setNamespace(&quot;toys&quot;, Namespace);
-          connection.add(getClass().getResourceAsStream(&quot;toys.ttl&quot;), Base, TURTLE);
+					connection.setNamespace(&quot;toys&quot;, Namespace);
+					connection.add(getClass().getResourceAsStream(&quot;toys.ttl&quot;), Base, TURTLE);
 
-        } catch ( final IOException e ) {
-          throw new UncheckedIOException(e);
-        }
-      }
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			}
 
-      return this;
+			return this;
 
 		});
 	}
@@ -963,60 +957,60 @@ public final class Products extends Delegator {
 
 				field(RDF.TYPE, exactly(Toys.Product)),
 
-        field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-        field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+				field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-        server(field(Toys.code, required())),
+				server(field(Toys.code, required())),
 
-        field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+				field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-            relate(field(RDFS.LABEL, required()))
+						relate(field(RDFS.LABEL, required()))
 
-        ),
+				),
 
-        field(Toys.scale, required(),
-            datatype(XSD.STRING),
-            pattern(&quot;1:[1-9][0-9]{1,2}&quot;)
-        ),
+				field(Toys.scale, required(),
+						datatype(XSD.STRING),
+						pattern(&quot;1:[1-9][0-9]{1,2}&quot;)
+				),
 
-        field(Toys.vendor, required(),
-            datatype(XSD.STRING),
-            maxLength(50)
-        ),
+				field(Toys.vendor, required(),
+						datatype(XSD.STRING),
+						maxLength(50)
+				),
 
-        field(&quot;price&quot;, Toys.sell, required(),
-            datatype(XSD.DECIMAL),
-            minExclusive(literal(0.0)),
-            maxExclusive(literal(1_000.0))
-        ),
+				field(&quot;price&quot;, Toys.sell, required(),
+						datatype(XSD.DECIMAL),
+						minExclusive(literal(0.0)),
+						maxExclusive(literal(1_000.0))
+				),
 
-        role(Toys.staff).then(field(Toys.buy, required(),
-            datatype(XSD.DECIMAL),
-            minInclusive(literal(0.0)),
-            maxInclusive(literal(1_000.0))
-        )),
+				role(Toys.staff).then(field(Toys.buy, required(),
+						datatype(XSD.DECIMAL),
+						minInclusive(literal(0.0)),
+						maxInclusive(literal(1_000.0))
+				)),
 
-        server().then(field(Toys.stock, required(),
-            datatype(XSD.INTEGER),
-            minInclusive(literal(0)),
-            maxExclusive(literal(10_000))
-        ))
+				server().then(field(Toys.stock, required(),
+						datatype(XSD.INTEGER),
+						minInclusive(literal(0)),
+						maxExclusive(literal(10_000))
+				))
 
-    )).wrap(router()
+		)).wrap(router()
 
-        .path(&quot;/&quot;, router()
-            .get(relator())
-            .post(creator())
-        )
+				.path(&quot;/&quot;, router()
+						.get(relator())
+						.post(creator())
+				)
 
-        .path(&quot;/*&quot;, router()
-            .get(relator())
-            .put(updater())
-            .delete(deleter())
-        )
+				.path(&quot;/*&quot;, router()
+						.get(relator())
+						.put(updater())
+						.delete(deleter())
+				)
 
-    ));
-  }
+		));
+	}
 
 }
 </code></pre>
@@ -1100,32 +1094,32 @@ Content-Type: application/json;charset=UTF-8
 					following naive sample:</p>
 				<pre><code class="language-java">public final class Server {
 
-  public static void main(final String... args) {
-    new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-        .delegate(toolbox -&gt; toolbox
+				.delegate(toolbox -&gt; toolbox
 
-            .set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
-            .set(engine(), GraphEngine::new)
+						.set(graph(), () -&gt; new Graph(new SailRepository(new MemoryStore())))
+						.set(engine(), GraphEngine::new)
 
-            .exec(new Toys())
+						.exec(new Toys())
 
-            .get(() -&gt; server()
+						.get(() -&gt; server()
 
-                .with(preprocessor(request -&gt; request.base(Toys.Base)))
+								.with(preprocessor(request -&gt; request.base(Toys.Base)))
 
-                .with(bearer(&quot;secret&quot;, Toys.staff)) // &lt;&lt;&lt; add this line &lt;&lt;&lt;
+								.with(bearer(&quot;secret&quot;, Toys.staff)) // &lt;&lt;&lt; add this line &lt;&lt;&lt;
 
-                .wrap(router()
+								.wrap(router()
 
-                    .path(&quot;/products/*&quot;, new Products())
+										.path(&quot;/products/*&quot;, new Products())
 
-                )
+								)
 
-            )
-        )
+						)
+				)
 
-        .start();
+				.start();
 	}
 
 }
@@ -1219,60 +1213,60 @@ import static com.metreeca.rest.wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-  public Products() {
-    delegate(driver(or(relate(), role(Toys.staff)).then(
+	public Products() {
+		delegate(driver(or(relate(), role(Toys.staff)).then(
 
-        filter(clazz(Toys.Product)),
+				filter(clazz(Toys.Product)),
 
-        field(RDF.TYPE, exactly(Toys.Product)),
+				field(RDF.TYPE, exactly(Toys.Product)),
 
-        field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-        field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+				field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-        server(field(Toys.code, required())),
+				server(field(Toys.code, required())),
 
-        field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+				field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-            relate(field(RDFS.LABEL, required()))
+						relate(field(RDFS.LABEL, required()))
 
-        ),
+				),
 
-        field(Toys.scale, required(),
-            datatype(XSD.STRING),
-            pattern(&quot;1:[1-9][0-9]{1,2}&quot;)
-        ),
+				field(Toys.scale, required(),
+						datatype(XSD.STRING),
+						pattern(&quot;1:[1-9][0-9]{1,2}&quot;)
+				),
 
-        field(Toys.vendor, required(),
-            datatype(XSD.STRING),
-            maxLength(50)
-        ),
+				field(Toys.vendor, required(),
+						datatype(XSD.STRING),
+						maxLength(50)
+				),
 
-        field(&quot;price&quot;, Toys.sell, required(),
-            datatype(XSD.DECIMAL),
-            minExclusive(literal(0.0)),
-            maxExclusive(literal(1_000.0))
-        ),
+				field(&quot;price&quot;, Toys.sell, required(),
+						datatype(XSD.DECIMAL),
+						minExclusive(literal(0.0)),
+						maxExclusive(literal(1_000.0))
+				),
 
-        role(Toys.staff).then(field(Toys.buy, required(),
-            datatype(XSD.DECIMAL),
-            minInclusive(literal(0.0)),
-            maxInclusive(literal(1_000.0))
-        )),
+				role(Toys.staff).then(field(Toys.buy, required(),
+						datatype(XSD.DECIMAL),
+						minInclusive(literal(0.0)),
+						maxInclusive(literal(1_000.0))
+				)),
 
-        server().then(field(Toys.stock, required(),
-            datatype(XSD.INTEGER),
-            minInclusive(literal(0)),
-            maxExclusive(literal(10_000))
-        ))
+				server().then(field(Toys.stock, required(),
+						datatype(XSD.INTEGER),
+						minInclusive(literal(0)),
+						maxExclusive(literal(10_000))
+				))
 
-    )).wrap(router()
+		)).wrap(router()
 
 				.path(&quot;/&quot;, router()
 						.get(relator())
-            .post(creator()
-                .slug(new ProductsSlug())
-                .with(postprocessor(update(text(Products.class, &quot;ProductsCreate.ql&quot;))))
-            ))
+						.post(creator()
+								.slug(new ProductsSlug())
+								.with(postprocessor(update(text(Products.class, &quot;ProductsCreate.ql&quot;))))
+						))
 
 				.path(&quot;/*&quot;, router()
 						.get(relator())
@@ -1302,37 +1296,37 @@ import static org.eclipse.rdf4j.model.util.Values.literal;
 
 public final class ProductsSlug implements Function&lt;Request, String&gt; {
 
-  private final Graph graph=service(graph());
+	private final Graph graph=service(graph());
 
-  @Override
-  public String apply(final Request request) {
-    return graph.update(connection -&gt; {
+	@Override
+	public String apply(final Request request) {
+		return graph.update(connection -&gt; {
 
-      final Value scale=literal(request.body(jsonld()).get()
-          .flatMap(frame -&gt; frame.string(Toys.scale))
-          .orElse(&quot;1:1&quot;)
-      );
+			final Value scale=literal(request.body(jsonld()).get()
+					.flatMap(frame -&gt; frame.string(Toys.scale))
+					.orElse(&quot;1:1&quot;)
+			);
 
-      int serial=0;
+			int serial=0;
 
-      try ( final RepositoryResult&lt;Statement&gt; matches=connection.getStatements(
-          null, Toys.scale, scale
-      ) ) {
-        for (; matches.hasNext(); matches.next()) { ++serial; }
-      }
+			try ( final RepositoryResult&lt;Statement&gt; matches=connection.getStatements(
+					null, Toys.scale, scale
+			) ) {
+				for (; matches.hasNext(); matches.next()) { ++serial; }
+			}
 
-      String code=&quot;&quot;;
+			String code=&quot;&quot;;
 
-      do {
-        code=String.format(&quot;S%s_%d&quot;, scale.stringValue().substring(2), serial);
-      } while ( connection.hasStatement(
-          null, Toys.code, literal(code), true
-      ) );
+			do {
+				code=String.format(&quot;S%s_%d&quot;, scale.stringValue().substring(2), serial);
+			} while ( connection.hasStatement(
+					null, Toys.code, literal(code), true
+			) );
 
-      return code;
+			return code;
 
-    });
-  }
+		});
+	}
 
 }
 </code></pre>
@@ -1340,10 +1334,9 @@ public final class ProductsSlug implements Function&lt;Request, String&gt; {
 				<blockquote>
 					<p>
 						<img src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png?v7" alt="emoji places:warning" height="20" width="20" align="absmiddle"/>
-					</p>
-					<p>Real-world slug generators depending on shared state would take care that operations are
-						synchronized among different
-						transactions in order to prevent the creation of duplicate identifiers.</p>
+						Real-world slug generators depending on shared state would take care that operations are
+						synchronized
+						among different transactions in order to prevent the creation of duplicate identifiers.</p>
 				</blockquote>
 				<p>The <em>ProductsCreate.ql</em> SPARQL Update postprocessing script updates server-managed <code>toys:code</code>
 					and <code>toys:stock</code>

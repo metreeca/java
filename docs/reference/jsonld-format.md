@@ -1,16 +1,8 @@
 ---
-title:  "JSON-LD Serialization Reference"
-parent: "Reference"
+title:  Idiomatic JSON-LD Serialization
 ---
 
 [comment]: <> (excerpt:	JSON-LD serialization format grammar)
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
 
 
 Metreeca/Base generates and consumes linked data using a compacted/framed [JSON-LD](https://json-ld.org) format, which
@@ -41,7 +33,8 @@ RDF values are serialized to different JSON value patterns according to their ki
 
 	<blank> ::= {  "@id" : "_:<id>" (, <property>)* }
 
-Blank nodes descriptions are serialized as JSON objects including a JSON field for the node identifier and a JSON field for each exposed property.
+Blank nodes descriptions are serialized as JSON objects including a JSON field for the node identifier and a JSON field
+for each exposed property.
 
 ```
 <blank> ::= { [<property> (, <property>)*] }
@@ -61,7 +54,7 @@ If the value is a back-link to an enclosing blank node, only the `@id` id field 
 <blank> ::= "_:<id>"
 ```
 
-If the value may be proved to be  a back-reference to an enclosing resource, the node id may be inlined.
+If the value may be proved to be a back-reference to an enclosing resource, the node id may be inlined.
 
 # IRI References
 
@@ -69,7 +62,8 @@ If the value may be proved to be  a back-reference to an enclosing resource, the
 <iri> ::= { "@id" : "<iri>" (, <property>)* }
 ```
 
-IRI reference descriptions are serialized as JSON objects including a JSON field for the resource IRI and a JSON field for each exposed property.
+IRI reference descriptions are serialized as JSON objects including a JSON field for the resource IRI and a JSON field
+for each exposed property.
 
 ```
 <iri> ::= { [<property> (, <property>)*] }
@@ -95,15 +89,17 @@ If the value is a back-reference to an enclosing object, only the `@id` id field
 <iri> ::= "<iri>"
 ```
 
-If the value may be proved to be  a back-reference to an enclosing resource, the IRI may be inlined.
+If the value may be proved to be a back-reference to an enclosing resource, the IRI may be inlined.
 
 ## Decoding
 
-When decoding, relative `<iri>` references are resolved against the provided base URI, which for HTTP REST operations equals the IRI of the request [item](../javadocs/com/metreeca/rest/Message.html#item--).
+When decoding, relative `<iri>` references are resolved against the provided base URI, which for HTTP REST operations
+equals the IRI of the request [item](../javadocs/com/metreeca/rest/Message.html#item--).
 
 ## Encoding
 
-When writing, local `<iri>` references are relativized as root-relative IRIs against the provide base URI, which for HTTP REST operations equals the root IRI of the response [item](../javadocs/com/metreeca/rest/Message.html#item--).
+When writing, local `<iri>` references are relativized as root-relative IRIs against the provide base URI, which for HTTP
+REST operations equals the root IRI of the response [item](../javadocs/com/metreeca/rest/Message.html#item--).
 
 # Properties
 
@@ -129,7 +125,8 @@ inferred by the system on the basis of the field IRI.
 <property> ::= <label>: <value>
 ```
 
-If  the property value may be proved to be non-repeatable, it may be included as a single JSON value, rather than a JSON array.
+If the property value may be proved to be non-repeatable, it may be included as a single JSON value, rather than a JSON
+array.
 
 # Literals
 
@@ -138,7 +135,8 @@ If  the property value may be proved to be non-repeatable, it may be included as
 "<text>"@<lang>  ::= { "@value": "<text>", "@language": "<lang>" }
 ```
 
-In the more general form, literals are serialized as JSON objects including the literal lexical representation and either the literal datatype IRI or the literal language tag.
+In the more general form, literals are serialized as JSON objects including the literal lexical representation and either
+the literal datatype IRI or the literal language tag.
 
 ## Typed Literals
 
@@ -156,7 +154,8 @@ Simple literals and typed `xsd:string` literals are serialized as JSON string va
 "<number>"^^<type> ::= { "@value": "<number>", "@type": "<type>" } # explicit type
 ```
 
-Typed `xsd:integer` and `xsd:decimal` literals are serialized as JSON numeric values using type-specific number formats. Other typed numeric literals are serialized in the extended form.
+Typed `xsd:integer` and `xsd:decimal` literals are serialized as JSON numeric values using type-specific number formats.
+Other typed numeric literals are serialized in the extended form.
 
 ```
 "boolean"^^xsd:boolean ::= <boolean>
@@ -166,7 +165,8 @@ Typed `xsd:boolean` literals are serialized as JSON boolean values.
 
 	"<text>"^^<type> ::= "<text>"
 
-If the datatype of the literal may be proved to be a constant known value, the literal may be serialized as a JSON string value including its lexical representation, omitting datatype info.
+If the datatype of the literal may be proved to be a constant known value, the literal may be serialized as a JSON string
+value including its lexical representation, omitting datatype info.
 
 ## Tagged Literals
 
@@ -178,7 +178,8 @@ If the datatype of the literal may be proved to be a constant known value, the l
 } 
 ```
 
-If collection of literals may be proved to be `rdf:langString`, the collections may be serialized as a JSON object mapping  language tags to lists of string values.
+If collection of literals may be proved to be `rdf:langString`, the collections may be serialized as a JSON object
+mapping language tags to lists of string values.
 
 ```
 "<text1>"@"<lang1>", "<text2>"@"<lang2>", … ::= { 
@@ -188,16 +189,19 @@ If collection of literals may be proved to be `rdf:langString`, the collections 
 } 
 ```
 
-If language tags may be proved to be unique in the collection, string values may be included without wraping them in a list.
+If language tags may be proved to be unique in the collection, string values may be included without wraping them in a
+list.
 
 ```
 "<text1>"@"<lang>", "<text2>"@"<lang>", … ::= ["<text1>","<text2>", …]
 ```
 
-If the language tag may be proved to be a constant, string values may be serialized as a JSON list, omitting language tags.
+If the language tag may be proved to be a constant, string values may be serialized as a JSON list, omitting language
+tags.
 
 ```
 "<text>"@"<lang>" ::= "<text"
 ```
 
-If the tagged literal may be proved to be non-repeatable and with a known language tag, its string value may be included directly.
+If the tagged literal may be proved to be non-repeatable and with a known language tag, its string value may be included
+directly.

@@ -5,27 +5,27 @@ title:  How to Fix sun.security.provider.certpath.SunCertPathBuilderException
 # Test
 
 ```java
-public static void main(final String... args) throws IOException {
+public static void main(final String...args)throws IOException{
 
-    final String host="www.serviziocontrattipubblici.it";
-    final int port=443;
+final String host="www.serviziocontrattipubblici.it";
+final int port=443;
 
-    try (
+		try(
 
-            final Socket socket=SSLSocketFactory.getDefault().createSocket(host, port);
+final Socket socket=SSLSocketFactory.getDefault().createSocket(host,port);
 
-            final InputStream input=socket.getInputStream();
-            final OutputStream output=socket.getOutputStream()
+final InputStream input=socket.getInputStream();
+final OutputStream output=socket.getOutputStream()
 
-    ) {
+		){
 
-        output.write(1);
+		output.write(1);
 
-        while ( input.read() >= 0 ) {}
+		while(input.read()>=0){}
 
-    }
+		}
 
-}
+		}
 ```
 
 # Diagnosis
@@ -44,7 +44,7 @@ See https://security.stackexchange.com/a/168061
 ```
 
 ```java
-static { System.setProperty("com.sun.security.enableAIAcaIssuers", "true"); }
+static {System.setProperty("com.sun.security.enableAIAcaIssuers","true");}
 ```
 
 ## Manually Add Certificate to Keystore

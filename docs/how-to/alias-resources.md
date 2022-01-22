@@ -1,14 +1,6 @@
 ---
-title:  "How To Alias Resources"
-parent: "How To…"
+title:  How To Alias Resources
 ---
-
-<details open markdown="block">
-  <summary>Table of Contents</summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
 
 Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints:
 the [Aliaser](../javadocs/com/metreeca/rest/wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting
@@ -23,8 +15,8 @@ private Optional<String> byname(final RepositoryConnection connection,final Stri
 		.map(Statement::getSubject)
 		.filter(resource->connection.hasStatement(resource,RDF.TYPE,Toys.Product,true))
 		.map(Value::stringValue)
-            .findFirst();
-}
+		.findFirst();
+		}
 ```
 
 # Alternate Identifiers
@@ -34,18 +26,18 @@ private Optional<String> byname(final RepositoryConnection connection,final Stri
 ```java
 router()
 
-	// primary code-based endpoint
+		// primary code-based endpoint
 
-	.path("/products/{code}", router()
-			.get(relator())
-	)
+		.path("/products/{code}",router()
+		.get(relator())
+		)
 
-	// alternate name-based endpoint
+		// alternate name-based endpoint
 
-	.path("/products/byname/{name}", aliaser(request -> request
-			.parameter("name")
-			.flatMap(connect(this::byname))
-	).wrap(request -> request.reply(status(NotFound))))
+		.path("/products/byname/{name}",aliaser(request->request
+		.parameter("name")
+		.flatMap(connect(this::byname))
+		).wrap(request->request.reply(status(NotFound))))
 ```
 
 ```shell
@@ -60,15 +52,15 @@ Location: http://localhost:8080/products/S72_3212
 ```java
 router()
 
-		.path("/products/{code}", router()
-				.get(relator()
-						.with(aliaser(request -> request
-								.parameter("code")
-								.filter(code -> !code.matches("S\\d+_\\d+")) // not a product code
-								.flatMap(connect(this::byname)) // resolve and redirect
-						))
-				)
-         )
+		.path("/products/{code}",router()
+		.get(relator()
+		.with(aliaser(request->request
+		.parameter("code")
+		.filter(code->!code.matches("S\\d+_\\d+")) // not a product code
+		.flatMap(connect(this::byname)) // resolve and redirect
+		))
+		)
+		)
 ```
 
 ```shell
@@ -82,13 +74,13 @@ Location: http://localhost:8080/products/S72_3212
 
 ```java
 router()
-		.path("/products/", router()
-				.get(relator()
-						.with(aliaser(request -> request
-								.parameter("name") // product name keywords provided as query parameter
-								.map(name -> "?~label="+ encode(name)) // rewrite query
-						))
-				)
+		.path("/products/",router()
+		.get(relator()
+		.with(aliaser(request->request
+		.parameter("name") // product name keywords provided as query parameter
+		.map(name->"?~label="+encode(name)) // rewrite query
+		))
+		)
 		)
 ```
 

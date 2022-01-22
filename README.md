@@ -11,6 +11,12 @@ low-level chores and completely shielding frontend developers from linked data t
 While collectively providing a floor-to-ceiling JSON-LD server development solution, its modules are loosely coupled and
 may be easily plugged as a specialized component into your framework of choice.
 
+# Documentation
+
+- **[Tutorials](tutorials/index.md)**
+- **[How-To](how-to/index.md)**
+- **[Reference](reference/index.md)**
+
 # Modules
 
 |    area | javadocs                                                     | description                             |
@@ -108,7 +114,8 @@ Hello world!
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
+  idea
 
 # License
 

@@ -1,5 +1,5 @@
 ---
-title: "How To…"
-has_children: "true"
-nav_order: 3
+title: How To…
 ---
+
+* [How To Alias Resources](alias-resources.md)
