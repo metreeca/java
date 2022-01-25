@@ -31,7 +31,7 @@
 	<version>0.2.0</version>
 	<packaging>pom</packaging>
 
-	<name>Metrecaa/Base</name>
+	<name>Metreaca/Base</name>
 	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
@@ -233,14 +233,15 @@
 
 				<groupId>com.metreeca</groupId>
 				<artifactId>mark-maven-plugin</artifactId>
-				<version>0.7.1</version>
+				<version>0.8.1</version>
 
 				<inherited>false</inherited>
 
 				<configuration>
 
+					<readme>true</readme>
+
 					<options>
-						<index>README.md</index>
 						<markdown-smart-links>true</markdown-smart-links>
 						<markdown-external-links>true</markdown-external-links>
 					</options>
