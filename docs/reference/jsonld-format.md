@@ -1,5 +1,6 @@
 ---
-title:  Idiomatic JSON-LD Serialization
+title: "Idiomatic JSON-LD Serialization"
+trail: "Reference"
 ---
 
 [comment]: <> (excerpt:	JSON-LD serialization format grammar)

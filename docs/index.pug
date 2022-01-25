@@ -22,10 +22,10 @@ html(lang="en")
 
 			meta(name="viewport" content="width=device-width,initial-scale=1")
 			meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
-			meta(http-equiv="Refresh" content="0; url=#{page.canonical}")
+			meta(http-equiv="Refresh" content=`0; url=${page.canonical.0}`)
 
 			link(rel="shortcut icon" href=`${page.root}/index.svg`)
-			link(rel="canonical" href=page.canonical)
+			link(rel="canonical" href=page.canonical.0)
 
 	else
 
@@ -57,7 +57,8 @@ html(lang="en")
 
 				a(href=organizationURL title=organizationName style=logo)
 
-				a(href="/") #{package}
+				span
+					a(href=page.root) #{package}
 
 				label(for="toggle")
 
@@ -77,7 +78,12 @@ html(lang="en")
 
 				a(href=organizationURL title=organizationName style=logo)
 
-				button(title="SCroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
+				span
+
+					if page.trail
+						a(href="..") #{page.trail}
+
+					button(title="Scroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
 
 				label(for="toggle")
 

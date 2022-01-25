@@ -1,5 +1,6 @@
 ---
-title:  Consuming Model‑Driven REST/JSON-LD APIs
+title: "Consuming Model‑Driven REST/JSON-LD APIs"
+trail: "Tutorials"
 ---
 
 [comment]: <> (excerpt:  Hands-on guided tour of model-driven lREST/JSON-LD APIs features)

@@ -1,5 +1,3 @@
-# Broken ;-(
-
 # Added
 
 - REST / Resource retrieval action

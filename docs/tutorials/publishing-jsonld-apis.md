@@ -1,5 +1,6 @@
 ---
-title:  Publishing Model‑Driven REST/JSON-LD APIs
+title: "Publishing Model‑Driven REST/JSON-LD APIs"
+trail: "Tutorials"
 ---
 
 [comment]: <> "excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing"
