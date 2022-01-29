@@ -24,11 +24,10 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-base</artifactId>
-		<version>1.0.2</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-json</artifactId>
-	<version>1.0.2</version>
 
 	<name>Metreeca JSON Modelling</name>
 	<description>A shape-based JSON modelling framework.</description>

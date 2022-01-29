@@ -43,7 +43,7 @@ may be easily plugged as a specialized component into your framework of choice.
        <dependency>
           <groupId>${project.group}</groupId>
           <artifactId>metreeca-base</artifactId>
-          <version>1.0.2</version>
+          <version>${revision}</version>
           <type>pom</type>
 				<scope>import</scope>
 			</dependency>

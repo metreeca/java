@@ -24,11 +24,10 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-back</artifactId>
-		<version>1.0.2</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-gcp</artifactId>
-	<version>1.0.2</version>
 
 	<name>Metreeca Google Cloud Connector</name>
 	<description>Connector kit for Google Cloud.</description>

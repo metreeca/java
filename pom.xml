@@ -24,17 +24,35 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-root</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<artifactId>metreeca-base</artifactId>
-	<version>1.0.2</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<name>Metreeca/Base</name>
 	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
+
+	<properties>
+
+		<revision>1.0.2</revision>
+
+	</properties>
+
+	<modules>
+
+		<module>metreeca-json</module>
+		<module>metreeca-rest</module>
+		<module>metreeca-text</module>
+
+		<module>metreeca-mime</module>
+		<module>metreeca-head</module>
+		<module>metreeca-back</module>
+
+	</modules>
 
 	<scm>
 		<connection>scm:git:git@github.com:metreeca/base.git</connection>
@@ -63,13 +81,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -77,13 +95,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -91,13 +109,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-text</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-text</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -107,13 +125,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-xml</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -122,13 +140,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jee</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jse</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -137,25 +155,25 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf4j</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-open</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-gcp</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-gcp-rdf4j</artifactId>
-				<version>1.0.2</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -212,23 +230,23 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<modules>
-
-		<module>metreeca-json</module>
-		<module>metreeca-rest</module>
-		<module>metreeca-text</module>
-
-		<module>metreeca-mime</module>
-		<module>metreeca-head</module>
-		<module>metreeca-back</module>
-
-	</modules>
-
 	<dependencies>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 
