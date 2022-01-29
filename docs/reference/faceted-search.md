@@ -1,5 +1,6 @@
 ---
-title:  REST Faceted Search
+title: "REST Faceted Search"
+trail: "Reference"
 ---
 
 [comment]: <> (excerpt:    REST faceted search queries and serialization)

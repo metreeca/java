@@ -41,9 +41,9 @@ may be easily plugged as a specialized component into your framework of choice.
 		<dependencies>
 
 			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
-				<version>${metreeca-base.version}</version>
+				<groupId>${project.group}</groupId>
+				<artifactId>${project.artifactId}</artifactId>
+				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -114,8 +114,7 @@ Hello world!
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
-  idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
 
 # License
 

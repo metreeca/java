@@ -1,5 +1,6 @@
 ---
-title:  Shape Specification Language
+title: "Shape Specification Language"
+trail: "Reference"
 ---
 
 [comment]: <> (excerpt:    Shape-based data modelling language semantics and components)

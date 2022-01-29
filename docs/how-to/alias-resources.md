@@ -1,5 +1,6 @@
 ---
-title:  How To Alias Resources
+title: "Alias Resources"
+trail: "How-To"
 ---
 
 Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints:

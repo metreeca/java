@@ -24,28 +24,17 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-root</artifactId>
-		<version>0.1.1</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<artifactId>metreeca-base</artifactId>
 	<version>0.2.0</version>
 	<packaging>pom</packaging>
 
-	<name>Metreaca/Base</name>
+	<name>Metreeca/Base</name>
 	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
-
-	<scm>
-		<connection>scm:git:git@github.com:metreeca/base.git</connection>
-		<developerConnection>scm:git:git@github.com:metreeca/base.git</developerConnection>
-		<url>https://github.com/metreeca/base</url>
-	</scm>
-
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/metreeca/base/issues</url>
-	</issueManagement>
 
 	<modules>
 
@@ -58,6 +47,25 @@
 		<module>metreeca-back</module>
 
 	</modules>
+
+	<scm>
+		<connection>scm:git:git@github.com:metreeca/base.git</connection>
+		<developerConnection>scm:git:git@github.com:metreeca/base.git</developerConnection>
+		<url>https://github.com/metreeca/base</url>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/metreeca/base/issues</url>
+	</issueManagement>
+
+	<distributionManagement>
+
+		<site>
+			<url>https://metreeca.github.io/base/</url>
+		</site>
+
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>
@@ -233,7 +241,7 @@
 
 				<groupId>com.metreeca</groupId>
 				<artifactId>mark-maven-plugin</artifactId>
-				<version>0.8.1</version>
+				<version>0.8.5</version>
 
 				<inherited>false</inherited>
 
@@ -254,7 +262,6 @@
 						<goals>
 							<goal>clean</goal>
 							<goal>build</goal>
-							<goal>check</goal>
 						</goals>
 
 					</execution>

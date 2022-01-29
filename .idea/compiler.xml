@@ -36,6 +36,7 @@
       <module name="metreeca-rdf4j" target="11" />
       <module name="metreeca-rest" target="11" />
       <module name="metreeca-text" target="11" />
+      <module name="metreeca-text" target="11" />
       <module name="metreeca-xml" target="11" />
     </bytecodeTargetLevel>
   </component>
