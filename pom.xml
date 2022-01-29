@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-root</artifactId>
-		<version>0.1.1</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<artifactId>metreeca-base</artifactId>
@@ -47,17 +47,13 @@
 		<url>https://github.com/metreeca/base/issues</url>
 	</issueManagement>
 
-	<modules>
+	<distributionManagement>
 
-		<module>metreeca-json</module>
-		<module>metreeca-rest</module>
-		<module>metreeca-text</module>
+		<site>
+			<url>https://metreeca.github.io/base/</url>
+		</site>
 
-		<module>metreeca-mime</module>
-		<module>metreeca-head</module>
-		<module>metreeca-back</module>
-
-	</modules>
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>
@@ -216,6 +212,18 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<modules>
+
+		<module>metreeca-json</module>
+		<module>metreeca-rest</module>
+		<module>metreeca-text</module>
+
+		<module>metreeca-mime</module>
+		<module>metreeca-head</module>
+		<module>metreeca-back</module>
+
+	</modules>
+
 	<dependencies>
 
 		<dependency>
@@ -234,14 +242,15 @@
 
 				<groupId>com.metreeca</groupId>
 				<artifactId>mark-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.5</version>
 
 				<inherited>false</inherited>
 
 				<configuration>
 
+					<readme>true</readme>
+
 					<options>
-						<index>README.md</index>
 						<markdown-smart-links>true</markdown-smart-links>
 						<markdown-external-links>true</markdown-external-links>
 					</options>
@@ -254,14 +263,12 @@
 						<goals>
 							<goal>clean</goal>
 							<goal>build</goal>
-							<goal>check</goal>
 						</goals>
 
 					</execution>
 				</executions>
 
 			</plugin>
-
 
 		</plugins>
 

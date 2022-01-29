@@ -13,9 +13,9 @@ may be easily plugged as a specialized component into your framework of choice.
 
 # Documentation
 
-- **[Tutorials](tutorials/index.md)**
-- **[How-To](how-to/index.md)**
-- **[Reference](reference/index.md)**
+- **[Tutorials](https://metreeca.github.io/base/tutorials/)**
+- **[How-To](https://metreeca.github.io/base/how-to/)**
+- **[Reference](https://metreeca.github.io/base/reference/)**
 
 # Modules
 
@@ -40,11 +40,11 @@ may be easily plugged as a specialized component into your framework of choice.
 	<dependencyManagement>
 		<dependencies>
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
-				<version>${metreeca-base.version}</version>
-				<type>pom</type>
+       <dependency>
+          <groupId>${project.group}</groupId>
+          <artifactId>metreeca-base</artifactId>
+          <version>1.0.2</version>
+          <type>pom</type>
 				<scope>import</scope>
 			</dependency>
 
@@ -114,10 +114,10 @@ Hello world!
 # Support
 
 - open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an open-ended
-  idea
+- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
 
 # License
 
 This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/base/blob/main/LICENSE)
 file for details.
+

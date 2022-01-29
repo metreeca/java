@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,400,700|Roboto+Mono:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
 
 html {
 
@@ -85,8 +85,20 @@ html {
 
             display: none;
 
+            &:not(:checked) ~ nav {
+                visibility: hidden;
+            }
+
+            &:not(:checked) ~ main {
+                visibility: visible;
+            }
+
             &:checked ~ nav {
-                z-index: 10
+                visibility: visible;
+            }
+
+            &:checked ~ main {
+                visibility: hidden;
             }
 
         }
@@ -161,7 +173,7 @@ html {
 
                 }
 
-                & > label {
+                & > span {
                     flex-shrink: 1;
                     flex-grow: 1;
                 }
@@ -198,14 +210,6 @@ html {
 
         & > nav {
 
-            & > header {
-
-                & > span > a {
-                    font-weight: 700;
-                }
-
-            }
-
             & > section {
 
                 a, a:visited {
@@ -234,19 +238,15 @@ html {
                 }
 
                 & > h1 + h1 {
-                    margin-top: 0.5em;
+                    margin-top: 0.1em;
+                }
+
+                & > h1 + h2 {
+                    margin-top: 0.25em;
                 }
 
                 & > h2 + h1 {
                     margin-top: 0.75em;
-                }
-
-                & > h2 + h2 {
-                    margin-top: 0;
-                }
-
-                & > h1 + h2 {
-                    margin-top: 0.5em;
                 }
 
                 & > h3 {
@@ -274,8 +274,27 @@ html {
 
                     & > button {
 
+                        position: relative;
+                        display: inline-block;
+
                         font-weight: 300;
                         color: #999;
+
+                        /* min-width: 100%; */
+                        /* animation: 5s linear 0s infinite move; */
+                    }
+
+                    @keyframes move {
+                        0%,
+                        10% {
+                            transform: translateX(0%);
+                            left: 0;
+                        }
+                        90%,
+                        100% {
+                            transform: translateX(-100%);
+                            left: 100%;
+                        }
                     }
 
                 }
@@ -306,7 +325,7 @@ html {
 
 /**** Toggle **********************************************************************************************************/
 
-label:empty {
+body > * > header > label {
 
     --size: 0.75em;
     --weight: 0.125em;
@@ -362,7 +381,13 @@ label:empty {
 /**** Admonitions *****************************************************************************************************/
 
 .adm-hidden {
+
     display: none;
+
+    &:first-child + * {
+        margin-top: 0;
+    }
+
 }
 
 .adm-block {
@@ -590,7 +615,7 @@ p {
 
 blockquote {
     margin-top: 1.5em;
-    padding-left: 2em;
+    padding-left: 1em;
     padding-right: 0.5em;
     margin-bottom: 1.5em;
     border-left: solid 0.5em #EEE;
@@ -603,29 +628,49 @@ blockquote > small:last-child {
     text-align: right;
 }
 
-a > img:only-child {
-    vertical-align: middle;
-}
-
-p > img:only-child {
-    width: 100%;
-    height: auto;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-}
-
 hr {
     margin-top: 1em;
     margin-bottom: 1em;
     border-top-style: solid;
 }
 
+img:not([alt~=emoji]) {
+
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+
+    &[src$='#left'] {
+        float: left;
+        max-width: 33%;
+        margin: 0 1.5em 1.5em 0;
+    }
+
+    &[src$='#right'] {
+        float: right;
+        max-width: 33%;
+        margin: 0 0 1.5em 1.5em;
+    }
+
+}
+
 a, a:visited {
+
     white-space: nowrap;
     text-decoration: none;
-    font-weight: 500;
-    color: #567;
+    font-weight: 700;
+    color: #678;
     cursor: pointer;
+
+
+    & > img:only-child {
+        display: inline-block;
+        margin: 0;
+        vertical-align: middle;
+    }
+
 }
 
 a:hover, button:active {
@@ -635,6 +680,7 @@ a:hover, button:active {
 
 a[target=_blank]:after { // external link
     content: "⌝";
+    margin-left: 0.1em;
     vertical-align: 5%;
     font-size: 90%;
 }
@@ -650,7 +696,6 @@ em {
 
 strong {
     color: #333;
-    white-space: pre;
     font-weight: 700;
 }
 
@@ -694,7 +739,7 @@ select {
     }
 
     ul {
-        list-style-type: square;
+        list-style-type: disc;
     }
 
     ul > li::before {
@@ -716,9 +761,7 @@ select {
 
         & > body {
 
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
+            grid-template-columns: minmax(min-content, 1fr) 3fr;
 
             & > * {
 
@@ -726,7 +769,7 @@ select {
 
                     border-bottom-style: none;
 
-                    & > label:empty {
+                    & > label {
                         display: none;
                     }
 
@@ -734,10 +777,21 @@ select {
 
             }
 
+            & > input {
+
+                &:not(:checked) ~ nav {
+                    visibility: visible;
+                }
+
+                &:not(:checked) ~ main {
+                    visibility: visible;
+                }
+
+            }
+
             & > nav {
 
-                flex-grow: 1;
-                flex-shrink: 0;
+                grid-column: 1;
 
                 border-right-style: solid;
 
@@ -745,9 +799,7 @@ select {
 
                 & > header {
 
-                    justify-content: end;
-
-                    & > a:first-child {
+                    & > a {
                         display: none;
                     }
 
@@ -757,7 +809,7 @@ select {
 
             & > main {
 
-                flex-grow: 2;
+                grid-column: 2;
 
                 & > * {
                     padding-left: 2rem;
@@ -766,7 +818,7 @@ select {
 
                 & > header {
 
-                    & > a:first-child {
+                    & > a {
                         order: 2;
                     }
 

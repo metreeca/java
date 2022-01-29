@@ -41,9 +41,9 @@ may be easily plugged as a specialized component into your framework of choice.
 		<dependencies>
 
 			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
-				<version>${metreeca-base.version}</version>
+				<groupId>${project.group}</groupId>
+				<artifactId>${project.artifactId}</artifactId>
+				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
