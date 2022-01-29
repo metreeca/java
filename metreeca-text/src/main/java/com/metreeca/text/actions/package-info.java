@@ -15,6 +15,6 @@
  */
 
 /**
- * Text processors.
+ * Text processing actions.
  */
-package com.metreeca.text.processors;
+package com.metreeca.text.actions;

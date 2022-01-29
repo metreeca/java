@@ -36,6 +36,11 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-text</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-rdf</artifactId>
 		</dependency>
 

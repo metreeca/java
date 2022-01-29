@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.metreeca.text.processors;
+package com.metreeca.text.actions;
 
-import com.metreeca.text.actions.Normalize;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +26,7 @@ final class NormalizeTest {
 
 		final String text="  leading \t\u00A0trailing\n\r";
 
-		Assertions.assertThat(new Normalize().space(true).apply(text)).isEqualTo("leading trailing");
+		assertThat(new Normalize().space(true).apply(text)).isEqualTo("leading trailing");
 		assertThat(new Normalize().space(false).apply(text)).isEqualTo(text);
 	}
 
