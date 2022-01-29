@@ -24,11 +24,10 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-base</artifactId>
-		<version>0.2.0</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-head</artifactId>
-	<version>0.2.0</version>
 	<packaging>pom</packaging>
 
 	<name>Metreeca Server Connectors</name>

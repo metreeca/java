@@ -24,21 +24,15 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-back</artifactId>
-		<version>0.2.0</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-open</artifactId>
-	<version>0.2.0</version>
 
 	<name>Metreeca Open Data Connector</name>
 	<description>Connector kit for open data sources.</description>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-text</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.metreeca</groupId>

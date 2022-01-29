@@ -24,21 +24,15 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-back</artifactId>
-		<version>0.2.0</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-rdf4j</artifactId>
-	<version>0.2.0</version>
 
 	<name>Metreeca RDF4J Connector</name>
 	<description>Connector kit for RDF4J-based SPARQL repositories.</description>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-text</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.metreeca</groupId>

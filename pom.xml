@@ -24,17 +24,23 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-root</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<artifactId>metreeca-base</artifactId>
-	<version>0.2.0</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<name>Metreeca/Base</name>
 	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
 	<url>https://github.com/metreeca/base</url>
 	<inceptionYear>2013</inceptionYear>
+
+	<properties>
+
+		<revision>1.0.2</revision>
+
+	</properties>
 
 	<modules>
 
@@ -75,13 +81,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -89,13 +95,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rest</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -103,13 +109,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-text</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-text</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
@@ -119,13 +125,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-xml</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -134,13 +140,13 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jee</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jse</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -149,25 +155,25 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf4j</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-open</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-gcp</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-gcp-rdf4j</artifactId>
-				<version>0.2.0</version>
+				<version>${project.version}</version>
 			</dependency>
 
 
@@ -232,9 +238,22 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
+
 		<plugins>
 
 			<plugin>
@@ -270,6 +289,7 @@
 			</plugin>
 
 		</plugins>
+
 	</build>
 
 	<profiles>

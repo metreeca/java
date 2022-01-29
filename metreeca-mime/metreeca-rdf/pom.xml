@@ -24,11 +24,10 @@
 	<parent>
 		<groupId>com.metreeca</groupId>
 		<artifactId>metreeca-mime</artifactId>
-		<version>0.2.0</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-rdf</artifactId>
-	<version>0.2.0</version>
 
 	<name>Metreeca RDF Data Connector</name>
 	<description>Connector kit for RDF data.</description>
