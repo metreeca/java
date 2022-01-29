@@ -37,24 +37,24 @@ may be easily plugged as a specialized component into your framework of choice.
 
 <project>
 
-	<dependencyManagement>
-		<dependencies>
+   <dependencyManagement>
+      <dependencies>
 
-       <dependency>
-          <groupId>${project.group}</groupId>
-          <artifactId>metreeca-base</artifactId>
-          <version>${revision}</version>
-          <type>pom</type>
-				<scope>import</scope>
-			</dependency>
+         <dependency>
+            <groupId>${project.group}</groupId>
+            <artifactId>metreeca-base</artifactId>
+            <version>1.0.2</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
 
-		</dependencies>
-	</dependencyManagement>
+      </dependencies>
+   </dependencyManagement>
 
-	<dependencies>
+   <dependencies>
 
-		<dependency> <!-- server connector -->
-			<groupId>com.metreeca</groupId>
+      <dependency> <!-- server connector -->
+         <groupId>com.metreeca</groupId>
 			<artifactId>metreeca-jse</artifactId>
 		</dependency>
 
