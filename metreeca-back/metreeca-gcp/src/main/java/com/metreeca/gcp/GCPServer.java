@@ -22,7 +22,10 @@ import com.metreeca.jse.JSEServer;
 import com.metreeca.rest.Handler;
 import com.metreeca.rest.Toolbox;
 
+import com.google.cloud.ServiceOptions;
+
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -42,11 +45,9 @@ import static java.lang.String.format;
  */
 public final class GCPServer {
 
-	private static final String ProjectVariable="GOOGLE_CLOUD_PROJECT";
 	private static final String ServiceVariable="GAE_SERVICE";
 	private static final String AddressVariable="PORT";
 
-	private static final String UnknownProject="unknown";
 	private static final String DefaultService="default";
 
 
@@ -56,7 +57,7 @@ public final class GCPServer {
 	 * @return {@code true} if running in the development environment; {@code false}, otherwise
 	 */
 	public static boolean development() {
-		return project().equals(UnknownProject);
+		return Objects.isNull(project());
 	}
 
 	/**
@@ -72,10 +73,10 @@ public final class GCPServer {
 	/**
 	 * Retrieves the project name.
 	 *
-	 * @return the Google Cloud Platform project name or an empty string if unknown
+	 * @return the Google Cloud Platform project name or null if unknown
 	 */
 	public static String project() {
-		return System.getenv().getOrDefault(ProjectVariable, UnknownProject);
+		return ServiceOptions.getDefaultProjectId();
 	}
 
 	/**
