@@ -45,117 +45,117 @@ import static java.lang.String.format;
  */
 public final class GCPServer {
 
-	private static final String ServiceVariable="GAE_SERVICE";
-	private static final String AddressVariable="PORT";
+    private static final String ServiceVariable="GAE_SERVICE";
+    private static final String AddressVariable="PORT";
 
-	private static final String DefaultService="default";
-
-
-	/**
-	 * Checks if running in the development environment
-	 *
-	 * @return {@code true} if running in the development environment; {@code false}, otherwise
-	 */
-	public static boolean development() {
-		return Objects.isNull(project());
-	}
-
-	/**
-	 * Checks if running in the production environment
-	 *
-	 * @return {@code true} if running in the production environment; {@code false}, otherwise
-	 */
-	public static boolean production() {
-		return !development();
-	}
+    private static final String DefaultService="default";
 
 
-	/**
-	 * Retrieves the project name.
-	 *
-	 * @return the Google Cloud Platform project name or null if unknown
-	 */
-	public static String project() {
-		return ServiceOptions.getDefaultProjectId();
-	}
+    /**
+     * Checks if running in the development environment
+     *
+     * @return {@code true} if running in the development environment; {@code false}, otherwise
+     */
+    public static boolean development() {
+        return Objects.isNull(System.getenv(ServiceVariable));
+    }
 
-	/**
-	 * Retrieves the service name.
-	 *
-	 * @return the Google App Engine service name
-	 */
-	public static String service() {
-		return System.getenv().getOrDefault(ServiceVariable, DefaultService);
-	}
-
-
-	/**
-	 * Restricts access to a cron handler.
-	 *
-	 * @param handler the cron handler
-	 *
-	 * @return an access control handler restricting {@code handler} to requests issued by the Google App Engine cron
-	 * service
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public static Handler cron(final Handler handler) {
-
-		if ( handler == null ) {
-			throw new NullPointerException("null handler");
-		}
-
-		return request -> request.headers("X-Appengine-Cron").contains("true")
-				? handler.handle(request)
-				: request.reply(status(Forbidden));
-	}
+    /**
+     * Checks if running in the production environment
+     *
+     * @return {@code true} if running in the production environment; {@code false}, otherwise
+     */
+    public static boolean production() {
+        return !development();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Retrieves the project name.
+     *
+     * @return the Google Cloud Platform project name or null if unknown
+     */
+    public static String project() {
+        return ServiceOptions.getDefaultProjectId();
+    }
 
-	private final JSEServer delegate=new JSEServer()
-
-			.context(Optional.of(service())
-					.filter(service -> !service.equals(DefaultService))
-					.map(service -> format("/%s/", service))
-					.orElse("/")
-			)
-
-			.address(System.getenv().getOrDefault(AddressVariable, ""));
-
-
-	public GCPServer context(final String context) {
-
-		if ( context == null ) {
-			throw new NullPointerException("null context");
-		}
-
-		delegate.context(context);
-
-		return this;
-	}
-
-	public GCPServer delegate(final Function<Toolbox, Handler> factory) {
-
-		if ( factory == null ) {
-			throw new NullPointerException("null factory");
-		}
-
-		delegate.delegate(context -> factory.apply(context
-
-				.set(storage(), () -> Paths.get("/tmp"))
-
-				.set(vault(), production() ? GCPVault::new : vault())
-				.set(store(), production() ? GCPStore::new : store())
-
-		));
-
-		return this;
-	}
+    /**
+     * Retrieves the service name.
+     *
+     * @return the Google App Engine service name
+     */
+    public static String service() {
+        return System.getenv().getOrDefault(ServiceVariable, DefaultService);
+    }
 
 
-	public void start() {
-		delegate.start();
-	}
+    /**
+     * Restricts access to a cron handler.
+     *
+     * @param handler the cron handler
+     *
+     * @return an access control handler restricting {@code handler} to requests issued by the Google App Engine cron
+     * service
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public static Handler cron(final Handler handler) {
+
+        if ( handler == null ) {
+            throw new NullPointerException("null handler");
+        }
+
+        return request -> request.headers("X-Appengine-Cron").contains("true")
+                ? handler.handle(request)
+                : request.reply(status(Forbidden));
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private final JSEServer delegate=new JSEServer()
+
+            .context(Optional.of(service())
+                    .filter(service -> !service.equals(DefaultService))
+                    .map(service -> format("/%s/", service))
+                    .orElse("/")
+            )
+
+            .address(System.getenv().getOrDefault(AddressVariable, ""));
+
+
+    public GCPServer context(final String context) {
+
+        if ( context == null ) {
+            throw new NullPointerException("null context");
+        }
+
+        delegate.context(context);
+
+        return this;
+    }
+
+    public GCPServer delegate(final Function<Toolbox, Handler> factory) {
+
+        if ( factory == null ) {
+            throw new NullPointerException("null factory");
+        }
+
+        delegate.delegate(context -> factory.apply(context
+
+                .set(storage(), () -> Paths.get("/tmp"))
+
+                .set(vault(), production() ? GCPVault::new : vault())
+                .set(store(), production() ? GCPStore::new : store())
+
+        ));
+
+        return this;
+    }
+
+
+    public void start() {
+        delegate.start();
+    }
 
 }
