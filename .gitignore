@@ -1,8 +1,12 @@
 /@
 
+/.idea/
+/.vscode/
+
 target/
 
 *~
 ~*
 
 *.iml
+*.pom-flattened.xml
