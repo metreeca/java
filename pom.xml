@@ -27,13 +27,13 @@
 		<version>1.0.2</version>
 	</parent>
 
-	<artifactId>metreeca-base</artifactId>
+	<artifactId>metreeca-java</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>Metreeca/Base</name>
-	<description>A Java framework for rapid model-driven REST/JSON-LD development</description>
-	<url>https://github.com/metreeca/base</url>
+	<name>Metreeca/Java</name>
+	<description>A model‑driven Java framework for rapid REST/JSON‑LD development</description>
+	<url>https://github.com/metreeca/java</url>
 	<inceptionYear>2013</inceptionYear>
 
 	<properties>
@@ -55,20 +55,20 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git@github.com:metreeca/base.git</connection>
-		<developerConnection>scm:git:git@github.com:metreeca/base.git</developerConnection>
-		<url>https://github.com/metreeca/base</url>
+		<connection>scm:git:git@github.com:metreeca/java.git</connection>
+		<developerConnection>scm:git:git@github.com:metreeca/java.git</developerConnection>
+		<url>https://github.com/metreeca/java</url>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/metreeca/base/issues</url>
+		<url>https://github.com/metreeca/java/issues</url>
 	</issueManagement>
 
 	<distributionManagement>
 
 		<site>
-			<url>https://metreeca.github.io/base/</url>
+			<url>https://metreeca.github.io/java/</url>
 		</site>
 
 	</distributionManagement>
@@ -304,6 +304,7 @@
 
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.3.2</version>
 
 						<configuration>
 

@@ -1,21 +1,21 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-base.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-base/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-java.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-java/)
 
-# Metreeca/Base
+# Metreeca/Java
 
-Metreeca/Base is modular Java framework for rapid model-driven REST/JSON-LD server development.
+Metreeca/Java is a model‑driven Java framework for rapid REST/JSON‑LD development.
 
 Its engines automatically convert high-level declarative JSON-LD models into extended REST APIs supporting CRUD
-operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers from
-low-level chores and completely shielding frontend developers from linked data technicalities.
+operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers
+from low-level chores and completely shielding frontend developers from linked data technicalities.
 
-While collectively providing a floor-to-ceiling JSON-LD server development solution, its modules are loosely coupled and
+While collectively providing a floor-to-ceiling development solution, Metreeca/Java modules are loosely coupled and
 may be easily plugged as a specialized component into your framework of choice.
 
 # Documentation
 
-- **[Tutorials](https://metreeca.github.io/base/tutorials/)**
-- **[How-To](https://metreeca.github.io/base/how-to/)**
-- **[Reference](https://metreeca.github.io/base/reference/)**
+- **[Tutorials](https://metreeca.github.io/java/tutorials/)**
+- **[How-To](https://metreeca.github.io/java/how-to/)**
+- **[Reference](https://metreeca.github.io/java/reference/)**
 
 # Modules
 
@@ -33,8 +33,7 @@ may be easily plugged as a specialized component into your framework of choice.
 
 1. Add the framework to your Maven configuration
 
-```xml
-
+```xml 
 <project>
 
 	<dependencyManagement>
@@ -42,7 +41,7 @@ may be easily plugged as a specialized component into your framework of choice.
 
 			<dependency>
 				<groupId>${project.group}</groupId>
-				<artifactId>metreeca-base</artifactId>
+				<artifactId>metreeca-java</artifactId>
 				<version>0.2.0</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -58,12 +57,12 @@ may be easily plugged as a specialized component into your framework of choice.
 			<artifactId>metreeca-jse</artifactId>
 		</dependency>
 
-		<dependency> <!-- storage connector -->
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rdf4j</artifactId>
-		</dependency>
+        <dependency> <!-- storage connector -->
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-rdf4j</artifactId>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>
 ```
@@ -78,18 +77,18 @@ import static com.metreeca.rest.formats.TextFormat.text;
 
 public final class Hello {
 
-	public static void main(final String... args) {
-		new JSEServer()
+   public static void main(final String... args) {
+      new JSEServer()
 
-				.delegate(context -> request ->
-						request.reply(response -> response
-								.status(OK)
-								.body(text(), "Hello world!")
-						)
-				)
+          .delegate(context -> request ->
+              request.reply(response -> response
+                  .status(OK)
+                  .body(text(), "Hello world!")
+              )
+          )
 
-				.start();
-	}
+          .start();
+   }
 
 }
 ```
@@ -113,11 +112,11 @@ Hello world!
 
 # Support
 
-- open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
+- open an [issue](https://github.com/metreeca/java/issues) to report a problem or to suggest a new feature
+- start a [discussion](https://github.com/metreeca/java/discussions) to ask a how-to question or to share an idea
 
 # License
 
-This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/base/blob/main/LICENSE)
+This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/java/blob/main/LICENSE)
 file for details.
 

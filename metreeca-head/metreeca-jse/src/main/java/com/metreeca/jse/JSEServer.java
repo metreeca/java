@@ -49,7 +49,7 @@ import static java.util.stream.Collectors.toMap;
  * Java SE HTTP server connector.
  *
  * <p>Connects web applications managed by a native Java SE {@linkplain HttpServer HTTP server} with
- * resource handlers based on the Metreeca/Base framework:</p>
+ * resource handlers based on the Metreeca/Java framework:</p>
  *
  * <ul>
  *

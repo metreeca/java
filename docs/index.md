@@ -1,14 +1,14 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-base.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-base/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-java.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-java/)
 
-# Metreeca/Base
+# Metreeca/Java
 
-Metreeca/Base is modular Java framework for rapid model-driven REST/JSON-LD server development.
+Metreeca/Java is a model‑driven Java framework for rapid REST/JSON‑LD development.
 
 Its engines automatically convert high-level declarative JSON-LD models into extended REST APIs supporting CRUD
-operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers from
-low-level chores and completely shielding frontend developers from linked data technicalities.
+operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers
+from low-level chores and completely shielding frontend developers from linked data technicalities.
 
-While collectively providing a floor-to-ceiling JSON-LD server development solution, its modules are loosely coupled and
+While collectively providing a floor-to-ceiling development solution, Metreeca/Java modules are loosely coupled and
 may be easily plugged as a specialized component into your framework of choice.
 
 # Documentation
@@ -113,10 +113,10 @@ Hello world!
 
 # Support
 
-- open an [issue](https://github.com/metreeca/base/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/base/discussions) to ask a how-to question or to share an idea
+- open an [issue](https://github.com/metreeca/java/issues) to report a problem or to suggest a new feature
+- start a [discussion](https://github.com/metreeca/java/discussions) to ask a how-to question or to share an idea
 
 # License
 
-This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/base/blob/main/LICENSE)
+This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/java/blob/main/LICENSE)
 file for details.
