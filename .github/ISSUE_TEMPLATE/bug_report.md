@@ -1,38 +1,45 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+name: "Bug Report"
+about: "Create a report to help us improve"
+title: "What's wrong with metreeca/java?"
+labels: "Issue"
+assignees: ""
 ---
 
-**Environment**
 
-- metreeca/java: version
-- operating system: name/version
-- java VM: vendor/version
+**environment**
 
-**Description**
+- metreeca/java: *version*
+- operating system: *name/version*
+- java vm: *vendor/version*
 
-A clear and concise description of what the bug is.
 
-**How To Reproduce**
+**steps to reproduce**
 
-- Step to reproduce the behaviour;
-- …
+1. …
+2. …
 
-**Expected behaviour**
 
-A clear and concise description of what you expected to happen.
+**expected behaviour**
 
-**Actual behaviour**
+*What did you expect to happen?*
 
-A clear and concise description of what actually happens
 
-**Workarounds**
+**actual behaviour**
 
-Share any workaround you found for the bug.
+*What did actually happen?*
 
-**Notes**
 
-Additional observations and any other context about the bug.
+**workarounds**
+
+*Did you find any workaround for the bug?*
+
+
+**notes**
+
+*Would you share any observation or additional context about the bug?*
+
+
+**screenshots /recordings**
+
+*Are you able to document the issue with screenshot and/or recordings?*
