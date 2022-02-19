@@ -68,12 +68,13 @@ public final class GCPVault implements Vault, AutoCloseable {
 			throw new IllegalArgumentException("empty parameter id");
 		}
 
-		final Iterable<Secret> secrets=client.listSecrets(ProjectName.of(project())).iterateAll();
+		final String project=project();
+		final Iterable<Secret> secrets=client.listSecrets(ProjectName.of(project)).iterateAll();
 
 		if ( stream(secrets.spliterator(), false).anyMatch(secret -> secret.getName().equals(id)) ) {
 
 			final AccessSecretVersionRequest request=AccessSecretVersionRequest.newBuilder()
-					.setName(SecretVersionName.of(project(), id, "latest").toString())
+					.setName(SecretVersionName.of(project, id, "latest").toString())
 					.build();
 
 			return Optional.of(client.accessSecretVersion(request).getPayload().getData().toStringUtf8());
