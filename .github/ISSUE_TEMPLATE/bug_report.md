@@ -8,7 +8,7 @@ assignees: ''
 
 **Environment**
 
-- metreeca/base: version
+- metreeca/java: version
 - operating system: name/version
 - java VM: vendor/version
 

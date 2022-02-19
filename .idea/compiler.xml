@@ -30,6 +30,7 @@
       <module name="metreeca-gcp" target="11" />
       <module name="metreeca-gcp-rdf4j" target="11" />
       <module name="metreeca-head" target="11" />
+      <module name="metreeca-java" target="11" />
       <module name="metreeca-jee" target="11" />
       <module name="metreeca-jse" target="11" />
       <module name="metreeca-json" target="11" />

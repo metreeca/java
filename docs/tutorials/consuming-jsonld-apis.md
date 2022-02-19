@@ -5,7 +5,7 @@ trail: "Tutorials"
 
 [comment]: <> (excerpt:  Hands-on guided tour of model-driven lREST/JSON-LD APIs features)
 
-This example-driven tutorial introduces the main client-facing features of the Metreeca/Base model-driven REST/JSON
+This example-driven tutorial introduces the main client-facing features of the Metreeca/Java model-driven REST/JSON
 framework. Basic familiarity with [linked data](https://www.w3.org/standards/semanticweb/data) concepts
 and [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) APIs is required.
 
@@ -47,7 +47,7 @@ to the database and perform coordinated custom queries supporting data retrieval
 sorting, pagination and so on. User authorization, validation of updates and enforcing of consistency rules would as well
 require lenghty and error-prone custom back-end development.
 
-Metreeca/Base automates the whole process with a model-driven API engine that compiles high‑level declarative linked data
+Metreeca/Java automates the whole process with a model-driven API engine that compiles high‑level declarative linked data
 models into read/write REST APIs immediately available for front-end app development, supporting all of the
 above-mentioned features without custom back-end coding.
 
@@ -56,7 +56,7 @@ the [linked data publishing tutorial](publishing-jsonld-apis.md).
 
 # Read Operations
 
-Linked data REST APIs published by Metreeca/Base API engine support controlled read access to RDF contents managed by the
+Linked data REST APIs published by Metreeca/Java API engine support controlled read access to RDF contents managed by the
 underlying graph storage layer.
 
 User authorization and user-specific content generation are performed according
@@ -91,7 +91,7 @@ Content-Type: application/json;charset=UTF-8
 }
 ```
 
-Metreeca/Base produces and accepts an idiomatic [compacted/framed](../reference/jsonld-format.md) JSON-LD format, which
+Metreeca/Java produces and accepts an idiomatic [compacted/framed](../reference/jsonld-format.md) JSON-LD format, which
 streamlines resource descriptions taking into account the constraints described in the associated linked data models.
 
 To include context information, specify the `application/ld+json` MIME type in the `Accept` HTTP request header.
@@ -190,7 +190,7 @@ Content-Type: application/json;charset=UTF-8
 
 # Write Operations
 
-Linked data REST APIs published by Metreeca/Base API engine support controlled write access to content managed by the
+Linked data REST APIs published by Metreeca/Java API engine support controlled write access to content managed by the
 underlying graph storage layer.
 
 User authorization and user-specific content validation are performed according
@@ -342,7 +342,7 @@ The deleted resource is immediately no longer available for retrieval.
 
 # Faceted Search
 
-Metreeca/Base REST APIs engine supports model-driven faceted search and related facet-related queries without additional
+Metreeca/Java REST APIs engine supports model-driven faceted search and related facet-related queries without additional
 effort.
 
 To retrieve a digest description of collection items matching a set of facet filters, perform a `GET` operation on the

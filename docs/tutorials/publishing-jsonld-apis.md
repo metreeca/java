@@ -5,7 +5,7 @@ trail: "Tutorials"
 
 [comment]: <> "excerpt:    Hands-on guided tour of model-driven REST/JSON-LD APIs publishing"
 
-This example-driven tutorial introduces the main building blocks of the Metreeca/Base model-driven REST/JSON framework.
+This example-driven tutorial introduces the main building blocks of the Metreeca/Java model-driven REST/JSON framework.
 Basic familiarity with [linked data](https://www.w3.org/standards/semanticweb/data) concepts
 and [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) APIs is required.
 
@@ -27,7 +27,7 @@ or `wget`.
 
 # Getting Started
 
-To get started, set up a Maven Java 1.8 project, importing the BOM module for Metreeca/Base:
+To get started, set up a Maven Java 1.8 project, importing the BOM module for Metreeca/Java:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -54,7 +54,7 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
+				<artifactId>metreeca-java</artifactId>
 				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -67,11 +67,11 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 </project>
 ```
 
-Then, add the required dependencies for the Metreeca/Base [connectors](../#modules) for the target deployment server and
+Then, add the required dependencies for the Metreeca/Java [connectors](../#modules) for the target deployment server and
 the target graph storage option; in this tutorial we’ll use an RDF4J Memory store deploying either to an embedded server
 or to a Servlet 3.1 container.
 
-Note that the Metreeca/Base BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
+Note that the Metreeca/Java BOM module re-exports the BOM module for the target RDF4J version, so we don't need to
 specify version numbers explicitly.
 
 ## Embedded Server

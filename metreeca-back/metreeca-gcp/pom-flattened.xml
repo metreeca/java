@@ -17,40 +17,40 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.metreeca</groupId>
-        <artifactId>metreeca-back</artifactId>
-        <version>1.0.2</version>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>com.metreeca</groupId>
-    <artifactId>metreeca-gcp</artifactId>
+    <artifactId>metreeca-back</artifactId>
     <version>1.0.2</version>
-    <name>Metreeca Google Cloud Connector</name>
-    <description>Connector kit for Google Cloud.</description>
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <dependencies>
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-jse</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-secretmanager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-datastore</artifactId>
-        </dependency>
-    </dependencies>
+  </parent>
+  <groupId>com.metreeca</groupId>
+  <artifactId>metreeca-gcp</artifactId>
+  <version>1.0.2</version>
+  <name>Metreeca Google Cloud Connector</name>
+  <description>Connector kit for Google Cloud.</description>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <dependencies>
+    <dependency>
+      <groupId>com.metreeca</groupId>
+      <artifactId>metreeca-jse</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-storage</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-secretmanager</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-datastore</artifactId>
+    </dependency>
+  </dependencies>
 </project>

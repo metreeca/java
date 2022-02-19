@@ -5,7 +5,7 @@ trail: "Reference"
 
 [comment]: <> (excerpt:    REST faceted search queries and serialization)
 
-REST/JSON-LD APIs published with the Metreeca/Base framework support engine-managed faceted search capabilities, driven
+REST/JSON-LD APIs published with the Metreeca/Java framework support engine-managed faceted search capabilities, driven
 by structural and typing constraints specified in the underlying linked data model.
 
 # Queries

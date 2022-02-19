@@ -20,23 +20,23 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.metreeca</groupId>
-        <artifactId>metreeca-base</artifactId>
+        <artifactId>metreeca-java</artifactId>
         <version>1.0.2</version>
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-back</artifactId>
     <version>1.0.2</version>
     <packaging>pom</packaging>
-  <name>Metreeca Storage Connectors</name>
-  <description>Storage connector kits.</description>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <modules>
+    <name>Metreeca Storage Connectors</name>
+    <description>Storage connector kits.</description>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <modules>
     <module>metreeca-rdf4j</module>
     <module>metreeca-open</module>
     <module>metreeca-gcp</module>

@@ -17,7 +17,7 @@
 /**
  * Java EE Servlet connector.
  *
- * <p>Provides a connector for deploying apps based on Metreeca/Base as web applications managed by a Servlet 3.1
+ * <p>Provides a connector for deploying apps based on Metreeca/Java as web applications managed by a Servlet 3.1
  * container.</p>
  */
 
