@@ -25,7 +25,7 @@
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-java</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
     <name>Metreeca/Java</name>
     <description>A model‑driven Java framework for rapid REST/JSON‑LD development</description>
@@ -61,7 +61,7 @@
         </site>
     </distributionManagement>
     <properties>
-        <revision>1.0.2</revision>
+        <revision>1.0.3</revision>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -229,6 +229,48 @@
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.3.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <tags>
+                                        <tag>
+                                            <name>apiNote</name>
+                                            <placement>a</placement>
+                                            <head>API Note:</head>
+                                        </tag>
+                                        <tag>
+                                            <name>implSpec</name>
+                                            <placement>a</placement>
+                                            <head>Implementation Specification:</head>
+                                        </tag>
+                                        <tag>
+                                            <name>implNote</name>
+                                            <placement>a</placement>
+                                            <head>Implementation Note:</head>
+                                        </tag>
+                                    </tags>
+                                    <links>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
+                                        <link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>
+                                        <link>https://rdf4j.org/javadoc/latest/</link>
+                                    </links>
+                                </configuration>
+                            </execution>
+                        </executions>
                         <configuration>
                             <tags>
                                 <tag>

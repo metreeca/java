@@ -21,11 +21,11 @@
     <parent>
         <groupId>com.metreeca</groupId>
         <artifactId>metreeca-java</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-back</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
     <name>Metreeca Storage Connectors</name>
     <description>Storage connector kits.</description>
@@ -37,9 +37,9 @@
         </license>
     </licenses>
     <modules>
-    <module>metreeca-rdf4j</module>
-    <module>metreeca-open</module>
-    <module>metreeca-gcp</module>
-    <module>metreeca-gcp-rdf4j</module>
-  </modules>
+        <module>metreeca-rdf4j</module>
+        <module>metreeca-open</module>
+        <module>metreeca-gcp</module>
+        <module>metreeca-gcp-rdf4j</module>
+    </modules>
 </project>

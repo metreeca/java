@@ -21,11 +21,11 @@
     <parent>
         <groupId>com.metreeca</groupId>
         <artifactId>metreeca-java</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-text</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>Metreeca NLP Framework</name>
     <description>A lightweight NLP framework.</description>
     <licenses>

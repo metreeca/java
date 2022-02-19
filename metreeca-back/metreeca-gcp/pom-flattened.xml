@@ -17,16 +17,16 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.metreeca</groupId>
+        <artifactId>metreeca-back</artifactId>
+        <version>1.0.3</version>
+    </parent>
     <groupId>com.metreeca</groupId>
-    <artifactId>metreeca-back</artifactId>
-    <version>1.0.2</version>
-  </parent>
-  <groupId>com.metreeca</groupId>
-  <artifactId>metreeca-gcp</artifactId>
-  <version>1.0.2</version>
-  <name>Metreeca Google Cloud Connector</name>
+    <artifactId>metreeca-gcp</artifactId>
+    <version>1.0.3</version>
+    <name>Metreeca Google Cloud Connector</name>
   <description>Connector kit for Google Cloud.</description>
   <licenses>
     <license>

@@ -21,11 +21,11 @@
     <parent>
         <groupId>com.metreeca</groupId>
         <artifactId>metreeca-java</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-head</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
     <name>Metreeca Server Connectors</name>
     <description>Server connector kits.</description>
