@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/metreeca/base/compare/v1.0.2...HEAD)
 
+### Changed
+
+- REST / Merged development server support from Packer into Publisher
+
 ### Added
 
 - REST / Resource retrieval action

@@ -17,6 +17,7 @@
 package com.metreeca.rest.handlers;
 
 import com.metreeca.rest.Request;
+import com.metreeca.rest.Toolbox;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +30,13 @@ import static com.metreeca.rest.handlers.Publisher.variants;
 import static org.assertj.core.api.Assertions.assertThat;
 
 final class PublisherTest {
+
+	private void exec(final Runnable... tasks) {
+		new Toolbox()
+				.exec(tasks)
+				.clear();
+	}
+
 
 	@Test void testVariants() {
 
@@ -50,13 +58,14 @@ final class PublisherTest {
 	}
 
 	@Test void testRejectUnsafeRequestsRequests() {
-		publisher(getClass().getResource("/"))
+		exec(() -> publisher(getClass().getResource("/"))
 
 				.handle(new Request().method(POST))
 
 				.accept(response -> assertThat(response)
 						.hasStatus(MethodNotAllowed)
-				);
+				)
+		);
 	}
 
 }
