@@ -18,15 +18,15 @@ package com.metreeca.gcp.services;
 
 import com.metreeca.rest.services.Vault;
 
-import com.google.cloud.secretmanager.v1.*;
+import com.google.api.gax.rpc.NotFoundException;
+import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
+import com.google.cloud.secretmanager.v1.SecretVersionName;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 
 import static com.metreeca.gcp.GCPServer.project;
-
-import static java.util.stream.StreamSupport.stream;
 
 
 /**
@@ -68,18 +68,16 @@ public final class GCPVault implements Vault, AutoCloseable {
 			throw new IllegalArgumentException("empty parameter id");
 		}
 
-		final String project=project();
-		final Iterable<Secret> secrets=client.listSecrets(ProjectName.of(project)).iterateAll();
+		try {
 
-		if ( stream(secrets.spliterator(), false).anyMatch(secret -> secret.getName().equals(id)) ) {
+			return Optional.of(client
+					.accessSecretVersion(SecretVersionName.of(project(), id, "latest"))
+					.getPayload()
+					.getData()
+					.toStringUtf8()
+			);
 
-			final AccessSecretVersionRequest request=AccessSecretVersionRequest.newBuilder()
-					.setName(SecretVersionName.of(project, id, "latest").toString())
-					.build();
-
-			return Optional.of(client.accessSecretVersion(request).getPayload().getData().toStringUtf8());
-
-		} else {
+		} catch ( final NotFoundException e ) {
 
 			return Optional.empty();
 
