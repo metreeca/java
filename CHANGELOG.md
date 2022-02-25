@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased](https://github.com/metreeca/base/compare/v1.0.2...HEAD)
+## [Unreleased](https://github.com/metreec/java/compare/v1.0.2...HEAD)
 
 ### Changed
 
@@ -31,7 +31,7 @@ RDF4J / Upgraded to RDF4J 3.7.4
 RDF4J / Handling of union shapes in GraphEngine: now fields are matched inside SPARQL unions
 
 
-## [1.0.2](https://github.com/metreeca/base/compare/v1.0.1...v1.0.2)+2022-01-12
+## [1.0.2+2022-01-12](https://github.com/metreec/java/compare/v1.0.1...v1.0.2)
 
 This is a patch release fixing the lowing issues.
 
@@ -40,7 +40,7 @@ This is a patch release fixing the lowing issues.
 
 - Base / Broken version numbers in maven BOM
 
-## [1.0.1](https://github.com/metreeca/base/compare/v1.0.1...v0.55.0)+2021-12-28
+## [1.0.1+2021-12-28](https://github.com/metreec/java/compare/v1.0.1...v0.55.0)
 
 This is a major release marking the initial public availability of the framework ;).
 
