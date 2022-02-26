@@ -22,97 +22,89 @@ import com.metreeca.json.shapes.*;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.metreeca.json.shapes.Guard.*;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
-abstract class JSONLDInspector<V> extends Shape.Probe<V> {
+abstract class JSONLDInspector<V> extends Shape.Probe<Stream<V>> {
 
-	static Shape driver(final Shape shape) { // !!! caching
-		return shape
+    static Shape driver(final Shape shape) { // !!! caching
+        return shape
 
-				.redact(Role)
-				.redact(Task)
-				.redact(View)
-				.redact(Mode, Convey) // remove internal filtering shapes
+                .redact(Role)
+                .redact(Task)
+                .redact(View)
+                .redact(Mode, Convey) // remove internal filtering shapes
 
-				.expand(); // add inferred constraints to drive json shorthands
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	static boolean tagged(final Shape shape) {
-		return datatype(shape).filter(RDF.LANGSTRING::equals).isPresent();
-	}
-
-	static boolean localized(final Shape shape) {
-		return (shape == null ? Optional.empty() : Optional.ofNullable(shape.map(new JSONLDInspector<Object>() {
-
-			@Override public Object probe(final Localized localized) { return localized; }
-
-		}))).isPresent();
-	}
+                .expand(); // add inferred constraints to drive json shorthands
+    }
 
 
-	static Optional<IRI> datatype(final Shape shape) {
-		return shape == null ? Optional.empty() : Optional.ofNullable(shape.map(new JSONLDInspector<IRI>() {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			@Override public IRI probe(final Datatype datatype) { return datatype.iri(); }
+    static boolean tagged(final Shape shape) {
+        return datatype(shape).filter(RDF.LANGSTRING::equals).isPresent();
+    }
 
-		}));
-	}
+    static boolean localized(final Shape shape) {
+        return shape != null && shape.map(new JSONLDInspector<>() {
 
-	static Optional<Set<String>> langs(final Shape shape) {
-		return shape == null ? Optional.empty() : Optional.ofNullable(shape.map(new JSONLDInspector<Set<String>>() {
+            @Override public Stream<Object> probe(final Localized localized) { return Stream.of(localized); }
 
-			@Override public Set<String> probe(final Lang lang) { return lang.tags(); }
-
-		}));
-	}
+        }).findAny().isPresent();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    static Optional<IRI> datatype(final Shape shape) {
+        return shape == null ? Optional.empty() : Optional
+
+                .of(shape.map(new JSONLDInspector<IRI>() {
+
+                    @Override public Stream<IRI> probe(final Datatype datatype) { return Stream.of(datatype.iri()); }
+
+                }).collect(toSet()))
 
 
-	@Override public V probe(final Link link) {
-		return link.shape().map(this);
-	}
+                .filter(datatypes -> datatypes.size() == 1)
+                .map(datatypes -> datatypes.iterator().next());
+    }
+
+    static Set<String> langs(final Shape shape) {
+        return shape == null ? Set.of() : shape.map(new JSONLDInspector<String>() {
+
+            @Override public Stream<String> probe(final Lang lang) { return lang.tags().stream(); }
+
+        }).collect(toSet());
+    }
 
 
-	@Override public V probe(final When when) {
-		return value(Stream.of(when.pass(), when.fail()));
-	}
-
-	@Override public V probe(final And and) {
-		return value(and.shapes().stream());
-	}
-
-	@Override public V probe(final Or or) {
-		return value(or.shapes().stream());
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	private V value(final Stream<Shape> shapes) {
+    @Override public Stream<V> probe(final Link link) {
+        return link.shape().map(this);
+    }
 
-		final Set<V> values=shapes
-				.map(shape -> shape.map(this))
-				.filter(Objects::nonNull)
-				.collect(toSet());
 
-		if ( values.size() > 1 ) {
-			throw new IllegalArgumentException(format(
-					"conflicting values {%s}", values.stream().map(Object::toString).collect(joining(", "))
-			));
-		}
+    @Override public Stream<V> probe(final When when) {
+        return Stream.of(when.pass(), when.fail()).flatMap(shape -> shape.map(this));
+    }
 
-		return values.isEmpty() ? null : values.iterator().next();
+    @Override public Stream<V> probe(final And and) {
+        return and.shapes().stream().flatMap(shape -> shape.map(this));
+    }
 
-	}
+    @Override public Stream<V> probe(final Or or) {
+        return or.shapes().stream().flatMap(shape -> shape.map(this));
+    }
+
+
+    @Override protected Stream<V> probe(final Shape shape) {
+        return Stream.empty();
+    }
 
 }
