@@ -54,22 +54,22 @@ import static java.util.Collections.unmodifiableSet;
  */
 public final class Wikidata implements Function<String, Xtream<Frame>> {
 
+	public static final String WB="http://wikiba.se/ontology#";
 	public static final String WD="http://www.wikidata.org/entity/";
 	public static final String WDP="http://www.wikidata.org/prop/";
 	public static final String WDT="http://www.wikidata.org/prop/direct/";
-	public static final String WB="http://wikiba.se/ontology#";
 
-	public static final IRI ITEM=iri(WB, "Item");
-	public static final IRI PROPERTY=iri(WB, "Property");
-	public static final IRI SITELINKS=iri(WB, "sitelinks");
+	public static final IRI ITEM=wb("Item");
+	public static final IRI PROPERTY=wb("Property");
+	public static final IRI SITELINKS=wb("sitelinks");
 
-	public static final IRI P31=iri(WDT, "P31"); // instance of
-	public static final IRI P279=iri(WDT, "P279"); // subclass of
-	public static final IRI P1647=iri(WDT, "P1647"); // subproperty of
-	public static final IRI P625=iri(WDT, "P625"); // coordinate location
-	public static final IRI P1549=iri(WDT, "P1549"); // demonym
+	public static final IRI P31=wdt("P31"); // instance of
+	public static final IRI P279=wdt("P279"); // subclass of
+	public static final IRI P1647=wdt("P1647"); // subproperty of
+	public static final IRI P625=wdt("P625"); // coordinate location
+	public static final IRI P1549=wdt("P1549"); // demonym
 
-	public static final IRI Q4167410=iri(WD, "Q4167410"); // Wikimedia disambiguation page
+	public static final IRI Q4167410=wd("Q4167410"); // Wikimedia disambiguation page
 
 	public static final Collection<Value> Names=unmodifiableSet(new HashSet<>(asList(RDFS.LABEL, SKOS.ALT_LABEL)));
 
@@ -78,6 +78,34 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 	private static final Pattern PointPattern=Pattern.compile("Point\\(("+CoordPattern+")\\s+("+CoordPattern+")\\)");
 
 	private static final Limit<String> limit=new Limit<>(2);
+
+
+	public static IRI wb(final String name) {
+
+		if ( name == null ) {
+			throw new NullPointerException("null name");
+		}
+
+		return iri(WB, name);
+	}
+
+	public static IRI wd(final String name) {
+
+		if ( name == null ) {
+			throw new NullPointerException("null name");
+		}
+
+		return iri(WD, name);
+	}
+
+	public static IRI wdt(final String name) {
+
+		if ( name == null ) {
+			throw new NullPointerException("null name");
+		}
+
+		return iri(WDT, name);
+	}
 
 
 	public static Graph Graph() {
