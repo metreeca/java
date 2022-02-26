@@ -21,6 +21,8 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.FrameAssert.assertThat;
 import static com.metreeca.json.Values.*;
@@ -31,192 +33,214 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toSet;
 
 final class FrameTest {
 
-	private static final IRI w=iri("http://example.com/w");
-	private static final IRI x=iri("http://example.com/x");
-	private static final IRI y=iri("http://example.com/y");
-	private static final IRI z=iri("http://example.com/z");
+    private static final IRI w=iri("http://example.com/w");
+    private static final IRI x=iri("http://example.com/x");
+    private static final IRI y=iri("http://example.com/y");
+    private static final IRI z=iri("http://example.com/z");
 
-	@Nested final class Assembling {
 
-		@Test void testHandleDirectAndInverseTraits() {
+    @Nested final class Assembling {
 
-			final Frame frame=frame(x)
-					.value(RDF.VALUE, y)
-					.value(inverse(RDF.VALUE), z);
+        @Test void testHandleDirectAndInverseTraits() {
 
-			assertThat(frame.values(RDF.VALUE)).containsExactly(y);
-			assertThat(frame.values(inverse(RDF.VALUE))).containsExactly(z);
-		}
+            final Frame frame=frame(x)
+                    .value(RDF.VALUE, y)
+                    .value(inverse(RDF.VALUE), z);
 
-		@Test void testHandleNestedFrames() {
+            assertThat(frame.values(RDF.VALUE)).containsExactly(y);
+            assertThat(frame.values(inverse(RDF.VALUE))).containsExactly(z);
+        }
 
-			final Frame frame=frame(w)
-					.value(RDF.VALUE, x)
-					.frame(RDF.VALUE, frame(y)
-							.value(RDF.VALUE, w)
-					)
-					.value(RDF.VALUE, z);
+        @Test void testHandleNestedFrames() {
 
-			assertThat(frame).isIsomorphicTo(frame(w, asList(
-					statement(w, RDF.VALUE, x),
-					statement(w, RDF.VALUE, y),
-					statement(y, RDF.VALUE, w),
-					statement(w, RDF.VALUE, z)
-			)));
-		}
+            final Frame frame=frame(w)
+                    .value(RDF.VALUE, x)
+                    .frame(RDF.VALUE, frame(y)
+                            .value(RDF.VALUE, w)
+                    )
+                    .value(RDF.VALUE, z);
 
-		@Test void testReportLiteralSubjectsForDirectTraits() {
-			assertThatIllegalArgumentException().isThrownBy(() ->
-					frame(x).value(inverse(RDF.VALUE), literal(1))
-			);
-		}
+            assertThat(frame).isIsomorphicTo(frame(w, asList(
+                    statement(w, RDF.VALUE, x),
+                    statement(w, RDF.VALUE, y),
+                    statement(y, RDF.VALUE, w),
+                    statement(w, RDF.VALUE, z)
+            )));
+        }
 
-		@Test void testReportLiteralObjectsForInverseTraits() {
-			assertThatIllegalArgumentException().isThrownBy(() ->
-					frame(x).value(inverse(RDF.VALUE), literal(1))
-			);
-		}
+        @Test void testReportLiteralSubjectsForDirectTraits() {
+            assertThatIllegalArgumentException().isThrownBy(() ->
+                    frame(x).value(inverse(RDF.VALUE), literal(1))
+            );
+        }
 
-	}
+        @Test void testReportLiteralObjectsForInverseTraits() {
+            assertThatIllegalArgumentException().isThrownBy(() ->
+                    frame(x).value(inverse(RDF.VALUE), literal(1))
+            );
+        }
 
-	@Nested final class Importing {
+    }
 
-		@Test void testImportDirectStatements() {
-			assertThat(frame(x, singletonList(
+    @Nested final class Importing {
 
-					statement(x, RDF.VALUE, y)
+        @Test void testImportDirectStatements() {
+            assertThat(frame(x, singletonList(
 
-			))).isIsomorphicTo(frame(x, singletonList(
+                    statement(x, RDF.VALUE, y)
 
-					statement(x, RDF.VALUE, y)
+            ))).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(x, RDF.VALUE, y)
 
-		@Test void testImportInverseStatements() {
-			assertThat(frame(x, singletonList(
+            )));
+        }
 
-					statement(y, RDF.VALUE, x)
+        @Test void testImportInverseStatements() {
+            assertThat(frame(x, singletonList(
 
-			))).isIsomorphicTo(frame(x, singletonList(
+                    statement(y, RDF.VALUE, x)
 
-					statement(y, RDF.VALUE, x)
+            ))).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(y, RDF.VALUE, x)
 
-		@Test void testIgnoreUnconnectedStatements() {
-			assertThat(frame(x, asList(
+            )));
+        }
 
-					statement(x, RDF.VALUE, y),
-					statement(w, RDF.VALUE, z)
+        @Test void testIgnoreUnconnectedStatements() {
+            assertThat(frame(x, asList(
 
-			))).isIsomorphicTo(frame(x, singletonList(
+                    statement(x, RDF.VALUE, y),
+                    statement(w, RDF.VALUE, z)
 
-					statement(x, RDF.VALUE, y)
+            ))).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(x, RDF.VALUE, y)
 
-		@Test void testIgnoreInverseTypeLinks() {
-			assertThat(frame(x, asList(
+            )));
+        }
 
-					statement(x, RDF.TYPE, z),
-					statement(y, RDF.TYPE, z)
+        @Test void testIgnoreInverseTypeLinks() {
+            assertThat(frame(x, asList(
 
-			))).isIsomorphicTo(frame(x, singletonList(
+                    statement(x, RDF.TYPE, z),
+                    statement(y, RDF.TYPE, z)
 
-					statement(x, RDF.TYPE, z)
+            ))).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(x, RDF.TYPE, z)
 
-		@Test void testImportTransitiveStatements() {
-			assertThat(frame(x, asList(
+            )));
+        }
 
-					statement(x, RDF.FIRST, y),
-					statement(y, RDF.REST, z)
+        @Test void testImportTransitiveStatements() {
+            assertThat(frame(x, asList(
 
-			))).isIsomorphicTo(frame(x, asList(
+                    statement(x, RDF.FIRST, y),
+                    statement(y, RDF.REST, z)
 
-					statement(x, RDF.FIRST, y),
-					statement(y, RDF.REST, z)
+            ))).isIsomorphicTo(frame(x, asList(
 
-			)));
-		}
+                    statement(x, RDF.FIRST, y),
+                    statement(y, RDF.REST, z)
 
-		@Test void testImportSelfLinks() {
-			assertThat((
+            )));
+        }
 
-					frame(x, singletonList(
+        @Test void testImportSelfLinks() {
+            assertThat((
 
-							statement(x, RDF.VALUE, x)
+                    frame(x, singletonList(
 
-					)).values(RDF.VALUE)
+                            statement(x, RDF.VALUE, x)
 
-			)).containsExactly(x);
-		}
+                    )).values(RDF.VALUE)
 
-		@Test void testImportBackLinks() {
-			assertThat((
+            )).containsExactly(x);
+        }
 
-					frame(x, asList(
+        @Test void testImportBackLinks() {
+            assertThat((
 
-							statement(x, RDF.VALUE, y),
-							statement(y, RDF.VALUE, x)
+                    frame(x, asList(
 
-					)).values(seq(
-							RDF.VALUE, RDF.VALUE
-					))
+                            statement(x, RDF.VALUE, y),
+                            statement(y, RDF.VALUE, x)
 
-			)).containsExactly(x);
-		}
+                    )).values(seq(
+                            RDF.VALUE, RDF.VALUE
+                    ))
 
-	}
+            )).containsExactly(x);
+        }
 
-	@Nested final class Exporting {
+    }
 
-		@Test void testExportDirectStatements() {
-			assertThat(frame(x).value(RDF.VALUE, y)
+    @Nested final class Exporting {
 
+        @Test void testExportDirectStatements() {
+            assertThat(frame(x).value(RDF.VALUE, y)
 
-			).isIsomorphicTo(frame(x, singletonList(
 
-					statement(x, RDF.VALUE, y)
+            ).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(x, RDF.VALUE, y)
 
-		@Test void testExportInverseStatements() {
-			assertThat(frame(x).value(inverse(RDF.VALUE), y)
+            )));
+        }
 
+        @Test void testExportInverseStatements() {
+            assertThat(frame(x).value(inverse(RDF.VALUE), y)
 
-			).isIsomorphicTo(frame(x, singletonList(
 
-					statement(y, RDF.VALUE, x)
+            ).isIsomorphicTo(frame(x, singletonList(
 
-			)));
-		}
+                    statement(y, RDF.VALUE, x)
 
-		@Test void testExportTransitiveStatements() {
-			assertThat(frame(x)
+            )));
+        }
 
-					.frame(RDF.FIRST, frame(y)
-							.value(RDF.REST, z)
-					)
+        @Test void testExportTransitiveStatements() {
+            assertThat(frame(x)
 
+                    .frame(RDF.FIRST, frame(y)
+                            .value(RDF.REST, z)
+                    )
 
-			).isIsomorphicTo(frame(x, asList(
 
-					statement(x, RDF.FIRST, y),
-					statement(y, RDF.REST, z)
+            ).isIsomorphicTo(frame(x, asList(
 
-			)));
-		}
+                    statement(x, RDF.FIRST, y),
+                    statement(y, RDF.REST, z)
 
-	}
+            )));
+        }
+
+    }
+
+
+    @Nested final class Shifting {
+
+        @Test void testShiftSeq() {
+            assertThat(
+
+                    frame(w, List.of(
+                            statement(w, RDF.FIRST, x),
+                            statement(x, RDF.REST, y),
+                            statement(x, RDF.REST, z)
+                    ))
+
+                            .values(seq(RDF.FIRST, RDF.REST))
+                            .collect(toSet())
+
+            ).containsExactlyInAnyOrder(y, z);
+        }
+
+    }
 
 }

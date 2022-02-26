@@ -47,7 +47,7 @@ public final class Frame {
 			RDFS.LABEL, DC.TITLE, iri("http://schema.org/", "name")
 	);
 
-	private static final Path Notes=alt(
+	private static final Path Briefs=alt(
 			RDFS.COMMENT, DC.DESCRIPTION, iri("http://schema.org/", "description")
 	);
 
@@ -142,7 +142,7 @@ public final class Frame {
 	}
 
 	public Optional<String> notes() {
-		return string(Notes);
+		return string(Briefs);
 	}
 
 
