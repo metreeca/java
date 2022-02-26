@@ -193,9 +193,20 @@ public final class Frame {
 		}
 
 		return md5(Arrays.stream(traits)
-				.map(this::value)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.flatMap(this::values)
+				.map(Value::stringValue)
+				.collect(joining("\n"))
+		);
+	}
+
+	public String skolemize(final Shift... shifts) {
+
+		if ( shifts == null || Arrays.stream(shifts).anyMatch(Objects::isNull) ) {
+			throw new NullPointerException("null shifts");
+		}
+
+		return md5(Arrays.stream(shifts)
+				.flatMap(this::values)
 				.map(Value::stringValue)
 				.collect(joining("\n"))
 		);
