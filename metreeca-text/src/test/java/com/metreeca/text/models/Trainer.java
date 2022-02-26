@@ -16,12 +16,14 @@
 
 package com.metreeca.text.models;
 
-final class Trainer {
+import java.io.File;
 
-	//private static final File samples=new File("finder.person.it.txt");
-	//private static final File model=new File("finder.person.it.bin");
-	//
-	//
+public final class Trainer {
+
+	private static final File samples=new File("finder.person.it.txt");
+	private static final File model=new File("finder.person.it.bin");
+
+
 	//@Test void fetch() throws IOException {
 	//	try ( final Writer writer=new FileWriter(samples) ) {
 	//		new Toolbox()
@@ -72,7 +74,7 @@ final class Trainer {
 	//				.clear();
 	//	}
 	//}
-	//
+
 	//@Test void train() throws IOException {
 	//
 	//	final InputStreamFactory inputs=new MarkableFileInputStreamFactory(samples);
