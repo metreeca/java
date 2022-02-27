@@ -1,0 +1,45 @@
+name: maven-snapshot
+
+on:
+
+  push:
+    branches:
+      - 'release/*'
+
+jobs:
+
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up java environment
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: temurin
+          cache: maven
+          server-id: ossrh
+          server-username: OSSRH_USR
+          server-password: OSSRH_PWD
+          gpg-private-key: ${{ secrets.MAVEN_KEY }}
+          gpg-passphrase: MAVEN_PWD
+
+      - name: Convert trigger release branch name into a maven snapshot version
+        id: revision
+        run: echo ::set-output
+          name=version::$(echo ${{ github.ref_name }} | sed -r 's:release/([0-9]+\.[0-9]+).*:\1.0-SNAPSHOT:')
+
+      - name: Release snapshot version to ossrh
+        run: mvn --batch-mode --update-snapshots
+          --activate-profiles release
+          -Drevision=${{ steps.revision.outputs.version }}
+          deploy
+        env:
+          OSSRH_USR: ${{ secrets.OSSRH_USR }}
+          OSSRH_PWD: ${{ secrets.OSSRH_PWD }}
+          MAVEN_PWD: ${{ secrets.MAVEN_PWD }}

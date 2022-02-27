@@ -21,11 +21,11 @@
     <parent>
         <groupId>com.metreeca</groupId>
         <artifactId>metreeca-root</artifactId>
-        <version>1.0.2</version>
+        <version>1.1.0</version>
     </parent>
     <groupId>com.metreeca</groupId>
     <artifactId>metreeca-java</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metreeca/Java</name>
     <description>A model‑driven Java framework for rapid REST/JSON‑LD development</description>
@@ -61,7 +61,7 @@
         </site>
     </distributionManagement>
     <properties>
-        <revision>1.0.3</revision>
+        <revision>1.0.0-SNAPSHOT</revision>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -228,7 +228,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.2</version>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -237,23 +237,6 @@
                                     <goal>jar</goal>
                                 </goals>
                                 <configuration>
-                                    <tags>
-                                        <tag>
-                                            <name>apiNote</name>
-                                            <placement>a</placement>
-                                            <head>API Note:</head>
-                                        </tag>
-                                        <tag>
-                                            <name>implSpec</name>
-                                            <placement>a</placement>
-                                            <head>Implementation Specification:</head>
-                                        </tag>
-                                        <tag>
-                                            <name>implNote</name>
-                                            <placement>a</placement>
-                                            <head>Implementation Note:</head>
-                                        </tag>
-                                    </tags>
                                     <links>
                                         <link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
                                         <link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
@@ -272,23 +255,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <tags>
-                                <tag>
-                                    <name>apiNote</name>
-                                    <placement>a</placement>
-                                    <head>API Note:</head>
-                                </tag>
-                                <tag>
-                                    <name>implSpec</name>
-                                    <placement>a</placement>
-                                    <head>Implementation Specification:</head>
-                                </tag>
-                                <tag>
-                                    <name>implNote</name>
-                                    <placement>a</placement>
-                                    <head>Implementation Note:</head>
-                                </tag>
-                            </tags>
                             <links>
                                 <link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
                                 <link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>

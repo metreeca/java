@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -639,7 +639,8 @@ img:not([alt~=emoji]) {
     display: block;
     max-width: 100%;
     height: auto;
-    padding: 1.5em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 
     &[src$='#left'] {
         float: left;
@@ -651,11 +652,6 @@ img:not([alt~=emoji]) {
         float: right;
         max-width: 33%;
         margin: 0 0 1.5em 1.5em;
-    }
-
-    &[src$='#center'] {
-        max-width: 66%;
-        margin: auto;
     }
 
 }
@@ -671,7 +667,6 @@ a, a:visited {
 
     & > img:only-child {
         display: inline-block;
-        padding: 0;
         margin: 0;
         vertical-align: middle;
     }
