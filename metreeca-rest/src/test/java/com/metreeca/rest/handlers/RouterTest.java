@@ -198,7 +198,7 @@ final class RouterTest {
 
 	@Nested final class Methods {
 
-		private Future<Response> handler(final Request request) {
+		private Response handler(final Request request) {
 			return request.reply(response -> response
 
 					.status(Response.OK)

@@ -248,7 +248,7 @@ public final class Publisher extends Delegator {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Future<Response> handle(final Request request, final Path root) {
+    private Response handle(final Request request, final Path root) {
         return development(request)
 
                 .or(() -> content(request, root, request.path()))
@@ -258,7 +258,7 @@ public final class Publisher extends Delegator {
     }
 
 
-    private Optional<Future<Response>> development(final Request request) {
+    private Optional<Response> development(final Request request) {
         return request.header("Host").filter(host -> host.startsWith("localhost:")).map(host -> request
 
                 .reply(response -> fetcher.apply(new Request()
@@ -284,7 +284,7 @@ public final class Publisher extends Delegator {
         );
     }
 
-    private Optional<Future<Response>> content(final Request request, final Path root, final String path) {
+    private Optional<Response> content(final Request request, final Path root, final String path) {
         return variants(path)
 
                 .map(variant -> root.getRoot().relativize(root.getFileSystem().getPath(variant)))
@@ -321,7 +321,7 @@ public final class Publisher extends Delegator {
                 })));
     }
 
-    private Optional<Future<Response>> fallback(final Request request, final Path root) {
+    private Optional<Response> fallback(final Request request, final Path root) {
         return request.route() && !fallback.isEmpty()
                 ? content(request, root, fallback)
                 : Optional.empty();

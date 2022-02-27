@@ -90,15 +90,15 @@ public abstract class Format<V> {
 
 
 	/**
-	 * Guess the MIME type of a resource path.
-	 *
-	 * @param path the path of the resource whose MIME type is to be guessed
-	 *
-	 * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
-	 * MIMEDefault}, if {@code path} doesn't include an extension or no well-known MIME type is defined
-	 *
-	 * @throws NullPointerException if {@code path} is null
-	 */
+     * Guess the MIME type of resource path.
+     *
+     * @param path the path of the resource whose MIME type is to be guessed
+     *
+     * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
+     * MIMEDefault}, if {@code path} doesn't include an extension or no well-known MIME type is defined
+     *
+     * @throws NullPointerException if {@code path} is null
+     */
 	public static String mime(final String path) {
 
 		if ( path == null ) {

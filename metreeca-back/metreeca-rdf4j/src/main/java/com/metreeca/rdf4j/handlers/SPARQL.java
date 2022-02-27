@@ -17,7 +17,8 @@
 package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.query.*;
@@ -26,6 +27,7 @@ import org.eclipse.rdf4j.query.resultio.*;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.rio.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -33,8 +35,7 @@ import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.Xtream.guarded;
-import static com.metreeca.rest.Xtream.task;
-import static com.metreeca.rest.formats.OutputFormat.output;
+import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.handlers.Router.router;
 
 
@@ -51,255 +52,283 @@ import static com.metreeca.rest.handlers.Router.router;
  */
 public final class SPARQL extends Endpoint<SPARQL> {
 
-	/**
-	 * Creates a SPARQL endpoint
-	 *
-	 * @return a new SPARQL endpoint
-	 */
-	public static SPARQL sparql() {
-		return new SPARQL();
-	}
+    /**
+     * Creates a SPARQL endpoint
+     *
+     * @return a new SPARQL endpoint
+     */
+    public static SPARQL sparql() {
+        return new SPARQL();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Consumer<Operation> options=operation -> {};
+    private Consumer<Operation> options=operation -> { };
 
 
-	private SPARQL() {
-		delegate(router()
-				.get(this::process)
-				.post(this::process)
-		);
-	}
+    private SPARQL() {
+        delegate(router()
+                .get(this::process)
+                .post(this::process)
+        );
+    }
 
 
-	/**
-	 * Configures the options for this endpoint.
-	 *
-	 * @param options an options configurator; takes as argument the SPARQL operation to be configured
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code options} is null
-	 */
-	public SPARQL options(final Consumer<Operation> options) {
+    /**
+     * Configures the options for this endpoint.
+     *
+     * @param options an options configurator; takes as argument the SPARQL operation to be configured
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code options} is null
+     */
+    public SPARQL options(final Consumer<Operation> options) {
 
-		if ( options == null ) {
-			throw new NullPointerException("null options");
-		}
+        if ( options == null ) {
+            throw new NullPointerException("null options");
+        }
 
-		this.options=options;
+        this.options=options;
 
-		return this;
-	}
+        return this;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Future<Response> process(final Request request) {
-		return consumer -> graph().query(task(connection -> {
-			try {
+    private Response process(final Request request) {
+        return graph().query(connection -> {
+            try {
 
-				final Operation operation=operation(request, connection);
+                final Operation operation=operation(request, connection);
 
-				if ( operation == null ) { // !!! return void description for GET
+                if ( operation == null ) { // !!! return void description for GET
 
-					request.reply(status(BadRequest, "missing query/update parameter")).accept(consumer);
+                    return request.reply(status(BadRequest, "missing query/update parameter"));
 
-				} else if ( operation instanceof Query && !queryable(request.roles())
-						|| operation instanceof Update && !updatable(request.roles())
-				) {
+                } else if ( operation instanceof Query && !queryable(request.roles())
+                        || operation instanceof Update && !updatable(request.roles())
+                ) {
 
-					request.reply(response -> response.status(Unauthorized)).accept(consumer);
+                    return request.reply(response -> response.status(Unauthorized));
 
-				} else if ( operation instanceof BooleanQuery ) {
+                } else if ( operation instanceof BooleanQuery ) {
 
-					process(request, (BooleanQuery)operation).accept(consumer);
+                    return process(request, (BooleanQuery)operation);
 
-				} else if ( operation instanceof TupleQuery ) {
+                } else if ( operation instanceof TupleQuery ) {
 
-					process(request, (TupleQuery)operation).accept(consumer);
+                    return process(request, (TupleQuery)operation);
 
-				} else if ( operation instanceof GraphQuery ) {
+                } else if ( operation instanceof GraphQuery ) {
 
-					process(request, (GraphQuery)operation).accept(consumer);
+                    return process(request, (GraphQuery)operation);
 
-				} else if ( operation instanceof Update ) {
+                } else if ( operation instanceof Update ) {
 
-					if ( connection.isActive() ) {
+                    if ( connection.isActive() ) {
 
-						process(request, (Update)operation).accept(consumer);
+                        return process(request, (Update)operation);
 
-					} else {
+                    } else {
 
-						try {
+                        try {
 
-							connection.begin();
+                            connection.begin();
 
-							process(request, (Update)operation).accept(consumer);
+                            final Response response=process(request, (Update)operation);
 
-							connection.commit();
+                            connection.commit();
 
-						} finally {
+                            return response;
 
-							if ( connection.isActive() ) { connection.rollback(); }
+                        } finally {
 
-						}
+                            if ( connection.isActive() ) { connection.rollback(); }
 
-					}
+                        }
 
+                    }
 
-				} else {
 
-					request.reply(status(NotImplemented, operation.getClass().getName())).accept(consumer);
+                } else {
 
-				}
+                    return request.reply(status(NotImplemented, operation.getClass().getName()));
 
-			} catch ( final MalformedQueryException|IllegalArgumentException e ) {
+                }
 
-				request.reply(status(BadRequest, e)).accept(consumer);
+            } catch ( final MalformedQueryException|IllegalArgumentException e ) {
 
-			} catch ( final UnsupportedOperationException e ) {
+                return request.reply(status(BadRequest, e));
 
-				request.reply(status(NotImplemented, e)).accept(consumer);
+            } catch ( final UnsupportedOperationException e ) {
 
-			} catch ( final RuntimeException e ) {
+                return request.reply(status(NotImplemented, e));
 
-				// !!! fails for QueryInterruptedException (timeout) ≫ response is already committed
+            } catch ( final RuntimeException e ) {
 
-				request.reply(status(InternalServerError, e)).accept(consumer);
+                // !!! fails for QueryInterruptedException (timeout) ≫ response is already committed
 
-			}
-		}));
-	}
+                return request.reply(status(InternalServerError, e));
 
+            }
+        });
+    }
 
-	private Operation operation(final Request request, final RepositoryConnection connection) {
 
-		final Optional<String> query=request.parameter("query");
-		final Optional<String> update=request.parameter("update");
-		final Optional<String> infer=request.parameter("infer");
-		final Optional<String> timeout=request.parameter("timeout");
+    private Operation operation(final Request request, final RepositoryConnection connection) {
 
-		final Collection<String> basics=request.parameters("default-graph-uri");
-		final Collection<String> nameds=request.parameters("named-graph-uri");
+        final Optional<String> query=request.parameter("query");
+        final Optional<String> update=request.parameter("update");
+        final Optional<String> infer=request.parameter("infer");
+        final Optional<String> timeout=request.parameter("timeout");
 
-		final Operation operation=query.isPresent() ? connection.prepareQuery(query.get())
-				: update.map(connection::prepareUpdate).orElse(null);
+        final Collection<String> basics=request.parameters("default-graph-uri");
+        final Collection<String> nameds=request.parameters("named-graph-uri");
 
-		if ( operation != null ) {
+        final Operation operation=query.isPresent() ? connection.prepareQuery(query.get())
+                : update.map(connection::prepareUpdate).orElse(null);
 
-			final ValueFactory factory=connection.getValueFactory();
-			final SimpleDataset dataset=new SimpleDataset();
+        if ( operation != null ) {
 
-			basics.stream().distinct().forEachOrdered(basic -> dataset.addDefaultGraph(factory.createIRI(basic)));
-			nameds.stream().distinct().forEachOrdered(named -> dataset.addNamedGraph(factory.createIRI(named)));
+            final ValueFactory factory=connection.getValueFactory();
+            final SimpleDataset dataset=new SimpleDataset();
 
-			operation.setDataset(dataset);
-			operation.setMaxExecutionTime(timeout.map(guarded(Integer::valueOf)).filter(v -> v > 0).orElse(60));
-			operation.setIncludeInferred(infer.map(Boolean::parseBoolean).orElse(true));
+            basics.stream().distinct().forEachOrdered(basic -> dataset.addDefaultGraph(factory.createIRI(basic)));
+            nameds.stream().distinct().forEachOrdered(named -> dataset.addNamedGraph(factory.createIRI(named)));
 
-			options.accept(operation);
+            operation.setDataset(dataset);
+            operation.setMaxExecutionTime(timeout.map(guarded(Integer::valueOf)).filter(v -> v > 0).orElse(60));
+            operation.setIncludeInferred(infer.map(Boolean::parseBoolean).orElse(true));
 
-		}
+            options.accept(operation);
 
-		return operation;
+        }
 
-	}
+        return operation;
 
+    }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Future<Response> process(final Request request, final BooleanQuery query) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		final boolean result=query.evaluate();
+    private Response process(final Request request, final BooleanQuery query) {
 
-		final String accept=request.header("Accept").orElse("");
+        final String accept=request.header("Accept").orElse("");
 
-		final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-				BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
+        final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
+                BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
 
-		return request.reply(response -> response.status(OK)
-				.header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-				.body(output(), output -> { factory.getWriter(output).handleBoolean(result); })
-		);
-	}
+        try ( final ByteArrayOutputStream output=new ByteArrayOutputStream() ) {
 
-	private Future<Response> process(final Request request, final TupleQuery query) {
+            factory.getWriter(output).handleBoolean(query.evaluate());
 
-		final TupleQueryResult result=query.evaluate();
+            return request.reply(response -> response.status(OK)
+                    .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
+                    .body(data(), output.toByteArray())
+            );
 
-		final String accept=request.header("Accept").orElse("");
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
 
-		final TupleQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-				TupleQueryResultWriterRegistry.getInstance(), TupleQueryResultFormat.SPARQL, mimes(accept));
+    }
 
-		return request.reply(response -> response.status(OK)
-				.header("Content-Type", factory.getTupleQueryResultFormat().getDefaultMIMEType())
-				.body(output(), output -> {
-					try {
+    private Response process(final Request request, final TupleQuery query) {
 
-						final TupleQueryResultWriter writer=factory.getWriter(output);
+        final String accept=request.header("Accept").orElse("");
 
-						writer.startDocument();
-						writer.startQueryResult(result.getBindingNames());
+        final TupleQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
+                TupleQueryResultWriterRegistry.getInstance(), TupleQueryResultFormat.SPARQL, mimes(accept));
 
-						while ( result.hasNext() ) { writer.handleSolution(result.next());}
+        try (
+                final TupleQueryResult result=query.evaluate();
+                final ByteArrayOutputStream output=new ByteArrayOutputStream()
+        ) {
 
-						writer.endQueryResult();
+            final TupleQueryResultWriter writer=factory.getWriter(output);
 
-					} finally {
-						result.close();
-					}
-				}));
-	}
+            writer.startDocument();
+            writer.startQueryResult(result.getBindingNames());
 
-	private Future<Response> process(final Request request, final GraphQuery query) {
+            while ( result.hasNext() ) { writer.handleSolution(result.next()); }
 
-		final GraphQueryResult result=query.evaluate();
+            writer.endQueryResult();
 
-		final String accept=request.header("Accept").orElse("");
+            return request.reply(response -> response.status(OK)
+                    .header("Content-Type", factory.getTupleQueryResultFormat().getDefaultMIMEType())
+                    .body(data(), output.toByteArray()));
 
-		final RDFWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-				RDFWriterRegistry.getInstance(), RDFFormat.NTRIPLES, mimes(accept));
+        } catch ( final IOException e ) {
 
-		return request.reply(response -> response.status(OK)
-				.header("Content-Type", factory.getRDFFormat().getDefaultMIMEType())
-				.body(output(), output -> {
+            throw new UncheckedIOException(e);
 
-					final RDFWriter writer=factory.getWriter(output);
+        }
+    }
 
-					writer.startRDF();
+    private Response process(final Request request, final GraphQuery query) {
 
-					for (final Map.Entry<String, String> entry : result.getNamespaces().entrySet()) {
-						writer.handleNamespace(entry.getKey(), entry.getValue());
-					}
 
-					try {
-						while ( result.hasNext() ) { writer.handleStatement(result.next());}
-					} finally {
-						result.close();
-					}
+        final String accept=request.header("Accept").orElse("");
 
-					writer.endRDF();
+        final RDFWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
+                RDFWriterRegistry.getInstance(), RDFFormat.NTRIPLES, mimes(accept));
 
-				}));
-	}
 
-	private Future<Response> process(final Request request, final Update update) {
+        try (
+                final GraphQueryResult result=query.evaluate();
+                final ByteArrayOutputStream output=new ByteArrayOutputStream()
+        ) {
 
-		update.execute();
+            final RDFWriter writer=factory.getWriter(output);
 
-		final String accept=request.header("Accept").orElse("");
+            writer.startRDF();
 
-		final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-				BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
+            for (final Map.Entry<String, String> entry : result.getNamespaces().entrySet()) {
+                writer.handleNamespace(entry.getKey(), entry.getValue());
+            }
 
-		return request.reply(response -> response.status(OK)
-				.header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-				.body(output(), output -> { factory.getWriter(output).handleBoolean(true); })
-		);
-	}
+            while ( result.hasNext() ) { writer.handleStatement(result.next()); }
+
+            writer.endRDF();
+
+            return request.reply(response -> response.status(OK)
+                    .header("Content-Type", factory.getRDFFormat().getDefaultMIMEType())
+                    .body(data(), output.toByteArray()));
+
+        } catch ( final IOException e ) {
+
+            throw new UncheckedIOException(e);
+
+        }
+
+    }
+
+    private Response process(final Request request, final Update update) {
+
+        final String accept=request.header("Accept").orElse("");
+
+        final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
+                BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
+
+        try ( final ByteArrayOutputStream output=new ByteArrayOutputStream() ) {
+
+            update.execute();
+
+            factory.getWriter(output).handleBoolean(true);
+
+            return request.reply(response -> response.status(OK)
+                    .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
+                    .body(data(), output.toByteArray())
+            );
+
+        } catch ( final IOException e ) {
+
+            throw new UncheckedIOException(e);
+
+        }
+    }
 
 }

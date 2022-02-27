@@ -140,22 +140,22 @@ public final class Request extends Message<Request> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Creates a response for this request.
-	 *
-	 * @param mapper the mapping function  used to initialize the new response; must return a non-null value
-	 *
-	 * @return a new lazy response for this request
-	 *
-	 * @throws NullPointerException if {@code mapper} is null or return a null value
-	 */
-	public Future<Response> reply(final Function<Response, Response> mapper) {
+     * Creates a response for this request.
+     *
+     * @param mapper the mapping function  used to initialize the new response; must return a non-null value
+     *
+     * @return a new lazy response for this request
+     *
+     * @throws NullPointerException if {@code mapper} is null or return a null value
+     */
+    public Response reply(final Function<Response, Response> mapper) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
-		return consumer -> consumer.accept(new Response(this).map(mapper));
-	}
+        return new Response(this).map(mapper);
+    }
 
 
 	//// Checks ////////////////////////////////////////////////////////////////////////////////////////////////////////

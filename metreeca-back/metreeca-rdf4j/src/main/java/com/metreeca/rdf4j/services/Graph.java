@@ -35,7 +35,6 @@ import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.literal;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Xtream.task;
 import static com.metreeca.rest.services.Logger.logger;
 import static com.metreeca.rest.services.Logger.time;
 
@@ -81,9 +80,7 @@ public final class Graph implements AutoCloseable {
 
 		final Graph graph=service(graph());
 
-		return handler -> request -> consumer -> graph.update(task(connection ->
-				handler.handle(request).accept(consumer)
-		));
+		return handler -> request -> graph.update(connection -> handler.handle(request));
 	}
 
 

@@ -75,7 +75,7 @@ final class JSONLDFormatTest {
 					.body(input(), () -> new ByteArrayInputStream(json.getBytes(UTF_8)));
 		}
 
-		private Future<Response> response(final Request request) {
+		private Response response(final Request request) {
 			return request.reply(response -> request.body(jsonld()).fold(
 					response::map,
 					model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)

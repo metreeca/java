@@ -20,8 +20,7 @@ import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -84,25 +83,41 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
 	 * @return a non-null value obtained by applying {@code mapper} to this message
 	 *
 	 * @throws NullPointerException if {@code mapper} is null or returns a null value
-	 */
-	public <R> R map(final Function<T, R> mapper) {
+     */
+    public <R> R map(final Function<T, R> mapper) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
-		return requireNonNull(mapper.apply(self()), "null mapper return value");
-	}
+        return requireNonNull(mapper.apply(self()), "null mapper return value");
+    }
+
+    /**
+     * Process this message.
+     *
+     * @param consumer the message processing consumer
+     *
+     * @throws NullPointerException if {@code consumer} is null
+     */
+    public void accept(final Consumer<T> consumer) {
+
+        if ( consumer == null ) {
+            throw new NullPointerException("null consumer");
+        }
+
+        consumer.accept(self());
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Retrieves the charset of this message.
-	 *
-	 * <p><strong>Warning</strong> / The {@code Accept-Charset} header or the originating request is
-	 * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset">ignored</a>.</p>
-	 *
+    /**
+     * Retrieves the charset of this message.
+     *
+     * <p><strong>Warning</strong> / The {@code Accept-Charset} header or the originating request is
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset">ignored</a>.</p>
+     *
 	 * @return the charset defined in the {@code Content-Type} header of this message, defaulting to {@code UTF-8} if no
 	 * charset is explicitly defined
 	 */

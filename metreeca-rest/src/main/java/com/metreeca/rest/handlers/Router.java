@@ -112,7 +112,7 @@ public final class Router implements Handler {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Map<String, Function<Request, Optional<Future<Response>>>> routes=new LinkedHashMap<>();
+	private final Map<String, Function<Request, Optional<Response>>> routes=new LinkedHashMap<>();
 	private final Map<String, Handler> methods=new LinkedHashMap<>();
 
 
@@ -152,7 +152,7 @@ public final class Router implements Handler {
 		final String prefix=matcher.group("prefix");
 		final String suffix=matcher.group("suffix");
 
-		final Function<Request, Optional<Future<Response>>> route=route(
+		final Function<Request, Optional<Response>> route=route(
 				prefix == null ? "" : prefix,
 				suffix == null ? "" : suffix,
 				handler
@@ -283,7 +283,7 @@ public final class Router implements Handler {
 		}
 
 		if ( method.equals(GET) ) {
-			methods.putIfAbsent(HEAD, this::head);
+			methods.putIfAbsent(HEAD, request -> head(request));
 		}
 
 		methods.put(method, handler);
@@ -294,7 +294,7 @@ public final class Router implements Handler {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Future<Response> handle(final Request request) {
+	@Override public Response handle(final Request request) {
 
 		if ( request == null ) {
 			throw new NullPointerException("null request");
@@ -311,7 +311,7 @@ public final class Router implements Handler {
 				.orElseGet(() -> (
 
 						methods.isEmpty() ? status(NotFound)
-								: methods.getOrDefault(request.method(), this::options)
+								: methods.getOrDefault(request.method(), request1 -> options(request1))
 
 				).handle(request));
 	}
@@ -319,7 +319,7 @@ public final class Router implements Handler {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Function<Request, Optional<Future<Response>>> route(
+	private Function<Request, Optional<Response>> route(
 			final String prefix, final String suffix, final Handler handler
 	) {
 
@@ -377,14 +377,14 @@ public final class Router implements Handler {
 	}
 
 
-	private Future<Response> head(final Request request) {
+	private Response head(final Request request) {
 		return handle(request.method(GET)).map(response -> response
 				.headers("Content-Length", emptyList())
-				.body(output(), target -> {})
+				.body(output(), target -> { })
 		);
 	}
 
-	private Future<Response> options(final Request request) {
+	private Response options(final Request request) {
 		return request.reply(response -> response
 				.status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
 				.header("Allow", OPTIONS)

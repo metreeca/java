@@ -72,10 +72,10 @@ public final class Server implements Wrapper {
 			throw new NullPointerException("null handler");
 		}
 
-		return request -> consumer -> {
+		return request -> {
 			try {
 
-				request
+				return request
 
 						.map(this::query)
 						.map(this::form)
@@ -83,19 +83,15 @@ public final class Server implements Wrapper {
 						.map(handler::handle)
 
 						.map(this::logging)
-						.map(this::charset)
-
-						.accept(consumer);
+						.map(this::charset);
 
 			} catch ( final RuntimeException e ) { // try to send a new response
 
-				request
+				return request
 
 						.reply(status(InternalServerError, e))
 
-						.map(this::logging)
-
-						.accept(consumer);
+						.map(this::logging);
 
 			}
 		};
