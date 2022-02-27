@@ -307,6 +307,26 @@
 
 						<configuration>
 
+							<quiet>true</quiet>
+
+							<tags>
+								<tag>
+									<name>apiNote</name>
+									<placement>a</placement>
+									<head>API Note:</head>
+								</tag>
+								<tag>
+									<name>implSpec</name>
+									<placement>a</placement>
+									<head>Implementation Specification:</head>
+								</tag>
+								<tag>
+									<name>implNote</name>
+									<placement>a</placement>
+									<head>Implementation Note:</head>
+								</tag>
+							</tags>
+
 							<links>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
