@@ -4,6 +4,7 @@
 /.vscode/
 
 target/
+pom-flattened.xml
 
 *~
 ~*
