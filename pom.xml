@@ -44,6 +44,7 @@
 
 	<modules>
 
+		<module>metreeca-work</module>
 		<module>metreeca-json</module>
 		<module>metreeca-rest</module>
 		<module>metreeca-text</module>
@@ -307,7 +308,11 @@
 
 						<configuration>
 
+							<!-- !!! remove after metreeca-root is upgraded -->
+
 							<quiet>true</quiet>
+
+							<!-- !!! remove after metreeca-root is upgraded -->
 
 							<tags>
 								<tag>
