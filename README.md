@@ -33,7 +33,8 @@ may be easily plugged as a specialized component into your framework of choice.
 
 1. Add the framework to your Maven configuration
 
-```xml 
+```xml
+
 <project>
 
 	<dependencyManagement>
@@ -42,7 +43,7 @@ may be easily plugged as a specialized component into your framework of choice.
 			<dependency>
 				<groupId>${project.group}</groupId>
 				<artifactId>metreeca-java</artifactId>
-				<version>0.2.0</version>
+				<version>0.0.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -57,12 +58,12 @@ may be easily plugged as a specialized component into your framework of choice.
 			<artifactId>metreeca-jse</artifactId>
 		</dependency>
 
-        <dependency> <!-- storage connector -->
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-rdf4j</artifactId>
-        </dependency>
+		<dependency> <!-- storage connector -->
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-rdf4j</artifactId>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
 </project>
 ```
@@ -77,18 +78,18 @@ import static com.metreeca.rest.formats.TextFormat.text;
 
 public final class Hello {
 
-   public static void main(final String... args) {
-      new JSEServer()
+	public static void main(final String... args) {
+		new JSEServer()
 
-          .delegate(context -> request ->
-              request.reply(response -> response
-                  .status(OK)
-                  .body(text(), "Hello world!")
-              )
-          )
+				.delegate(context -> request ->
+						request.reply(response -> response
+								.status(OK)
+								.body(text(), "Hello world!")
+						)
+				)
 
-          .start();
-   }
+				.start();
+	}
 
 }
 ```
