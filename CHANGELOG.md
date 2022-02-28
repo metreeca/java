@@ -6,16 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.0.2](https://github.com/metreeca/base/compare/v1.0.1...v1.0.2)+2022-01-12
+## [Unpublished](https://github.com/metreeca/base/compare/v1.0.2...HEAD)
 
-This is a patch release fixing the lowing issues.
+### Improved
 
+- RDF / Factor RDFFormat static parsing method
+
+
+## [1.0.2+20220112](https://github.com/metreeca/base/compare/v1.0.1...v1.0.2)
+
+This is a patch release fixing the following issues.
 
 ### Fixed
 
 - Base / Broken version numbers in maven BOM
 
-## [1.0.1](https://github.com/metreeca/base/compare/v1.0.1...v0.55.0)+2021-12-28
+## [1.0.1+20211228](https://github.com/metreeca/base/compare/v1.0.1...v0.55.0)
 
 This is a major release marking the initial public availability of the framework ;).
 
