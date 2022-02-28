@@ -175,7 +175,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 	 *
 	 * @throws NullPointerException if either {@code input} or {@code parser} is null
 	 */
-	public Either<MessageException, Collection<Statement>> rdf(
+	public static Either<MessageException, Collection<Statement>> rdf(
 			final InputStream input, final String base, final RDFParser parser
 	) {
 
