@@ -210,7 +210,7 @@
 			</dependency>
 
 
-			<!-- Test Harness -->
+			<!-- Test Harness --> <!-- !!! migrate to metreeca-root -->
 
 			<dependency>  <!-- https://search.maven.org/artifact/org.junit.jupiter/junit-bom -->
 				<groupId>org.junit</groupId>
