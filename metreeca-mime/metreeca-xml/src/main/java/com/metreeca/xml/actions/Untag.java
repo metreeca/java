@@ -139,11 +139,11 @@ public final class Untag implements Function<Node, String> {
 
 		private Builder feed() {
 
-			if ( builder.length() == 0 || builder.charAt(builder.length()-1) != '\n' ) {
+			if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
 				builder.append('\n');
 			}
 
-			if ( builder.length() == 1 || builder.charAt(builder.length()-2) != '\n' ) {
+			if ( builder.length() > 2 && builder.charAt(builder.length()-2) != '\n' ) {
 				builder.append('\n');
 			}
 
@@ -152,7 +152,7 @@ public final class Untag implements Function<Node, String> {
 
 		private Builder wrap() {
 
-			if ( builder.length() == 0 || builder.charAt(builder.length()-1) != '\n' ) {
+			if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
 				builder.append('\n');
 			}
 
