@@ -164,6 +164,85 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Parses an RDF document.
+	 *
+	 * @param input  the input stream the RDF document is to be parsed from
+	 * @param base   the possibly null base URL for the RDF document to be parsed
+	 * @param parser the RDF parser
+	 *
+	 * @return either a parsing exception or the RDF model parsed from {@code input}
+	 *
+	 * @throws NullPointerException if either {@code input} or {@code parser} is null
+	 */
+	public Either<MessageException, Collection<Statement>> rdf(
+			final InputStream input, final String base, final RDFParser parser
+	) {
+
+		if ( input == null ) {
+			throw new NullPointerException("null input");
+		}
+
+		if ( parser == null ) {
+			throw new NullPointerException("null parser");
+		}
+
+		final ParseErrorCollector errorCollector=new ParseErrorCollector();
+
+		parser.setParseErrorListener(errorCollector);
+
+		final Collection<Statement> model=new LinkedHashModel(); // order-preserving and writable
+
+		parser.setRDFHandler(new AbstractRDFHandler() {
+
+			@Override public void handleStatement(final Statement statement) {
+				model.add(statement);
+			}
+
+		});
+
+		try {
+
+			parser.parse(input, base); // resolve relative IRIs wrt the request focus
+
+		} catch ( final RDFParseException e ) {
+
+			if ( errorCollector.getFatalErrors().isEmpty() ) { // exception not always reported by parser…
+				errorCollector.fatalError(e.getMessage(), e.getLineNumber(), e.getColumnNumber());
+			}
+
+		} catch ( final IOException e ) {
+
+			throw new UncheckedIOException(e);
+
+		}
+
+		final List<String> fatals=errorCollector.getFatalErrors();
+		final List<String> errors=errorCollector.getErrors();
+		final List<String> warnings=errorCollector.getWarnings();
+
+		if ( fatals.isEmpty() ) { // return model
+
+			return Right(model);
+
+		} else { // report errors // !!! log warnings/error/fatals?
+
+			final JsonObjectBuilder trace=Json.createObjectBuilder()
+
+					.add("format", parser.getRDFFormat().getDefaultMIMEType());
+
+			if ( !fatals.isEmpty() ) { trace.add("fatals", Json.createArrayBuilder(fatals)); }
+			if ( !errors.isEmpty() ) { trace.add("errors", Json.createArrayBuilder(errors)); }
+			if ( !warnings.isEmpty() ) { trace.add("warnings", Json.createArrayBuilder(warnings)); }
+
+			return Left(status(BadRequest, trace.build()));
+
+		}
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	private final Consumer<RioConfig> customizer;
 
 
@@ -199,55 +278,13 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 
 			customizer.accept(parser.getParserConfig());
 
-			final ParseErrorCollector errorCollector=new ParseErrorCollector();
-
-			parser.setParseErrorListener(errorCollector);
-
-			final Collection<Statement> model=new LinkedHashModel(); // order-preserving and writable
-
-			parser.setRDFHandler(new AbstractRDFHandler() {
-
-				@Override public void handleStatement(final Statement statement) {
-					model.add(statement);
-				}
-
-			});
-
 			try ( final InputStream input=source.get() ) {
 
-				parser.parse(input, base); // resolve relative IRIs wrt the request focus
-
-			} catch ( final RDFParseException e ) {
-
-				if ( errorCollector.getFatalErrors().isEmpty() ) { // exception not always reported by parser…
-					errorCollector.fatalError(e.getMessage(), e.getLineNumber(), e.getColumnNumber());
-				}
+				return rdf(input, base, parser);
 
 			} catch ( final IOException e ) {
 
 				throw new UncheckedIOException(e);
-
-			}
-
-			final List<String> fatals=errorCollector.getFatalErrors();
-			final List<String> errors=errorCollector.getErrors();
-			final List<String> warnings=errorCollector.getWarnings();
-
-			if ( fatals.isEmpty() ) { // return model
-
-				return Right(model);
-
-			} else { // report errors // !!! log warnings/error/fatals?
-
-				final JsonObjectBuilder trace=Json.createObjectBuilder()
-
-						.add("format", parser.getRDFFormat().getDefaultMIMEType());
-
-				if ( !fatals.isEmpty() ) { trace.add("fatals", Json.createArrayBuilder(fatals)); }
-				if ( !errors.isEmpty() ) { trace.add("errors", Json.createArrayBuilder(errors)); }
-				if ( !warnings.isEmpty() ) { trace.add("warnings", Json.createArrayBuilder(warnings)); }
-
-				return Left(status(BadRequest, trace.build()));
 
 			}
 
