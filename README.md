@@ -33,12 +33,11 @@ may be easily plugged as a specialized component into your framework of choice.
 
 1. Add the framework to your Maven configuration
 
-```xml
-
+```xml 
 <project>
 
-	<dependencyManagement>
-		<dependencies>
+    <dependencyManagement>
+        <dependencies>
 
 			<dependency>
 				<groupId>${project.group}</groupId>
@@ -48,22 +47,22 @@ may be easily plugged as a specialized component into your framework of choice.
 				<scope>import</scope>
 			</dependency>
 
-		</dependencies>
-	</dependencyManagement>
+        </dependencies>
+    </dependencyManagement>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency> <!-- server connector -->
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-jse</artifactId>
-		</dependency>
+        <dependency> <!-- server connector -->
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-jse</artifactId>
+        </dependency>
 
-		<dependency> <!-- storage connector -->
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rdf4j</artifactId>
-		</dependency>
+        <dependency> <!-- storage connector -->
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-rdf4j</artifactId>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>
 ```
@@ -78,18 +77,18 @@ import static com.metreeca.rest.formats.TextFormat.text;
 
 public final class Hello {
 
-	public static void main(final String... args) {
-		new JSEServer()
+   public static void main(final String... args) {
+      new JSEServer()
 
-				.delegate(context -> request ->
-						request.reply(response -> response
-								.status(OK)
-								.body(text(), "Hello world!")
-						)
-				)
+          .delegate(context -> request ->
+              request.reply(response -> response
+                  .status(OK)
+                  .body(text(), "Hello world!")
+              )
+          )
 
-				.start();
-	}
+          .start();
+   }
 
 }
 ```

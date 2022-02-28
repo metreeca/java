@@ -3,8 +3,8 @@
 /.idea/
 /.vscode/
 
-pom-flattened.xml
 target/
+pom-flattened.xml
 
 *~
 ~*

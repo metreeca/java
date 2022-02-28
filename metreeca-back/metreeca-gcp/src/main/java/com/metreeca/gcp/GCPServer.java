@@ -57,7 +57,7 @@ public final class GCPServer {
      * @return {@code true} if running in the development environment; {@code false}, otherwise
      */
     public static boolean development() {
-        return Objects.isNull(System.getenv(ServiceVariable));
+		return Objects.isNull(project());
     }
 
     /**

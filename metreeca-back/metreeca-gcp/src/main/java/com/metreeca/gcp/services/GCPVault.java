@@ -71,7 +71,7 @@ public final class GCPVault implements Vault, AutoCloseable {
 		try {
 
 			return Optional.of(client
-					.accessSecretVersion(SecretVersionName.of(project(), id, "latest"))
+					.accessSecretVersion(SecretVersionName.of(project, id, "latest"))
 					.getPayload()
 					.getData()
 					.toStringUtf8()
