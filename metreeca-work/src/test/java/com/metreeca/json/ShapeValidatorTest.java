@@ -18,8 +18,7 @@ package com.metreeca.json;
 
 import com.metreeca.json.shapes.StringShape;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Map;
 
@@ -40,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static java.util.List.of;
 
+@Disabled
 final class ShapeValidatorTest {
 
     private ShapeValidator validator(final Value value) {
