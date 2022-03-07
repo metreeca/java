@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - RDF / Factor RDFFormat static parsing method
 
+### Fixed
+
+- JSON / Frame formatting: now recursively formats nested frames
+
 
 ## [1.0.2+20220112](https://github.com/metreeca/base/compare/v1.0.1...v1.0.2)
 

@@ -875,7 +875,7 @@ public final class Frame {
 
 	private String format(final Collection<Frame> values) {
 		return values.isEmpty() ? "[]" // unexpected
-				: values.size() == 1 ? Values.format(values.iterator().next())
+				: values.size() == 1 ? values.iterator().next().format()
 				: values.stream()
 				.map(Frame::format)
 				.map(Values::indent)
