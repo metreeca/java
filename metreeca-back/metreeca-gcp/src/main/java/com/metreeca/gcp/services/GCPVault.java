@@ -41,53 +41,55 @@ import static java.util.stream.StreamSupport.stream;
  */
 public final class GCPVault implements Vault, AutoCloseable {
 
-	private final SecretManagerServiceClient client;
+    private final SecretManagerServiceClient client;
 
 
-	/**
-	 * Creates a new Google Cloud secret vault.
-	 */
-	public GCPVault() {
-		try {
+    /**
+     * Creates a new Google Cloud secret vault.
+     */
+    public GCPVault() {
+        try {
 
-			this.client=SecretManagerServiceClient.create();
+            this.client=SecretManagerServiceClient.create();
 
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 
-	@Override public Optional<String> get(final String id) {
+    @Override public Optional<String> get(final String id) {
 
-		if ( id == null ) {
-			throw new NullPointerException("null id");
-		}
+        if ( id == null ) {
+            throw new NullPointerException("null id");
+        }
 
-		if ( id.isEmpty() ) {
-			throw new IllegalArgumentException("empty parameter id");
-		}
+        if ( id.isEmpty() ) {
+            throw new IllegalArgumentException("empty parameter id");
+        }
 
-		final String project=project();
-		final Iterable<Secret> secrets=client.listSecrets(ProjectName.of(project)).iterateAll();
+        final String project=project();
+        final Iterable<Secret> secrets=client.listSecrets(ProjectName.of(project)).iterateAll();
 
-		if ( stream(secrets.spliterator(), false).anyMatch(secret -> secret.getName().equals(id)) ) {
+        if ( stream(secrets.spliterator(), false).anyMatch(secret ->
+                SecretName.parse(secret.getName()).getSecret().equals(id)
+        ) ) {
 
-			final AccessSecretVersionRequest request=AccessSecretVersionRequest.newBuilder()
-					.setName(SecretVersionName.of(project, id, "latest").toString())
-					.build();
+            final AccessSecretVersionRequest request=AccessSecretVersionRequest.newBuilder()
+                    .setName(SecretVersionName.of(project, id, "latest").toString())
+                    .build();
 
-			return Optional.of(client.accessSecretVersion(request).getPayload().getData().toStringUtf8());
+            return Optional.of(client.accessSecretVersion(request).getPayload().getData().toStringUtf8());
 
-		} else {
+        } else {
 
-			return Optional.empty();
+            return Optional.empty();
 
-		}
-	}
+        }
+    }
 
-	@Override public void close() {
-		client.close();
-	}
+    @Override public void close() {
+        client.close();
+    }
 
 }
