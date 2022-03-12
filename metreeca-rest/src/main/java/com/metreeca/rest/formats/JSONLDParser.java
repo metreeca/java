@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import javax.json.*;
 
+import static com.metreeca.core.Identifiers.decode;
 import static com.metreeca.json.Order.decreasing;
 import static com.metreeca.json.Order.increasing;
 import static com.metreeca.json.Values.format;
@@ -42,7 +43,6 @@ import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Field.labels;
 import static com.metreeca.json.shapes.Link.link;
 import static com.metreeca.rest.Request.search;
-import static com.metreeca.rest.Xtream.decode;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;

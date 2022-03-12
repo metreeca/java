@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Shape;
 import com.metreeca.json.queries.Terms;
@@ -125,7 +126,7 @@ final class GraphTerms extends GraphFacts {
 						final Value label=bindings.getValue("label");
 						final Value notes=bindings.getValue("notes");
 
-						final BNode term=bnode(md5(format(value)));
+						final BNode term=bnode(Identifiers.md5(format(value)));
 
 						model.add(statement((Resource)focus, Engine.terms, term));
 

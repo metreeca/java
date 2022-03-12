@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.core.Feeds;
 import com.metreeca.rest.*;
 
 import java.io.*;
@@ -76,7 +77,7 @@ public final class DataFormat extends Format<byte[]> {
 		return message.body(input()).map(source -> {
 			try ( final InputStream input=source.get() ) {
 
-				return Xtream.data(input);
+				return Feeds.data(input);
 
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
@@ -94,7 +95,7 @@ public final class DataFormat extends Format<byte[]> {
 				.header("~Content-Type", MIME)
 				.header("~Content-Length", valueOf(value.length))
 
-				.body(output(), output -> Xtream.data(output, value));
+				.body(output(), output -> Feeds.data(output, value));
 	}
 
 }

@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import static com.metreeca.json.Values.AbsoluteIRIPattern;
+import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;

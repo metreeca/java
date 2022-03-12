@@ -16,6 +16,7 @@
 
 package com.metreeca.open.actions;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.core.Strings;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.*;
@@ -69,7 +70,7 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 		return iri -> Optional.of(iri)
 				.map(Value::stringValue)
 				.filter(s -> s.startsWith(external))
-				.map(s -> iri(internal, md5(s)))
+				.map(s -> iri(internal, Identifiers.md5(s)))
 				.orElse(iri);
 	}
 

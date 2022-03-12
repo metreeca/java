@@ -17,6 +17,7 @@
 package com.metreeca.rest;
 
 
+import com.metreeca.core.Feeds;
 import com.metreeca.rest.formats.TextFormat;
 
 import org.assertj.core.api.Assertions;
@@ -41,7 +42,7 @@ public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
 
 				try ( final InputStream stream=source.get() ) {
 
-					final byte[] data=Xtream.data(stream);
+					final byte[] data=Feeds.data(stream);
 
 					return () -> new ByteArrayInputStream(data);
 

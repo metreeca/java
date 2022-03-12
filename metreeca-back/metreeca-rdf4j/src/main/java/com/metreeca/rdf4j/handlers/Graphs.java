@@ -16,10 +16,12 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.core.Feeds;
+import com.metreeca.core.Identifiers;
 import com.metreeca.json.Shape;
-import com.metreeca.json.Values;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 import com.metreeca.rest.formats.JSONLDFormat;
 
 import org.eclipse.rdf4j.model.*;
@@ -193,7 +195,7 @@ public final class Graphs extends Endpoint<Graphs> {
             );
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> Xtream.input(), Supplier::get) ) {
+                try ( final InputStream input=request.body(input()).fold(e -> Feeds.input(), Supplier::get) ) {
 
                     final boolean exists=exists(connection, context);
 
@@ -302,7 +304,7 @@ public final class Graphs extends Endpoint<Graphs> {
             );
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> Xtream.input(),
+                try ( final InputStream input=request.body(input()).fold(e -> Feeds.input(),
                         Supplier::get) ) {
 
                     final boolean exists=exists(connection, context);
@@ -347,7 +349,7 @@ public final class Graphs extends Endpoint<Graphs> {
         final List<String> nameds=request.parameters("graph");
 
         final boolean dflt=defaults.size() == 1 && defaults.get(0).isEmpty();
-        final boolean named=nameds.size() == 1 && Values.AbsoluteIRIPattern.matcher(nameds.get(0)).matches();
+        final boolean named=nameds.size() == 1 && Identifiers.AbsoluteIRIPattern.matcher(nameds.get(0)).matches();
 
         return dflt && named ? null : dflt ? "" : named ? nameds.get(0) : null;
     }

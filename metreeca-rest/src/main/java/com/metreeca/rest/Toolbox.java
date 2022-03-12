@@ -16,6 +16,7 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.core.Feeds;
 import com.metreeca.rest.services.Logger;
 
 import java.io.*;
@@ -228,7 +229,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 		try ( final Reader reader=reader(master, resource) ) {
 
-			return Xtream.text(reader);
+			return Feeds.text(reader);
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -260,7 +261,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				final ByteArrayOutputStream output=new ByteArrayOutputStream()
 		) {
 
-			return Xtream.data(output, input).toByteArray();
+			return Feeds.data(output, input).toByteArray();
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);

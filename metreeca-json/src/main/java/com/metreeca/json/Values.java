@@ -16,7 +16,7 @@
 
 package com.metreeca.json;
 
-import com.metreeca.core.Strings;
+import com.metreeca.core.*;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.base.AbstractNamespace;
@@ -28,23 +28,16 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.ROOT;
-import static java.util.UUID.nameUUIDFromBytes;
-import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
 
 
@@ -53,625 +46,519 @@ import static java.util.stream.Collectors.joining;
  */
 public final class Values {
 
-	private static final String IRIScheme="(?<schemeall>(?<scheme>[-+\\w]+):)";
-	private static final String IRIHost="(?<hostall>//(?<host>[^/?#]*))";
-	private static final String IRIQuery="(?<queryall>\\?(?<query>[^#]*))";
-	private static final String IRIFragment="(?<fragmentall>#(?<fragment>.*))";
-	private static final String IRIPath="(?<pathall>(?<path>[^?#]*)"+IRIQuery+"?"+IRIFragment+"?)";
 
+    public static String path(final String iri) {
+        return Optional.ofNullable(iri)
+                .map(Identifiers.IRIPattern::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("pathall"))
+                .orElse("/");
+    }
 
-	/**
-	 * A pattern matching absolute IRIs.
-	 */
-	public static final Pattern AbsoluteIRIPattern=Pattern.compile("^"+IRIScheme+IRIHost+"?"+IRIPath+"$");
 
-	/**
-	 * A pattern matching IRI components.
-	 *
-	 * @see <a href="https://tools.ietf.org/html/rfc3986#appendix-B">RFC 3986 Uniform Resource Identifier (URI): Generic
-	 * Syntax - Appendix B.  Parsing a URI Reference with a Regular Expression</a>
-	 */
-	public static final Pattern IRIPattern=Pattern.compile("^"+IRIScheme+"?"+IRIHost+"?"+IRIPath+"$");
+    private static final ValueFactory factory=new AbstractValueFactory() { }; // before constant initialization
+    private static final Comparator<Value> comparator=new ValueComparator();
 
+    private static final ThreadLocal<DecimalFormat> exponential=ThreadLocal.withInitial(() ->
+            new DecimalFormat("0.0#########E0", DecimalFormatSymbols.getInstance(ROOT)) // ;( not thread-safe
+    );
 
-	private static final ValueFactory factory=new AbstractValueFactory() {}; // before constant initialization
-	private static final Comparator<Value> comparator=new ValueComparator();
 
-	private static final ThreadLocal<DecimalFormat> exponential=ThreadLocal.withInitial(() ->
-			new DecimalFormat("0.0#########E0", DecimalFormatSymbols.getInstance(ROOT)) // ;( not thread-safe
-	);
+    //// Constants /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final char[] HexDigits="0123456789abcdef".toCharArray();
+    public static final Literal True=literal(true);
+    public static final Literal False=literal(false);
 
 
-	//// Constants /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Internal Namespace ////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static final Literal True=literal(true);
-	public static final Literal False=literal(false);
+    public static final String Base="app:/";
 
+    public static final IRI Root=iri(Base);
+    public static final IRI Terms=iri(Base, "/terms/");
 
-	//// Internal Namespace ////////////////////////////////////////////////////////////////////////////////////////////
+    public static final Namespace NS=namespace("", Terms.stringValue());
 
-	public static final String Base="app:/";
 
-	public static final IRI Root=iri(Base);
-	public static final IRI Terms=iri(Base, "/terms/");
+    public static IRI term(final String name) {
+        return name == null ? null : iri(NS.getName(), name);
+    }
 
-	public static final Namespace NS=namespace("", Terms.stringValue());
+    public static IRI item(final String name) {
+        return name == null ? null : iri(Root, name);
+    }
 
 
-	public static IRI term(final String name) {
-		return name == null ? null : iri(NS.getName(), name);
-	}
+    //// Extended Datatypes ////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static IRI item(final String name) {
-		return name == null ? null : iri(Root, name);
-	}
+    public static final IRI ValueType=term("value"); // abstract datatype IRI for values
+    public static final IRI ResourceType=term("resource"); // abstract datatype IRI for resources
+    public static final IRI BNodeType=term("bnode"); // datatype IRI for blank nodes
+    public static final IRI IRIType=term("iri"); // datatype IRI for IRI references
+    public static final IRI LiteralType=term("literal"); // abstract datatype IRI for literals
 
 
-	//// Extended Datatypes ////////////////////////////////////////////////////////////////////////////////////////////
+    public static boolean derives(final IRI upper, final IRI lower) {
+        return upper != null && lower != null && (
+                upper.equals(ValueType)
+                        || upper.equals(ResourceType) && resource(lower)
+                        || upper.equals(LiteralType) && literal(lower)
+        );
+    }
 
-	public static final IRI ValueType=term("value"); // abstract datatype IRI for values
-	public static final IRI ResourceType=term("resource"); // abstract datatype IRI for resources
-	public static final IRI BNodeType=term("bnode"); // datatype IRI for blank nodes
-	public static final IRI IRIType=term("iri"); // datatype IRI for IRI references
-	public static final IRI LiteralType=term("literal"); // abstract datatype IRI for literals
 
+    private static boolean resource(final IRI type) {
+        return type.equals(ResourceType) || type.equals(BNodeType) || type.equals(IRIType);
+    }
 
-	public static boolean derives(final IRI upper, final IRI lower) {
-		return upper != null && lower != null && (
-				upper.equals(ValueType)
-						|| upper.equals(ResourceType) && resource(lower)
-						|| upper.equals(LiteralType) && literal(lower)
-		);
-	}
+    private static boolean literal(final IRI type) {
+        return type.equals(LiteralType) || !type.equals(ValueType) && !resource(type);
+    }
 
 
-	private static boolean resource(final IRI type) {
-		return type.equals(ResourceType) || type.equals(BNodeType) || type.equals(IRIType);
-	}
+    //// Inverse Predicates ////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static boolean literal(final IRI type) {
-		return type.equals(LiteralType) || !type.equals(ValueType) && !resource(type);
-	}
+    /**
+     * An IRI scheme for inverse predicates ({@value}).
+     */
+    private static final String InverseScheme="inverse:";
 
 
-	//// Inverse Predicates ////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Checks predicate direction.
+     *
+     * @param predicate the IRI identifying the predicate
+     *
+     * @return {@code true} if {@code predicate} identifies a direct predicate; {@code false} if {@code predicate}
+     * identifies an {@link #inverse(IRI) inverse} predicate
+     *
+     * @throws NullPointerException if {@code predicate} is null
+     */
+    public static boolean direct(final IRI predicate) {
 
-	/**
-	 * An IRI scheme for inverse predicates ({@value}).
-	 */
-	private static final String InverseScheme="inverse:";
+        if ( predicate == null ) {
+            throw new NullPointerException("null predicate");
+        }
 
+        return !predicate.stringValue().startsWith(InverseScheme);
+    }
 
-	/**
-	 * Checks predicate direction.
-	 *
-	 * @param predicate the IRI identifying the predicate
-	 *
-	 * @return {@code true} if {@code predicate} identifies a direct predicate; {@code false} if {@code predicate}
-	 * identifies an {@link #inverse(IRI) inverse} predicate
-	 *
-	 * @throws NullPointerException if {@code predicate} is null
-	 */
-	public static boolean direct(final IRI predicate) {
-
-		if ( predicate == null ) {
-			throw new NullPointerException("null predicate");
-		}
-
-		return !predicate.stringValue().startsWith(InverseScheme);
-	}
-
-	/**
-	 * Creates an inverse predicate.
-	 *
-	 * @param predicate the IRI identifying the predicate
-	 *
-	 * @return the inverse version of {@code predicate}
-	 *
-	 * @throws NullPointerException if {@code predicate} is null
-	 */
-	public static IRI inverse(final IRI predicate) {
-
-		if ( predicate == null ) {
-			throw new NullPointerException("null predicate");
-		}
-
-		final String label=predicate.stringValue();
-
-		return label.startsWith(InverseScheme)
-				? iri(label.substring(InverseScheme.length()))
-				: iri(InverseScheme+label);
-	}
-
-	/**
-	 * Traverses a predicate.
-	 *
-	 * @param predicate the IRI identifying the predicate to be traversed
-	 * @param direct    a predicate mapper to be executed if {@code predicate} is {@link #direct(IRI) direct}
-	 * @param inverse   a predicate mapper to be executed if {@code predicate} is {@link #inverse(IRI) inverse}
-	 * @param <V>       the type of the value returned by predicate mappers
-	 *
-	 * @return the value returned by the predicate mapper selected according to the direction of {@code predicate}
-	 *
-	 * @throws NullPointerException if any argument is null
-	 */
-	public static <V> V traverse(final IRI predicate, final Function<IRI, V> direct, final Function<IRI, V> inverse) {
-
-		if ( predicate == null ) {
-			throw new NullPointerException("null predicate");
-		}
-
-		if ( direct == null ) {
-			throw new NullPointerException("null direct");
-		}
-
-		if ( inverse == null ) {
-			throw new NullPointerException("null inverse");
-		}
-
-		return predicate.stringValue().startsWith(InverseScheme)
-				? inverse.apply(iri(predicate.stringValue().substring(InverseScheme.length())))
-				: direct.apply(predicate);
-	}
-
+    /**
+     * Creates an inverse predicate.
+     *
+     * @param predicate the IRI identifying the predicate
+     *
+     * @return the inverse version of {@code predicate}
+     *
+     * @throws NullPointerException if {@code predicate} is null
+     */
+    public static IRI inverse(final IRI predicate) {
 
-	//// Comparator ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if ( predicate == null ) {
+            throw new NullPointerException("null predicate");
+        }
 
-	public static int compare(final Value x, final Value y) {
-		return comparator.compare(x, y);
-	}
+        final String label=predicate.stringValue();
 
+        return label.startsWith(InverseScheme)
+                ? iri(label.substring(InverseScheme.length()))
+                : iri(InverseScheme+label);
+    }
 
-	//// Accessors /////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Traverses a predicate.
+     *
+     * @param predicate the IRI identifying the predicate to be traversed
+     * @param direct    a predicate mapper to be executed if {@code predicate} is {@link #direct(IRI) direct}
+     * @param inverse   a predicate mapper to be executed if {@code predicate} is {@link #inverse(IRI) inverse}
+     * @param <V>       the type of the value returned by predicate mappers
+     *
+     * @return the value returned by the predicate mapper selected according to the direction of {@code predicate}
+     *
+     * @throws NullPointerException if any argument is null
+     */
+    public static <V> V traverse(final IRI predicate, final Function<IRI, V> direct, final Function<IRI, V> inverse) {
 
-	public static boolean is(final Value value, final IRI datatype) {
-		return value != null && (type(value).equals(datatype)
-				|| value instanceof Resource && ResourceType.equals(datatype)
-				|| value instanceof Literal && LiteralType.equals(datatype)
-				|| ValueType.equals(datatype)
-		);
-	}
+        if ( predicate == null ) {
+            throw new NullPointerException("null predicate");
+        }
 
+        if ( direct == null ) {
+            throw new NullPointerException("null direct");
+        }
 
-	public static String root(final IRI resource) {
-		return Optional.ofNullable(resource)
-				.map(Value::stringValue)
-				.map(IRIPattern::matcher)
-				.filter(Matcher::matches)
-				.map(matcher -> Optional.ofNullable(matcher.group("schemeall")).orElse("")
-						+Optional.ofNullable(matcher.group("hostall")).orElse("")
-						+"/"
-				)
-				.orElse(Base);
-	}
+        if ( inverse == null ) {
+            throw new NullPointerException("null inverse");
+        }
 
-	public static String path(final IRI resource) {
-		return Optional.ofNullable(resource)
-				.map(Value::stringValue)
-				.map(IRIPattern::matcher)
-				.filter(Matcher::matches)
-				.map(matcher -> matcher.group("pathall"))
-				.orElse("/");
-	}
+        return predicate.stringValue().startsWith(InverseScheme)
+                ? inverse.apply(iri(predicate.stringValue().substring(InverseScheme.length())))
+                : direct.apply(predicate);
+    }
 
 
-	public static String text(final Value value) {
-		return value == null ? null : value.stringValue();
-	}
+    //// Comparator ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static IRI type(final Value value) {
-		return value == null ? null
-				: value instanceof BNode ? BNodeType
-				: value instanceof IRI ? IRIType
-				: value instanceof Literal ? ((Literal)value).getDatatype()
-				: ValueType;
-	}
+    public static int compare(final Value x, final Value y) {
+        return comparator.compare(x, y);
+    }
 
-	public static String lang(final Value value) {
-		return value instanceof Literal ? ((Literal)value).getLanguage().orElse("") : "";
-	}
 
+    //// Accessors /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//// Identifiers ///////////////////////////////////////////////////////////////////////////////////////////////////
+    public static boolean is(final Value value, final IRI datatype) {
+        return value != null && (type(value).equals(datatype)
+                || value instanceof Resource && ResourceType.equals(datatype)
+                || value instanceof Literal && LiteralType.equals(datatype)
+                || ValueType.equals(datatype)
+        );
+    }
 
-	public static String uuid() {
-		return randomUUID().toString();
-	}
 
-	public static String uuid(final String text) {
-		return text == null ? null : uuid(text.getBytes(UTF_8));
-	}
+    public static String text(final Value value) {
+        return value == null ? null : value.stringValue();
+    }
 
-	public static String uuid(final byte[] data) {
-		return data == null ? null : nameUUIDFromBytes(data).toString();
-	}
+    public static IRI type(final Value value) {
+        return value == null ? null
+                : value instanceof BNode ? BNodeType
+                : value instanceof IRI ? IRIType
+                : value instanceof Literal ? ((Literal)value).getDatatype()
+                : ValueType;
+    }
 
+    public static String lang(final Value value) {
+        return value instanceof Literal ? ((Literal)value).getLanguage().orElse("") : "";
+    }
 
-	public static String md5() {
 
-		final byte[] bytes=new byte[16];
+    //// Factories /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		ThreadLocalRandom.current().nextBytes(bytes);
+    public static ValueFactory factory() {
+        return factory;
+    }
 
-		return hex(bytes);
-	}
 
-	public static String md5(final String text) {
-		return text == null ? null : md5(text.getBytes(UTF_8));
-	}
+    public static Namespace namespace(final String prefix, final String name) {
+        return prefix == null || name == null ? null : new AbstractNamespace() {
 
-	public static String md5(final byte[] data) {
-		try {
+            @Override public String getPrefix() { return prefix; }
 
-			return data == null ? null : hex(MessageDigest.getInstance("MD5").digest(data));
+            @Override public String getName() { return name; }
 
-		} catch ( final NoSuchAlgorithmException unexpected ) {
-			throw new InternalError(unexpected);
-		}
-	}
+        };
+    }
 
 
-	public static String hex(final byte[] bytes) {
-		if ( bytes == null ) { return null; } else {
+    public static Predicate<Statement> pattern(
+            final Value subject, final Value predicate, final Value object
+    ) {
+        return statement
+                -> (subject == null || subject.equals(statement.getSubject()))
+                && (predicate == null || predicate.equals(statement.getPredicate()))
+                && (object == null || object.equals(statement.getObject()));
+    }
 
-			final char[] hex=new char[bytes.length*2];
 
-			for (int i=0, l=bytes.length; i < l; ++i) {
+    public static Statement statement(
+            final Resource subject, final IRI predicate, final Value object
+    ) {
+        return subject == null || predicate == null || object == null ? null
+                : factory.createStatement(subject, predicate, object);
+    }
 
-				final int b=bytes[i]&0xFF;
+    public static Statement statement(
+            final Resource subject, final IRI predicate, final Value object, final Resource context
+    ) {
+        return subject == null || predicate == null || object == null ? null
+                : factory.createStatement(subject, predicate, object, context);
+    }
 
-				hex[2*i]=HexDigits[b >>> 4];
-				hex[2*i+1]=HexDigits[b&0x0F];
-			}
 
-			return new String(hex);
-		}
-	}
+    public static Triple triple(
+            final Resource subject, final IRI predicate, final Value object
+    ) {
+        return subject == null || predicate == null || object == null ? null
+                : factory.createTriple(subject, predicate, object);
+    }
 
 
-	//// Factories /////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static BNode bnode() {
+        return factory.createBNode();
+    }
 
-	public static ValueFactory factory() {
-		return factory;
-	}
+    public static BNode bnode(final String id) {
 
+        if ( id == null ) {
+            throw new NullPointerException("null id");
+        }
 
-	public static Namespace namespace(final String prefix, final String name) {
-		return prefix == null || name == null ? null : new AbstractNamespace() {
+        return factory.createBNode(id.startsWith("_:") ? id.substring(2) : id);
+    }
 
-			@Override public String getPrefix() { return prefix; }
 
-			@Override public String getName() { return name; }
+    public static IRI iri() {
+        return factory.createIRI("urn:uuid:", Identifiers.uuid());
+    }
 
-		};
-	}
+    public static IRI iri(final URI uri) {
+        return uri == null ? null : factory.createIRI(uri.toString());
+    }
 
+    public static IRI iri(final URL url) {
+        return url == null ? null : factory.createIRI(url.toString());
+    }
 
-	public static Predicate<Statement> pattern(
-			final Value subject, final Value predicate, final Value object
-	) {
-		return statement
-				-> (subject == null || subject.equals(statement.getSubject()))
-				&& (predicate == null || predicate.equals(statement.getPredicate()))
-				&& (object == null || object.equals(statement.getObject()));
-	}
+    public static IRI iri(final String iri) {
+        return iri == null ? null : factory.createIRI(iri);
+    }
 
+    public static IRI iri(final IRI space, final String name) {
+        return space == null || name == null ? null : iri(space.stringValue(), name);
+    }
 
-	public static Statement statement(
-			final Resource subject, final IRI predicate, final Value object
-	) {
-		return subject == null || predicate == null || object == null ? null
-				: factory.createStatement(subject, predicate, object);
-	}
+    public static IRI iri(final String space, final String name) {
+        return space == null || name == null ? null
+                : factory.createIRI(space, space.endsWith("/") && name.startsWith("/") ? name.substring(1) : name);
+    }
 
-	public static Statement statement(
-			final Resource subject, final IRI predicate, final Value object, final Resource context
-	) {
-		return subject == null || predicate == null || object == null ? null
-				: factory.createStatement(subject, predicate, object, context);
-	}
 
+    public static Literal literal(final boolean value) {
+        return factory.createLiteral(value);
+    }
 
-	public static Triple triple(
-			final Resource subject, final IRI predicate, final Value object
-	) {
-		return subject == null || predicate == null || object == null ? null
-				: factory.createTriple(subject, predicate, object);
-	}
 
+    public static Literal literal(final Number value) {
+        return literal(value, false);
+    }
 
-	public static BNode bnode() {
-		return factory.createBNode();
-	}
+    public static Literal literal(final Number value, final boolean strict) {
+        return value == null ? null
 
-	public static BNode bnode(final String id) {
+                : value instanceof Byte ? literal(value.byteValue(), strict)
+                : value instanceof Short ? literal(value.shortValue(), strict)
+                : value instanceof Integer ? literal(value.intValue(), strict)
+                : value instanceof Long ? literal(value.longValue(), strict)
 
-		if ( id == null ) {
-			throw new NullPointerException("null id");
-		}
+                : value instanceof Float ? literal(value.floatValue(), strict)
+                : value instanceof Double ? literal(value.doubleValue(), strict)
 
-		return factory.createBNode(id.startsWith("_:") ? id.substring(2) : id);
-	}
+                : value instanceof BigInteger ? literal((BigInteger)value)
+                : value instanceof BigDecimal ? literal((BigDecimal)value)
 
+                : null;
+    }
 
-	public static IRI iri() {
-		return factory.createIRI("urn:uuid:", uuid());
-	}
+    public static Literal literal(final byte value) {
+        return literal(value, false);
+    }
 
-	public static IRI iri(final URI uri) {
-		return uri == null ? null : factory.createIRI(uri.toString());
-	}
+    public static Literal literal(final byte value, final boolean strict) {
+        return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
+    }
 
-	public static IRI iri(final URL url) {
-		return url == null ? null : factory.createIRI(url.toString());
-	}
+    public static Literal literal(final short value) {
+        return literal(value, false);
+    }
 
-	public static IRI iri(final String iri) {
-		return iri == null ? null : factory.createIRI(iri);
-	}
+    public static Literal literal(final short value, final boolean strict) {
+        return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
+    }
 
-	public static IRI iri(final IRI space, final String name) {
-		return space == null || name == null ? null : iri(space.stringValue(), name);
-	}
+    public static Literal literal(final int value) {
+        return literal(value, false);
+    }
 
-	public static IRI iri(final String space, final String name) {
-		return space == null || name == null ? null
-				: factory.createIRI(space, space.endsWith("/") && name.startsWith("/") ? name.substring(1) : name);
-	}
+    public static Literal literal(final int value, final boolean strict) {
+        return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
+    }
 
+    public static Literal literal(final long value) {
+        return literal(value, false);
+    }
 
-	public static Literal literal(final boolean value) {
-		return factory.createLiteral(value);
-	}
+    public static Literal literal(final long value, final boolean strict) {
+        return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
+    }
 
+    public static Literal literal(final float value) {
+        return literal(value, false);
+    }
 
-	public static Literal literal(final Number value) {
-		return literal(value, false);
-	}
+    public static Literal literal(final float value, final boolean strict) {
+        return strict || Float.isInfinite(value) || Float.isNaN(value) ?
+                factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
+    }
 
-	public static Literal literal(final Number value, final boolean strict) {
-		return value == null ? null
+    public static Literal literal(final double value) {
+        return literal(value, false);
+    }
 
-				: value instanceof Byte ? literal(value.byteValue(), strict)
-				: value instanceof Short ? literal(value.shortValue(), strict)
-				: value instanceof Integer ? literal(value.intValue(), strict)
-				: value instanceof Long ? literal(value.longValue(), strict)
+    public static Literal literal(final double value, final boolean strict) {
+        return strict || Double.isInfinite(value) || Double.isNaN(value) ?
+                factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
+    }
 
-				: value instanceof Float ? literal(value.floatValue(), strict)
-				: value instanceof Double ? literal(value.doubleValue(), strict)
+    public static Literal literal(final BigInteger value) {
+        return value == null ? null : factory.createLiteral(value);
+    }
 
-				: value instanceof BigInteger ? literal((BigInteger)value)
-				: value instanceof BigDecimal ? literal((BigDecimal)value)
+    public static Literal literal(final BigDecimal value) {
+        return value == null ? null : factory.createLiteral(value);
+    }
 
-				: null;
-	}
 
-	public static Literal literal(final byte value) {
-		return literal(value, false);
-	}
+    public static Literal literal(final String value) {
+        return value == null ? null : factory.createLiteral(value);
+    }
 
-	public static Literal literal(final byte value, final boolean strict) {
-		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
-	}
 
-	public static Literal literal(final short value) {
-		return literal(value, false);
-	}
+    public static Literal literal(final TemporalAccessor accessor) {
+        return accessor == null ? null : factory.createLiteral(accessor);
+    }
 
-	public static Literal literal(final short value, final boolean strict) {
-		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
-	}
+    public static Literal literal(final TemporalAmount amount) {
+        return amount == null ? null : factory.createLiteral(amount);
+    }
 
-	public static Literal literal(final int value) {
-		return literal(value, false);
-	}
 
-	public static Literal literal(final int value, final boolean strict) {
-		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
-	}
+    public static Literal literal(final byte[] value) {
+        return value == null ? null : factory.createLiteral(
+                "data:application/octet-stream;base64,"+Base64.getEncoder().encodeToString(value), XSD.ANYURI);
+    }
 
-	public static Literal literal(final long value) {
-		return literal(value, false);
-	}
 
-	public static Literal literal(final long value, final boolean strict) {
-		return strict ? factory.createLiteral(value) : factory.createLiteral(BigInteger.valueOf(value));
-	}
+    public static Literal literal(final String value, final String lang) {
+        return value == null || lang == null ? null : factory.createLiteral(value, lang);
+    }
 
-	public static Literal literal(final float value) {
-		return literal(value, false);
-	}
+    public static Literal literal(final String value, final IRI datatype) {
+        return value == null || datatype == null ? null : factory.createLiteral(value, datatype);
+    }
 
-	public static Literal literal(final float value, final boolean strict) {
-		return strict || Float.isInfinite(value) || Float.isNaN(value) ?
-				factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
-	}
 
-	public static Literal literal(final double value) {
-		return literal(value, false);
-	}
+    //// Converters ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static Literal literal(final double value, final boolean strict) {
-		return strict || Double.isInfinite(value) || Double.isNaN(value) ?
-				factory.createLiteral(value) : factory.createLiteral(BigDecimal.valueOf(value));
-	}
+    public static Optional<Resource> resource(final Value value) {
+        return Optional.ofNullable(value).filter(Value::isResource).map(Resource.class::cast);
+    }
 
-	public static Literal literal(final BigInteger value) {
-		return value == null ? null : factory.createLiteral(value);
-	}
+    public static Optional<BNode> bnode(final Value value) {
+        return Optional.ofNullable(value).filter(Value::isBNode).map(BNode.class::cast);
+    }
 
-	public static Literal literal(final BigDecimal value) {
-		return value == null ? null : factory.createLiteral(value);
-	}
+    public static Optional<IRI> iri(final Value value) {
+        return Optional.ofNullable(value).filter(Value::isIRI).map(IRI.class::cast);
+    }
 
+    public static Optional<Literal> literal(final Value value) {
+        return Optional.ofNullable(value).filter(Value::isLiteral).map(Literal.class::cast);
+    }
 
-	public static Literal literal(final String value) {
-		return value == null ? null : factory.createLiteral(value);
-	}
 
+    public static Optional<Boolean> bool(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::booleanValue));
+    }
 
-	public static Literal literal(final TemporalAccessor accessor) {
-		return accessor == null ? null : factory.createLiteral(accessor);
-	}
 
-	public static Literal literal(final TemporalAmount amount) {
-		return amount == null ? null : factory.createLiteral(amount);
-	}
+    public static Optional<BigInteger> integer(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::integerValue));
+    }
 
+    public static Optional<BigDecimal> decimal(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::decimalValue));
+    }
 
-	public static Literal literal(final byte[] value) {
-		return value == null ? null : factory.createLiteral(
-				"data:application/octet-stream;base64,"+Base64.getEncoder().encodeToString(value), XSD.ANYURI);
-	}
 
+    public static Optional<String> string(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::stringValue));
+    }
 
-	public static Literal literal(final String value, final String lang) {
-		return value == null || lang == null ? null : factory.createLiteral(value, lang);
-	}
 
-	public static Literal literal(final String value, final IRI datatype) {
-		return value == null || datatype == null ? null : factory.createLiteral(value, datatype);
-	}
+    public static Optional<TemporalAccessor> temporalAccessor(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::temporalAccessorValue));
+    }
 
+    public static Optional<TemporalAmount> temporalAmount(final Value value) {
+        return literal(value).map(Lambdas.guarded(Literal::temporalAmountValue));
+    }
 
-	//// Converters ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static Optional<Resource> resource(final Value value) {
-		return Optional.ofNullable(value).filter(Value::isResource).map(Resource.class::cast);
-	}
+    //// Formatters ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static Optional<BNode> bnode(final Value value) {
-		return Optional.ofNullable(value).filter(Value::isBNode).map(BNode.class::cast);
-	}
+    public static String format(final Statement statement) {
+        return statement == null ? null : String.format("%s %s %s",
+                format(statement.getSubject()), format(statement.getPredicate()), format(statement.getObject())
+        );
+    }
 
-	public static Optional<IRI> iri(final Value value) {
-		return Optional.ofNullable(value).filter(Value::isIRI).map(IRI.class::cast);
-	}
 
-	public static Optional<Literal> literal(final Value value) {
-		return Optional.ofNullable(value).filter(Value::isLiteral).map(Literal.class::cast);
-	}
+    public static String format(final List<IRI> path) {
+        return path == null ? null : path.stream().map(Values::format).collect(joining("/"));
+    }
 
+    public static String format(final Collection<? extends Value> values) {
+        return values == null ? null : values.stream().map(Values::format).collect(joining(", "));
+    }
 
-	public static Optional<Boolean> bool(final Value value) {
-		return literal(value).map(guard(Literal::booleanValue));
-	}
 
+    public static String format(final Value value) {
+        return value == null ? null
+                : value instanceof Focus ? format((Focus)value)
+                : value instanceof BNode ? format((BNode)value)
+                : value instanceof IRI ? format((IRI)value)
+                : format((Literal)value);
+    }
 
-	public static Optional<BigInteger> integer(final Value value) {
-		return literal(value).map(guard(Literal::integerValue));
-	}
+    public static String format(final Frame frame) {
+        return frame == null ? null : frame.toString();
+    }
 
-	public static Optional<BigDecimal> decimal(final Value value) {
-		return literal(value).map(guard(Literal::decimalValue));
-	}
+    public static String format(final Focus focus) {
+        return focus == null ? null : "{"+focus.stringValue()+"}";
+    }
 
+    public static String format(final BNode bnode) {
+        return bnode == null ? null : "_:"+bnode.getID();
+    }
 
-	public static Optional<String> string(final Value value) {
-		return literal(value).map(guard(Literal::stringValue));
-	}
+    public static String format(final IRI iri) { // !!! relativize wrt to base
+        return iri == null ? null : traverse(iri,
+                direct -> direct.equals(RDF.TYPE) ? "a" : '<'+iri.stringValue()+'>',
+                inverse -> "^<"+inverse.stringValue()+'>'
+        );
+    }
 
+    public static String format(final Literal literal) {
+        if ( literal == null ) { return null; } else {
 
-	public static Optional<TemporalAccessor> temporalAccessor(final Value value) {
-		return literal(value).map(guard(Literal::temporalAccessorValue));
-	}
+            final IRI type=literal.getDatatype();
 
-	public static Optional<TemporalAmount> temporalAmount(final Value value) {
-		return literal(value).map(guard(Literal::temporalAmountValue));
-	}
+            try {
 
+                return type.equals(XSD.BOOLEAN) ? String.valueOf(literal.booleanValue())
 
-	public static <V, R> Function<V, R> guard(final Function<V, R> mapper) {
+                        : type.equals(XSD.INTEGER) ? String.valueOf(literal.integerValue())
+                        : type.equals(XSD.DECIMAL) ? literal.decimalValue().toPlainString()
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+                        : type.equals(XSD.DOUBLE) ? exponential.get().format(literal.doubleValue())
+                        : type.equals(XSD.STRING) ? Strings.quote(literal.getLabel())
 
-		return value -> {
+                        : literal.getLanguage()
+                        .map(lang -> Strings.quote(literal.getLabel())+'@'+lang)
+                        .orElseGet(() -> Strings.quote(literal.getLabel())+"^^"+format(type));
 
-			try {return mapper.apply(value);} catch ( final RuntimeException e ) {return null;}
+            } catch ( final IllegalArgumentException ignored ) {
 
-		};
-	}
+                return Strings.quote(literal.getLabel())+"^^"+format(type);
 
+            }
+        }
+    }
 
-	//// Formatters ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static String format(final Statement statement) {
-		return statement == null ? null : String.format("%s %s %s",
-				format(statement.getSubject()), format(statement.getPredicate()), format(statement.getObject())
-		);
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-	public static String format(final List<IRI> path) {
-		return path == null ? null : path.stream().map(Values::format).collect(joining("/"));
-	}
-
-	public static String format(final Collection<? extends Value> values) {
-		return values == null ? null : values.stream().map(Values::format).collect(joining(", "));
-	}
-
-
-	public static String format(final Value value) {
-		return value == null ? null
-				: value instanceof Focus ? format((Focus)value)
-				: value instanceof BNode ? format((BNode)value)
-				: value instanceof IRI ? format((IRI)value)
-				: format((Literal)value);
-	}
-
-	public static String format(final Frame frame) {
-		return frame == null ? null : frame.toString();
-	}
-
-	public static String format(final Focus focus) {
-		return focus == null ? null : "{"+focus.stringValue()+"}";
-	}
-
-	public static String format(final BNode bnode) {
-		return bnode == null ? null : "_:"+bnode.getID();
-	}
-
-	public static String format(final IRI iri) { // !!! relativize wrt to base
-		return iri == null ? null : traverse(iri,
-				direct -> direct.equals(RDF.TYPE) ? "a" : '<'+iri.stringValue()+'>',
-				inverse -> "^<"+inverse.stringValue()+'>'
-		);
-	}
-
-	public static String format(final Literal literal) {
-		if ( literal == null ) { return null; } else {
-
-			final IRI type=literal.getDatatype();
-
-			try {
-
-				return type.equals(XSD.BOOLEAN) ? String.valueOf(literal.booleanValue())
-
-						: type.equals(XSD.INTEGER) ? String.valueOf(literal.integerValue())
-						: type.equals(XSD.DECIMAL) ? literal.decimalValue().toPlainString()
-
-						: type.equals(XSD.DOUBLE) ? exponential.get().format(literal.doubleValue())
-						: type.equals(XSD.STRING) ? Strings.quote(literal.getLabel())
-
-						: literal.getLanguage()
-						.map(lang -> Strings.quote(literal.getLabel())+'@'+lang)
-						.orElseGet(() -> Strings.quote(literal.getLabel())+"^^"+format(type));
-
-			} catch ( final IllegalArgumentException ignored ) {
-
-				return Strings.quote(literal.getLabel())+"^^"+format(type);
-
-			}
-		}
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Values() {}
+    private Values() { }
 
 }

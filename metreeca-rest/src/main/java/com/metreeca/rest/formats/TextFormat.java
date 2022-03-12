@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.core.Feeds;
 import com.metreeca.rest.*;
 
 import java.io.*;
@@ -82,7 +83,7 @@ public final class TextFormat extends Format<String> {
 					final Reader reader=new InputStreamReader(input, message.charset())
 			) {
 
-				return Either.Right(Xtream.text(reader));
+				return Either.Right(Feeds.text(reader));
 
 			} catch ( final UnsupportedEncodingException e ) {
 

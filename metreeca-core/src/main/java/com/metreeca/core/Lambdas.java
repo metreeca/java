@@ -69,14 +69,14 @@ public final class Lambdas {
     }
 
     /**
-     * Creates an autocloseable function.
+     * Creates an auto-closing function.
      *
      * @param function the function to be wrapped
      * @param <V>      the type of the {@code function} input value
      * @param <R>      the type of the {@code function} return value
      *
-     * @return a function returning the value produced by applying {@code function} to its input value and closing it
-     * after processing
+     * @return a function returning the value produced by applying {@code function} to its autocloseable input value and
+     * closing it after processing
      *
      * @throws NullPointerException if {@code function} is null
      */

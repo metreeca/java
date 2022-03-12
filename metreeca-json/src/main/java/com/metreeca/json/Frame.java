@@ -16,6 +16,7 @@
 
 package com.metreeca.json;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.core.Strings;
 import com.metreeca.json.shifts.Path;
 
@@ -184,7 +185,7 @@ public final class Frame {
 
 	public String skolemize() {
 
-		return md5(focus.stringValue());
+		return Identifiers.md5(focus.stringValue());
 	}
 
 	public String skolemize(final IRI... traits) {
@@ -193,7 +194,7 @@ public final class Frame {
 			throw new NullPointerException("null traits");
 		}
 
-		return md5(Arrays.stream(traits)
+		return Identifiers.md5(Arrays.stream(traits)
 				.flatMap(this::values)
 				.map(Value::stringValue)
 				.collect(joining("\n"))
@@ -206,7 +207,7 @@ public final class Frame {
 			throw new NullPointerException("null shifts");
 		}
 
-		return md5(Arrays.stream(shifts)
+		return Identifiers.md5(Arrays.stream(shifts)
 				.flatMap(this::values)
 				.map(Value::stringValue)
 				.collect(joining("\n"))

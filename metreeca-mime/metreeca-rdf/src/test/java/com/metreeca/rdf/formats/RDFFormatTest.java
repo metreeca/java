@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf.formats;
 
+import com.metreeca.core.Feeds;
 import com.metreeca.json.Values;
 import com.metreeca.rest.*;
 
@@ -140,10 +141,10 @@ final class RDFFormatTest {
 		}
 
 		@Test void testHandleEmptyInput() {
-			exec(() -> new Request().body(input(), Xtream::input).body(rdf()).fold(
-					error -> fail("unexpected error {"+error+"}"),
-					value -> assertThat(value).isEmpty()
-			));
+            exec(() -> new Request().body(input(), Feeds::input).body(rdf()).fold(
+                    error -> fail("unexpected error {"+error+"}"),
+                    value -> assertThat(value).isEmpty()
+            ));
 		}
 
 	}

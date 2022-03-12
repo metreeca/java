@@ -15,7 +15,12 @@ public final class Strings {
     /**
      * The default maximum line length limit ({@value}).
      */
-    public static final int LineLengthLimit=80;
+    public static final int LineLength=80;
+
+    /**
+     * The default maximum small text length limit ({@value}).
+     */
+    public static final int TextLength=400;
 
 
     private static final Pattern SpacePattern=Pattern.compile("[ \\p{Cntrl}]+");
@@ -84,7 +89,7 @@ public final class Strings {
      * @param string the string to be clipped
      *
      * @return the input {@code string} {@linkplain #clip(String, int) clipped} to the default line length limit ({@value
-     * #LineLengthLimit})
+     * #LineLength})
      *
      * @throws NullPointerException if {@code string} is null
      */
@@ -94,7 +99,7 @@ public final class Strings {
             throw new NullPointerException("null string");
         }
 
-        return string.isEmpty() ? string : clip(string, LineLengthLimit);
+        return string.isEmpty() ? string : clip(string, LineLength);
     }
 
     /**
@@ -127,7 +132,7 @@ public final class Strings {
      * @param string the string to be folded
      *
      * @return the input {@code string} {@linkplain #fold(String, int) folded} to the default line length limit ({@value
-     * #LineLengthLimit})
+     * #LineLength})
      *
      * @throws NullPointerException if {@code string} is null
      */
@@ -137,7 +142,7 @@ public final class Strings {
             throw new NullPointerException("null string");
         }
 
-        return string.isEmpty() ? string : clip(string, LineLengthLimit);
+        return string.isEmpty() ? string : clip(string, LineLength);
     }
 
     /**

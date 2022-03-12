@@ -18,6 +18,7 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.json.Values;
 import com.metreeca.rdf.schemas.Schema;
 import com.metreeca.rest.services.Logger;
@@ -224,7 +225,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 				.filter(id -> {
 
-					if ( AbsoluteIRIPattern.matcher(id).matches() ) { return true; } else {
+					if ( Identifiers.AbsoluteIRIPattern.matcher(id).matches() ) { return true; } else {
 
 						logger.warning(this, format("malformed %s <%s>", ItemId, id)); // !!! report open tag
 

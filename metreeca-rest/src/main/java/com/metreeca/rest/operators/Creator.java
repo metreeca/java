@@ -31,16 +31,16 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static com.metreeca.core.Identifiers.encode;
+import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.md5;
 import static com.metreeca.json.shapes.Guard.Create;
 import static com.metreeca.json.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.Wrapper.keeper;
-import static com.metreeca.rest.Xtream.encode;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.services.Engine.engine;
@@ -196,6 +196,7 @@ public final class Creator extends Delegator {
 							.of(focus)
 							.filter(Value::isIRI)
 							.map(IRI.class::cast)
+							.map(Value::stringValue)
 							.map(Values::path) // root-relative to support relocation
 							.orElse(focus.stringValue())
 					)))

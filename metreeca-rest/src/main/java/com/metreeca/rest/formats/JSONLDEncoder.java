@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.json.Shape;
 import com.metreeca.json.shapes.Field;
 import com.metreeca.json.shapes.MaxCount;
@@ -29,6 +30,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 
 import javax.json.*;
 
@@ -74,7 +76,15 @@ final class JSONLDEncoder {
 		this.keywords=keywords;
 		this.context=context;
 
-		this.root=root(focus);
+		this.root=Optional.ofNullable(focus)
+				.map(Value::stringValue)
+				.map(Identifiers.IRIPattern::matcher)
+				.filter(Matcher::matches)
+				.map(matcher -> Optional.ofNullable(matcher.group("schemeall")).orElse("")
+						+Optional.ofNullable(matcher.group("hostall")).orElse("")
+						+"/"
+				)
+				.orElse(Base);
 
 		this.aliaser=keyword -> keywords.getOrDefault(keyword, keyword);
 	}

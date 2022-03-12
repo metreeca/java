@@ -16,6 +16,8 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.core.Feeds;
+
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,8 +49,8 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 					throw new UncheckedIOException(e);
 				}
 
-				response.body(output(), output -> { Xtream.data(output, data); }); // cache output
-				response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
+                response.body(output(), output -> { Feeds.data(output, data); }); // cache output
+                response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
 
 			});
 
