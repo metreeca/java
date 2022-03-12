@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
+- JSON / Extend JSONPath.Processor API with getters for JSON objects, arrays and nested processors
 - RDF / Factor RDFFormat static parsing method
 
 ### Fixed
