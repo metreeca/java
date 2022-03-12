@@ -19,17 +19,15 @@ package com.metreeca.rest.handlers;
 import com.metreeca.rest.*;
 import com.metreeca.rest.services.Fetcher.URLFetcher;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.*;
 import java.nio.file.*;
 import java.util.MissingResourceException;
 import java.util.Optional;
-import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Lambdas.checked;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
@@ -175,7 +173,7 @@ public final class Publisher extends Delegator {
             // load the filesystem from the service toolbox to have it automatically closed
             // !!! won't handle multiple publishers from the same filesystem
 
-            final FileSystem filesystem=service(supplier(() ->
+            final FileSystem filesystem=service(checked(() ->
                     FileSystems.newFileSystem(URI.create(jar), emptyMap())
             ));
 
@@ -296,7 +294,7 @@ public final class Publisher extends Delegator {
 
                 .findFirst()
 
-                .map(file -> request.reply(function(response -> {
+                .map(file -> request.reply(checked(response -> {
 
                     final String mime=Format.mime(file.getFileName().toString());
                     final String length=String.valueOf(Files.size(file));
@@ -316,7 +314,7 @@ public final class Publisher extends Delegator {
                             .header("Content-Type", mime)
                             .header("Content-Length", length)
                             .header("ETag", etag)
-                            .body(output(), consumer(output -> Files.copy(file, output)));
+                            .body(output(), checked(output -> { Files.copy(file, output); }));
 
                 })));
     }
@@ -325,79 +323,6 @@ public final class Publisher extends Delegator {
         return request.route() && !fallback.isEmpty()
                 ? content(request, root, fallback)
                 : Optional.empty();
-    }
-
-
-    //// Unchecked Lambdas /////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static <V> Supplier<V> supplier(final CheckedSupplier<? extends V> supplier) {
-        return () -> {
-            try {
-
-                return supplier.get();
-
-            } catch ( final IOException e ) {
-
-                throw new UncheckedIOException(e);
-
-            } catch ( final Exception e ) {
-
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
-    private static <V> Consumer<V> consumer(final CheckedConsumer<? super V> consumer) {
-        return v -> {
-            try {
-
-                consumer.accept(v);
-
-            } catch ( final IOException e ) {
-
-                throw new UncheckedIOException(e);
-
-            } catch ( final Exception e ) {
-
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
-    private static <V, R> Function<V, R> function(final CheckedFunction<? super V, ? extends R> function) {
-        return v -> {
-            try {
-
-                return function.apply(v);
-
-            } catch ( final IOException e ) {
-
-                throw new UncheckedIOException(e);
-
-            } catch ( final Exception e ) {
-
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
-
-    @FunctionalInterface private static interface CheckedSupplier<V> {
-
-        public V get() throws Exception;
-
-    }
-
-    @FunctionalInterface private static interface CheckedConsumer<V> {
-
-        public void accept(final V value) throws Exception;
-
-    }
-
-    @FunctionalInterface private static interface CheckedFunction<V, R> {
-
-        public R apply(final V value) throws Exception;
-
     }
 
 }
