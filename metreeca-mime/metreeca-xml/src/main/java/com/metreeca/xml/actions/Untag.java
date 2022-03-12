@@ -18,10 +18,14 @@ package com.metreeca.xml.actions;
 
 import org.w3c.dom.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.Locale;
 import java.util.function.Function;
 
 import static com.metreeca.rest.actions.Clean.normalize;
+import static com.metreeca.xml.formats.HTMLFormat.html;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * X/HTML to Markdown conversion.
@@ -29,6 +33,32 @@ import static com.metreeca.rest.actions.Clean.normalize;
  * <p>Converts an X/HTMl document to a markdown-based plain text representation.</p>
  */
 public final class Untag implements Function<Node, String> {
+
+
+	/**
+	 * Converts an X/HTMl document to a markdown-based plain text representation.
+	 *
+	 * @param document the content of the X/HTML document
+	 *
+	 * @return the markdown-based plain text representation of {@code document} or the original {@code document}
+	 * contents
+	 * if unable to parse it as an X/HTML document
+	 *
+	 * @throws NullPointerException id {@code document } is {@code null}
+	 */
+	public static String untag(final String document) {
+
+		if ( document == null ) {
+			throw new NullPointerException("null cocument");
+		}
+
+		return html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8.name(), "").fold(
+
+				error -> document, value -> new Untag().apply(value)
+
+		);
+	}
+
 
 	@Override public String apply(final Node element) {
 		return element == null ? "" : new Builder().format(element).toString();
