@@ -44,7 +44,7 @@
 
 	<modules>
 
-		<module>metreeca-work</module>
+		<module>metreeca-core</module>
 		<module>metreeca-json</module>
 		<module>metreeca-rest</module>
 		<module>metreeca-text</module>
@@ -52,6 +52,8 @@
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
 		<module>metreeca-back</module>
+
+		<module>metreeca-work</module>
 
 	</modules>
 
@@ -78,6 +80,12 @@
 		<dependencies>
 
 			<!-- Core Modules -->
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>

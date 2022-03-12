@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unpublished](https://github.com/metreeca/base/compare/v1.0.2...HEAD)
 
+### Changed
+
+- Core / Factor common definitions and utilities to a dedicated module
+- Text / Factor text processing utilities to a dedicated module
+
 ### Improved
 
-- Text / Add Normalize.normalize(String) utility method
 - JSON / Extend JSONPath.Processor API with getters for JSON objects, arrays and nested processors
 - XML / Add Untag.untag(String) utility method 
 - RDF / Factor RDFFormat static parsing method

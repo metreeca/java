@@ -17,7 +17,7 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -27,46 +27,10 @@
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>metreeca-json</artifactId>
+	<artifactId>metreeca-core</artifactId>
 
-	<name>Metreeca JSON Modelling</name>
-	<description>A shape-based JSON modelling framework.</description>
-
-	<dependencies>
-
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-model-api</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-model-vocabulary</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-model</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-turtle</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
+	<name>Metreeca Core Utilities</name>
+	<description>Common definitions and utilities.</description>
 
 	<build>
 		<plugins>
@@ -79,7 +43,7 @@
 				<executions>
 					<execution>
 
-						<id>json-test-jar</id>
+						<id>core-test-jar</id>
 						<phase>package</phase>
 
 						<goals>
