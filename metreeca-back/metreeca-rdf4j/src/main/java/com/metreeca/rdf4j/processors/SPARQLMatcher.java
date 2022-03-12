@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf4j.processors;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.*;
@@ -139,12 +140,12 @@ public final class SPARQLMatcher implements Function<Stream<String>, Stream<Matc
 						)
 
 						.value("anchors", batch -> batch.stream()
-								.map(Values::quote)
+                                .map(Strings::quote)
 								.collect(joining("\n\t\t"))
 						)
 
 						.value("languages", languages.stream()
-								.map(Values::quote)
+                                .map(Strings::quote)
 								.collect(joining(", "))
 						)
 

@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Strings.indent;
 import static com.metreeca.json.Values.derives;
 import static com.metreeca.json.Values.direct;
 import static com.metreeca.json.Values.format;
-import static com.metreeca.json.Values.indent;
 import static com.metreeca.json.shapes.All.all;
 import static com.metreeca.json.shapes.Lang.lang;
 import static com.metreeca.json.shapes.MaxCount.maxCount;

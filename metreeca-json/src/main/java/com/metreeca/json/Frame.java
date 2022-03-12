@@ -16,6 +16,7 @@
 
 package com.metreeca.json;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.shifts.Path;
 
 import org.eclipse.rdf4j.model.*;
@@ -860,7 +861,7 @@ public final class Frame {
 		if ( !traits.isEmpty() ) {
 			builder.append(' ').append(traits.entrySet().stream()
 					.map(this::format)
-					.map(Values::indent)
+					.map(Strings::indent)
 					.collect(joining(",\n\t", "{\n\t", "\n}"))
 			);
 		}
@@ -878,7 +879,7 @@ public final class Frame {
 				: values.size() == 1 ? values.iterator().next().format()
 				: values.stream()
 				.map(Frame::format)
-				.map(Values::indent)
+				.map(Strings::indent)
 				.collect(joining(",\n\t", "[\n\t", "\n]"));
 	}
 
@@ -898,8 +899,8 @@ public final class Frame {
 
 	@Override public String toString() {
 		return Values.format(focus)
-				+label().map(l -> String.format(" : %s", clip(l))).orElse("")
-				+notes().map(n -> String.format(" / %s", clip(n))).orElse("")
+				+label().map(l -> String.format(" : %s", Strings.fold(Strings.excerpt(l)))).orElse("")
+				+notes().map(n -> String.format(" / %s", Strings.fold(Strings.excerpt(n)))).orElse("")
 				+(traits.isEmpty() ? "" : String.format(" { [%d] }", size()));
 	}
 

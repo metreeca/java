@@ -16,8 +16,8 @@
 
 package com.metreeca.json.shapes;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Shape;
-import com.metreeca.json.Values;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -286,7 +286,7 @@ public final class Or extends Shape {
 
 	@Override public String toString() {
 		return "or("+(shapes.isEmpty() ? "" : shapes.stream()
-				.map(shape -> Values.indent(shape.toString()))
+                .map(shape -> Strings.indent(shape.toString()))
 				.collect(joining(",\n\t", "\n\t", "\n"))
 		)+")";
 	}

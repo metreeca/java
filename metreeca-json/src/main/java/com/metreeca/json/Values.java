@@ -16,6 +16,8 @@
 
 package com.metreeca.json;
 
+import com.metreeca.core.Strings;
+
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.base.AbstractNamespace;
 import org.eclipse.rdf4j.model.base.AbstractValueFactory;
@@ -72,9 +74,6 @@ public final class Values {
 	public static final Pattern IRIPattern=Pattern.compile("^"+IRIScheme+"?"+IRIHost+"?"+IRIPath+"$");
 
 
-	private static final Pattern NewlinePattern=Pattern.compile("\n");
-
-
 	private static final ValueFactory factory=new AbstractValueFactory() {}; // before constant initialization
 	private static final Comparator<Value> comparator=new ValueComparator();
 
@@ -83,7 +82,6 @@ public final class Values {
 	);
 
 	private static final char[] HexDigits="0123456789abcdef".toCharArray();
-	private static final int NameLengthLimit=80; // log args length limit
 
 
 	//// Constants /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -657,83 +655,18 @@ public final class Values {
 						: type.equals(XSD.DECIMAL) ? literal.decimalValue().toPlainString()
 
 						: type.equals(XSD.DOUBLE) ? exponential.get().format(literal.doubleValue())
-						: type.equals(XSD.STRING) ? quote(literal.getLabel())
+						: type.equals(XSD.STRING) ? Strings.quote(literal.getLabel())
 
 						: literal.getLanguage()
-						.map(lang -> quote(literal.getLabel())+'@'+lang)
-						.orElseGet(() -> quote(literal.getLabel())+"^^"+format(type));
+						.map(lang -> Strings.quote(literal.getLabel())+'@'+lang)
+						.orElseGet(() -> Strings.quote(literal.getLabel())+"^^"+format(type));
 
 			} catch ( final IllegalArgumentException ignored ) {
 
-				return quote(literal.getLabel())+"^^"+format(type);
+				return Strings.quote(literal.getLabel())+"^^"+format(type);
 
 			}
 		}
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public static String quote(final CharSequence text) {
-
-		if ( text == null ) {
-			throw new NullPointerException("null text");
-		}
-
-		final StringBuilder builder=new StringBuilder(text.length()+text.length()/10);
-
-		builder.append('\''); // use single quote to interoperate with Java/JSON string
-
-		for (int i=0, n=text.length(); i < n; ++i) {
-			switch ( text.charAt(i) ) {
-				case '\\':
-					builder.append("\\\\");
-					break;
-				case '\'':
-					builder.append("\\'");
-					break;
-				case '\r':
-					builder.append("\\r");
-					break;
-				case '\n':
-					builder.append("\\n");
-					break;
-				case '\t':
-					builder.append("\\t");
-					break;
-				default:
-					builder.append(text.charAt(i));
-					break;
-			}
-		}
-
-		builder.append('\'');
-
-		return builder.toString();
-	}
-
-	public static String indent(final CharSequence text) {
-
-		if ( text == null ) {
-			throw new NullPointerException("null text");
-		}
-
-		return NewlinePattern.matcher(text).replaceAll("\n\t");
-	}
-
-	/**
-	 * Clips a string.
-	 *
-	 * @param string the string to be clipped
-	 *
-	 * @return the input {@code string} clipped to a maximum length limit, or {@code null} if {@code string} is null
-	 */
-	public static String clip(final String string) {
-		return string == null || string.isEmpty() ? "?"
-				: string.indexOf('\n') >= 0 ? clip(string.substring(0, string.indexOf('\n')))
-				: string.length() > NameLengthLimit ?
-				string.substring(0, NameLengthLimit/2)+" … "+string.substring(string.length()-NameLengthLimit/2)
-				: string;
 	}
 
 

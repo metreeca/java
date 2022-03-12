@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Shape;
 import com.metreeca.json.Values;
 import com.metreeca.json.shapes.*;
@@ -61,7 +62,6 @@ import static com.metreeca.rdf4j.SPARQLScribe.strstarts;
 import static com.metreeca.rdf4j.SPARQLScribe.union;
 import static com.metreeca.rdf4j.SPARQLScribe.values;
 import static com.metreeca.rdf4j.SPARQLScribe.var;
-import static com.metreeca.rest.Scribe.indent;
 import static com.metreeca.rest.Scribe.text;
 import static com.metreeca.rest.Scribe.*;
 import static com.metreeca.rest.Toolbox.service;
@@ -250,7 +250,7 @@ abstract class GraphFacts {
 			} else {
 
 				return lang.tags().isEmpty() ? nothing() : filter(
-						in(lang(var(anchor)), lang.tags().stream().map(Values::quote).map(Scribe::text))
+						in(lang(var(anchor)), lang.tags().stream().map(Strings::quote).map(Scribe::text))
 				);
 
 			}
@@ -285,19 +285,19 @@ abstract class GraphFacts {
 
 		@Override public Scribe probe(final Pattern pattern) {
 			return filter(regex(
-					str(var(anchor)), text(quote(pattern.expression())), text(quote(pattern.flags()))
+					str(var(anchor)), text(Strings.quote(pattern.expression())), text(Strings.quote(pattern.flags()))
 			));
 		}
 
 		@Override public Scribe probe(final Like like) {
 			return filter(regex(
-					str(var(anchor)), text(quote(like.toExpression()))
+					str(var(anchor)), text(Strings.quote(like.toExpression()))
 			));
 		}
 
 		@Override public Scribe probe(final Stem stem) {
 			return filter(strstarts(
-					str(var(anchor)), text(quote(stem.prefix()))
+					str(var(anchor)), text(Strings.quote(stem.prefix()))
 			));
 		}
 

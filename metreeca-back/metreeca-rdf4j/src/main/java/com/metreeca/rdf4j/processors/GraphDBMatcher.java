@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf4j.processors;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.GraphQuery;
@@ -333,12 +334,12 @@ public final class GraphDBMatcher implements Function<Stream<String>, Stream<Mat
 						.value("index", index)
 
 						.value("anchors", batch -> batch.stream()
-								.map(s -> Values.quote(quote(s)))
+                                .map(s -> Strings.quote(quote(s)))
 								.collect(joining("\n\t\t"))
 						)
 
 						.value("languages", languages.stream()
-								.map(Values::quote)
+                                .map(Strings::quote)
 								.collect(joining(", "))
 						)
 

@@ -22,7 +22,7 @@ import org.eclipse.rdf4j.model.Statement;
 import java.util.List;
 import java.util.Optional;
 
-import static com.metreeca.json.Values.indent;
+import static com.metreeca.core.Strings.indent;
 
 import static org.eclipse.rdf4j.model.util.Models.isomorphic;
 

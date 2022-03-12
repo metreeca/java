@@ -16,6 +16,7 @@
 
 package com.metreeca.open.actions;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.services.Graph;
@@ -399,8 +400,8 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 						)
 
 						.value("languages", Stream
-								.concat(Stream.of(""), languages.stream()) // empty e.g. for version literals
-								.map(Values::quote)
+                                .concat(Stream.of(""), languages.stream()) // empty e.g. for version literals
+                                .map(Strings::quote)
 								.collect(joining(", "))
 						)
 

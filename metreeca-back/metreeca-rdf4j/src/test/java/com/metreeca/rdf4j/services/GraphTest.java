@@ -18,6 +18,7 @@
 package com.metreeca.rdf4j.services;
 
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Frame;
 import com.metreeca.rest.*;
 
@@ -248,8 +249,8 @@ public final class GraphTest {
 	static Model construct(final RepositoryConnection connection, final String sparql) {
 		try {
 
-			logger.info("evaluating SPARQL query\n\n\t"
-					+indent(sparql)+(sparql.endsWith("\n") ? "" : "\n"));
+            logger.info("evaluating SPARQL query\n\n\t"
+                    +Strings.indent(sparql)+(sparql.endsWith("\n") ? "" : "\n"));
 
 			final Model model=new LinkedHashModel();
 
@@ -261,7 +262,7 @@ public final class GraphTest {
 
 		} catch ( final MalformedQueryException e ) {
 
-			throw new MalformedQueryException(e.getMessage()+"----\n\n\t"+indent(sparql));
+            throw new MalformedQueryException(e.getMessage()+"----\n\n\t"+Strings.indent(sparql));
 
 		}
 	}

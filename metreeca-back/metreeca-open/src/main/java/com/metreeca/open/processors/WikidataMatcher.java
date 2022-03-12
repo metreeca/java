@@ -16,6 +16,7 @@
 
 package com.metreeca.open.processors;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.open.actions.Wikidata;
@@ -36,8 +37,8 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Strings.quote;
 import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.quote;
 import static com.metreeca.json.shifts.Alt.alt;
 
 import static java.util.stream.Collectors.joining;
@@ -96,7 +97,7 @@ public final class WikidataMatcher implements Function<Stream<String>, Stream<Ma
 								+"}")
 
 						.value("anchors", batch -> batch.stream()
-								.map(Values::quote)
+								.map(Strings::quote)
 								.collect(joining("\n\t\t"))
 						)
 

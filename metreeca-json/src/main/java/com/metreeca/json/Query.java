@@ -16,6 +16,7 @@
 
 package com.metreeca.json;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.queries.*;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -134,11 +135,11 @@ public abstract class Query {
 
 	@Override public String toString() {
 		return format(
-				"%s {\n\tshape: %s\n\tpath: %s\n\torder: %s\n\toffset: %d\n\tlimit: %d\n}",
-				getClass().getSimpleName().toLowerCase(Locale.ROOT),
-				Values.indent(shape.toString()),
-				path, orders, offset, limit
-		);
+                "%s {\n\tshape: %s\n\tpath: %s\n\torder: %s\n\toffset: %d\n\tlimit: %d\n}",
+                getClass().getSimpleName().toLowerCase(Locale.ROOT),
+                Strings.indent(shape.toString()),
+                path, orders, offset, limit
+        );
 	}
 
 

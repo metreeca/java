@@ -27,39 +27,6 @@ import java.util.function.UnaryOperator;
  */
 public final class Normalize implements UnaryOperator<String> {
 
-	private static final Normalize Default=new Normalize()
-			.space(true)
-			.smart(true)
-			.marks(true);
-
-
-	/**
-	 * Normalizes a text value.
-	 *
-	 * @param text the text value to be normalized
-	 *
-	 * @return a version of {@code text} normalized with the following parameters:
-	 *
-	 * <ul>
-	 *     <li>{@link #space(boolean) space(true)}</li>
-	 *     <li>{@link #smart(boolean) smart(true)}</li>
-	 *     <li>{@link #marks(boolean) marks(true)}</li>
-	 * </ul>
-	 *
-	 * @throws NullPointerException if {@code text} is null
-	 */
-	public static String normalize(final String text) {
-
-		if ( text == null ) {
-			throw new NullPointerException("null text");
-		}
-
-		return Default.apply(text);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private boolean space;
 	private boolean marks;
 	private boolean smart;

@@ -24,7 +24,7 @@ import org.eclipse.rdf4j.model.*;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.Values.quote;
+import static com.metreeca.core.Strings.quote;
 import static com.metreeca.json.Values.traverse;
 import static com.metreeca.rest.Scribe.*;
 

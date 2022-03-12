@@ -16,8 +16,8 @@
 
 package com.metreeca.json.shapes;
 
+import com.metreeca.core.Strings;
 import com.metreeca.json.Shape;
-import com.metreeca.json.Values;
 
 import org.eclipse.rdf4j.model.Value;
 
@@ -98,7 +98,7 @@ public final class Range extends Shape {
 
 	@Override public String toString() {
 		return "range("+values.stream()
-				.map(v -> Values.indent(format(v)))
+                .map(v -> Strings.indent(format(v)))
 				.collect(joining(",\n\t", "\n\t", "\n"))
 				+")";
 	}
