@@ -19,16 +19,15 @@ package com.metreeca.rest;
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.*;
 import java.util.stream.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -37,7 +36,6 @@ import static java.util.stream.Collectors.*;
  * @param <T> the type of the extended stream elements
  */
 public final class Xtream<T> implements Stream<T> {
-
 
 	/**
 	 * Creates an empty sequential extended stream.
@@ -161,118 +159,7 @@ public final class Xtream<T> implements Stream<T> {
 	}
 
 
-	//// Text Utilities ////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 	//// Functional Utilities //////////////////////////////////////////////////////////////////////////////////////////
-
-	public static <K, V> Map<K, V> map() {
-		return emptyMap();
-	}
-
-	@SafeVarargs public static <K, V> Map<K, V> map(final Entry<K, V>... entries) {
-		return Arrays.stream(entries).filter(Objects::nonNull).collect(toMap(Entry::getKey, Entry::getValue));
-	}
-
-	public static <K, V> Entry<K, V> entry(final K key, final V value) {
-		return new SimpleImmutableEntry<>(key, value);
-	}
-
-
-	/**
-	 * Converts a consumer into a function.
-	 *
-	 * @param consumer the consumer to be converted
-	 * @param <V>      the type of the value accepted by {@code consumer}
-	 * @param <R>      the type returned by the generated function
-	 *
-	 * @return a function forwarding its input value to {@code supplier} and returning a null value
-	 *
-	 * @throws NullPointerException if consumer is null
-	 */
-	public static <V, R> Function<V, R> task(final Consumer<V> consumer) {
-
-		if ( consumer == null ) {
-			throw new NullPointerException("null consumer");
-		}
-
-		return value -> {
-
-			consumer.accept(value);
-
-			return null;
-
-		};
-	}
-
-	/**
-	 * Creates a guarded function.
-	 *
-	 * @param function the function to be wrapped
-	 * @param <V>      the type of the {@code function} input value
-	 * @param <R>      the type of the {@code function} return value
-	 *
-	 * @return a function returning the value produced by applying {@code function} to its input value, if the input
-	 * value is not null and no exception is thrown in the process, or {@code null}, otherwise
-	 *
-	 * @throws NullPointerException if {@code function} is null
-	 */
-	public static <V, R> Function<V, R> guarded(final Function<? super V, ? extends R> function) {
-
-		if ( function == null ) {
-			throw new NullPointerException("null function");
-		}
-
-		return value -> {
-			try {
-
-				return value == null ? null : function.apply(value);
-
-			} catch ( final RuntimeException e ) {
-
-				return null;
-
-			}
-		};
-
-	}
-
-	/**
-	 * Creates an autocloseable function.
-	 *
-	 * @param function the function to be wrapped
-	 * @param <V>      the type of the {@code function} input value
-	 * @param <R>      the type of the {@code function} return value
-	 *
-	 * @return a function returning the value produced by applying {@code function} to its input value and closing it
-	 * after processing
-	 *
-	 * @throws NullPointerException if {@code function} is null
-	 */
-	public static <V extends AutoCloseable, R> Function<V, R> closing(final Function<? super V, ? extends R> function) {
-
-		if ( function == null ) {
-			throw new NullPointerException("null function");
-		}
-
-		return value -> {
-
-			try ( final V c=value ) {
-
-				return function.apply(c);
-
-			} catch ( final IOException e ) {
-
-				throw new UncheckedIOException(e);
-
-			} catch ( final Exception e ) {
-
-				throw new RuntimeException(e);
-
-			}
-
-		};
-	}
 
 
 	//// IO Utilities //////////////////////////////////////////////////////////////////////////////////////////////////

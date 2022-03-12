@@ -41,8 +41,6 @@ import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Guard.filter;
 import static com.metreeca.json.shapes.Lang.lang;
 import static com.metreeca.json.shapes.Localized.localized;
-import static com.metreeca.rest.Xtream.entry;
-import static com.metreeca.rest.Xtream.map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -684,12 +682,8 @@ final class JSONLDDecoderTest {
 
 					field(RDF.FIRST),
 
-					map(
-							entry("@id", "id"),
-							entry("@value", "value"),
-							entry("@type", "type"),
-							entry("@language", "language")
-					),
+					Map.ofEntries((Map.Entry<String, String>[])new Map.Entry[]{ Map.entry("@id", "id"), Map.entry(
+							"@value", "value"), Map.entry("@type", "type"), Map.entry("@language", "language") }),
 
 					createObjectBuilder()
 							.add("id", "/x")
@@ -713,7 +707,8 @@ final class JSONLDDecoderTest {
 		}
 
 		@Test void testIgnoreDuplicateKeywords() {
-			assertThat(decode(x, and(), map(entry("@id", "id")), createObjectBuilder()
+			assertThat(decode(x, and(), Map.ofEntries((Map.Entry<String, String>[])new Map.Entry[]{ Map.entry("@id",
+                    "id") }), createObjectBuilder()
 
 					.add("id", "/x")
 					.add("@id", "/x")

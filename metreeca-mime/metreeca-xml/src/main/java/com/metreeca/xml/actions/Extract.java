@@ -26,7 +26,7 @@ import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import static com.metreeca.rest.Xtream.normalize;
+import static com.metreeca.core.Strings.normalize;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingDouble;

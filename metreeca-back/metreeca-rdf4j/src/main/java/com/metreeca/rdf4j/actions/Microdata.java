@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 
 import static com.metreeca.json.Values.*;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Xtream.entry;
 import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.String.format;
@@ -186,7 +185,7 @@ public final class Microdata implements Function<Node, Stream<Statement>> {
 
 		}
 
-		return entry(id, model);
+		return Map.entry(id, model);
 	}
 
 

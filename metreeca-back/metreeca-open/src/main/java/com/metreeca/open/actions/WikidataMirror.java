@@ -35,12 +35,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Xtream.task;
 import static com.metreeca.rest.services.Logger.logger;
 import static com.metreeca.rest.services.Logger.time;
 

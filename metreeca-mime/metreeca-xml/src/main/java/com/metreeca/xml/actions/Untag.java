@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static com.metreeca.rest.Xtream.normalize;
+import static com.metreeca.core.Strings.normalize;
 import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

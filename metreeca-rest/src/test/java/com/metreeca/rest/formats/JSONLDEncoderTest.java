@@ -40,8 +40,6 @@ import static com.metreeca.json.shapes.Localized.localized;
 import static com.metreeca.json.shapes.MaxCount.maxCount;
 import static com.metreeca.json.shapes.Or.or;
 import static com.metreeca.rest.JSONAssert.assertThat;
-import static com.metreeca.rest.Xtream.entry;
-import static com.metreeca.rest.Xtream.map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -594,7 +592,8 @@ final class JSONLDEncoderTest {
 			assertThat(encode(x,
 
 					field(RDF.TYPE, required(), datatype(IRIType)),
-					map(entry("@id", "id"), entry("@type", "type")),
+					Map.ofEntries((Map.Entry<String, String>[])new Map.Entry[]{ Map.entry("@id", "id"), Map.entry(
+							"@type", "type") }),
 
 					statement(x, RDF.TYPE, y)
 
@@ -609,12 +608,8 @@ final class JSONLDEncoderTest {
 
 					field(RDF.FIRST),
 
-					map(
-							entry("@id", "id"),
-							entry("@value", "value"),
-							entry("@type", "type"),
-							entry("@language", "language")
-					),
+					Map.ofEntries((Map.Entry<String, String>[])new Map.Entry[]{ Map.entry("@id", "id"), Map.entry(
+							"@value", "value"), Map.entry("@type", "type"), Map.entry("@language", "language") }),
 
 					statement(x, RDF.FIRST, literal("string", "en")),
 					statement(x, RDF.FIRST, literal("2020-09-10", XSD.DATE)))

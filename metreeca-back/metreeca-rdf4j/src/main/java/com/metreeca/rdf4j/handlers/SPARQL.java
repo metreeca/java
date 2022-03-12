@@ -31,10 +31,10 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static com.metreeca.core.Lambdas.guarded;
 import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
-import static com.metreeca.rest.Xtream.guarded;
 import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.handlers.Router.router;
 

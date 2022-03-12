@@ -32,6 +32,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Supplier;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Shape.exactly;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.statement;
@@ -41,7 +42,6 @@ import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.InternalServerError;
-import static com.metreeca.rest.Xtream.task;
 import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.handlers.Router.router;

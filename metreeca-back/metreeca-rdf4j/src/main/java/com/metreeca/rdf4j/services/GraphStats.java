@@ -31,17 +31,16 @@ import org.eclipse.rdf4j.query.BindingSet;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.is;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Scribe.indent;
 import static com.metreeca.rest.Scribe.text;
 import static com.metreeca.rest.Scribe.*;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Xtream.task;
 
 final class GraphStats extends GraphFacts {
 

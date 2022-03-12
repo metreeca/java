@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Toolbox.input;
-import static com.metreeca.rest.Xtream.entry;
 
 import static java.lang.Float.parseFloat;
 import static java.lang.Math.max;
@@ -80,7 +79,7 @@ public abstract class Format<V> {
 
 				final int tab=line.indexOf('\t');
 
-				return entry(line.substring(0, tab), line.substring(tab+1));
+				return Map.entry(line.substring(0, tab), line.substring(tab+1));
 
 			})
 

@@ -27,8 +27,6 @@ import java.io.*;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.metreeca.rest.Xtream.entry;
-import static com.metreeca.rest.Xtream.map;
 import static com.metreeca.rest.formats.MultipartFormat.multipart;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
@@ -181,10 +179,10 @@ final class MultipartFormatTest {
 			new Request().reply(response -> response
 
 					.status(Response.OK)
-					.body(multipart(), map(
-							entry("one", response.part("one").body(text(), "one")),
-							entry("two", response.part("two").body(text(), "two"))
-					))
+					.body(multipart(), Map.ofEntries((Map.Entry<String, Message<?>>[])new Map.Entry[]{ Map.entry("one",
+							response.part("one").body(text(), "one")), Map.entry("two",
+                            response.part("two").body(text(),
+							"two")) }))
 
 			).accept(response -> MessageAssert.assertThat(response)
 
@@ -203,7 +201,7 @@ final class MultipartFormatTest {
 
 							.status(Response.OK)
 							.header("Content-Type", "multipart/form-data; boundary=1234567890")
-							.body(multipart(), map())
+							.body(multipart(), Map.of())
 
 					)
 

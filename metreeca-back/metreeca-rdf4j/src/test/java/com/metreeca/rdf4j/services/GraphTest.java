@@ -37,13 +37,13 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.ValuesTest.Prefixes;
 import static com.metreeca.json.ValuesTest.decode;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Xtream.task;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
