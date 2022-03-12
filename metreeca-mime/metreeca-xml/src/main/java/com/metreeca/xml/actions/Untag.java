@@ -18,10 +18,14 @@ package com.metreeca.xml.actions;
 
 import org.w3c.dom.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.Locale;
 import java.util.function.Function;
 
 import static com.metreeca.rest.Xtream.normalize;
+import static com.metreeca.xml.formats.HTMLFormat.html;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * X/HTML to Markdown conversion.
@@ -30,140 +34,165 @@ import static com.metreeca.rest.Xtream.normalize;
  */
 public final class Untag implements Function<Node, String> {
 
-	@Override public String apply(final Node element) {
-		return element == null ? "" : new Builder().format(element).toString();
-	}
+
+    /**
+     * Converts an X/HTMl document to a markdown-based plain text representation.
+     *
+     * @param document the content of the X/HTML document
+     *
+     * @return the markdown-based plain text representation of {@code document} or the original {@code document} contents
+     * if unable to parse it as an X/HTML document
+     *
+     * @throws NullPointerException id {@code document } is {@code null}
+     */
+    public static String untag(final String document) {
+
+        if ( document == null ) {
+            throw new NullPointerException("null cocument");
+        }
+
+        return html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8.name(), "").fold(
+
+                error -> document, value -> new Untag().apply(value)
+
+        );
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static final class Builder {
-
-		private final StringBuilder builder=new StringBuilder(100);
+    @Override public String apply(final Node element) {
+        return element == null ? "" : new Builder().format(element).toString();
+    }
 
 
-		private Builder format(final NodeList nodes) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			for (int i=0, n=nodes.getLength(); i < n; ++i) {
-				format(nodes.item(i));
-			}
+    private static final class Builder {
 
-			return this;
-		}
-
-		private Builder format(final Node node) {
-			return node instanceof Document ? format((Document)node)
-					: node instanceof Element ? format((Element)node)
-					: node instanceof Text ? format((Text)node)
-					: this;
-		}
-
-		private Builder format(final Document document) {
-
-			document.normalize();
-
-			format(document.getDocumentElement());
-
-			return this;
-		}
-
-		private Builder format(final Element element) {
-			switch ( element.getTagName().toLowerCase(Locale.ROOT) ) {
-
-				case "h1":
-
-					return feed().append("# ").append(normalize(element.getTextContent()));
-
-				case "h2":
-
-					return feed().append("## ").append(normalize(element.getTextContent()));
-
-				case "h3":
-
-					return feed().append("### ").append(normalize(element.getTextContent()));
-
-				case "p":
-
-				case "ul":
-				case "ol":
-
-				case "div":
-				case "section":
-
-					return feed().format(element.getChildNodes());
-
-				case "li":
-
-					return wrap().append("- ").format(element.getChildNodes());
-
-				case "br":
-
-					return wrap();
-
-				case "hr":
-
-					return feed().append("---");
-
-				case "head":
-				case "style":
-				case "script":
-
-					return this;
-
-				default:
-
-					return format(element.getChildNodes());
-
-			}
-		}
-
-		private Builder format(final Text text) {
-
-			final String value=text.getNodeValue();
-			final boolean border=text.getPreviousSibling() == null || text.getNextSibling() == null;
-
-			if ( !(border && normalize(value).isEmpty()) ) {
-				builder.append(value);
-			}
-
-			return this;
-		}
+        private final StringBuilder builder=new StringBuilder(100);
 
 
-		private Builder append(final String string) {
+        private Builder format(final NodeList nodes) {
 
-			builder.append(string);
+            for (int i=0, n=nodes.getLength(); i < n; ++i) {
+                format(nodes.item(i));
+            }
 
-			return this;
-		}
+            return this;
+        }
 
-		private Builder feed() {
+        private Builder format(final Node node) {
+            return node instanceof Document ? format((Document)node)
+                    : node instanceof Element ? format((Element)node)
+                    : node instanceof Text ? format((Text)node)
+                    : this;
+        }
 
-			if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
-				builder.append('\n');
-			}
+        private Builder format(final Document document) {
 
-			if ( builder.length() > 2 && builder.charAt(builder.length()-2) != '\n' ) {
-				builder.append('\n');
-			}
+            document.normalize();
 
-			return this;
-		}
+            format(document.getDocumentElement());
 
-		private Builder wrap() {
+            return this;
+        }
 
-			if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
-				builder.append('\n');
-			}
+        private Builder format(final Element element) {
+            switch ( element.getTagName().toLowerCase(Locale.ROOT) ) {
 
-			return this;
-		}
+                case "h1":
+
+                    return feed().append("# ").append(normalize(element.getTextContent()));
+
+                case "h2":
+
+                    return feed().append("## ").append(normalize(element.getTextContent()));
+
+                case "h3":
+
+                    return feed().append("### ").append(normalize(element.getTextContent()));
+
+                case "p":
+
+                case "ul":
+                case "ol":
+
+                case "div":
+                case "section":
+
+                    return feed().format(element.getChildNodes());
+
+                case "li":
+
+                    return wrap().append("- ").format(element.getChildNodes());
+
+                case "br":
+
+                    return wrap();
+
+                case "hr":
+
+                    return feed().append("---");
+
+                case "head":
+                case "style":
+                case "script":
+
+                    return this;
+
+                default:
+
+                    return format(element.getChildNodes());
+
+            }
+        }
+
+        private Builder format(final Text text) {
+
+            final String value=text.getNodeValue();
+            final boolean border=text.getPreviousSibling() == null || text.getNextSibling() == null;
+
+            if ( !(border && normalize(value).isEmpty()) ) {
+                builder.append(value);
+            }
+
+            return this;
+        }
 
 
-		@Override public String toString() {
-			return builder.toString();
-		}
+        private Builder append(final String string) {
 
-	}
+            builder.append(string);
+
+            return this;
+        }
+
+        private Builder feed() {
+
+            if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
+                builder.append('\n');
+            }
+
+            if ( builder.length() > 2 && builder.charAt(builder.length()-2) != '\n' ) {
+                builder.append('\n');
+            }
+
+            return this;
+        }
+
+        private Builder wrap() {
+
+            if ( builder.length() > 1 && builder.charAt(builder.length()-1) != '\n' ) {
+                builder.append('\n');
+            }
+
+            return this;
+        }
+
+
+        @Override public String toString() {
+            return builder.toString();
+        }
+
+    }
 
 }
