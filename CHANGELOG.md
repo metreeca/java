@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unpublished](https://github.com/metreeca/base/compare/v1.0.2...HEAD)
+## [Unpublished](https://github.com/metreeca/java/compare/v1.0.2...HEAD)
 
 ### Changed
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSON / Frame formatting: now recursively formats nested frames
 
 
-## [1.0.2+20220112](https://github.com/metreeca/base/compare/v1.0.1...v1.0.2)
+## [1.0.2+20220112](https://github.com/metreeca/java/compare/v1.0.1...v1.0.2)
 
 This is a patch release fixing the following issues.
 
@@ -33,7 +33,7 @@ This is a patch release fixing the following issues.
 
 - Base / Broken version numbers in maven BOM
 
-## [1.0.1+20211228](https://github.com/metreeca/base/compare/v1.0.1...v0.55.0)
+## [1.0.1+20211228](https://github.com/metreeca/java/compare/v1.0.1...v0.55.0)
 
 This is a major release marking the initial public availability of the framework ;).
 
