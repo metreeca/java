@@ -306,17 +306,38 @@ public final class Request extends Message<Request> {
     //// Actor ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Retrieves the identifier of the request user.
+     * Retrieves the profile of the request user.
      *
-     * @return an optional identifier for the user performing this request or the empty optional if no user is
-     * authenticated
+     * @return an optional profile for the user performing this request or the empty optional if no user is authenticated
      */
-    public Optional<Object> user() { return Optional.ofNullable(user); }
+    public Optional<Object> user() {
+        return Optional.ofNullable(user);
+    }
 
     /**
-     * Configures the identifier of the request user.
+     * Retrieves the profile of the request user.
      *
-     * @param user an identifier for the user performing this request or {@code null} if no user is authenticated
+     * @param <T>  the expected profile type
+     * @param type the expected profile type
+     *
+     * @return an optional typed profile for the user performing this request or the empty optional if either no user is
+     * authenticated or the {@linkplain #user(Object) current profile} is not an instance of {@code type}
+     *
+     * @throws NullPointerException if {@code type} is null
+     */
+    public <T> Optional<T> user(final Class<T> type) {
+
+        if ( type == null ) {
+            throw new NullPointerException("null type");
+        }
+
+        return Optional.ofNullable(user).filter(type::isInstance).map(type::cast);
+    }
+
+    /**
+     * Configures the profile of the request user.
+     *
+     * @param user a profile for the user performing this request or {@code null} if no user is authenticated
      *
      * @return this request
      */

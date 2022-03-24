@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
+- REST / Add Request.profile(Class) typed user profile getter
 - REST / Add Xtream.scan() processing method
 - JSON / Extend JSONPath.Processor API with getters for JSON objects, arrays and nested processors
 - XML / Add Untag.untag(String) utility method 
