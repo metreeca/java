@@ -106,6 +106,38 @@ public final class Lambdas {
 
 
     /**
+     * Creates an unchecked runnable.
+     *
+     * @param runnable the checked runnable to be wrapped
+     *
+     * @return a runnable forwarding calls to {@code runnable} and wrapping any checked exception thrown in the process
+     * within a suitable unchecked exception
+     *
+     * @throws NullPointerException if {@code runnable} is null
+     */
+    public static Runnable checked(final CheckedRunnable runnable) {
+
+        if ( runnable == null ) {
+            throw new NullPointerException("null runnable");
+        }
+
+        return () -> {
+            try {
+
+                runnable.run();
+
+            } catch ( final IOException e ) {
+
+                throw new UncheckedIOException(e);
+
+            } catch ( final Exception e ) {
+
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    /**
      * Creates an unchecked supplier.
      *
      * @param supplier the checked supplier to be wrapped
@@ -212,6 +244,15 @@ public final class Lambdas {
 
 
     //// Checked Lambdas ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * A {@link Runnable} throwing checked exceptions.
+     */
+    @FunctionalInterface public static interface CheckedRunnable {
+
+        public void run() throws Exception;
+
+    }
 
     /**
      * A {@link Supplier} throwing checked exceptions.
