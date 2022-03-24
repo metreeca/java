@@ -98,7 +98,7 @@ public final class JSONLDFormat extends Format<Frame> {
 	/**
 	 * Decodes a shape-based query.
 	 *
-	 * @param focus the target IRI fr the decoding process; relative IRIs will be resolved against it
+	 * @param focus the target IRI for the decoding process; relative IRIs will be resolved against it
 	 * @param shape the base shape for the decoded query
 	 * @param query the query to be decoded
 	 *
@@ -133,6 +133,130 @@ public final class JSONLDFormat extends Format<Frame> {
 			return Left(status(UnprocessableEntity, e));
 
 		}
+	}
+
+
+	/**
+	 * Decodes a shape-based JSON-LD entity.
+	 *
+	 * @param focus    the target IRI for the decoding process; relative IRIs will be resolved against it
+	 * @param shape    the expected shape for the JSON-LD entity
+	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+	 * @param json     the JSON-LD entity to be decoded
+	 *
+	 * @return an RDF representation of the decoded {@code entity}
+	 *
+	 * @throws NullPointerException if any parameter is null or contains null values
+	 */
+	public static Collection<Statement> decode(
+			final IRI focus, final Shape shape, final Map<String, String> keywords,
+			final JsonObject json
+	) {
+
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
+		}
+
+		if ( shape == null ) {
+			throw new NullPointerException("null shape");
+		}
+
+		if ( keywords == null
+				|| keywords.keySet().stream().anyMatch(Objects::isNull)
+				|| keywords.values().stream().anyMatch(Objects::isNull)
+		) {
+			throw new NullPointerException("null keywords");
+		}
+
+		if ( json == null ) {
+			throw new NullPointerException("null json");
+		}
+
+		return new JSONLDDecoder(
+
+				focus,
+				shape,
+				keywords
+
+		).decode(json);
+
+	}
+
+	/**
+	 * Encodes a shape-based JSON-LD entity.
+	 *
+	 * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
+	 * @param shape    the target shape for the entity to be encoded
+	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+	 * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
+	 *
+	 * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
+	 *
+	 * @throws NullPointerException if any parameter is null or contains null values
+	 */
+	public static JsonObject encode(
+			final IRI focus, final Shape shape, final Map<String, String> keywords,
+			final Collection<Statement> model
+	) {
+
+		if ( focus == null ) {
+			throw new NullPointerException("null focus");
+		}
+
+		if ( shape == null ) {
+			throw new NullPointerException("null shape");
+		}
+
+		if ( keywords == null
+				|| keywords.keySet().stream().anyMatch(Objects::isNull)
+				|| keywords.values().stream().anyMatch(Objects::isNull)
+		) {
+			throw new NullPointerException("null keywords");
+		}
+
+		if ( model == null ) {
+			throw new NullPointerException("null model");
+		}
+
+		return new JSONLDEncoder(
+
+				focus,
+				shape,
+				keywords,
+				false
+
+		).encode(model);
+
+	}
+
+	/**
+	 * Encodes a shape-based JSON-LD entity.
+	 *
+	 * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
+	 * @param shape    the target shape for the entity to be encoded
+	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+	 * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
+	 * @param context  a flag declaring if the JSON-LD {@code @context} should be included in the generated description
+	 *
+	 * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
+	 *
+	 * @throws NullPointerException if any parameter is null or contains null values
+	 */
+	public static JsonObject encode(
+			final IRI focus, final Shape shape, final Map<String, String> keywords,
+			final Collection<Statement> model,
+			final boolean context
+	) {
+
+		return new JSONLDEncoder(
+
+				focus,
+				shape,
+				keywords,
+				context
+
+		).encode(model);
+
 	}
 
 
@@ -211,13 +335,7 @@ public final class JSONLDFormat extends Format<Frame> {
 						final Shape shape=message.get(shape());
 						final Map<String, String> keywords=service(keywords());
 
-						final Collection<Statement> model=new JSONLDDecoder(
-
-								focus,
-								shape,
-								keywords
-
-						).decode(jsonReader.readObject());
+						final Collection<Statement> model=decode(focus, shape, keywords, jsonReader.readObject());
 
 						return validate(focus, shape, model).fold(
 
@@ -324,14 +442,14 @@ public final class JSONLDFormat extends Format<Frame> {
 							final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
 					) {
 
-						jsonWriter.writeObject(new JSONLDEncoder(
 
+						jsonWriter.writeObject(encode(
 								iri(item),
 								shape.localize(langs),
-								service(keywords()),
+								service(keywords()), validated,
 								mime.equals(MIME) // include context objects for application/ld+json
+						));
 
-						).encode(validated));
 
 					} catch ( final IOException e ) {
 
