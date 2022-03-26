@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.Toolbox.service;
@@ -252,17 +251,19 @@ public final class Publisher extends Delegator {
                 .or(() -> content(request, root, request.path()))
                 .or(() -> fallback(request, root))
 
-                .orElseGet(() -> request.reply(status(NotFound)));
+                .orElseGet(() -> request.reply(NotFound));
     }
 
 
     private Optional<Response> development(final Request request) {
-        return request.header("Host").filter(host -> host.startsWith("localhost:")).map(host -> request
+        return request.header("Host")
 
-                .reply(response -> fetcher.apply(new Request()
+                .filter(host -> Stream.of("localhost:", "127.0.0.1:").anyMatch(host::startsWith))
+
+                .map(host -> new Request()
 
                         .method(request.method())
-                        .base(format("http://%s/", host))
+                        .base(request.base())
                         .path("/index.html")
 
                         .headers(request.headers())
@@ -272,14 +273,14 @@ public final class Publisher extends Delegator {
                         .header("If-None-Match", "")
                         .header("If-Modified-Since", "")
 
-                ))
+                        .map(fetcher)
 
-                .map(response -> response.body(data()).fold(
-                        error -> { throw error; },
-                        value -> response.body(data(), value)
-                ))
+                        .map(response -> response.body(data()).fold(
+                                error -> { throw error; },
+                                value -> response.body(data(), value)
+                        ))
 
-        );
+                );
     }
 
     private Optional<Response> content(final Request request, final Path root, final String path) {
