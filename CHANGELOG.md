@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- REST / Factor query string utilities to Identifiers
 - Core / Factor common definitions and utilities to a dedicated module
 - Text / Factor text processing utilities to a dedicated module
 

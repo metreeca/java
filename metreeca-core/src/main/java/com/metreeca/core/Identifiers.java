@@ -6,13 +6,17 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Map.entry;
 import static java.util.UUID.nameUUIDFromBytes;
 import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.joining;
 
 /**
  * Identifier utilities.
@@ -239,6 +243,76 @@ public final class Identifiers {
         } catch ( final UnsupportedEncodingException unexpected ) {
             throw new UncheckedIOException(unexpected);
         }
+    }
+
+
+    /**
+     * Converts a parameter map into a query string.
+     *
+     * @param parameters the parameter map to be converted
+     *
+     * @return a query string built from {@code parameters}
+     *
+     * @throws NullPointerException if {@code parameters} is null or contains null values
+     */
+    public static String query(final Map<String, List<String>> parameters) {
+
+        if ( parameters == null || parameters.entrySet().stream().anyMatch(entry ->
+                entry.getKey() == null || entry.getValue() == null || entry.getValue().stream().anyMatch(Objects::isNull)
+        ) ) {
+            throw new NullPointerException("null parameters");
+        }
+
+        return parameters.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream().map(value -> entry(entry.getKey(), value)))
+                .map(p -> format("%s=%s", encode(p.getKey()), encode(p.getValue())))
+                .collect(joining("&"));
+    }
+
+    /**
+     * Converts a query string into a parameter map.
+     *
+     * @param query the query string to be converted
+     *
+     * @return a parameter map parsed from {@code query}
+     *
+     * @throws NullPointerException if {@code query} is null
+     */
+    public static Map<String, List<String>> parameters(final String query) {
+
+        if ( query == null ) {
+            throw new NullPointerException("null query");
+        }
+
+        final Map<String, List<String>> parameters=new LinkedHashMap<>();
+
+        final int length=query.length();
+
+        for (int head=0, tail; head < length; head=tail+1) {
+
+            final int equal=query.indexOf('=', head);
+            final int ampersand=query.indexOf('&', head);
+
+            tail=(ampersand >= 0) ? ampersand : length;
+
+            final boolean split=equal >= 0 && equal < tail;
+
+            final String label=URLDecoder.decode(query.substring(head, split ? equal : tail), UTF_8);
+            final String value=URLDecoder.decode(query.substring(split ? equal+1 : tail, tail), UTF_8);
+
+            parameters.compute(label, (name, values) -> {
+
+                final List<String> strings=(values != null) ? values : new ArrayList<>();
+
+                strings.add(value);
+
+                return strings;
+
+            });
+
+        }
+
+        return parameters;
     }
 
 

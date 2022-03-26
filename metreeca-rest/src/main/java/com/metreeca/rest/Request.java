@@ -16,11 +16,6 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.json.Values;
-
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -61,55 +56,13 @@ public final class Request extends Message<Request> {
     ));
 
 
-    public static Map<String, List<String>> search(final String query) {
-
-        if ( query == null ) {
-            throw new NullPointerException("null query");
-        }
-
-        final Map<String, List<String>> parameters=new LinkedHashMap<>();
-
-        final int length=query.length();
-
-        for (int head=0, tail; head < length; head=tail+1) {
-            try {
-
-                final int equal=query.indexOf('=', head);
-                final int ampersand=query.indexOf('&', head);
-
-                tail=(ampersand >= 0) ? ampersand : length;
-
-                final boolean split=equal >= 0 && equal < tail;
-
-                final String label=URLDecoder.decode(query.substring(head, split ? equal : tail), "UTF-8");
-                final String value=URLDecoder.decode(query.substring(split ? equal+1 : tail, tail), "UTF-8");
-
-                parameters.compute(label, (name, values) -> {
-
-                    final List<String> strings=(values != null) ? values : new ArrayList<>();
-
-                    strings.add(value);
-
-                    return strings;
-
-                });
-
-            } catch ( final UnsupportedEncodingException unexpected ) {
-                throw new UncheckedIOException(unexpected);
-            }
-        }
-
-        return parameters;
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Object user;
     private Set<Object> roles=emptySet();
 
     private String method=GET;
-    private String base=Values.Base;
+    private String base="app:/";
     private String path="/";
     private String item=base;
     private String query="";

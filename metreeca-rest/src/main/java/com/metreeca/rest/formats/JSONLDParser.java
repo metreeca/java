@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import javax.json.*;
 
 import static com.metreeca.core.Identifiers.decode;
+import static com.metreeca.core.Identifiers.parameters;
 import static com.metreeca.json.Order.decreasing;
 import static com.metreeca.json.Order.increasing;
 import static com.metreeca.json.Values.format;
@@ -42,7 +43,6 @@ import static com.metreeca.json.shapes.And.and;
 import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Field.labels;
 import static com.metreeca.json.shapes.Link.link;
-import static com.metreeca.rest.Request.search;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;
@@ -126,7 +126,7 @@ final class JSONLDParser {
 
 
 	private Query form(final String query) {
-		return json(Json.createObjectBuilder(search(query).entrySet().stream()
+		return json(Json.createObjectBuilder(parameters(query).entrySet().stream()
 
 				.collect(toMap(Map.Entry::getKey, this::value))
 

@@ -23,8 +23,10 @@ import com.metreeca.rest.services.Logger;
 
 import java.util.regex.Pattern;
 
+import static com.metreeca.core.Identifiers.parameters;
 import static com.metreeca.rest.MessageException.status;
-import static com.metreeca.rest.Request.*;
+import static com.metreeca.rest.Request.GET;
+import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.TextFormat.text;
@@ -102,7 +104,7 @@ public final class Server implements Wrapper {
 
 	private Request query(final Request request) { // parse parameters from query string, if not already set
 		return request.parameters().isEmpty() && request.method().equals(GET)
-				? request.parameters(search(request.query()))
+				? request.parameters(parameters(request.query()))
 				: request;
 	}
 
@@ -110,7 +112,7 @@ public final class Server implements Wrapper {
 		return request.parameters().isEmpty()
 				&& request.method().equals(POST)
 				&& URLEncodedPattern.matcher(request.header("Content-Type").orElse("")).lookingAt()
-				? request.parameters(search(request.body(text()).fold(e -> "", identity()))) // !!! error handling?
+				? request.parameters(parameters(request.body(text()).fold(e -> "", identity()))) // !!! error handling?
 				: request;
 	}
 
