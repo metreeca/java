@@ -31,7 +31,6 @@ import static com.metreeca.core.Lambdas.checked;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.handlers.Router.router;
 
@@ -206,8 +205,6 @@ public final class Publisher extends Handler.Base {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private String fallback="";
-
     private final URLFetcher fetcher=new URLFetcher();
 
 
@@ -221,70 +218,10 @@ public final class Publisher extends Handler.Base {
     }
 
 
-    /**
-     * Configures the fallback path.
-     *
-     * @param path the path of the resource to be served for {@linkplain Request#route() route} requests that don't match
-     *             any available resource path; ignored if empty
-     *
-     * @return this publisher
-     *
-     * @throws NullPointerException if {@code path} is null
-     */
-    public Publisher fallback(final String path) {
-
-        if ( path == null ) {
-            throw new NullPointerException("null path");
-        }
-
-        this.fallback=path;
-
-        return this;
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Response handle(final Request request, final Path root) {
-        return development(request)
-
-                .or(() -> content(request, root, request.path()))
-                .or(() -> fallback(request, root))
-
-                .orElseGet(() -> request.reply(NotFound));
-    }
-
-
-    private Optional<Response> development(final Request request) {
-        return request.header("Host")
-
-                .filter(host -> Stream.of("localhost:", "127.0.0.1:").anyMatch(host::startsWith))
-
-                .map(host -> new Request()
-
-                        .method(request.method())
-                        .base(request.base())
-                        .path("/index.html")
-
-                        .headers(request.headers())
-
-                        // disable conditional requests
-
-                        .header("If-None-Match", "")
-                        .header("If-Modified-Since", "")
-
-                        .map(fetcher)
-
-                        .map(response -> response.body(data()).fold(
-                                error -> { throw error; },
-                                value -> response.body(data(), value)
-                        ))
-
-                );
-    }
-
-    private Optional<Response> content(final Request request, final Path root, final String path) {
-        return variants(path)
+        return variants(request.path())
 
                 .map(variant -> root.getRoot().relativize(root.getFileSystem().getPath(variant)))
                 .map(root::resolve)
@@ -317,13 +254,9 @@ public final class Publisher extends Handler.Base {
                             .header("ETag", etag)
                             .body(output(), checked(output -> { Files.copy(file, output); }));
 
-                })));
-    }
+                })))
 
-    private Optional<Response> fallback(final Request request, final Path root) {
-        return request.route() && !fallback.isEmpty()
-                ? content(request, root, fallback)
-                : Optional.empty();
+                .orElseGet(() -> request.reply(NotFound));
     }
 
 }
