@@ -21,6 +21,8 @@ import com.metreeca.rest.formats.JSONFormat;
 import com.metreeca.rest.formats.TextFormat;
 import com.metreeca.rest.services.Logger;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.parameters;
@@ -45,105 +47,136 @@ import static java.util.function.Function.identity;
  */
 public final class Server implements Wrapper {
 
-	private static final Pattern TextualPattern=Pattern.compile(TextFormat.MIMEPattern+"|"+JSONFormat.MIMEPattern);
-	private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
+    private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
+    private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
+
+    private static final Pattern TextualPattern=Pattern.compile(TextFormat.MIMEPattern+"|"+JSONFormat.MIMEPattern);
+    private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
 
 
-	/**
-	 * Creates an API server.
-	 *
-	 * @return a new API server
-	 */
-	public static Server server() {
-		return new Server();
-	}
+    /**
+     * Creates an API server.
+     *
+     * @return a new API server
+     */
+    public static Server server() {
+        return new Server();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Logger logger=service(logger());
+    private final Logger logger=service(logger());
 
-	private Server() {}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Handler wrap(final Handler handler) {
-
-		if ( handler == null ) {
-			throw new NullPointerException("null handler");
-		}
-
-		return request -> {
-			try {
-
-				return request
-
-						.map(this::query)
-						.map(this::form)
-
-						.map(handler::handle)
-
-						.map(this::logging)
-						.map(this::charset);
-
-			} catch ( final RuntimeException e ) { // try to send a new response
-
-				return request
-
-						.reply(status(InternalServerError, e))
-
-						.map(this::logging);
-
-			}
-		};
-	}
+    private Server() { }
 
 
-	//// Pre-Processing ///////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Request query(final Request request) { // parse parameters from query string, if not already set
-		return request.parameters().isEmpty() && request.method().equals(GET)
-				? request.parameters(parameters(request.query()))
-				: request;
-	}
+    @Override public Handler wrap(final Handler handler) {
 
-	private Request form(final Request request) { // parse parameters from encoded form body, ignoring charset
-		return request.parameters().isEmpty()
-				&& request.method().equals(POST)
-				&& URLEncodedPattern.matcher(request.header("Content-Type").orElse("")).lookingAt()
-				? request.parameters(parameters(request.body(text()).fold(e -> "", identity()))) // !!! error handling?
-				: request;
-	}
+        if ( handler == null ) {
+            throw new NullPointerException("null handler");
+        }
+
+        return request -> {
+            try {
+
+                return request
+
+                        .map(this::base)
+                        .map(this::query)
+                        .map(this::form)
+
+                        .map(handler::handle)
+
+                        .map(this::logging)
+                        .map(this::charset);
+
+            } catch ( final RuntimeException e ) { // try to send a new response
+
+                return request
+
+                        .reply(status(InternalServerError, e))
+
+                        .map(this::logging);
+
+            }
+        };
+    }
 
 
-	//// Post-Processing //////////////////////////////////////////////////////////////////////////////////////////////
+    //// Pre-Processing ///////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Response logging(final Response response) { // log request outcome
+    private Request base(final Request request) { // reconstruct public base from proxy forward headers
 
-		final Request request=response.request();
-		final String method=request.method();
-		final String item=request.item();
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded
 
-		final int status=response.status();
-		final Throwable cause=response.cause().orElse(null);
+        final Optional<String> proto=request.header("Forwarded")
 
-		final Logger.Level level=(status < 400) ? info
-				: (status < 500) ? warning
-				: error;
+                .map(ProtoPattern::matcher)
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group("proto"))
 
-		logger.entry(level, this, () -> format("%s %s > %d", method, item, status), cause);
+                .or(() -> request.header("X-Forwarded-Proto"));
 
-		return response;
-	}
+        final Optional<String> host=request.header("Forwarded")
 
-	private Response charset(final Response response) { // ;( prevent the container from adding its default charset…
+                .map(HostPattern::matcher)
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group("host"))
 
-		response.header("Content-Type")
-				.filter(type -> TextualPattern.matcher(type).matches()) // textual content with no charset
-				.ifPresent(type -> response.header("Content-Type", type+"; charset=UTF-8"));
+                .or(() -> request.header("X-Forwarded-Host"));
 
-		return response;
-	}
+        return proto
+
+                .flatMap(_proto -> host.map(_host -> request.base(format("%s://%s/", _proto, _host))))
+
+                .orElse(request);
+    }
+
+    private Request query(final Request request) { // parse parameters from query string, if not already set
+        return request.parameters().isEmpty() && request.method().equals(GET)
+                ? request.parameters(parameters(request.query()))
+                : request;
+    }
+
+    private Request form(final Request request) { // parse parameters from encoded form body, ignoring charset
+        return request.parameters().isEmpty()
+                && request.method().equals(POST)
+                && URLEncodedPattern.matcher(request.header("Content-Type").orElse("")).lookingAt()
+                ? request.parameters(parameters(request.body(text()).fold(e -> "", identity()))) // !!! error handling?
+                : request;
+    }
+
+
+    //// Post-Processing //////////////////////////////////////////////////////////////////////////////////////////////
+
+    private Response logging(final Response response) { // log request outcome
+
+        final Request request=response.request();
+        final String method=request.method();
+        final String item=request.item();
+
+        final int status=response.status();
+        final Throwable cause=response.cause().orElse(null);
+
+        final Logger.Level level=(status < 400) ? info
+                : (status < 500) ? warning
+                : error;
+
+        logger.entry(level, this, () -> format("%s %s > %d", method, item, status), cause);
+
+        return response;
+    }
+
+    private Response charset(final Response response) { // ;( prevent the container from adding its default charset…
+
+        response.header("Content-Type")
+                .filter(type -> TextualPattern.matcher(type).matches()) // textual content with no charset
+                .ifPresent(type -> response.header("Content-Type", type+"; charset=UTF-8"));
+
+        return response;
+    }
 
 }

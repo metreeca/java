@@ -19,8 +19,7 @@ package com.metreeca.jse;
 import com.metreeca.rest.*;
 import com.metreeca.rest.services.Logger;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -62,291 +61,290 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class JSEServer {
 
-	private static final String DefaultHost="localhost";
-	private static final int DefaultPort=8080;
+    private static final String DefaultHost="localhost";
+    private static final int DefaultPort=8080;
 
-	private static final Pattern ContextPattern=Pattern.compile(
-			"(?<base>(?:\\w+://[^/?#]*)?)(?<path>.*)"
-	);
+    private static final Pattern ContextPattern=Pattern.compile(
+            "(?<base>(?:\\w+://[^/?#]*)?)(?<path>.*)"
+    );
 
-	private static final Pattern AddressPattern=Pattern.compile(
-			"(?<host>^|[-+._a-zA-Z0-9]*[-+._a-zA-Z][-+._a-zA-Z0-9]*)(?:^:?|:)(?<port>\\d{1,4}|$)"
-	);
+    private static final Pattern AddressPattern=Pattern.compile(
+            "(?<host>^|[-+._a-zA-Z0-9]*[-+._a-zA-Z][-+._a-zA-Z0-9]*)(?:^:?|:)(?<port>\\d{1,4}|$)"
+    );
 
 
-	private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
+    private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private InetSocketAddress address=new InetSocketAddress(DefaultHost, DefaultPort);
+    private InetSocketAddress address=new InetSocketAddress(DefaultHost, DefaultPort);
 
-	private String base="";
-	private String path="/";
+    private String base="";
+    private String path="/";
 
-	private final int backlog=128;
-	private final int delay=0;
+    private final int backlog=128;
+    private final int delay=0;
 
-	private final Toolbox toolbox=new Toolbox();
+    private final Toolbox toolbox=new Toolbox();
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Configures the socket address.
-	 *
-	 * @param address the socket address to listen to; must match one of the following formats: {@code <host>:<port>},
-	 *                {@code <host>}, {@code <port>}
-	 *
-	 * @return this server
-	 *
-	 * @throws NullPointerException     if {@code address} is null
-	 * @throws IllegalArgumentException if {@code address} is malformed
-	 */
-	public JSEServer address(final String address) {
+    /**
+     * Configures the socket address.
+     *
+     * @param address the socket address to listen to; must match one of the following formats: {@code <host>:<port>},
+     *                {@code <host>}, {@code <port>}
+     *
+     * @return this server
+     *
+     * @throws NullPointerException     if {@code address} is null
+     * @throws IllegalArgumentException if {@code address} is malformed
+     */
+    public JSEServer address(final String address) {
 
-		if ( address == null ) {
-			throw new NullPointerException("null address");
-		}
+        if ( address == null ) {
+            throw new NullPointerException("null address");
+        }
 
-		final Matcher matcher=AddressPattern.matcher(address);
+        final Matcher matcher=AddressPattern.matcher(address);
 
-		if ( !matcher.matches() ) {
-			throw new IllegalArgumentException(format("malformed address <%s>", address));
-		}
+        if ( !matcher.matches() ) {
+            throw new IllegalArgumentException(format("malformed address <%s>", address));
+        }
 
-		this.address=new InetSocketAddress(
+        this.address=new InetSocketAddress(
 
-				Optional
-						.of(matcher.group("host"))
-						.filter(host -> !host.isEmpty())
-						.orElse(DefaultHost),
+                Optional
+                        .of(matcher.group("host"))
+                        .filter(host -> !host.isEmpty())
+                        .orElse(DefaultHost),
 
-				Optional
-						.of(matcher.group("port"))
-						.filter(port -> !port.isEmpty())
-						.map(Integer::valueOf)
-						.orElse(DefaultPort)
+                Optional
+                        .of(matcher.group("port"))
+                        .filter(port -> !port.isEmpty())
+                        .map(Integer::valueOf)
+                        .orElse(DefaultPort)
 
-		);
+        );
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Configures the socket address.
-	 *
-	 * @param address the socket address to listen to
-	 *
-	 * @return this server
-	 *
-	 * @throws NullPointerException if {@code address} is null
-	 */
-	public JSEServer address(final InetSocketAddress address) {
+    /**
+     * Configures the socket address.
+     *
+     * @param address the socket address to listen to
+     *
+     * @return this server
+     *
+     * @throws NullPointerException if {@code address} is null
+     */
+    public JSEServer address(final InetSocketAddress address) {
 
-		if ( address == null ) {
-			throw new NullPointerException("null address");
-		}
+        if ( address == null ) {
+            throw new NullPointerException("null address");
+        }
 
-		this.address=address;
+        this.address=address;
 
-		return this;
-	}
+        return this;
+    }
 
 
-	/**
-	 * Configures the context.
-	 *
-	 * @param context the context IRI for the root resource of this server; accepts root-relative paths
-	 *
-	 * @return this server
-	 *
-	 * @throws NullPointerException     if {@code context} is null
-	 * @throws IllegalArgumentException if {@code context} is malformed
-	 */
-	public JSEServer context(final String context) {
+    /**
+     * Configures the context.
+     *
+     * @param context the context IRI for the root resource of this server; accepts root-relative paths
+     *
+     * @return this server
+     *
+     * @throws NullPointerException     if {@code context} is null
+     * @throws IllegalArgumentException if {@code context} is malformed
+     */
+    public JSEServer context(final String context) {
 
-		if ( context == null ) {
-			throw new NullPointerException("null context");
-		}
+        if ( context == null ) {
+            throw new NullPointerException("null context");
+        }
 
-		final Matcher matcher=ContextPattern.matcher(context);
+        final Matcher matcher=ContextPattern.matcher(context);
 
-		if ( !matcher.matches() ) {
-			throw new IllegalArgumentException(format("malformed context IRI <%s>", context));
-		}
+        if ( !matcher.matches() ) {
+            throw new IllegalArgumentException(format("malformed context IRI <%s>", context));
+        }
 
-		this.base=matcher.group("base");
+        this.base=matcher.group("base");
 
-		this.path=Optional
-				.of(matcher.group("path"))
-				.map(p -> p.startsWith("/") ? p : "/"+p)
-				.map(p -> p.endsWith("/") ? p : p+"/")
-				.get();
+        this.path=Optional
+                .of(matcher.group("path"))
+                .map(p -> p.startsWith("/") ? p : "/"+p)
+                .map(p -> p.endsWith("/") ? p : p+"/")
+                .get();
 
-		return this;
-	}
+        return this;
+    }
 
 
-	/**
-	 * Configures the delegate handler factory.
-	 *
-	 * @param factory the delegate handler factory; takes as argument a shared service manager (which may configured
-	 *                   with
-	 *                additional application-specific services as a side effect) and must return a non-null handler
-	 *                to be
-	 *                used as entry point for serving requests
-	 *
-	 * @return this server
-	 *
-	 * @throws NullPointerException if {@code factory} is null or returns a null value
-	 */
-	public JSEServer delegate(final Function<Toolbox, Handler> factory) {
+    /**
+     * Configures the delegate handler factory.
+     *
+     * @param factory the delegate handler factory; takes as argument a shared service manager (which may configured with
+     *                additional application-specific services as a side effect) and must return a non-null handler to be
+     *                used as entry point for serving requests
+     *
+     * @return this server
+     *
+     * @throws NullPointerException if {@code factory} is null or returns a null value
+     */
+    public JSEServer delegate(final Function<Toolbox, Handler> factory) {
 
-		if ( factory == null ) {
-			throw new NullPointerException("null handler factory");
-		}
+        if ( factory == null ) {
+            throw new NullPointerException("null handler factory");
+        }
 
-		toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
+        toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
 
-		return this;
-	}
+        return this;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void start() {
-		try {
+    public void start() {
+        try {
 
-			final Handler handler=toolbox.get(delegate());
-			final Logger logger=toolbox.get(logger());
+            final Handler handler=toolbox.get(delegate());
+            final Logger logger=toolbox.get(logger());
 
-			final HttpServer server=HttpServer.create(address, backlog);
+            final HttpServer server=HttpServer.create(address, backlog);
 
-			server.setExecutor(Executors.newCachedThreadPool());
+            server.setExecutor(Executors.newCachedThreadPool());
 
-			server.createContext(path, exchange -> {
-				try {
+            server.createContext(path, exchange -> {
+                try {
 
-					toolbox.exec(() -> handler.handle(request(exchange))
-							.map(response -> response.status() > 0 ? response : response.status(NotFound))
-							.accept(response -> response(exchange, response))
-					);
+                    toolbox.exec(() -> handler.handle(request(exchange))
+                            .map(response -> response.status() > 0 ? response : response.status(NotFound))
+                            .accept(response -> response(exchange, response))
+                    );
 
-				} catch ( final RuntimeException e ) {
+                } catch ( final RuntimeException e ) {
 
-					if ( !e.toString().toLowerCase(Locale.ROOT).contains("broken pipe") ) {
-						logger.error(this, "unhandled exception", e);
-					}
+                    if ( !e.toString().toLowerCase(Locale.ROOT).contains("broken pipe") ) {
+                        logger.error(this, "unhandled exception", e);
+                    }
 
-				}
-			});
+                }
+            });
 
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 
-				logger.info(this, "server stopping");
+                logger.info(this, "server stopping");
 
-				try { server.stop(delay); } catch ( final RuntimeException e ) {
-					logger.error(this, "unhandled exception while stopping server", e);
-				}
+                try { server.stop(delay); } catch ( final RuntimeException e ) {
+                    logger.error(this, "unhandled exception while stopping server", e);
+                }
 
-				try { toolbox.clear(); } catch ( final RuntimeException e ) {
-					logger.error(this, "unhandled exception while releasing resources", e);
-				}
+                try { toolbox.clear(); } catch ( final RuntimeException e ) {
+                    logger.error(this, "unhandled exception while releasing resources", e);
+                }
 
-				logger.info(this, "server stopped");
+                logger.info(this, "server stopped");
 
-			}));
+            }));
 
-			logger.info(this, "server starting");
+            logger.info(this, "server starting");
 
-			server.start();
+            server.start();
 
-			logger.info(this, format("server listening at <http://%s:%d%s>",
-					address.getHostString(), address.getPort(), path
-			));
+            logger.info(this, format("server listening at <http://%s:%d%s>",
+                    address.getHostString(), address.getPort(), path
+            ));
 
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Request request(final HttpExchange exchange) {
+    private Request request(final HttpExchange exchange) {
 
-		final URI uri=exchange.getRequestURI();
+        final String origin=format("http://%s:%d", // !!! protocol?
+                exchange.getLocalAddress().getHostString(),
+                exchange.getLocalAddress().getPort()
+        );
 
-		return new Request()
+        final URI uri=exchange.getRequestURI();
+        final Headers headers=exchange.getRequestHeaders();
 
-				.method(exchange.getRequestMethod())
+        return new Request()
 
-				.base((base.isEmpty() ? format("http://%s",
+                .method(exchange.getRequestMethod())
 
-						Optional.ofNullable(exchange.getRequestHeaders().getFirst("Host")).orElse(DefaultHost)
+                .base((base.isEmpty() ? origin : base)+path)
+                .path(Optional.ofNullable(uri.getPath()).orElse("/").substring(path.length()-1))
 
-				) : base)+path)
+                .query(Optional.ofNullable(uri.getRawQuery()).orElse(""))
 
-				.path(Optional.ofNullable(uri.getPath()).orElse("/").substring(path.length()-1))
+                .headers(headers.entrySet().stream() // ;( possibly null header names…
+                        .filter(entry -> nonNull(entry.getKey()) && nonNull(entry.getValue()))
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+                )
 
-				.query(Optional.ofNullable(uri.getRawQuery()).orElse(""))
+                .body(input(), exchange::getRequestBody);
+    }
 
-				.headers(exchange.getRequestHeaders().entrySet().stream() // ;( possibly null header names…
-						.filter(entry -> nonNull(entry.getKey()) && nonNull(entry.getValue()))
-						.collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
-				)
+    private void response(final HttpExchange exchange, final Response response) {
+        try {
 
-				.body(input(), exchange::getRequestBody);
-	}
+            response.headers().entrySet().stream() // Content-Length is generated by server
+                    .filter(entry -> !entry.getKey().equalsIgnoreCase("Content-Length"))
+                    .forEachOrdered(entry -> exchange.getResponseHeaders().put(entry.getKey(), entry.getValue()));
 
-	private void response(final HttpExchange exchange, final Response response) {
-		try {
+            response.body(output()).accept(
 
-			response.headers().entrySet().stream() // Content-Length is generated by server
-					.filter(entry -> !entry.getKey().equalsIgnoreCase("Content-Length"))
-					.forEachOrdered(entry -> exchange.getResponseHeaders().put(entry.getKey(), entry.getValue()));
+                    error -> {
+                        try {
 
-			response.body(output()).accept(
+                            final int status=error.getStatus() == 0  // undefined output body
+                                    ? response.status()  // return response status
+                                    : error.getStatus(); // return error status
 
-					error -> {
-						try {
+                            exchange.sendResponseHeaders(status, -1L); // no output
 
-							final int status=error.getStatus() == 0  // undefined output body
-									? response.status()  // return response status
-									: error.getStatus(); // return error status
+                        } catch ( final IOException e ) {
+                            throw new UncheckedIOException(e);
+                        }
+                    },
 
-							exchange.sendResponseHeaders(status, -1L); // no output
+                    value -> {
+                        try ( final OutputStream output=exchange.getResponseBody() ) {
 
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					},
+                            final long length=exchange.getRequestMethod().equals(HEAD) ? -1L : response
+                                    .header("Content-Length")
+                                    .map(guarded(Long::parseUnsignedLong))
+                                    .orElse(0L); // chunked transfer
 
-					value -> {
-						try ( final OutputStream output=exchange.getResponseBody() ) {
+                            exchange.sendResponseHeaders(response.status(), length);
 
-							final long length=exchange.getRequestMethod().equals(HEAD) ? -1L : response
-									.header("Content-Length")
-									.map(guarded(Long::parseUnsignedLong))
-									.orElse(0L); // chunked transfer
+                            value.accept(output);
 
-							exchange.sendResponseHeaders(response.status(), length);
+                        } catch ( final IOException e ) {
+                            throw new UncheckedIOException(e);
+                        }
+                    }
 
-							value.accept(output);
+            );
 
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					}
+        } finally {
 
-			);
+            exchange.close();
 
-		} finally {
-
-			exchange.close();
-
-		}
-	}
+        }
+    }
 
 }
