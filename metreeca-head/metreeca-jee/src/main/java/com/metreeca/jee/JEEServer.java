@@ -38,7 +38,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.list;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 
 
 /**
@@ -60,7 +59,7 @@ import static java.util.function.Function.identity;
  */
 public abstract class JEEServer implements Filter {
 
-	private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
+	private static Supplier<Handler> delegate() { return () -> Request::reply; }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +92,7 @@ public abstract class JEEServer implements Filter {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public void init(final FilterConfig config) {
 
@@ -239,7 +238,7 @@ public abstract class JEEServer implements Filter {
 					values.forEach(value -> http.addHeader(name, value))
 			);
 
-			response.body(output()).accept(e -> {}, target -> { // ignore missing response bodies
+			response.body(output()).accept(e -> { }, target -> { // ignore missing response bodies
 				try {
 
 					target.accept(http.getOutputStream());

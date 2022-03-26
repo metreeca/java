@@ -202,4 +202,49 @@ import java.util.function.Predicate;
         return new Chain(wrapper, this);
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Delegating handler.
+     *
+     * <p>Delegates request processing to a {@linkplain #delegate(Handler) delegate} handler, possibly assembled as a
+     * combination of other handlers and wrappers.</p>
+     */
+    public abstract class Base implements Handler {
+
+        private Handler delegate=Request::reply;
+
+
+        /**
+         * Configures the delegate handler.
+         *
+         * @param delegate the handler request processing is delegated to
+         *
+         * @return this handler
+         *
+         * @throws NullPointerException if {@code delegate} is null
+         */
+        protected Base delegate(final Handler delegate) {
+
+            if ( delegate == null ) {
+                throw new NullPointerException("null delegate");
+            }
+
+            this.delegate=delegate;
+
+            return this;
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        @Override public Handler with(final Wrapper wrapper) { return delegate.with(wrapper); }
+
+        @Override public Response handle(final Request request) {
+            return delegate.handle(request);
+        }
+
+    }
+
 }

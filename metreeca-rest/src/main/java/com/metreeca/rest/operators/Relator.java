@@ -21,7 +21,6 @@ import com.metreeca.json.queries.*;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
-import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -99,16 +98,16 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * </ul>
  */
-public final class Relator extends Delegator {
+public final class Relator extends Handler.Base {
 
-	/**
-	 * Creates a resource relator.
-	 *
-	 * @return a new resource relator
-	 */
-	public static Relator relator() {
-		return new Relator();
-	}
+    /**
+     * Creates a resource relator.
+     *
+     * @return a new resource relator
+     */
+    public static Relator relator() {
+        return new Relator();
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

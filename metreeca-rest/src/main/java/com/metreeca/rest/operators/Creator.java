@@ -21,7 +21,6 @@ import com.metreeca.json.*;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
-import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -89,16 +88,16 @@ import static java.util.stream.Collectors.toMap;
  *
  * </ul>
  */
-public final class Creator extends Delegator {
+public final class Creator extends Handler.Base {
 
-	/**
-	 * Creates a resource creator with a UUID-based slug generator.
-	 *
-	 * @return a new resource creator
-	 */
-	public static Creator creator() {
-		return new Creator();
-	}
+    /**
+     * Creates a resource creator with a UUID-based slug generator.
+     *
+     * @return a new resource creator
+     */
+    public static Creator creator() {
+        return new Creator();
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

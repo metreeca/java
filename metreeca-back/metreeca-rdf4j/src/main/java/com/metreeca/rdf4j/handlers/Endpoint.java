@@ -17,8 +17,8 @@
 package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.rdf4j.services.Graph;
+import com.metreeca.rest.Handler;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Logger;
 
 import java.util.*;
@@ -39,7 +39,7 @@ import static java.util.Collections.*;
  *
  * @see <a href="https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/">SPARQL 1.1 Overview</a>
  */
-public abstract class Endpoint<T extends Endpoint<T>> extends Delegator {
+public abstract class Endpoint<T extends Endpoint<T>> extends Handler.Base {
 
 	private Graph graph=service(Graph.graph());
 

@@ -41,7 +41,7 @@ import static java.util.Collections.emptyMap;
 /**
  * Static content publisher.
  */
-public final class Publisher extends Delegator {
+public final class Publisher extends Handler.Base {
 
     private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
 

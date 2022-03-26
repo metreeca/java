@@ -21,7 +21,6 @@ import com.metreeca.json.Shape;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
-import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import static com.metreeca.json.shapes.Guard.Detail;
@@ -76,16 +75,16 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * </ul>
  */
-public final class Updater extends Delegator {
+public final class Updater extends Handler.Base {
 
-	/**
-	 * Creates a resource updater.
-	 *
-	 * @return a new resource updater
-	 */
-	public static Updater updater() {
-		return new Updater();
-	}
+    /**
+     * Creates a resource updater.
+     *
+     * @return a new resource updater
+     */
+    public static Updater updater() {
+        return new Updater();
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,6 @@ import com.metreeca.json.Shape;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
-import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -75,16 +74,16 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * </ul>
  */
-public final class Deleter extends Delegator {
+public final class Deleter extends Handler.Base {
 
-	/**
-	 * Creates a resource deleter.
-	 *
-	 * @return a new resource deleter
-	 */
-	public static Deleter deleter() {
-		return new Deleter();
-	}
+    /**
+     * Creates a resource deleter.
+     *
+     * @return a new resource deleter
+     */
+    public static Deleter deleter() {
+        return new Deleter();
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
