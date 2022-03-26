@@ -25,16 +25,15 @@ import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.MovedPermanently;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.wrappers.Relocator.relocator;
 
-final class RelocatorTest {
+final class ForwarderTest {
 
-	private final Handler relocator=relocator()
+	private final Handler relocator=Forwarder.forwarder()
 
-			.rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
-			.rewrite("http:(.*)", "https:$1")
+            .rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
+            .rewrite("http:(.*)", "https:$1")
 
-			.wrap(request -> request.reply(status(OK)));
+            .wrap(request -> request.reply(status(OK)));
 
 
 	@Test void testRelocate() {

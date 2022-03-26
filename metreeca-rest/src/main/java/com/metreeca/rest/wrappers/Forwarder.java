@@ -29,20 +29,20 @@ import static com.metreeca.rest.Response.MovedPermanently;
 import static java.util.function.UnaryOperator.identity;
 
 /**
- * Pattern-based relocating preprocessor.
+ * Pattern-based forwarding preprocessor.
  *
  * <p>Iteratively applies pattern-based {@linkplain #rewrite(String, String) rewrite} rules to incoming
  * {@linkplain Request#item() request items} and redirecting them if actually modified.</p>
  */
-public final class Relocator implements Wrapper {
+public final class Forwarder implements Wrapper {
 
 	/**
 	 * Creates a relocating preprocessor.
 	 *
 	 * @return a new relocating preprocessor redirecting requests with a {@link Response#MovedPermanently} status code
 	 */
-	public static Relocator relocator() {
-		return relocator(MovedPermanently);
+	public static Forwarder forwarder() {
+		return forwarder(MovedPermanently);
 	}
 
 	/**
@@ -54,13 +54,13 @@ public final class Relocator implements Wrapper {
 	 *
 	 * @throws IllegalArgumentException if {@code status} is less than 100 or greater than 599
 	 */
-	public static Relocator relocator(final int status) {
+	public static Forwarder forwarder(final int status) {
 
 		if ( status < 100 || status > 599 ) {
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
 		}
 
-		return new Relocator(status);
+		return new Forwarder(status);
 	}
 
 
@@ -71,7 +71,7 @@ public final class Relocator implements Wrapper {
 	private Function<String, String> rewriter=identity();
 
 
-	private Relocator(final int status) {
+	private Forwarder(final int status) {
 		this.status=status;
 	}
 
@@ -86,7 +86,7 @@ public final class Relocator implements Wrapper {
 	 *
 	 * @throws NullPointerException if either {@code pattern} or {@code replacement} is null
 	 */
-	public Relocator rewrite(final String pattern, final String replacement) {
+	public Forwarder rewrite(final String pattern, final String replacement) {
 
 		if ( pattern == null ) {
 			throw new NullPointerException("null pattern");
@@ -109,7 +109,7 @@ public final class Relocator implements Wrapper {
 	 *
 	 * @throws NullPointerException if either {@code pattern} or {@code replacement} is null
 	 */
-	public Relocator rewrite(final Pattern pattern, final String replacement) {
+	public Forwarder rewrite(final Pattern pattern, final String replacement) {
 
 		if ( pattern == null ) {
 			throw new NullPointerException("null pattern");
