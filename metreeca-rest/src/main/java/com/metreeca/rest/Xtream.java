@@ -417,11 +417,11 @@ public final class Xtream<T> implements Stream<T> {
 
         while ( !pending.isEmpty() ) {
 
-            visitor.apply(pending.pop()).forEach(element -> {
+            Stream.of(pending.pop())
+                    .filter(visited::add)
+                    .flatMap(visitor)
+                    .forEach(pending::add);
 
-                if ( visited.add(element) ) { pending.add(element); }
-
-            });
         }
 
 
