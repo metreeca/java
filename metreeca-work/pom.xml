@@ -35,6 +35,7 @@
 	<modules>
 
 		<module>metreeca-json</module>
+		<module>metreeca-rest</module>
 
 	</modules>
 
