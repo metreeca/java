@@ -17,7 +17,7 @@ jobs:
       - name: Convert trigger tag name into the corresponding release branch name
         id: source
         run: echo ::set-output
-          name=branch::$(echo ${{ github.ref_name }} | sed -r 's:([0-9]+\.[0-9]+).*:release/\1.x:')
+          name=branch::$(echo ${{ github.ref_name }} | sed -r 's:([0-9]+\.[0-9]+).*:release/\1:')
 
       - name: Mirror the release branch to main
         uses: google/mirror-branch-action@v1.0
