@@ -61,15 +61,8 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class JSEServer {
 
-    private static final String DefaultHost="localhost";
-    private static final int DefaultPort=8080;
-
     private static final Pattern ContextPattern=Pattern.compile(
             "(?<base>(?:\\w+://[^/?#]*)?)(?<path>.*)"
-    );
-
-    private static final Pattern AddressPattern=Pattern.compile(
-            "(?<host>^|[-+._a-zA-Z0-9]*[-+._a-zA-Z][-+._a-zA-Z0-9]*)(?:^:?|:)(?<port>\\d{1,4}|$)"
     );
 
 
@@ -78,59 +71,18 @@ public final class JSEServer {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private InetSocketAddress address=new InetSocketAddress(DefaultHost, DefaultPort);
+    private InetSocketAddress address=new InetSocketAddress(Optional.ofNullable(System.getenv("PORT"))
+            .map(Integer::parseInt) // abort on exception
+            .orElse(8080)
+    );
 
     private String base="";
     private String path="/";
-
-    private final int backlog=128;
-    private final int delay=0;
 
     private final Toolbox toolbox=new Toolbox();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Configures the socket address.
-     *
-     * @param address the socket address to listen to; must match one of the following formats: {@code <host>:<port>},
-     *                {@code <host>}, {@code <port>}
-     *
-     * @return this server
-     *
-     * @throws NullPointerException     if {@code address} is null
-     * @throws IllegalArgumentException if {@code address} is malformed
-     */
-    public JSEServer address(final String address) {
-
-        if ( address == null ) {
-            throw new NullPointerException("null address");
-        }
-
-        final Matcher matcher=AddressPattern.matcher(address);
-
-        if ( !matcher.matches() ) {
-            throw new IllegalArgumentException(format("malformed address <%s>", address));
-        }
-
-        this.address=new InetSocketAddress(
-
-                Optional
-                        .of(matcher.group("host"))
-                        .filter(host -> !host.isEmpty())
-                        .orElse(DefaultHost),
-
-                Optional
-                        .of(matcher.group("port"))
-                        .filter(port -> !port.isEmpty())
-                        .map(Integer::valueOf)
-                        .orElse(DefaultPort)
-
-        );
-
-        return this;
-    }
 
     /**
      * Configures the socket address.
@@ -151,7 +103,6 @@ public final class JSEServer {
 
         return this;
     }
-
 
     /**
      * Configures the context.
@@ -186,7 +137,6 @@ public final class JSEServer {
         return this;
     }
 
-
     /**
      * Configures the delegate handler factory.
      *
@@ -218,7 +168,7 @@ public final class JSEServer {
             final Handler handler=toolbox.get(delegate());
             final Logger logger=toolbox.get(logger());
 
-            final HttpServer server=HttpServer.create(address, backlog);
+            final HttpServer server=HttpServer.create(address, 0);
 
             server.setExecutor(Executors.newCachedThreadPool());
 
@@ -243,7 +193,7 @@ public final class JSEServer {
 
                 logger.info(this, "server stopping");
 
-                try { server.stop(delay); } catch ( final RuntimeException e ) {
+                try { server.stop(0); } catch ( final RuntimeException e ) {
                     logger.error(this, "unhandled exception while stopping server", e);
                 }
 
@@ -259,7 +209,7 @@ public final class JSEServer {
 
             server.start();
 
-            logger.info(this, format("server listening at <http://%s:%d%s>",
+            logger.info(this, format("server listening at <http://%s:%d%s>", // !!! protocol?
                     address.getHostString(), address.getPort(), path
             ));
 

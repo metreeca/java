@@ -119,9 +119,7 @@ public final class GCPServer {
                     .filter(service -> !service.equals(DefaultService))
                     .map(service -> format("/%s/", service))
                     .orElse("/")
-            )
-
-            .address(System.getenv().getOrDefault(AddressVariable, ""));
+            );
 
 
     public GCPServer context(final String context) {
