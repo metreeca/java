@@ -72,13 +72,14 @@
 	<modules>
 
 		<module>metreeca-core</module>
-		<module>metreeca-json</module>
 		<module>metreeca-rest</module>
 		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
 		<module>metreeca-back</module>
+
+		<module>metreeca-work</module>
 
 	</modules>
 
@@ -114,12 +115,12 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- Core Modules -->
+			<!-- Work in Progress -->
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-core</artifactId>
-				<version>${project.version}</version>
+			<dependency> <!-- !!! remove -->
+				<groupId>org.glassfish</groupId>
+				<artifactId>javax.json</artifactId>
+				<version>1.1.4</version>
 			</dependency>
 
 			<dependency>
@@ -135,6 +136,14 @@
 				<type>test-jar</type>
 			</dependency>
 
+
+			<!-- Core Modules -->
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
@@ -223,22 +232,16 @@
 
 			<!-- Exported dependencies -->
 
-			<dependency>
+			<dependency> <!-- https://search.maven.org/artifact/com.google.code.gson/gson -->
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
 				<version>2.9.0</version>
 			</dependency>
 
-			<dependency> <!-- !!! remove -->
-				<groupId>org.glassfish</groupId>
-				<artifactId>javax.json</artifactId>
-				<version>1.1.4</version>
-			</dependency>
-
 			<dependency> <!-- https://search.maven.org/artifact/org.eclipse.rdf4j/rdf4j-bom -->
 				<groupId>org.eclipse.rdf4j</groupId>
 				<artifactId>rdf4j-bom</artifactId>
-				<version>3.7.4</version>
+				<version>3.7.7</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -260,7 +263,7 @@
 			</dependency>
 
 
-			<!-- Test Harness --> <!-- !!! migrate to metreeca-root -->
+			<!-- Test Harness -->
 
 			<dependency>  <!-- https://search.maven.org/artifact/org.junit.jupiter/junit-bom -->
 				<groupId>org.junit</groupId>

@@ -23,7 +23,7 @@
 
 	<parent>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-java</artifactId>
+		<artifactId>metreeca-work</artifactId>
 		<version>${revision}</version>
 	</parent>
 
