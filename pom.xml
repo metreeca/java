@@ -21,12 +21,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-root</artifactId>
-		<version>1.1.0</version>
-	</parent>
-
+	<groupId>com.metreeca</groupId>
 	<artifactId>metreeca-java</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
@@ -36,9 +31,41 @@
 	<url>https://github.com/metreeca/java</url>
 	<inceptionYear>2013</inceptionYear>
 
+	<organization>
+		<name>Metreeca</name>
+		<url>https://www.metreeca.com/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Metreeca</name>
+			<email>info@metreeca.com</email>
+			<organization>Metreeca</organization>
+			<organizationUrl>https://www.metreeca.com/</organizationUrl>
+		</developer>
+	</developers>
+
 	<properties>
 
 		<revision>0.0.0-SNAPSHOT</revision>
+		<timestamp>${maven.build.timestamp}</timestamp>
+
+		<maven.version>3.6</maven.version>
+		<java.version>11</java.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyy:MM:dd'T'HH:mm:ss</maven.build.timestamp.format>
+
+		<maven.site.skip>true</maven.site.skip>
+		<maven.deploy.skip>true</maven.deploy.skip>
 
 	</properties>
 
@@ -73,6 +100,16 @@
 		<site>
 			<url>https://metreeca.github.io/java/</url>
 		</site>
+
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
 
 	</distributionManagement>
 
@@ -269,36 +306,129 @@
 
 	<build>
 
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+		</resources>
+
 		<plugins>
 
-			<plugin>
+			<plugin> <!-- https://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
 
-				<groupId>com.metreeca</groupId>
-				<artifactId>mark-maven-plugin</artifactId>
-				<version>0.8.5</version>
-
-				<inherited>false</inherited>
-
-				<configuration>
-
-					<readme>true</readme>
-
-					<options>
-						<markdown-smart-links>true</markdown-smart-links>
-						<markdown-external-links>true</markdown-external-links>
-					</options>
-
-				</configuration>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0</version>
 
 				<executions>
 					<execution>
 
+						<id>enforce-maven</id>
+
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${maven.version}</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin> <!-- https://www.mojohaus.org/flatten-maven-plugin/ -->
+
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>1.2.2</version>
+
+				<configuration>
+					<updatePomFile>true</updatePomFile>
+					<flattenMode>resolveCiFriendliesOnly</flattenMode>
+					<flattenedPomFilename>pom-flattened.xml</flattenedPomFilename>
+				</configuration>
+
+				<executions>
+
+					<execution>
+
+						<id>clean-flattened-poms</id>
+						<phase>clean</phase>
+
 						<goals>
 							<goal>clean</goal>
-							<goal>build</goal>
 						</goals>
 
 					</execution>
+
+					<execution>
+
+						<id>flatten-poms</id>
+						<phase>process-resources</phase>
+
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+
+					</execution>
+
+				</executions>
+
+			</plugin>
+
+			<plugin> <!-- https://maven.apache.org/plugins/maven-compiler-plugin/ -->
+
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+
+			</plugin>
+
+
+			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+			</plugin>
+
+			<plugin> <!-- https://maven.apache.org/plugins/maven-jar-plugin/ -->
+
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.2</version>
+
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+
+			</plugin>
+
+			<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
+
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+
+				<executions>
+					<execution>
+
+						<id>attach-sources</id>
+
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+
 				</executions>
 
 			</plugin>
@@ -314,6 +444,38 @@
 
 			<build>
 				<plugins>
+
+					<plugin>
+
+						<groupId>com.metreeca</groupId>
+						<artifactId>mark-maven-plugin</artifactId>
+						<version>0.8.5</version>
+
+						<inherited>false</inherited>
+
+						<configuration>
+
+							<readme>true</readme>
+
+							<options>
+								<markdown-smart-links>true</markdown-smart-links>
+								<markdown-external-links>true</markdown-external-links>
+							</options>
+
+						</configuration>
+
+						<executions>
+							<execution>
+
+								<goals>
+									<goal>clean</goal>
+									<goal>build</goal>
+								</goals>
+
+							</execution>
+						</executions>
+
+					</plugin>
 
 					<plugin> <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
 
@@ -369,6 +531,86 @@
 							</links>
 
 						</configuration>
+						<version>3.3.1</version>
+
+						<executions>
+							<execution>
+
+								<id>attach-javadocs</id>
+								<phase>package</phase>
+
+								<goals>
+									<goal>jar</goal>
+								</goals>
+
+							</execution>
+						</executions>
+
+					</plugin>
+
+					<plugin> <!-- https://maven.apache.org/plugins/maven-gpg-plugin/ -->
+
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.0.1</version>
+
+						<executions>
+							<execution>
+
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+
+								<goals>
+									<goal>sign</goal>
+								</goals>
+
+								<configuration>
+									<executable>gpg</executable>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+
+							</execution>
+						</executions>
+
+					</plugin>
+
+					<plugin> <!-- https://github.com/sonatype/nexus-maven-plugins -->
+
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+
+						<extensions>true</extensions>
+
+						<executions>
+							<execution>
+
+								<id>injected-nexus-deploy</id>
+								<phase>deploy</phase>
+
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+
+								<configuration>
+									<serverId>ossrh</serverId>
+									<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+									<autoReleaseAfterClose>true</autoReleaseAfterClose>
+								</configuration>
+
+							</execution>
+						</executions>
+
+						<dependencies>
+							<dependency>
+								<groupId>com.thoughtworks.xstream</groupId>
+								<artifactId>xstream</artifactId>
+								<version>1.4.15</version>
+								<scope>compile</scope>
+							</dependency>
+						</dependencies>
 
 					</plugin>
 
