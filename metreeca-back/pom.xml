@@ -35,8 +35,11 @@
 
 	<modules>
 
-		<module>metreeca-rdf4j</module>
 		<module>metreeca-open</module>
+
+		<module>metreeca-rdf4j</module>
+		<module>metreeca-rdf4j-text</module>
+
 		<module>metreeca-gcp</module>
 		<module>metreeca-gcp-rdf4j</module>
 

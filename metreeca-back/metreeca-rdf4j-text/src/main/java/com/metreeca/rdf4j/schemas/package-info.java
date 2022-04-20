@@ -15,6 +15,7 @@
  */
 
 /**
- * Entity linkers.
+ * Well-known RDF vocabularies
  */
-package com.metreeca.text.linkers;
+
+package com.metreeca.rdf4j.schemas;

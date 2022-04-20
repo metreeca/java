@@ -39,10 +39,14 @@
 			<artifactId>metreeca-rdf</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-rdf4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-rdf4j-text</artifactId>
 		</dependency>
 
 		<dependency>

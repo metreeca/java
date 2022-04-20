@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.text.linkers;
+package com.metreeca.rdf4j.linkers;
 
 import com.metreeca.json.Frame;
 import com.metreeca.text.*;

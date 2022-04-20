@@ -21,11 +21,11 @@ import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.open.actions.Wikidata;
 import com.metreeca.rdf4j.actions.GraphQuery;
+import com.metreeca.rdf4j.linkers.GraphLinker;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.Fill;
 import com.metreeca.text.Match;
-import com.metreeca.text.linkers.GraphLinker;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;

@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.metreeca.text;
+package com.metreeca.rdf4j.schemas;
 
 import com.metreeca.json.Frame;
+import com.metreeca.text.Chunk;
+import com.metreeca.text.Match;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -32,17 +34,17 @@ import static com.metreeca.json.Values.literal;
 /**
  * RDF vocabulary for describing textual annotations.
  */
-public final class Notes {
+public final class Text {
 
-	/**
-	 * Default entity labels.
-	 */
-	public static final Collection<IRI> Labels=Set.of(
-			RDFS.LABEL,
-			SKOS.PREF_LABEL, SKOS.ALT_LABEL, SKOS.HIDDEN_LABEL
-	);
+    /**
+     * Default entity labels.
+     */
+    public static final Collection<IRI> Labels=Set.of(
+            RDFS.LABEL,
+            SKOS.PREF_LABEL, SKOS.ALT_LABEL, SKOS.HIDDEN_LABEL
+    );
 
-	/**
+    /**
 	 * Default languages.
 	 */
 	public static final Set<String> Languages=Set.of(
@@ -94,12 +96,12 @@ public final class Notes {
 
 		return frame(iri)
 
-				.value(RDF.TYPE, Reference)
+                .value(RDF.TYPE, Reference)
 
-				.value(source, document)
-				.frame(target, _target)
+                .value(source, document)
+                .frame(target, _target)
 
-				.value(Notes.detail, detail)
+                .value(Text.detail, detail)
 
 				.value(anchor, literal(_source.text()))
 				.value(offset, literal(_source.lower()))
@@ -111,6 +113,6 @@ public final class Notes {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Notes() { }
+    private Text() { }
 
 }

@@ -20,12 +20,13 @@ import com.metreeca.core.Strings;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.*;
+import com.metreeca.rdf4j.linkers.GraphLinker;
+import com.metreeca.rdf4j.schemas.Text;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.Fill;
 import com.metreeca.rest.services.Logger;
 import com.metreeca.text.*;
-import com.metreeca.text.linkers.GraphLinker;
 import com.metreeca.text.tokenizers.PatternTokenizer;
 
 import org.eclipse.rdf4j.model.*;
@@ -56,21 +57,21 @@ import static java.util.stream.Collectors.joining;
  */
 public final class SPARQLMatcher implements Function<Stream<String>, Stream<Match<String, Frame>>> {
 
-	private final int size=1_000;
+    private final int size=1_000;
 
 
-	private Collection<IRI> labels=Notes.Labels;
-	private Set<String> languages=Notes.Languages;
+    private Collection<IRI> labels=Text.Labels;
+    private Set<String> languages=Text.Languages;
 
-	private final IRI context=RDF.NIL; // !!!
-	private final Graph graph=service(graph());
-	private final Logger logger=service(logger());
+    private final IRI context=RDF.NIL; // !!!
+    private final Graph graph=service(graph());
+    private final Logger logger=service(logger());
 
 
-	public SPARQLMatcher labels(final IRI... labels) {
+    public SPARQLMatcher labels(final IRI... labels) {
 
-		if ( labels == null ) {
-			throw new NullPointerException("null labels");
+        if ( labels == null ) {
+            throw new NullPointerException("null labels");
 		}
 
 		return labels(asList(labels));
@@ -165,7 +166,7 @@ public final class SPARQLMatcher implements Function<Stream<String>, Stream<Matc
 				.flatMap(frame -> {
 
 					final double weight=frame
-							.decimal(Notes.weight)
+                            .decimal(Text.weight)
 							.orElse(BigDecimal.ZERO)
 							.doubleValue();
 
@@ -184,25 +185,25 @@ public final class SPARQLMatcher implements Function<Stream<String>, Stream<Matc
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * SPARQL full-text indexer.
-	 *
-	 * <p>Creates a full-text index for {@link SPARQLMatcher}.</p>
-	 */
-	public static final class Indexer implements Runnable {
+    /**
+     * SPARQL full-text indexer.
+     *
+     * <p>Creates a full-text index for {@link SPARQLMatcher}.</p>
+     */
+    public static final class Indexer implements Runnable {
 
-		private Collection<IRI> labels=Notes.Labels;
-		private Set<String> languages=Notes.Languages;
-		private IRI context=RDF.NIL; // !!!
+        private Collection<IRI> labels=Text.Labels;
+        private Set<String> languages=Text.Languages;
+        private IRI context=RDF.NIL; // !!!
 
-		private Function<Token, Chunk> analyzer=new PatternTokenizer().defaults();
-
-
-		private final Graph graph=service(graph());
-		private final Logger logger=service(logger());
+        private Function<Token, Chunk> analyzer=new PatternTokenizer().defaults();
 
 
-		public Indexer labels(final IRI... labels) {
+        private final Graph graph=service(graph());
+        private final Logger logger=service(logger());
+
+
+        public Indexer labels(final IRI... labels) {
 
 			if ( labels == null ) {
 				throw new NullPointerException("null labels");
@@ -344,7 +345,7 @@ public final class SPARQLMatcher implements Function<Stream<String>, Stream<Matc
 						final Value label=bindings.getValue("l");
 
 						analyzer.apply(new Token(label.stringValue())).tokens().forEach(anchor ->
-								connection.add(entity, Notes.anchor, literal(anchor.text(true)), context)
+                                connection.add(entity, Text.anchor, literal(anchor.text(true)), context)
 						);
 
 					});
