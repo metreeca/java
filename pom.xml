@@ -72,6 +72,7 @@
 	<modules>
 
 		<module>metreeca-core</module>
+		<module>metreeca-http</module>
 		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
@@ -155,6 +156,20 @@
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-core</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-http</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-http</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
 			</dependency>
 
 
