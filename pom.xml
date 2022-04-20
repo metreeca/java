@@ -80,8 +80,6 @@
 		<module>metreeca-head</module>
 		<module>metreeca-back</module>
 
-		<module>metreeca-work</module>
-
 	</modules>
 
 	<scm>
@@ -604,12 +602,14 @@
 						</executions>
 
 						<dependencies>
-							<dependency>
+
+						<dependency>
 								<groupId>com.thoughtworks.xstream</groupId>
 								<artifactId>xstream</artifactId>
 								<version>1.4.15</version>
 								<scope>compile</scope>
 							</dependency>
+
 						</dependencies>
 
 					</plugin>
