@@ -38,7 +38,7 @@ import static java.util.Arrays.stream;
  * Shape-based content driver.
  *
  * <p>Drives the lifecycle of linked data resources managed by wrapped handlers {@linkplain JSONLDFormat#shape()
- * associating} a {@linkplain #driver(Shape...) shape} to incoming requests</p>
+ * associating} a {@linkplain #Driver(Shape...) shape} to incoming requests</p>
  *
  * <p>Wrapped handlers are responsible for:</p>
  *
@@ -62,27 +62,6 @@ public final class Driver implements Wrapper {
 	public static final IRI Inverse=inverse(Direct);
 
 	private static final String Tag="__link__";
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Creates a content driver.
-	 *
-	 * @param shapes the shapes driving the lifecycle of the linked data resources managed by the wrapped handler
-	 *
-	 * @return a new shape-based content driver
-	 *
-	 * @throws NullPointerException if {@code shape} is null of ccntains null elements
-	 */
-	public static Driver driver(final Shape... shapes) {
-
-		if ( shapes == null || stream(shapes).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null shapes");
-		}
-
-		return new Driver(and(shapes));
-	}
 
 
 	/**
@@ -121,14 +100,20 @@ public final class Driver implements Wrapper {
 
 	private final Shape shape;
 
+	/**
+	 * Creates a content driver.
+	 *
+	 * @param shapes the shapes driving the lifecycle of the linked data resources managed by the wrapped handler
+	 *
+	 * @throws NullPointerException if {@code shape} is null of ccntains null elements
+	 */
+	public Driver(final Shape... shapes) {
 
-	private Driver(final Shape shape) {
-
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
+		if ( shapes == null || stream(shapes).anyMatch(Objects::isNull) ) {
+			throw new NullPointerException("null shapes");
 		}
 
-		this.shape=shape;
+		this.shape=and(shapes);
 	}
 
 

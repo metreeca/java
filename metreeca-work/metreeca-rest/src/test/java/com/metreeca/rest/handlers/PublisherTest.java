@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.handlers.Publisher.publisher;
 import static com.metreeca.rest.handlers.Publisher.variants;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +57,7 @@ final class PublisherTest {
 	}
 
 	@Test void testRejectUnsafeRequestsRequests() {
-		exec(() -> publisher(getClass().getResource("/"))
+		exec(() -> new Publisher(getClass().getResource("/"))
 
 				.handle(new Request().method(POST))
 

@@ -100,21 +100,12 @@ import static com.metreeca.rest.services.Engine.*;
  */
 public final class Relator extends Handler.Base {
 
-    /**
-     * Creates a resource relator.
-     *
-     * @return a new resource relator
-     */
-    public static Relator relator() {
-        return new Relator();
-    }
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private final Engine engine=service(engine());
 
 
+	/**
+	 * Creates a resource relator.
+	 */
 	private Relator() {
 		delegate(relate().with(wrapper(Request::collection,
 				keeper(Relate, Digest),

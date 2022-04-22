@@ -30,7 +30,6 @@ import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.handlers.Router.router;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -53,46 +52,46 @@ final class RouterTest {
 		@Test void testCheckPaths() {
 
 			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("empty path")
-					.isThrownBy(() -> router()
-							.path("", handler())
-					);
+                    .as("empty path")
+                    .isThrownBy(() -> new Router()
+                            .path("", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("missing leading slash path")
-					.isThrownBy(() -> router()
-							.path("path", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("missing leading slash path")
+                    .isThrownBy(() -> new Router()
+                            .path("path", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("malformed placeholder step")
-					.isThrownBy(() -> router()
-							.path("/pa{}th", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("malformed placeholder step")
+                    .isThrownBy(() -> new Router()
+                            .path("/pa{}th", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("malformed prefix step")
-					.isThrownBy(() -> router()
-							.path("/pa*th", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("malformed prefix step")
+                    .isThrownBy(() -> new Router()
+                            .path("/pa*th", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("inline prefix step")
-					.isThrownBy(() -> router()
-							.path("/*/path", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("inline prefix step")
+                    .isThrownBy(() -> new Router()
+                            .path("/*/path", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalStateException.class)
-					.as("existing path")
-					.isThrownBy(() -> router()
-							.path("/path", handler())
-							.path("/path", handler())
-					);
+            assertThatExceptionOfType(IllegalStateException.class)
+                    .as("existing path")
+                    .isThrownBy(() -> new Router()
+                            .path("/path", handler())
+                            .path("/path", handler())
+                    );
 
 		}
 
 		@Test void testIgnoreUnknownPath() {
-			router()
+            new Router()
 
 					.path("/path", handler())
 
@@ -108,7 +107,7 @@ final class RouterTest {
 
 		@Test void testMatchesLiteralPath() {
 
-			final Router router=router().path("/path", handler());
+            final Router router=new Router().path("/path", handler());
 
 			router.handle(request("/path")).map(response -> assertThat(response)
 					.hasHeader("path", "/path")
@@ -126,7 +125,7 @@ final class RouterTest {
 
 		@Test void testMatchesPlaceholderPath() {
 
-			final Router router=router().path("/head/{id}/tail", handler());
+            final Router router=new Router().path("/head/{id}/tail", handler());
 
 			router.handle(request("/head/path/tail")).map(response -> assertThat(response)
 					.hasHeader("path", "/head/path/tail")
@@ -144,7 +143,7 @@ final class RouterTest {
 
 		@Test void testSavePlaceholderValuesAsRequestParameters() {
 
-			router().path("/{head}/{tail}", handler())
+            new Router().path("/{head}/{tail}", handler())
 					.handle(request("/one/two"))
 					.map(response -> assertThat(response.request())
 							.as("placeholder values saved as parameters")
@@ -152,7 +151,7 @@ final class RouterTest {
 							.hasParameter("tail", "two")
 					);
 
-			router().path("/{}/{}", handler())
+            new Router().path("/{}/{}", handler())
 					.handle(request("/one/two"))
 					.map(response -> assertThat(response.request())
 							.has(new Condition<>(
@@ -165,7 +164,7 @@ final class RouterTest {
 
 		@Test void testMatchesPrefixPath() {
 
-			final Router router=router().path("/head/*", handler());
+            final Router router=new Router().path("/head/*", handler());
 
 			router.handle(request("/head/path")).map(response -> assertThat(response)
 					.hasHeader("path", "/head/path")
@@ -184,10 +183,10 @@ final class RouterTest {
 
 		@Test void testPreferFirstMatch() {
 
-			final Router router=router()
+            final Router router=new Router()
 
-					.path("/path", request -> request.reply().map(response -> response.status(100)))
-					.path("/*", request -> request.reply().map(response -> response.status(200)));
+                    .path("/path", request -> request.reply().map(response -> response.status(100)))
+                    .path("/*", request -> request.reply().map(response -> response.status(200)));
 
 			router.handle(request("/path")).map(response -> assertThat(response).hasStatus(100));
 			router.handle(request("/path/path")).map(response -> assertThat(response).hasStatus(200));
@@ -214,7 +213,7 @@ final class RouterTest {
 
 
 		@Test void testHandleOPTIONSByDefault() {
-			router()
+            new Router()
 
 					.get(this::handler)
 
@@ -227,7 +226,7 @@ final class RouterTest {
 		}
 
 		@Test void testIncludeAllowHeaderOnUnsupportedMethods() {
-			router()
+            new Router()
 
 					.get(this::handler)
 
@@ -240,7 +239,7 @@ final class RouterTest {
 		}
 
 		@Test void testHandleHEADByDefault() {
-			router()
+            new Router()
 
 					.get(this::handler)
 
@@ -261,7 +260,7 @@ final class RouterTest {
 		}
 
 		@Test void testRejectHEADIfGetIsNotSupported() {
-			router()
+            new Router()
 
 					.post(status(Response.Created))
 

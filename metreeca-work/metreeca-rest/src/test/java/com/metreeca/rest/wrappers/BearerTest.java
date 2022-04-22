@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 
 final class BearerTest {
@@ -33,7 +34,7 @@ final class BearerTest {
 
 
 	private Bearer bearer() {
-		return Bearer.bearer((token, request) -> token.equals("token") ? Optional.of(request) : Optional.empty());
+		return new Bearer((BiFunction<? super String, ? super Request, Optional<Request>>)(token, request) -> token.equals("token") ? Optional.of(request) : Optional.empty());
 	}
 
 	private Handler handler(final int status) {

@@ -16,12 +16,11 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.rest.*;
-import com.metreeca.rest.services.Fetcher.URLFetcher;
+import com.metreeca.rest.Format;
+import com.metreeca.rest.Handler;
 
 import java.net.*;
 import java.nio.file.*;
-import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +31,6 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.OutputFormat.output;
-import static com.metreeca.rest.handlers.Router.router;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -96,51 +94,14 @@ public final class Publisher extends Handler.Base {
     /**
      * Creates a static content publisher.
      *
-     * @param root the absolute root path of the resource package to be published
-     *
-     * @return a new static content publisher for the content retrieved by the {@code Publisher} class loader from system
-     * resources under the {@code root} package
-     *
-     * @throws NullPointerException     if {@code root} is null
-     * @throws IllegalArgumentException if {@code root} doesn't include a leading slash
-     * @throws MissingResourceException if {@code root} is not available
-     */
-    public static Publisher publisher(final String root) {
-
-        if ( root == null ) {
-            throw new NullPointerException("null root");
-        }
-
-        if ( !root.startsWith("/") ) {
-            throw new IllegalArgumentException(format("relative root path <%s>", root));
-        }
-
-        final URL url=Publisher.class.getResource(root); // ;(gae) ClassLoader always returns null
-
-        if ( url == null ) {
-            throw new MissingResourceException(
-                    format("unknown resource <%s>", root),
-                    Publisher.class.getName(),
-                    root
-            );
-        }
-
-        return publisher(url);
-    }
-
-    /**
-     * Creates a static content publisher.
-     *
      * <p><strong>Warning</strong> / Only {@code file:} and {@code jar:} URLs are currently supported.</p>
      *
-     * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)})
-     *
-     * @return a new static content publisher for the content under {@code root}
+     * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)}) *
      *
      * @throws NullPointerException     if {@code root} is null
      * @throws IllegalArgumentException if {@code root} is malformed
      */
-    public static Publisher publisher(final URL root) {
+    public Publisher(final URL root) {
 
         if ( root == null ) {
             throw new NullPointerException("null root");
@@ -152,7 +113,7 @@ public final class Publisher extends Handler.Base {
 
             try {
 
-                return publisher(Paths.get(root.toURI()));
+                publish(Paths.get(root.toURI()));
 
             } catch ( final URISyntaxException e ) {
 
@@ -175,7 +136,7 @@ public final class Publisher extends Handler.Base {
                     FileSystems.newFileSystem(URI.create(jar), emptyMap())
             ));
 
-            return publisher(filesystem.getPath(entry));
+            publish(filesystem.getPath(entry));
 
         } else {
 
@@ -189,74 +150,62 @@ public final class Publisher extends Handler.Base {
      *
      * @param root the root path of the content to be published
      *
-     * @return a new static content publisher for the content under {@code root}
-     *
      * @throws NullPointerException if {@code root} is null
      */
-    public static Publisher publisher(final Path root) {
+    public Publisher(final Path root) {
 
         if ( root == null ) {
             throw new NullPointerException("null root");
         }
 
-        return new Publisher(root);
+        publish(root);
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final URLFetcher fetcher=new URLFetcher();
+    private void publish(final Path root) {
+        delegate(new Router()
 
+                .get(request -> variants(request.path())
 
-    private Publisher(final Path root) {
-        delegate(router()
+                        .map(variant -> root.getRoot().relativize(root.getFileSystem().getPath(variant)))
+                        .map(root::resolve)
+                        .map(Path::normalize) // prevent tree walking attacks
 
-                .head(request -> handle(request, root))
-                .get(request -> handle(request, root))
+                        .filter(Files::exists)
+                        .filter(Files::isRegularFile)
+
+                        .findFirst()
+
+                        .map(file -> request.reply().map(checked(response -> {
+
+                            final String mime=Format.mime(file.getFileName().toString());
+                            final String length=String.valueOf(Files.size(file));
+                            final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
+
+                            return request.headers("If-None-Match").anyMatch(etag::equals)
+
+                                    ? response.status(NotModified)
+
+                                    : request.method().equals(HEAD)
+
+                                    ? response.status(OK)
+                                    .header("Content-Type", mime)
+                                    .header("ETag", etag)
+
+                                    : response.status(OK)
+                                    .header("Content-Type", mime)
+                                    .header("Content-Length", length)
+                                    .header("ETag", etag)
+                                    .body(output(), checked(output -> { Files.copy(file, output); }));
+
+                        })))
+
+                        .orElseGet(() -> request.reply(NotFound))
+                )
 
         );
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private Response handle(final Request request, final Path root) {
-        return variants(request.path())
-
-                .map(variant -> root.getRoot().relativize(root.getFileSystem().getPath(variant)))
-                .map(root::resolve)
-                .map(Path::normalize) // prevent tree walking attacks
-
-                .filter(Files::exists)
-                .filter(Files::isRegularFile)
-
-                .findFirst()
-
-                .map(file -> request.reply().map(checked(response -> {
-
-                    final String mime=Format.mime(file.getFileName().toString());
-                    final String length=String.valueOf(Files.size(file));
-                    final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
-
-                    return request.headers("If-None-Match").anyMatch(etag::equals)
-
-                            ? response.status(NotModified)
-
-                            : request.method().equals(HEAD)
-
-                            ? response.status(OK)
-                            .header("Content-Type", mime)
-                            .header("ETag", etag)
-
-                            : response.status(OK)
-                            .header("Content-Type", mime)
-                            .header("Content-Length", length)
-                            .header("ETag", etag)
-                            .body(output(), checked(output -> { Files.copy(file, output); }));
-
-                })))
-
-                .orElseGet(() -> request.reply(NotFound));
     }
 
 }

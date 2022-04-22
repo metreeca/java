@@ -75,22 +75,13 @@ import static com.metreeca.rest.services.Engine.engine;
  */
 public final class Deleter extends Handler.Base {
 
-    /**
-     * Creates a resource deleter.
-     *
-     * @return a new resource deleter
-     */
-    public static Deleter deleter() {
-        return new Deleter();
-    }
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private final Engine engine=service(engine());
 
 
-	private Deleter() {
+	/**
+	 * Creates a resource deleter.
+	 */
+	public Deleter() {
 		delegate(delete().with(
 				keeper(Delete, Detail))
 		);
