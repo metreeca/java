@@ -52,8 +52,6 @@ public final class Bearer implements Wrapper {
      * @param roles a collection of values uniquely identifying the roles to be {@linkplain Request#role(Object...)
      *              assigned} to the request user on successful {@code key} validation
      *
-     * @return a new key-based bearer token authenticator
-     *
      * @throws NullPointerException if {@code roles} is null or contains a {@code null} value
      */
     public Bearer(final String key, final Object... roles) {
@@ -78,8 +76,6 @@ public final class Bearer implements Wrapper {
      * @param authenticator the delegated authentication service; takes as argument the bearer token presented with the
      *                      request and the request itself; returns an optional configured request on successful token
      *                      validation or an empty optional otherwise
-     *
-     * @return a new a bearer token authenticator
      *
      * @throws NullPointerException if {@code authenticator} is null
      */
