@@ -312,7 +312,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 
 				// try to set content type to the actual type requested even if it's not the default one
 
-				.header("~Content-Type", types.stream()
+				.header("Content-Type", types.stream()
 						.filter(type -> registry.getFileFormatForMIMEType(type).isPresent())
 						.findFirst()
 						.orElseGet(() -> factory.getRDFFormat().getDefaultMIMEType())

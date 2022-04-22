@@ -111,8 +111,8 @@ public final class TextFormat extends Format<String> {
 
 			return message
 
-					.header("~Content-Type", MIME)
-					.header("~Content-Length", valueOf(bytes.length))
+					.header("Content-Type", message.header("Content-Type").orElse(MIME))
+					.header("Content-Length", valueOf(bytes.length))
 
 					.body(output(), output -> {
 						try {

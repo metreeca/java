@@ -186,7 +186,7 @@ public final class Request extends Message<Request> {
      */
     public boolean route() {
         return safe() && (!FilePattern.matcher(path).find()
-                && headers("Accept").stream().anyMatch(value -> HTMLPattern.matcher(value).find())
+                && headers("Accept").anyMatch(value -> HTMLPattern.matcher(value).find())
         );
     }
 
@@ -200,7 +200,7 @@ public final class Request extends Message<Request> {
      */
     public boolean asset() {
         return safe() && (FilePattern.matcher(path).find()
-                || headers("Accept").stream().anyMatch(value -> HTMLPattern.matcher(value).find())
+                || headers("Accept").anyMatch(value -> HTMLPattern.matcher(value).find())
         );
     }
 

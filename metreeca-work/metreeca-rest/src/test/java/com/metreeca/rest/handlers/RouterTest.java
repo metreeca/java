@@ -28,6 +28,7 @@ import java.io.*;
 
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
+import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.handlers.Router.router;
 
@@ -233,7 +234,7 @@ final class RouterTest {
 					.handle(new Request().method(Request.POST))
 
 					.accept(response -> assertThat(response)
-							.hasStatus(Response.MethodNotAllowed)
+                            .hasStatus(MethodNotAllowed)
 							.hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
 					);
 		}
@@ -267,7 +268,7 @@ final class RouterTest {
 					.handle(new Request().method(Request.HEAD))
 
 					.accept(response -> assertThat(response)
-							.hasStatus(Response.MethodNotAllowed)
+                            .hasStatus(MethodNotAllowed)
 					);
 		}
 

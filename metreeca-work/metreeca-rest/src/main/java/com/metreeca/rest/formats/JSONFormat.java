@@ -186,7 +186,7 @@ public final class JSONFormat extends Format<JsonObject> {
 	@Override public <M extends Message<M>> M encode(final M message, final JsonObject value) {
 		return message
 
-				.header("~Content-Type", MIME)
+				.header("Content-Type", MIME)
 
 				.body(output(), output -> {
 					try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {

@@ -434,7 +434,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
 		return message
 
-				.header("~Content-Type", mime)
+				.header("Content-Type", mime)
 
 				.body(output(), output -> {
 

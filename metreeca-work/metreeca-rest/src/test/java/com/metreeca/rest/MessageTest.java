@@ -26,7 +26,6 @@ import static com.metreeca.rest.MessageAssert.assertThat;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.TextFormat.text;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -71,44 +70,6 @@ final class MessageTest {
 			)
 					.hasHeader("test-header", "two");
 		}
-
-		@Test void testDefaultsValues() {
-
-			final Message<?> message=message()
-					.header("+present", "one")
-					.header("~present", "two")
-					.header("~missing", "two");
-
-			assertThat(message.header("present")).hasValue("one");
-			assertThat(message.header("missing")).hasValue("two");
-
-		}
-
-		//@Test void testHeadersAppendsValues() {
-		//
-		//	final MessageMock message=new MessageMock()
-		//			.header("+test-header", "one")
-		//			.header("+test-header", "two");
-		//
-		//	assertEquals(list("one", "two"), list(message.headers("test-header")));
-		//}
-		//
-		//@Test void testHeadersAppendsCookies() {
-		//
-		//	final MessageMock message=new MessageMock()
-		//			.header("set-cookie", "one")
-		//			.header("set-cookie", "two");
-		//
-		//	assertEquals(list("one", "two"), list(message.headers("set-cookie")));
-		//}
-		//
-		//@Test void testHeadersIgnoresEmptyAndDuplicateValues() {
-		//
-		//	final MessageMock message=new MessageMock()
-		//			.headers("test-header", "one", "two", "", "two");
-		//
-		//	assertEquals(list("one", "two"), list(message.headers("test-header")));
-		//}
 
 	}
 

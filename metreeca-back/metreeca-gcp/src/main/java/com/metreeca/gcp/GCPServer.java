@@ -104,7 +104,7 @@ public final class GCPServer {
             throw new NullPointerException("null handler");
         }
 
-        return request -> request.headers("X-Appengine-Cron").contains("true")
+        return request -> request.headers("X-Appengine-Cron").anyMatch("true"::equals)
                 ? handler.handle(request)
                 : request.reply(Forbidden);
     }

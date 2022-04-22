@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import static com.metreeca.rest.formats.InputFormat.input;
 
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 
 
 public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
@@ -57,9 +58,9 @@ public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
 
 			builder.append(request.method()).append(' ').append(request.item()).append('\n');
 
-			request.headers().forEach((name, values) -> values.forEach(value ->
+			request.headers().forEach((name, value) ->
 					builder.append(name).append(": ").append(value).append('\n')
-			));
+			);
 
 			builder.append('\n');
 
@@ -103,7 +104,7 @@ public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
 
 		isNotNull();
 
-		final Collection<String> values=actual.headers(name);
+		final Collection<String> values=actual.headers(name).collect(toList());
 
 		if ( values.isEmpty() ) {
 			failWithMessage("expected message to have <%s> parameters but has none", name);
@@ -144,7 +145,7 @@ public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
 
 		isNotNull();
 
-		final Collection<String> values=actual.headers(name);
+		final Collection<String> values=actual.headers(name).collect(toList());
 
 		if ( !values.isEmpty() ) {
 			failWithMessage("expected response to have no <%s> parameters but has <%s>", name, values);

@@ -58,9 +58,9 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 
 			builder.append(response.status()).append('\n');
 
-			response.headers().forEach((name, values) -> values.forEach(value ->
-					builder.append(name).append(": ").append(value).append('\n')
-			));
+			response.headers().forEach((name, value) ->
+                    builder.append(name).append(": ").append(value).append('\n')
+            );
 
 			builder.append('\n');
 

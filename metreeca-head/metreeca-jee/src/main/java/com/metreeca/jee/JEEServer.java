@@ -234,9 +234,7 @@ public abstract class JEEServer implements Filter {
 
 			http.setStatus(response.status());
 
-			response.headers().forEach((name, values) ->
-					values.forEach(value -> http.addHeader(name, value))
-			);
+			response.headers().forEach(http::addHeader);
 
 			response.body(output()).accept(e -> { }, target -> { // ignore missing response bodies
 				try {

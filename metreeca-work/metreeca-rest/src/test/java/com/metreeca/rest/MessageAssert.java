@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.fail;
 
+import static java.util.stream.Collectors.toList;
+
 
 public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Message<T>> extends AbstractAssert<A, T> {
 
@@ -96,7 +98,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		final Collection<String> values=actual.headers(name);
+		final Collection<String> values=actual.headers(name).collect(toList());
 
 		if ( values.isEmpty() ) {
 			failWithMessage("expected message to have <%s> headers but has none", name);
@@ -160,7 +162,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		final Collection<String> values=actual.headers(name);
+		final Collection<String> values=actual.headers(name).collect(toList());
 
 		if ( !values.isEmpty() ) {
 			failWithMessage("expected response to have no <%s> headers but has <%s>", name, values);

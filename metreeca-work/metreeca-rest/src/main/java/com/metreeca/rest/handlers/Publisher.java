@@ -238,7 +238,7 @@ public final class Publisher extends Handler.Base {
                     final String length=String.valueOf(Files.size(file));
                     final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
 
-                    return request.headers("If-None-Match").stream().anyMatch(etag::equals)
+                    return request.headers("If-None-Match").anyMatch(etag::equals)
 
                             ? response.status(NotModified)
 

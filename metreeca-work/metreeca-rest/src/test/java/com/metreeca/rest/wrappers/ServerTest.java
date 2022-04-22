@@ -18,7 +18,6 @@ package com.metreeca.rest.wrappers;
 
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Toolbox;
-import com.metreeca.rest.formats.TextFormat;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -26,9 +25,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.rest.formats.TextFormat.text;
 import static com.metreeca.rest.wrappers.Server.server;
 
 import static java.util.Arrays.asList;
@@ -76,14 +77,15 @@ final class ServerTest {
 								parameter("two", asList("2", "2"))
 						);
 
-						return request.reply().map(response -> response.status(OK));
+						return request.reply(OK);
 
 					})
 
 					.handle(new Request()
-							.method(Request.POST)
+							.method(POST)
 							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(TextFormat.text(), "one=1&two=2&two=2"))
+							.body(text(), "one=1&two=2&two=2")
+					)
 
 					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
 		}
@@ -141,7 +143,7 @@ final class ServerTest {
 					.handle(new Request()
 							.method(Request.PUT)
 							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(TextFormat.text(), "one=1&two=2&two=2"))
+							.body(text(), "one=1&two=2&two=2"))
 
 					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
 		}
