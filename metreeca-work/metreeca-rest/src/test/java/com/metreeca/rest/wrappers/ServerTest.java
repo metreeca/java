@@ -55,7 +55,7 @@ final class ServerTest {
 								parameter("two", asList("2", "2"))
 						);
 
-						return request.reply(response -> response.status(OK));
+						return request.reply().map(response -> response.status(OK));
 
 					})
 
@@ -76,7 +76,7 @@ final class ServerTest {
 								parameter("two", asList("2", "2"))
 						);
 
-						return request.reply(response -> response.status(OK));
+						return request.reply().map(response -> response.status(OK));
 
 					})
 
@@ -97,7 +97,7 @@ final class ServerTest {
 								parameter("existing", singletonList("true"))
 						);
 
-						return request.reply(response -> response.status(OK));
+						return request.reply().map(response -> response.status(OK));
 
 					})
 
@@ -116,7 +116,7 @@ final class ServerTest {
 
 						Assertions.assertThat(request.parameters()).isEmpty();
 
-						return request.reply(response -> response.status(OK));
+						return request.reply().map(response -> response.status(OK));
 
 					})
 
@@ -134,7 +134,7 @@ final class ServerTest {
 
 						Assertions.assertThat(request.parameters()).isEmpty();
 
-						return request.reply(response -> response.status(OK));
+						return request.reply().map(response -> response.status(OK));
 
 					})
 

@@ -232,7 +232,7 @@ public final class Publisher extends Handler.Base {
 
                 .findFirst()
 
-                .map(file -> request.reply(checked(response -> {
+                .map(file -> request.reply().map(checked(response -> {
 
                     final String mime=Format.mime(file.getFileName().toString());
                     final String length=String.valueOf(Files.size(file));

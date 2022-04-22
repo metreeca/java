@@ -311,7 +311,7 @@ public final class Router implements Handler {
 				.orElseGet(() -> (
 
 						methods.isEmpty() ? status(NotFound)
-								: methods.getOrDefault(request.method(), request1 -> options(request1))
+								: methods.getOrDefault(request.method(), this::options)
 
 				).handle(request));
 	}
@@ -327,7 +327,7 @@ public final class Router implements Handler {
 
 		final Matcher scanner=KeyPattern.matcher(prefix.isEmpty() ? "" : Pattern.quote(prefix));
 
-		final StringBuffer buffer=new StringBuffer(2*(prefix.length()+suffix.length())).append("(");
+		final StringBuilder buffer=new StringBuilder(2*(prefix.length()+suffix.length())).append("(");
 
 		while ( scanner.find() ) { // collect placeholder keys and replace with wildcard step patterns
 
@@ -385,11 +385,10 @@ public final class Router implements Handler {
 	}
 
 	private Response options(final Request request) {
-		return request.reply(response -> response
+		return request.reply().map(response -> response
 				.status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
 				.header("Allow", OPTIONS)
-				.headers("+Allow", methods.keySet())
-		);
+				.headers("+Allow", methods.keySet()));
 	}
 
 }

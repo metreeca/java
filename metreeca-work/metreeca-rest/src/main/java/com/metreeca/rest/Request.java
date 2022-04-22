@@ -17,7 +17,6 @@
 package com.metreeca.rest;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
@@ -139,26 +138,6 @@ public final class Request extends Message<Request> {
         }
 
         return new Response(this).status(status).header("Location", location);
-    }
-
-
-    /**
-     * Creates a response for this request.
-     *
-     * @param mapper the mapping function  used to initialize the new response; must return a non-null value
-     *
-     * @return a new response for this request
-     *
-     * @throws NullPointerException if {@code mapper} is null or return a null value
-     * @deprecated use {@link #reply()}}
-     */
-    @Deprecated public Response reply(final Function<Response, Response> mapper) {
-
-        if ( mapper == null ) {
-            throw new NullPointerException("null mapper");
-        }
-
-        return new Response(this).map(mapper);
     }
 
 

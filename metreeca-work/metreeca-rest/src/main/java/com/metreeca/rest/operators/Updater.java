@@ -25,7 +25,6 @@ import com.metreeca.rest.services.Engine;
 
 import static com.metreeca.json.shapes.Guard.Detail;
 import static com.metreeca.json.shapes.Guard.Update;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Toolbox.service;
@@ -104,11 +103,12 @@ public final class Updater extends Handler.Base {
 
 			final Shape shape=request.get(shape());
 
-			return request.body(jsonld()).fold(request::reply, frame -> engine.update(frame, shape)
+			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.update(frame,
+							shape)
 
-					.map(iri -> request.reply(status(NoContent)))
+					.map(iri -> request.reply(NoContent))
 
-					.orElseGet(() -> request.reply(status(NotFound))) // !!! 410 Gone if previously known
+					.orElseGet(() -> request.reply(NotFound)) // !!! 410 Gone if previously known
 
 			);
 

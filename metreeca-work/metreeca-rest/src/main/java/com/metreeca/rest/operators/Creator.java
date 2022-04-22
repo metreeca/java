@@ -187,11 +187,12 @@ public final class Creator extends Handler.Base {
 			final IRI item=iri(request.item());
 			final Shape shape=request.get(shape());
 
-			return request.body(jsonld()).fold(request::reply, frame -> engine.create(frame, shape)
+			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.create(frame,
+                            shape)
 
 					.map(Frame::focus)
 
-					.map(focus -> request.reply(response -> response.status(Created).header("Location", Optional
+					.map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
 							.of(focus)
 							.filter(Value::isIRI)
 							.map(IRI.class::cast)

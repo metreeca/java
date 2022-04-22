@@ -36,7 +36,7 @@ final class BearerTest {
 	}
 
 	private Handler handler(final int status) {
-		return request -> request.reply(response -> response.status(status));
+		return request -> request.reply().map(response -> response.status(status));
 	}
 
 

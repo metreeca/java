@@ -154,26 +154,23 @@ final class RDFFormatTest {
 		@Test void testConfigureWriterBaseIRI() {
 			exec(() -> new Request()
 
-					.base("http://example.com/base/")
-					.path("/")
+                    .base("http://example.com/base/")
+                    .path("/").reply().map(response1 -> {
+                        return response1
+                                .status(Response.OK)
+                                .set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
+                                .body(rdf(), singletonList(statement(
+                                        iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
+                                                +".com/base/x")
+                                )));
+                    })
 
-					.reply(response -> {
-								return response
-										.status(Response.OK)
-										.set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
-										.body(rdf(), singletonList(statement(
-												iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
-														+ ".com/base/x")
-										)));
-							}
-					)
-
-					.accept(response -> assertThat(response)
-							.hasBody(text(), text -> assertThat(text)
-									.contains("@base <"+"http://example.com/base/"+">")
-							)
-					)
-			);
+                    .accept(response -> assertThat(response)
+                            .hasBody(text(), text -> assertThat(text)
+                                    .contains("@base <"+"http://example.com/base/"+">")
+                            )
+                    )
+            );
 		}
 
 	}

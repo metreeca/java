@@ -51,7 +51,7 @@ import java.util.function.Predicate;
             throw new NullPointerException("null pass handler");
         }
 
-        return handler(test, pass, request -> request.reply(response -> response));
+        return handler(test, pass, request -> request.reply().map(response -> response));
     }
 
     /**

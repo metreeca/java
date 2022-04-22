@@ -105,11 +105,11 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null && !catalog ) {
 
-            return request.reply(status(BadRequest, "missing target graph parameter"));
+            return request.reply().map(status(BadRequest, "missing target graph parameter"));
 
         } else if ( !queryable(request.roles()) ) {
 
-            return request.reply(response -> response.status(Response.Unauthorized));
+            return request.reply().map(response -> response.status(Response.Unauthorized));
 
         } else if ( catalog ) { // graph catalog
 
@@ -129,10 +129,9 @@ public final class Graphs extends Endpoint<Graphs> {
                 }
             }));
 
-            return request.reply(response -> response.status(Response.OK)
+            return request.reply().map(response -> response.status(Response.OK)
                     .set(JSONLDFormat.shape(), GraphsShape)
-                    .body(rdf(), model)
-            );
+                    .body(rdf(), model));
 
         } else {
 
@@ -148,16 +147,14 @@ public final class Graphs extends Endpoint<Graphs> {
 
                 graph().query(task(connection -> connection.export(factory.getWriter(data), context)));
 
-                return graph().query(connection -> request.reply(response -> response.status(Response.OK)
+                return graph().query(connection -> request.reply().map(response -> response.status(Response.OK)
 
                         .header("Content-Type", format.getDefaultMIMEType())
                         .header("Content-Disposition", format("attachment; filename=\"%s.%s\"",
                                 target.isEmpty() ? "default" : target, format.getDefaultFileExtension()
                         ))
 
-                        .body(data(), data.toByteArray())
-
-                ));
+                        .body(data(), data.toByteArray())));
 
             } catch ( final IOException e ) {
                 throw new UncheckedIOException(e);
@@ -175,11 +172,11 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply(status(BadRequest, "missing target graph parameter"));
+            return request.reply().map(status(BadRequest, "missing target graph parameter"));
 
         } else if ( !updatable(request.roles()) ) {
 
-            return request.reply(response -> response.status(Response.Unauthorized));
+            return request.reply().map(response -> response.status(Response.Unauthorized));
 
         } else {
 
@@ -202,28 +199,27 @@ public final class Graphs extends Endpoint<Graphs> {
                     connection.clear(context);
                     connection.add(input, request.base(), factory.getRDFFormat(), context);
 
-                    return request.reply(response ->
+                    return request.reply().map(response ->
                             response.status(exists ? Response.NoContent :
-                                    Response.Created)
-                    );
+                                    Response.Created));
 
                 } catch ( final IOException e ) {
 
                     logger().warning(this, "unable to read RDF payload", e);
 
-                    return request.reply(status(InternalServerError, e));
+                    return request.reply().map(status(InternalServerError, e));
 
                 } catch ( final RDFParseException e ) {
 
                     logger().warning(this, "malformed RDF payload", e);
 
-                    return request.reply(status(BadRequest, e));
+                    return request.reply().map(status(BadRequest, e));
 
                 } catch ( final RepositoryException e ) {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply(status(InternalServerError, e));
+                    return request.reply().map(status(InternalServerError, e));
 
                 }
             });
@@ -240,11 +236,11 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply(status(BadRequest, "missing target graph parameter"));
+            return request.reply().map(status(BadRequest, "missing target graph parameter"));
 
         } else if ( !updatable(request.roles()) ) {
 
-            return request.reply(response -> response.status(Response.Unauthorized));
+            return request.reply().map(response -> response.status(Response.Unauthorized));
 
         } else {
 
@@ -257,15 +253,14 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     connection.clear(context);
 
-                    return request.reply(response ->
-                            response.status(exists ? Response.NoContent : Response.NotFound)
-                    );
+                    return request.reply().map(response ->
+                            response.status(exists ? Response.NoContent : Response.NotFound));
 
                 } catch ( final RepositoryException e ) {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply(status(InternalServerError, e));
+                    return request.reply().map(status(InternalServerError, e));
 
                 }
             });
@@ -285,11 +280,11 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply(status(BadRequest, "missing target graph parameter"));
+            return request.reply().map(status(BadRequest, "missing target graph parameter"));
 
         } else if ( !updatable(request.roles()) ) {
 
-            return request.reply(response -> response.status(Response.Unauthorized));
+            return request.reply().map(response -> response.status(Response.Unauthorized));
 
         } else {
 
@@ -311,27 +306,26 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     connection.add(input, request.base(), factory.getRDFFormat(), context);
 
-                    return request.reply(response ->
-                            response.status(exists ? Response.NoContent : Response.Created)
-                    );
+                    return request.reply().map(response ->
+                            response.status(exists ? Response.NoContent : Response.Created));
 
                 } catch ( final IOException e ) {
 
                     logger().warning(this, "unable to read RDF payload", e);
 
-                    return request.reply(status(InternalServerError, e));
+                    return request.reply().map(status(InternalServerError, e));
 
                 } catch ( final RDFParseException e ) {
 
                     logger().warning(this, "malformed RDF payload", e);
 
-                    return request.reply(status(BadRequest, e));
+                    return request.reply().map(status(BadRequest, e));
 
                 } catch ( final RepositoryException e ) {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply(status(InternalServerError, e));
+                    return request.reply().map(status(InternalServerError, e));
 
                 }
             });

@@ -81,10 +81,10 @@ public final class Aliaser implements Wrapper {
 	private Optional<Response> alias(final Request request) {
         return requireNonNull(resolver.apply(request), "null resolver return value")
 
-                .filter(resource -> !resource.isEmpty())
-                .filter(resource -> !idempotent(request.item(), resource))
+		        .filter(resource -> !resource.isEmpty())
+		        .filter(resource -> !idempotent(request.item(), resource))
 
-                .map(resource -> request.reply(status(SeeOther, resource)));
+		        .map(resource -> request.reply().map(status(SeeOther, resource)));
     }
 
 

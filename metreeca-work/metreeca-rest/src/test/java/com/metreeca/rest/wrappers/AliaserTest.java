@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 
@@ -53,7 +52,7 @@ final class AliaserTest {
 	@Test void testRedirectAliasedItem() {
 		exec(() -> aliaser("/canonical")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request) -> request.reply(OK))
 
 				.handle(request("/alias"))
 
@@ -67,7 +66,7 @@ final class AliaserTest {
 	@Test void testForwardIdempotentItems() {
 		exec(() -> aliaser("/alias")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request) -> request.reply(OK))
 
 				.handle(request("/alias"))
 
@@ -80,7 +79,7 @@ final class AliaserTest {
 	@Test void testForwardOtherItems() {
 		exec(() -> aliaser("/canonical")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request) -> request.reply(OK))
 
 				.handle(request("/other"))
 

@@ -95,9 +95,7 @@ public final class Server implements Wrapper {
 
             } catch ( final RuntimeException e ) { // try to send a new response
 
-                return request
-
-                        .reply(status(InternalServerError, e))
+                return request.reply().map(status(InternalServerError, e))
 
                         .map(this::logging);
 

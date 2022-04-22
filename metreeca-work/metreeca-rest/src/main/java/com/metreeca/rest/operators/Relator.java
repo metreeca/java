@@ -131,17 +131,16 @@ public final class Relator extends Handler.Base {
 			final IRI item=iri(request.item());
 			final Shape shape=request.get(shape());
 
-			return query(item, shape, request.query()).fold(request::reply, query -> engine.relate(frame(item), query)
+			return query(item, shape, request.query()).fold(mapper -> request.reply().map(mapper),
+                    query -> engine.relate(frame(item), query)
 
-					.map(frame -> request.reply(response -> response.status(OK)
+					.map(frame -> request.reply().map(response -> response.status(OK)
 							.set(shape(), query.map(new ShapeProbe(collection)))
-							.body(jsonld(), frame)
-					))
+							.body(jsonld(), frame)))
 
-					.orElseGet(() -> request.reply(response -> collection
+					.orElseGet(() -> request.reply().map(response -> collection
 							? response.status(OK).set(shape(), and()).body(jsonld(), frame(item)) // virtual container
-							: response.status(NotFound)
-					)));
+							: response.status(NotFound))));
 		};
 	}
 

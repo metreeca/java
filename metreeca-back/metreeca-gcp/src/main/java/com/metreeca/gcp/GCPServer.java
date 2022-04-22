@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.Forbidden;
 import static com.metreeca.rest.Toolbox.storage;
 import static com.metreeca.rest.services.Store.store;
@@ -107,7 +106,7 @@ public final class GCPServer {
 
         return request -> request.headers("X-Appengine-Cron").contains("true")
                 ? handler.handle(request)
-                : request.reply(status(Forbidden));
+                : request.reply(Forbidden);
     }
 
 

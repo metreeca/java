@@ -34,7 +34,7 @@ final class ValidatorTest {
 	}
 
 	private Handler handler() {
-		return request -> request.reply(response -> response.status(Response.OK));
+		return request -> request.reply().map(response -> response.status(Response.OK));
 	}
 
 

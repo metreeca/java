@@ -76,7 +76,7 @@ final class JSONLDFormatTest {
 		}
 
 		private Response response(final Request request) {
-			return request.reply(response -> request.body(jsonld()).fold(
+			return request.reply().map(response -> request.body(jsonld()).fold(
 					response::map,
 					model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)
 			));
@@ -143,9 +143,7 @@ final class JSONLDFormatTest {
 
 
 		@Test void testHandleGenericRequests() {
-			exec(() -> request()
-
-					.reply(this::response)
+			exec(() -> request().reply().map(this::response)
 
 					.accept(response -> assertThat(response)
 							.hasHeader("Content-Type", JSONFormat.MIME)
@@ -160,9 +158,7 @@ final class JSONLDFormatTest {
 		@Test void testHandlePlainJSONRequests() {
 			exec(() -> request()
 
-					.header("Accept", JSONFormat.MIME)
-
-					.reply(this::response)
+					.header("Accept", JSONFormat.MIME).reply().map(this::response)
 
 					.accept(response -> assertThat(response)
 							.hasHeader("Content-Type", JSONFormat.MIME)
@@ -177,9 +173,7 @@ final class JSONLDFormatTest {
 		@Test void testHandleJSONLDRequests() {
 			exec(() -> request()
 
-					.header("Accept", MIME)
-
-					.reply(this::response)
+					.header("Accept", MIME).reply().map(this::response)
 
 					.accept(response -> assertThat(response)
 							.hasHeader("Content-Type", MIME)
@@ -198,9 +192,7 @@ final class JSONLDFormatTest {
 
 					.exec(() -> request()
 
-							.header("Accept", MIME)
-
-							.reply(this::response)
+							.header("Accept", MIME).reply().map(this::response)
 
 							.accept(response -> assertThat(response)
 
@@ -240,9 +232,7 @@ final class JSONLDFormatTest {
 
 
 		@Test void testTrimPayload() {
-			exec(() -> request()
-
-					.reply(this::response)
+			exec(() -> request().reply().map(this::response)
 
 					.accept(response -> assertThat(response)
 							.hasBody(json(), json -> assertThat(json)
@@ -257,13 +247,11 @@ final class JSONLDFormatTest {
 			exec(() -> new Request()
 
 					.base(base)
-					.header("Accept-Language", "en")
+					.header("Accept-Language", "en").reply().map(response1 -> {
 
-					.reply(response -> {
+						final IRI item=iri(response1.item());
 
-						final IRI item=iri(response.item());
-
-						return response.status(OK)
+						return response1.status(OK)
 
 								.set(shape(), field(direct, localized()))
 
@@ -285,11 +273,9 @@ final class JSONLDFormatTest {
 		}
 
 		@Test void testReportInvalidPayload() {
-			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request()
+			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 -> response(response1).body(jsonld(), frame(iri(response1.item()))))
 
-					.reply(response -> response(response).body(jsonld(), frame(iri(response.item()))))
-
-					.accept(response -> response.body(output()).accept(e -> {},
+					.accept(response -> response.body(output()).accept(e -> { },
 							target -> target.accept(new ByteArrayOutputStream())
 					)))
 

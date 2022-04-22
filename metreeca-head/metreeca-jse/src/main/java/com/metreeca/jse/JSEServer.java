@@ -66,7 +66,7 @@ public final class JSEServer {
     );
 
 
-    private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
+    private static Supplier<Handler> delegate() { return () -> request -> request.reply().map(identity()); }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,7 +29,6 @@ import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.shapes.Guard.Delete;
 import static com.metreeca.json.shapes.Guard.Detail;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Toolbox.service;
@@ -106,9 +105,9 @@ public final class Deleter extends Handler.Base {
 
 			return engine.delete(frame(item), shape)
 
-					.map(frame -> request.reply(status(NoContent)))
+					.map(frame -> request.reply(NoContent))
 
-					.orElseGet(() -> request.reply(status(NotFound))); // !!! 410 Gone if previously known
+					.orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known
 
 		};
 	}

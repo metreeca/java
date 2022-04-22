@@ -43,10 +43,9 @@ final class RouterTest {
 		}
 
 		private Handler handler() {
-			return request -> request.reply(response -> response
+			return request -> request.reply().map(response -> response
 					.status(Response.OK)
-					.header("path", request.path())
-			);
+					.header("path", request.path()));
 		}
 
 
@@ -186,8 +185,8 @@ final class RouterTest {
 
 			final Router router=router()
 
-					.path("/path", request -> request.reply(response -> response.status(100)))
-					.path("/*", request -> request.reply(response -> response.status(200)));
+					.path("/path", request -> request.reply().map(response -> response.status(100)))
+					.path("/*", request -> request.reply().map(response -> response.status(200)));
 
 			router.handle(request("/path")).accept(response -> assertThat(response).hasStatus(100));
 			router.handle(request("/path/path")).accept(response -> assertThat(response).hasStatus(200));
@@ -199,7 +198,7 @@ final class RouterTest {
 	@Nested final class Methods {
 
 		private Response handler(final Request request) {
-			return request.reply(response -> response
+			return request.reply().map(response -> response
 
 					.status(Response.OK)
 
@@ -209,9 +208,7 @@ final class RouterTest {
 						} catch ( final IOException e ) {
 							throw new UncheckedIOException(e);
 						}
-					})
-
-			);
+					}));
 		}
 
 

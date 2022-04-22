@@ -146,12 +146,11 @@ public final class Bearer implements Wrapper {
 
 							// not authenticated > report error
 
-							.orElseGet(() -> request.reply(response -> response
+							.orElseGet(() -> request.reply().map(response -> response
 									.status(Response.Unauthorized)
 									.header("WWW-Authenticate", format(
 											"Bearer realm=\"%s\", error=\"invalid_token\"", response.request().base()
-									))
-							))
+									))))
 
 					)
 

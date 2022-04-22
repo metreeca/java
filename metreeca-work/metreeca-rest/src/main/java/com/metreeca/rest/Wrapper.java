@@ -25,7 +25,6 @@ import java.util.function.*;
 
 import static com.metreeca.json.shapes.Guard.*;
 import static com.metreeca.rest.Handler.handler;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.Forbidden;
 import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
@@ -166,8 +165,9 @@ import static java.util.Objects.requireNonNull;
 		}
 
 		return handler -> request ->
-				request.body(format).fold(request::reply, value -> handler.handle(
-						request.body(format, requireNonNull(mapper.apply(request, value), "null mapper return value"))
+				request.body(format).fold(mapper1 -> request.reply().map(mapper1), value -> handler.handle(
+								request.body(format, requireNonNull(mapper.apply(request, value), "null mapper return "
+										+ "value"))
 						)
 				);
 	}
@@ -242,7 +242,7 @@ import static java.util.Objects.requireNonNull;
 		}
 
 		return handler -> request -> request.roles().stream().anyMatch(roles::contains)
-				? handler.handle(request) : request.reply(status(Unauthorized)); // !!! 404 under strict security
+				? handler.handle(request) : request.reply(Unauthorized); // !!! 404 under strict security
 	}
 
 
@@ -295,8 +295,8 @@ import static java.util.Objects.requireNonNull;
 
 			);
 
-			return baseline.empty() ? request.reply(status(Forbidden))
-					: authorized.empty() ? request.reply(status(Unauthorized))
+			return baseline.empty() ? request.reply(Forbidden)
+					: authorized.empty() ? request.reply(Unauthorized)
 					: handler.handle(request.map(incoming)).map(outgoing);
 
 		};
