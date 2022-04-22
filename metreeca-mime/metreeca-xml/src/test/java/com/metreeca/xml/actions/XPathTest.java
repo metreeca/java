@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.rest.Either;
+import com.metreeca.http.Either;
 import com.metreeca.rest.Xtream;
 import com.metreeca.xml.formats.XMLFormat;
 

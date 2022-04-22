@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.http.Either;
 import com.metreeca.json.*;
 import com.metreeca.json.shapes.Or;
 import com.metreeca.rest.*;
@@ -28,13 +29,13 @@ import java.util.function.Supplier;
 
 import javax.json.*;
 
+import static com.metreeca.http.Either.Left;
+import static com.metreeca.http.Either.Right;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Trace.trace;
 import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.lang;
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.Toolbox.service;

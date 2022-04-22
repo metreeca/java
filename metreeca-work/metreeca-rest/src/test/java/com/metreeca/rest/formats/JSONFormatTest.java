@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.rest.EitherAssert;
+import com.metreeca.http.EitherAssert;
 import com.metreeca.rest.Request;
 
 import org.assertj.core.api.Assertions;

@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.http.Either;
 import com.metreeca.json.Shape;
 import com.metreeca.json.Trace;
-import com.metreeca.rest.Either;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static com.metreeca.http.EitherAssert.assertThat;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Shape.required;
 import static com.metreeca.json.Values.*;
@@ -55,7 +56,6 @@ import static com.metreeca.json.shapes.Pattern.pattern;
 import static com.metreeca.json.shapes.Range.range;
 import static com.metreeca.json.shapes.Stem.stem;
 import static com.metreeca.json.shapes.When.when;
-import static com.metreeca.rest.EitherAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

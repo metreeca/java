@@ -17,6 +17,7 @@
 package com.metreeca.rest.formats;
 
 import com.metreeca.core.Feeds;
+import com.metreeca.http.Either;
 import com.metreeca.rest.*;
 
 import java.io.*;
