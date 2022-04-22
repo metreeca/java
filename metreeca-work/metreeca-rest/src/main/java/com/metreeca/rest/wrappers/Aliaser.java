@@ -50,8 +50,6 @@ public final class Aliaser implements Wrapper {
 	 *                 aliased request {@linkplain Request#item() item}, if one was identified, or an empty optional,
 	 *                 otherwise
 	 *
-	 * @return a new resource aliaser
-	 *
 	 * @throws NullPointerException if {@code resolver} is null or returns a null value
 	 */
 	public Aliaser(final Function<Request, Optional<String>> resolver) {
