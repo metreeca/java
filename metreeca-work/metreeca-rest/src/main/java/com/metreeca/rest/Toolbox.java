@@ -16,7 +16,7 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.rest.services.Logger;
+import com.metreeca.http.services.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

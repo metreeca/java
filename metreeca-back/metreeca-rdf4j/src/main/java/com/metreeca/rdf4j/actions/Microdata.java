@@ -19,9 +19,9 @@
 package com.metreeca.rdf4j.actions;
 
 import com.metreeca.core.Identifiers;
+import com.metreeca.http.services.Logger;
 import com.metreeca.json.Values;
 import com.metreeca.rdf.schemas.Schema;
-import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -37,9 +37,9 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

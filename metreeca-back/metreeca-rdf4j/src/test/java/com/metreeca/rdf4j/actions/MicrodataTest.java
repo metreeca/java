@@ -17,10 +17,10 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.http.services.Logger;
+import com.metreeca.http.services.Logger.Level;
 import com.metreeca.rest.Toolbox;
 import com.metreeca.rest.Xtream;
-import com.metreeca.rest.services.Logger;
-import com.metreeca.rest.services.Logger.Level;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
@@ -33,8 +33,8 @@ import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Values.*;
-import static com.metreeca.rest.services.Logger.logger;
 import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static org.assertj.core.api.Assertions.assertThat;

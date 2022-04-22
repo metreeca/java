@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.services.Logger.time;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;

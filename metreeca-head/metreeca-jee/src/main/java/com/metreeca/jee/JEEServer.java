@@ -30,9 +30,9 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;

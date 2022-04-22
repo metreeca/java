@@ -16,10 +16,10 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Handler;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.services.Logger;
 
 import java.util.*;
 

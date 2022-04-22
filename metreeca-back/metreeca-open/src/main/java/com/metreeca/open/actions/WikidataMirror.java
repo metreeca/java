@@ -18,12 +18,12 @@ package com.metreeca.open.actions;
 
 import com.metreeca.core.Identifiers;
 import com.metreeca.core.Strings;
+import com.metreeca.http.services.Logger;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.Fill;
-import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -37,13 +37,13 @@ import java.util.function.*;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.services.Logger.time;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
 

@@ -17,6 +17,7 @@
 package com.metreeca.rdf4j.processors;
 
 import com.metreeca.core.Strings;
+import com.metreeca.http.services.Logger;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Values;
 import com.metreeca.rdf4j.actions.GraphQuery;
@@ -25,7 +26,6 @@ import com.metreeca.rdf4j.schemas.Text;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.Fill;
-import com.metreeca.rest.services.Logger;
 import com.metreeca.text.Match;
 
 import org.eclipse.rdf4j.model.*;
@@ -41,11 +41,11 @@ import java.util.stream.Stream;
 
 import javax.json.Json;
 
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.util.Map.entry;
 import static java.util.regex.Pattern.compile;

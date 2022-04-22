@@ -17,6 +17,7 @@
 package com.metreeca.rest.services;
 
 import com.metreeca.core.Feeds;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 import com.metreeca.rest.formats.DataFormat;
@@ -31,11 +32,11 @@ import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
 import static com.metreeca.core.Feeds.data;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;

@@ -17,10 +17,10 @@
 package com.metreeca.rest.actions;
 
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 import com.metreeca.rest.services.Fetcher;
-import com.metreeca.rest.services.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;

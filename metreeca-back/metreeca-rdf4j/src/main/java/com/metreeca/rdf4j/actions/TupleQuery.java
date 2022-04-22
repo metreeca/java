@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.Operation;
@@ -25,8 +25,8 @@ import org.eclipse.rdf4j.query.Operation;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.time;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
 import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
