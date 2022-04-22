@@ -27,9 +27,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.*;
-import static com.metreeca.rest.Response.*;
+import static com.metreeca.rest.Response.MethodNotAllowed;
+import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -308,12 +308,10 @@ public final class Router implements Handler {
 				.filter(Objects::nonNull)
 				.findFirst()
 
-				.orElseGet(() -> (
-
-						methods.isEmpty() ? status(NotFound)
-								: methods.getOrDefault(request.method(), this::options)
-
-				).handle(request, forward));
+				.orElseGet(() -> methods.isEmpty()
+						? forward.apply(request) // fall through
+						: methods.getOrDefault(request.method(), this::options).handle(request, forward)
+				);
 	}
 
 

@@ -17,7 +17,6 @@
 package com.metreeca.rest.handlers;
 
 import com.metreeca.rest.*;
-import com.metreeca.rest.services.Fetcher.URLFetcher;
 
 import java.net.*;
 import java.nio.file.*;
@@ -204,9 +203,6 @@ public final class Publisher extends Delegator {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private final URLFetcher fetcher=new URLFetcher();
-
 
     private Publisher(final Path root) {
         delegate(router()

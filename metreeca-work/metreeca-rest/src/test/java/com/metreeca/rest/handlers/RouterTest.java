@@ -102,7 +102,7 @@ final class RouterTest {
 
                     .map(response -> assertThat(response)
                             .as("request ignored")
-                            .hasStatus(Response.NotFound)
+                            .hasStatus(0)
                             .doesNotHaveHeader("path")
                     );
         }
