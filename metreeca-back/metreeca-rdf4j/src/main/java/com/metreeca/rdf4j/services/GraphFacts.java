@@ -18,9 +18,9 @@ package com.metreeca.rdf4j.services;
 
 import com.metreeca.core.Strings;
 import com.metreeca.http.services.Logger;
-import com.metreeca.json.Shape;
-import com.metreeca.json.Values;
-import com.metreeca.json.shapes.*;
+import com.metreeca.link.Shape;
+import com.metreeca.link.Values;
+import com.metreeca.link.shapes.*;
 import com.metreeca.rest.Config;
 import com.metreeca.rest.Scribe;
 
@@ -34,13 +34,13 @@ import java.util.stream.Stream;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.All.all;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Link.link;
-import static com.metreeca.json.shapes.Or.or;
-import static com.metreeca.json.shapes.When.when;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.All.all;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Link.link;
+import static com.metreeca.link.shapes.Or.or;
+import static com.metreeca.link.shapes.When.when;
 import static com.metreeca.rdf4j.SPARQLScribe.datatype;
 import static com.metreeca.rdf4j.SPARQLScribe.edge;
 import static com.metreeca.rdf4j.SPARQLScribe.eq;
@@ -91,7 +91,7 @@ abstract class GraphFacts {
 	 *
 	 * @return the id of the principal node proxied by {@code id}
 	 *
-	 * @see "linking @ metreeca-json design notes"
+	 * @see "linking @ metreeca-link design notes"
 	 */
 	static String principal(final String id, final Collection<String> ids) {
 		return id.endsWith("a") ? id

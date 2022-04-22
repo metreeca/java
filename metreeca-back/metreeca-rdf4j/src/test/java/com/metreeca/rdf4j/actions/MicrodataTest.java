@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.json.Values.*;
+import static com.metreeca.link.Values.*;
 import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static org.assertj.core.api.Assertions.assertThat;

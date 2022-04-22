@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.Shape;
+import com.metreeca.link.Shape;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -29,16 +29,16 @@ import java.util.Map;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import static com.metreeca.json.Shape.optional;
-import static com.metreeca.json.Shape.required;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Lang.lang;
-import static com.metreeca.json.shapes.Localized.localized;
-import static com.metreeca.json.shapes.MaxCount.maxCount;
-import static com.metreeca.json.shapes.Or.or;
+import static com.metreeca.link.Shape.optional;
+import static com.metreeca.link.Shape.required;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Lang.lang;
+import static com.metreeca.link.shapes.Localized.localized;
+import static com.metreeca.link.shapes.MaxCount.maxCount;
+import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.rest.JSONAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -16,7 +16,7 @@
 
 package com.metreeca.open.actions;
 
-import com.metreeca.json.Frame;
+import com.metreeca.link.Frame;
 import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.*;
 import com.metreeca.rest.formats.JSONFormat;
@@ -28,8 +28,8 @@ import java.util.function.Function;
 
 import javax.json.*;
 
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.iri;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.iri;
 import static com.metreeca.rest.formats.JSONFormat.json;
 
 

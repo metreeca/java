@@ -19,7 +19,7 @@ package com.metreeca.rest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.json.Values.iri;
+import static com.metreeca.link.Values.iri;
 import static com.metreeca.rest.Scribe.code;
 import static com.metreeca.rest.Scribe.text;
 

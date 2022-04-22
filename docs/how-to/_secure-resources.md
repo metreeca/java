@@ -20,7 +20,7 @@ import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 
 import java.io.File;
 
-import static com.metreeca.json.Values.uuid;
+import static com.metreeca.link.Values.uuid;
 import static com.metreeca.rdf4j.assets.Graph.graph;
 import static com.metreeca.rdf4j.handlers.Graphs.graphs;
 import static com.metreeca.rdf4j.handlers.SPARQL.sparql;

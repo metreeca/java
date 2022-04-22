@@ -214,7 +214,7 @@ public abstract class Format<V> {
 	 *
 	 * @throws NullPointerException if {@code message} is null
 	 */
-	public Either<MessageException, V> decode(final Message<?> message) {
+	public <M extends Message<M>> Either<MessageException, V> decode(final M message) {
 
 		if ( message == null ) {
 			throw new NullPointerException("null message");

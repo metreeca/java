@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.json.*;
-import com.metreeca.json.queries.*;
-import com.metreeca.json.shapes.Field;
+import com.metreeca.link.*;
+import com.metreeca.link.queries.*;
+import com.metreeca.link.shapes.Field;
 import com.metreeca.rest.operators.Creator;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -29,11 +29,11 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.Values.term;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.link.Values.term;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;

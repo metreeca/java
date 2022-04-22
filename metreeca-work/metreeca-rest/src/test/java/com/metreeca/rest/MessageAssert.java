@@ -26,7 +26,6 @@ import org.assertj.core.api.Assertions;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.fail;
 
@@ -35,16 +34,16 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Message<T>> extends AbstractAssert<A, T> {
 
-	@SuppressWarnings("unchecked") public static <T extends Message<T>> MessageAssert<?, ?> assertThat(final Message<?> message) {
+    @SuppressWarnings("unchecked") public static <T extends Message<T>> MessageAssert<?, ?> assertThat(final Message<?> message) {
 
-		final class WorkAssert extends MessageAssert<WorkAssert, T> {
+	    final class WorkAssert extends MessageAssert<WorkAssert, T> {
 
-			private WorkAssert(final T actual) { super(actual, WorkAssert.class); }
+		    private WorkAssert(final T actual) { super(actual, WorkAssert.class); }
 
-		}
+	    }
 
-		return new WorkAssert((T)message);
-	}
+	    return new WorkAssert((T)message);
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,10 +69,10 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public <V> A hasAttribute(final Supplier<V> factory, final Consumer<V> assertions) {
+	public <V> A hasAttribute(final Class<V> key, final Consumer<V> assertions) {
 
-		if ( factory == null ) {
-			throw new NullPointerException("null factory");
+		if ( key == null ) {
+			throw new NullPointerException("null key");
 		}
 
 		if ( assertions == null ) {
@@ -82,7 +81,10 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		assertions.accept(actual.get(factory));
+		actual.attribute(key).ifPresentOrElse(assertions, () ->
+				failWithMessage("expected message to have <%s> attribute", key)
+		);
+
 
 		return myself;
 	}
@@ -200,7 +202,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 			throw new NullPointerException("null format");
 		}
 
-		return hasBody(format, body -> {});
+		return hasBody(format, body -> { });
 	}
 
 	public <V> A hasBody(final Format<V> body, final Consumer<V> assertions) {
@@ -238,7 +240,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		actual.body(DataFormat.data()).accept(e -> {}, data -> {
+		actual.body(DataFormat.data()).accept(e -> { }, data -> {
 
 			if ( data.length > 0 ) {
 				failWithMessage("expected empty body but had binary body of length <%d>", data.length);
@@ -246,7 +248,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		});
 
-		actual.body(TextFormat.text()).accept(e -> {}, text -> {
+		actual.body(TextFormat.text()).accept(e -> { }, text -> {
 
 			if ( !text.isEmpty() ) {
 				failWithMessage(

@@ -396,8 +396,8 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
@@ -577,8 +577,8 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.LDP;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
@@ -697,7 +697,7 @@ public final class Server {
 Actors delegate transaction management, data validation and trimming and CRUD operations to a customizable engine.
 
 CRUD perations are performed on the graph neighbourhood of the target target item(s)  matched by
-the  [shape](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/Shape.html)
+the  [shape](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/Shape.html)
 model associated to the request, after redaction according to the request user roles and to actor-specific task, area and
 mode parameters.
 
@@ -712,7 +712,7 @@ import com.metreeca.rest.Handler.Delegator;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
-import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.Deleter.deleter;
@@ -785,7 +785,7 @@ import org.eclipse.rdf4j.model.IRI;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-import static com.metreeca.json.Values.iri;
+import static com.metreeca.link.Values.iri;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.http.Locator.service;
 
@@ -839,7 +839,7 @@ public final class Toys implements Runnable {
 			return this;
 
 		});
-	}
+  }
 
 }
 ```
@@ -849,18 +849,18 @@ import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
 
-import static com.metreeca.json.Values.literal;
-import static com.metreeca.json.shapes.Clazz.clazz;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.*;
-import static com.metreeca.json.shapes.MaxExclusive.maxExclusive;
-import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
-import static com.metreeca.json.shapes.MaxLength.maxLength;
-import static com.metreeca.json.shapes.MinExclusive.minExclusive;
-import static com.metreeca.json.shapes.MinInclusive.minInclusive;
-import static com.metreeca.json.shapes.Or.or;
-import static com.metreeca.json.shapes.Pattern.pattern;
+import static com.metreeca.link.Values.literal;
+import static com.metreeca.link.shapes.Clazz.clazz;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.*;
+import static com.metreeca.link.shapes.MaxExclusive.maxExclusive;
+import static com.metreeca.link.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.link.shapes.MaxLength.maxLength;
+import static com.metreeca.link.shapes.MinExclusive.minExclusive;
+import static com.metreeca.link.shapes.MinInclusive.minInclusive;
+import static com.metreeca.link.shapes.Or.or;
+import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.Deleter.deleter;
@@ -870,7 +870,7 @@ import static com.metreeca.rest.wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-	public Products() {
+    public Products() {
 		delegate(driver(or(relate(), role(Toys.staff)).then(
 
 				filter(clazz(Toys.Product)),
@@ -1125,18 +1125,18 @@ import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
 
-import static com.metreeca.json.Values.literal;
-import static com.metreeca.json.shapes.Clazz.clazz;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.*;
-import static com.metreeca.json.shapes.MaxExclusive.maxExclusive;
-import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
-import static com.metreeca.json.shapes.MaxLength.maxLength;
-import static com.metreeca.json.shapes.MinExclusive.minExclusive;
-import static com.metreeca.json.shapes.MinInclusive.minInclusive;
-import static com.metreeca.json.shapes.Or.or;
-import static com.metreeca.json.shapes.Pattern.pattern;
+import static com.metreeca.link.Values.literal;
+import static com.metreeca.link.shapes.Clazz.clazz;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.*;
+import static com.metreeca.link.shapes.MaxExclusive.maxExclusive;
+import static com.metreeca.link.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.link.shapes.MaxLength.maxLength;
+import static com.metreeca.link.shapes.MinExclusive.minExclusive;
+import static com.metreeca.link.shapes.MinInclusive.minInclusive;
+import static com.metreeca.link.shapes.Or.or;
+import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.rdf4j.services.Graph.update;
 import static com.metreeca.http.Locator.text;
 import static com.metreeca.rest.Wrapper.postprocessor;
@@ -1291,8 +1291,8 @@ using custom filtering functions.
 
 Multi-lingual content retrieval is fully supported,
 with [compact rendering](https://www.w3.org/TR/json-ld11/#language-indexing) for shapes including
-either [`localized()`](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/shapes/Localized.html)
-or  [`lang()`](https://javadoc.io/doc/com.metreeca/metreeca-json/latest/com/metreeca/json/shapes/Lang.html) constraints.
+either [`localized()`](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/shapes/Localized.html)
+or  [`lang()`](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/shapes/Lang.html) constraints.
 
 Retrieved localizations may be limited to a predefined set of language tags using a `convey` language constraint, like
 for instance:

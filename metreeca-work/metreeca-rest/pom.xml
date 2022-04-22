@@ -41,7 +41,7 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-json</artifactId>
+			<artifactId>metreeca-link</artifactId>
 		</dependency>
 
 
@@ -54,7 +54,7 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-json</artifactId>
+			<artifactId>metreeca-link</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

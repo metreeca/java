@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.operators;
 
-import com.metreeca.json.Frame;
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
@@ -27,14 +27,13 @@ import com.metreeca.rest.services.Engine;
 import org.eclipse.rdf4j.model.IRI;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.shapes.Guard.Delete;
-import static com.metreeca.json.shapes.Guard.Detail;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.shapes.Guard.Delete;
+import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Wrapper.keeper;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.services.Engine.engine;
 
 
@@ -46,7 +45,7 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -93,7 +92,7 @@ public final class Deleter extends Delegator {
         return (request, next) -> {
 
             final IRI item=iri(request.item());
-            final Shape shape=request.get(shape());
+			final Shape shape=JSONLDFormat.shape(request);
 
             return engine.delete(frame(item), shape)
 

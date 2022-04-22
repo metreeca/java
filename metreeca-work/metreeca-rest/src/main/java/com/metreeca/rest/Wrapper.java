@@ -17,13 +17,14 @@
 package com.metreeca.rest;
 
 
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.Guard;
+import com.metreeca.rest.formats.JSONLDFormat;
 
 import java.util.*;
 import java.util.function.*;
 
-import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.Response.Forbidden;
 import static com.metreeca.rest.Response.Unauthorized;
@@ -43,75 +44,75 @@ import static java.util.Objects.requireNonNull;
  */
 @FunctionalInterface public interface Wrapper {
 
-	/**
-	 * Creates a conditional wrapper.
-	 *
-	 * @param test the request predicate used to decide if requests and responses are to be routed through the wrapper
-	 * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-	 *             true} on the request
-	 *
-	 * @return a conditional wrapper that routes requests and responses through the {@code pass} handler if the {@code
-	 * test} predicate evaluates to {@code true} on the request or to a dummy wrapper otherwise
-	 *
-	 * @throws NullPointerException if either {@code test} or {@code pass} is null
-	 */
-	public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass) {
+    /**
+     * Creates a conditional wrapper.
+     *
+     * @param test the request predicate used to decide if requests and responses are to be routed through the wrapper
+     * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
+     *             true} on the request
+     *
+     * @return a conditional wrapper that routes requests and responses through the {@code pass} handler if the {@code
+     * test} predicate evaluates to {@code true} on the request or to a dummy wrapper otherwise
+     *
+     * @throws NullPointerException if either {@code test} or {@code pass} is null
+     */
+    public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass) {
 
-		if ( test == null ) {
-			throw new NullPointerException("null test predicate");
-		}
+        if ( test == null ) {
+            throw new NullPointerException("null test predicate");
+        }
 
-		if ( pass == null ) {
-			throw new NullPointerException("null pass wrapper");
-		}
+        if ( pass == null ) {
+            throw new NullPointerException("null pass wrapper");
+        }
 
-		return wrapper(test, pass, handler -> handler);
-	}
+        return wrapper(test, pass, handler -> handler);
+    }
 
-	/**
-	 * Creates a conditional wrapper.
-	 *
-	 * @param test the request predicate used to select the wrapper requests and responses are to be routed through
-	 * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-	 *             true} on the request
-	 * @param fail the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-	 *             false} on the request
-	 *
-	 * @return a conditional wrapper that routes requests and responses either through the {@code pass} or the {@code
-	 * fail} wrapper according to the results of the {@code test} predicate
-	 *
-	 * @throws NullPointerException if any of the arguments is null
-	 */
-	public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass, final Wrapper fail) {
+    /**
+     * Creates a conditional wrapper.
+     *
+     * @param test the request predicate used to select the wrapper requests and responses are to be routed through
+     * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
+     *             true} on the request
+     * @param fail the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
+     *             false} on the request
+     *
+     * @return a conditional wrapper that routes requests and responses either through the {@code pass} or the {@code
+     * fail} wrapper according to the results of the {@code test} predicate
+     *
+     * @throws NullPointerException if any of the arguments is null
+     */
+    public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass, final Wrapper fail) {
 
-		if ( test == null ) {
-			throw new NullPointerException("null test predicate");
-		}
+        if ( test == null ) {
+            throw new NullPointerException("null test predicate");
+        }
 
-		if ( pass == null ) {
-			throw new NullPointerException("null pass wrapper");
-		}
+        if ( pass == null ) {
+            throw new NullPointerException("null pass wrapper");
+        }
 
-		if ( fail == null ) {
-			throw new NullPointerException("null fail wrapper");
-		}
+        if ( fail == null ) {
+            throw new NullPointerException("null fail wrapper");
+        }
 
-		return handler -> handler(test, pass.wrap(handler), fail.wrap(handler));
-	}
+        return handler -> handler(test, pass.wrap(handler), fail.wrap(handler));
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Creates a pre-processing wrapper.
-	 *
-	 * @param mapper a request mapping function; must return a non-null value
-	 *
-	 * @return a wrapper that pre-process requests using {@code mapper}
-	 *
-	 * @throws NullPointerException if {@code mapper} is null or returns a null value
-	 */
-	public static Wrapper preprocessor(final Function<Request, Request> mapper) {
+    /**
+     * Creates a pre-processing wrapper.
+     *
+     * @param mapper a request mapping function; must return a non-null value
+     *
+     * @return a wrapper that pre-process requests using {@code mapper}
+     *
+     * @throws NullPointerException if {@code mapper} is null or returns a null value
+     */
+    public static Wrapper preprocessor(final Function<Request, Request> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
@@ -122,20 +123,20 @@ import static java.util.Objects.requireNonNull;
                 next);
     }
 
-	/**
-	 * Creates a  {@linkplain Response#success() successful} post-processing wrapper.
-	 *
-	 * @param mapper a response mapping function; must return a non-null value
-	 *
-	 * @return a wrapper that post-process successful responses using {@code mapper}
-	 *
-	 * @throws NullPointerException if {@code mapper} is null or returns a null value
-	 */
-	public static Wrapper postprocessor(final Function<Response, Response> mapper) {
+    /**
+     * Creates a  {@linkplain Response#success() successful} post-processing wrapper.
+     *
+     * @param mapper a response mapping function; must return a non-null value
+     *
+     * @return a wrapper that post-process successful responses using {@code mapper}
+     *
+     * @throws NullPointerException if {@code mapper} is null or returns a null value
+     */
+    public static Wrapper postprocessor(final Function<Response, Response> mapper) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
         return handler -> (request, next) -> handler.handle(request, next).map(response -> response.success()
                 ? requireNonNull(mapper.apply(response), "null mapper return value")
@@ -144,25 +145,25 @@ import static java.util.Objects.requireNonNull;
 	}
 
 
-	/**
-	 * Creates a pre-processing body wrapper.
-	 *
-	 * @param <V>    the type of the request body to be pre-processed
-	 * @param format the format of the request body to be pre-processed
-	 * @param mapper the request body mapper; takes as argument a request and its {@code format} body and must return a
-	 *               non-null updated value
-	 *
-	 * @return a wrapper that pre-process request {@code format} bodies using {@code mapper}
-	 *
-	 * @throws NullPointerException if either {@code format} or {@code mapper} is null
-	 */
-	public static <V> Wrapper preprocessor(
-			final Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
-	) {
+    /**
+     * Creates a pre-processing body wrapper.
+     *
+     * @param <V>    the type of the request body to be pre-processed
+     * @param format the format of the request body to be pre-processed
+     * @param mapper the request body mapper; takes as argument a request and its {@code format} body and must return a
+     *               non-null updated value
+     *
+     * @return a wrapper that pre-process request {@code format} bodies using {@code mapper}
+     *
+     * @throws NullPointerException if either {@code format} or {@code mapper} is null
+     */
+    public static <V> Wrapper preprocessor(
+            final Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
+    ) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
         return handler -> (request, next) ->
                 request.body(format).fold(mapper1 -> request.reply().map(mapper1), value -> handler.handle(
@@ -172,26 +173,25 @@ import static java.util.Objects.requireNonNull;
                 );
 	}
 
-	/**
-	 * Creates a {@linkplain Response#success() successful} post-processing body wrapper.
-	 *
-	 * @param <V>    the type of the response body to be post-processed
-	 * @param format the format of the response body to be post-processed
-	 * @param mapper the response body mapper; takes as argument a response and its {@code format} body and must
-	 *                  return a
-	 *               non-null updated value
-	 *
-	 * @return a wrapper that post-process successful response {@code format} bodies using {@code mapper}
-	 *
-	 * @throws NullPointerException if either {@code format} or {@code mapper} is null
-	 */
-	public static <V> Wrapper postprocessor(
-			final Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
-	) {
+    /**
+     * Creates a {@linkplain Response#success() successful} post-processing body wrapper.
+     *
+     * @param <V>    the type of the response body to be post-processed
+     * @param format the format of the response body to be post-processed
+     * @param mapper the response body mapper; takes as argument a response and its {@code format} body and must return a
+     *               non-null updated value
+     *
+     * @return a wrapper that post-process successful response {@code format} bodies using {@code mapper}
+     *
+     * @throws NullPointerException if either {@code format} or {@code mapper} is null
+     */
+    public static <V> Wrapper postprocessor(
+            final Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
+    ) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
         return handler -> (request, next) -> handler.handle(request, next).map(response ->
                 response.success() ? response.body(format).fold(error -> { throw error; },
@@ -202,40 +202,40 @@ import static java.util.Objects.requireNonNull;
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Creates a role-based access controller.
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform the action managed by the
-	 *              wrapped handler
-	 *
-	 * @return a role-based access controller rejecting all requests with no enabled user {@code roles} with a {@link
-	 * Response#Unauthorized} status code
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public static Wrapper roles(final Object... roles) {
+    /**
+     * Creates a role-based access controller.
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform the action managed by the
+     *              wrapped handler
+     *
+     * @return a role-based access controller rejecting all requests with no enabled user {@code roles} with a {@link
+     * Response#Unauthorized} status code
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public static Wrapper roles(final Object... roles) {
 
-		if ( roles == null || Arrays.stream(roles).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null roles");
-		}
+        if ( roles == null || Arrays.stream(roles).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null roles");
+        }
 
-		return roles(asList(roles));
-	}
+        return roles(asList(roles));
+    }
 
-	/**
-	 * Creates a role-based access controller.
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform the action managed by the
-	 *              wrapped handler
-	 *
-	 * @return a role-based access controller rejecting all requests with no enabled user {@code roles} with a {@link
-	 * Response#Unauthorized} status code
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public static Wrapper roles(final Collection<Object> roles) {
+    /**
+     * Creates a role-based access controller.
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform the action managed by the
+     *              wrapped handler
+     *
+     * @return a role-based access controller rejecting all requests with no enabled user {@code roles} with a {@link
+     * Response#Unauthorized} status code
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public static Wrapper roles(final Collection<Object> roles) {
 
         if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
             throw new NullPointerException("null roles");
@@ -246,20 +246,20 @@ import static java.util.Objects.requireNonNull;
     }
 
 
-	/**
-	 * Creates a shape-based access controller.
-	 *
-	 * @param task the accepted value for the {@linkplain Guard#Task task} parametric axis
-	 * @param view the accepted values for the {@linkplain Guard#View task} parametric axis
-	 *
-	 * @return a wrapper performing role-based shape redaction and shape-based authorization
-	 *
-	 * @throws NullPointerException if either {@code task} or {@code view} is null
-	 */
-	public static Wrapper keeper(final Object task, final Object view) {
+    /**
+     * Creates a shape-based access controller.
+     *
+     * @param task the accepted value for the {@linkplain Guard#Task task} parametric axis
+     * @param view the accepted values for the {@linkplain Guard#View task} parametric axis
+     *
+     * @return a wrapper performing role-based shape redaction and shape-based authorization
+     *
+     * @throws NullPointerException if either {@code task} or {@code view} is null
+     */
+    public static Wrapper keeper(final Object task, final Object view) {
         return handler -> (request, next) -> {
 
-            final Shape shape=request.get(shape()) // visible taking into account task/area
+            final Shape shape=JSONLDFormat.shape(request) // visible taking into account task/area
 
                     .redact(Task, task)
                     .redact(View, view)
@@ -269,109 +269,107 @@ import static java.util.Objects.requireNonNull;
 
                     .redact(Role);
 
-			final Shape authorized=shape // visible to user
+            final Shape authorized=shape // visible to user
 
-					.redact(Role, request.roles());
+                    .redact(Role, request.roles());
 
 
-			final UnaryOperator<Request> incoming=message -> message.map(shape(), s -> s
+            final UnaryOperator<Request> incoming=message -> JSONLDFormat.shape(message, shape(message)
 
-					.redact(Role, message.roles())
-					.redact(Task, task)
-					.redact(View, view)
+                    .redact(Role, message.roles())
+                    .redact(Task, task)
+                    .redact(View, view)
 
-					.localize(message.request().langs())
+                    .localize(message.request().langs())
+            );
 
-			);
+            final UnaryOperator<Response> outgoing=message -> JSONLDFormat.shape(message, shape(message)
 
-			final UnaryOperator<Response> outgoing=message -> message.map(shape(), s -> s
+                    .redact(Role, message.request().roles())
+                    .redact(Task, task)
+                    .redact(View, view)
+                    .redact(Mode, Convey)
 
-					.redact(Role, message.request().roles())
-					.redact(Task, task)
-					.redact(View, view)
-					.redact(Mode, Convey)
-
-					.localize(message.request().langs())
-
-			);
+                    .localize(message.request().langs())
+            );
 
             return baseline.empty() ? request.reply(Forbidden)
                     : authorized.empty() ? request.reply(Unauthorized)
                     : handler.handle(request.map(incoming), next).map(outgoing);
 
-		};
-	}
+        };
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Wraps a handler.
-	 *
-	 * @param handler the handler to be wrapped
-	 *
-	 * @return the combined handler generated by wrapping this wrapper around {@code handler}
-	 */
-	public Handler wrap(final Handler handler);
-
-
-	/**
-	 * Chains a wrapper.
-	 *
-	 * @param wrapper the handler to be chained
-	 *
-	 * @return the combined wrapper generated by wrapping this wrapper around {@code wrapper}
-	 *
-	 * @throws NullPointerException if {@code wrapper} is null
-	 */
-	public default Wrapper with(final Wrapper wrapper) {
-
-		if ( wrapper == null ) {
-			throw new NullPointerException("null wrapper");
-		}
-
-		return handler -> wrap(wrapper.wrap(handler));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Delegating wrapper.
-	 *
-	 * <p>Delegates request processing to a {@linkplain #delegate(Wrapper) delegate} wrapper, possibly assembled as a
-	 * combination of other wrappers.</p>
-	 */
-	public abstract class Base implements Wrapper {
-
-		private Wrapper delegate=handler -> handler;
+    /**
+     * Wraps a handler.
+     *
+     * @param handler the handler to be wrapped
+     *
+     * @return the combined handler generated by wrapping this wrapper around {@code handler}
+     */
+    public Handler wrap(final Handler handler);
 
 
-		/**
-		 * Configures the delegate wrapper.
-		 *
-		 * @param delegate the wrapper request processing is delegated to
-		 *
-		 * @return this wrapper
-		 *
-		 * @throws NullPointerException if {@code delegate} is null
-		 */
-		protected Base delegate(final Wrapper delegate) {
+    /**
+     * Chains a wrapper.
+     *
+     * @param wrapper the handler to be chained
+     *
+     * @return the combined wrapper generated by wrapping this wrapper around {@code wrapper}
+     *
+     * @throws NullPointerException if {@code wrapper} is null
+     */
+    public default Wrapper with(final Wrapper wrapper) {
 
-			if ( delegate == null ) {
-				throw new NullPointerException("null delegate");
-			}
+        if ( wrapper == null ) {
+            throw new NullPointerException("null wrapper");
+        }
 
-			this.delegate=delegate;
+        return handler -> wrap(wrapper.wrap(handler));
+    }
 
-			return this;
-		}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Delegating wrapper.
+     *
+     * <p>Delegates request processing to a {@linkplain #delegate(Wrapper) delegate} wrapper, possibly assembled as a
+     * combination of other wrappers.</p>
+     */
+    public abstract class Base implements Wrapper {
+
+        private Wrapper delegate=handler -> handler;
 
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Configures the delegate wrapper.
+         *
+         * @param delegate the wrapper request processing is delegated to
+         *
+         * @return this wrapper
+         *
+         * @throws NullPointerException if {@code delegate} is null
+         */
+        protected Base delegate(final Wrapper delegate) {
 
-		@Override public Wrapper with(final Wrapper wrapper) { return delegate.with(wrapper); }
+            if ( delegate == null ) {
+                throw new NullPointerException("null delegate");
+            }
 
-		@Override public Handler wrap(final Handler handler) { return delegate.wrap(handler); }
-	}
+            this.delegate=delegate;
+
+            return this;
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        @Override public Wrapper with(final Wrapper wrapper) { return delegate.with(wrapper); }
+
+        @Override public Handler wrap(final Handler handler) { return delegate.wrap(handler); }
+    }
 
 }

@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.Values.format;
+import static com.metreeca.link.Values.format;
 
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
