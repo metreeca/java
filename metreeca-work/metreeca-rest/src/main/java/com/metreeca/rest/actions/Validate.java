@@ -18,17 +18,17 @@
 
 package com.metreeca.rest.actions;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.json.Frame;
 import com.metreeca.json.Shape;
-import com.metreeca.rest.services.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.JSONLDFormat.validate;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;

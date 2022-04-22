@@ -217,8 +217,8 @@ public final class MessageException extends RuntimeException implements Handler,
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
-        return request.reply(report);
-    }
+		return request.reply().map(report);
+	}
 
 	@Override public Response apply(final Response response) {
 		return report.apply(response);

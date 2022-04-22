@@ -17,8 +17,10 @@
 package com.metreeca.rdf.formats;
 
 import com.metreeca.core.Feeds;
+import com.metreeca.http.Locator;
 import com.metreeca.json.Values;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.model.vocabulary.LDP;
@@ -51,131 +53,125 @@ import static java.util.Collections.singletonList;
 
 final class RDFFormatTest {
 
-	private void exec(final Runnable... tasks) {
-		new Toolbox().exec(tasks).clear();
-	}
+    private void exec(final Runnable... tasks) {
+        new Locator().exec(tasks).clear();
+    }
 
 
-	@Nested
-	final class Services {
+    @Nested final class Services {
 
-		private final RDFFormatTestService Turtle=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.TURTLE);
-		private final RDFFormatTestService RDFXML=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.RDFXML);
-		private final RDFFormatTestService Binary=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.BINARY);
-
-
-		@Test void testServiceScanMimeTypes() {
-
-			assertThat((Object)Binary)
-					.as("none matching")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/none")));
-
-			assertThat((Object)Turtle)
-					.as("single matching")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/turtle")));
-
-			assertThat((Object)Turtle)
-					.as("leading matching")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, asList("text/turtle", "text/plain")));
-
-			assertThat((Object)Turtle)
-					.as("trailing matching")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, asList("text/turtle", "text/none")));
-
-			assertThat((Object)Binary)
-					.as("wildcard")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("*/*, text/plain;q=0.1")));
-
-			assertThat((Object)Turtle)
-					.as("type pattern")
-					.isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/*, text/plain;q=0.1")));
-
-		}
-
-		@Test void testServiceTrapUnknownFallback() {
-			assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-					service(new org.eclipse.rdf4j.rio.RDFFormat(
-							"None", "text/none",
-							StandardCharsets.UTF_8, "",
-							org.eclipse.rdf4j.rio.RDFFormat.NO_NAMESPACES, org.eclipse.rdf4j.rio.RDFFormat.NO_CONTEXTS,
-							org.eclipse.rdf4j.rio.RDFFormat.NO_RDF_STAR
-					), mimes("text/none"))
-			);
-		}
+        private final RDFFormatTestService Turtle=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.TURTLE);
+        private final RDFFormatTestService RDFXML=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.RDFXML);
+        private final RDFFormatTestService Binary=new RDFFormatTestService(org.eclipse.rdf4j.rio.RDFFormat.BINARY);
 
 
-		private RDFFormatTestService service(final org.eclipse.rdf4j.rio.RDFFormat fallback, final List<String> types) {
+        @Test void testServiceScanMimeTypes() {
 
-			final TestRegistry registry=new TestRegistry();
+            assertThat((Object)Binary)
+                    .as("none matching")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/none")));
 
-			registry.add(Binary); // no text/* MIME type
-			registry.add(RDFXML); // no text/* MIME type
-			registry.add(Turtle);
+            assertThat((Object)Turtle)
+                    .as("single matching")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/turtle")));
 
-			return com.metreeca.rdf.formats.RDFFormat.service(registry, fallback, types);
-		}
+            assertThat((Object)Turtle)
+                    .as("leading matching")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, asList("text/turtle", "text/plain")));
+
+            assertThat((Object)Turtle)
+                    .as("trailing matching")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, asList("text/turtle", "text/none")));
+
+            assertThat((Object)Binary)
+                    .as("wildcard")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("*/*, text/plain;q=0.1")));
+
+            assertThat((Object)Turtle)
+                    .as("type pattern")
+                    .isSameAs(service(org.eclipse.rdf4j.rio.RDFFormat.BINARY, mimes("text/*, text/plain;q=0.1")));
+
+        }
+
+        @Test void testServiceTrapUnknownFallback() {
+            assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                    service(new org.eclipse.rdf4j.rio.RDFFormat(
+                            "None", "text/none",
+                            StandardCharsets.UTF_8, "",
+                            org.eclipse.rdf4j.rio.RDFFormat.NO_NAMESPACES, org.eclipse.rdf4j.rio.RDFFormat.NO_CONTEXTS,
+                            org.eclipse.rdf4j.rio.RDFFormat.NO_RDF_STAR
+                    ), mimes("text/none"))
+            );
+        }
 
 
-		private final class TestRegistry
-				extends FileFormatServiceRegistry<org.eclipse.rdf4j.rio.RDFFormat, RDFFormatTestService> {
+        private RDFFormatTestService service(final org.eclipse.rdf4j.rio.RDFFormat fallback, final List<String> types) {
 
-			private TestRegistry() {
-				super(RDFFormatTestService.class);
-			}
+            final TestRegistry registry=new TestRegistry();
 
-			@Override protected org.eclipse.rdf4j.rio.RDFFormat getKey(final RDFFormatTestService service) {
-				return service.getFormat();
-			}
+            registry.add(Binary); // no text/* MIME type
+            registry.add(RDFXML); // no text/* MIME type
+            registry.add(Turtle);
 
-		}
+            return com.metreeca.rdf.formats.RDFFormat.service(registry, fallback, types);
+        }
 
-	}
 
-	@Nested final class Decoder {
+        private final class TestRegistry
+                extends FileFormatServiceRegistry<org.eclipse.rdf4j.rio.RDFFormat, RDFFormatTestService> {
 
-		@Test void testHandleMissingInput() {
-			exec(() -> new Request().body(rdf()).fold(
-					error -> assertThat(error.getStatus()).isEqualTo(UnsupportedMediaType),
-					value -> fail("unexpected RDF body {"+value+"}")
-			));
-		}
+            private TestRegistry() {
+                super(RDFFormatTestService.class);
+            }
 
-		@Test void testHandleEmptyInput() {
+            @Override protected org.eclipse.rdf4j.rio.RDFFormat getKey(final RDFFormatTestService service) {
+                return service.getFormat();
+            }
+
+        }
+
+    }
+
+    @Nested final class Decoder {
+
+        @Test void testHandleMissingInput() {
+            exec(() -> new Request().body(rdf()).fold(
+                    error -> assertThat(error.getStatus()).isEqualTo(UnsupportedMediaType),
+                    value -> fail("unexpected RDF body {"+value+"}")
+            ));
+        }
+
+        @Test void testHandleEmptyInput() {
             exec(() -> new Request().body(input(), Feeds::input).body(rdf()).fold(
                     error -> fail("unexpected error {"+error+"}"),
                     value -> assertThat(value).isEmpty()
             ));
-		}
+        }
 
-	}
+    }
 
-	@Nested final class Encoder {
+    @Nested final class Encoder {
 
-		@Test void testConfigureWriterBaseIRI() {
-			exec(() -> new Request()
+        @Test void testConfigureWriterBaseIRI() {
+            exec(() -> new Request()
 
-					.base("http://example.com/base/")
-					.path("/")
+                    .base("http://example.com/base/")
+                    .path("/").reply()
+                    .status(Response.OK)
+                    .set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
+                    .body(rdf(), singletonList(statement(
+                            iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
+                                    +".com/base/x")
+                    )))
 
-					.reply(response -> {
-								return response
-										.status(Response.OK)
-										.set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
-										.body(rdf(), singletonList(statement(
-												iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
-														+ ".com/base/x")
-										)));
-							}
-					)
+                    .map(response -> assertThat(response)
+                            .hasBody(text(), text -> assertThat(text)
+                                    .contains("@base <"+"http://example.com/base/"+">")
+                            )
+                    )
+            );
+        }
 
-					.accept(response -> assertThat(response)
-							.hasBody(text(), text -> assertThat(text)
-									.contains("@base <"+"http://example.com/base/"+">")
-							)
-					)
-			);
-		}
-
-	}
+    }
 
 }

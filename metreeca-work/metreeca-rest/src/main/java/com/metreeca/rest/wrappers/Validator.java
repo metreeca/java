@@ -110,7 +110,7 @@ public final class Validator implements Wrapper {
                         .build()
                 )
 
-                .map(details -> request.reply(status(UnprocessableEntity, details)))
+				.map(details -> request.reply().map(status(UnprocessableEntity, details)))
 
                 .orElseGet(() -> handler.handle(request, next));
 	}

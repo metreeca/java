@@ -28,6 +28,7 @@ import java.io.*;
 
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
+import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.handlers.Router.router;
@@ -99,7 +100,7 @@ final class RouterTest {
 
                     .handle(request("/unknown"), Request::reply)
 
-                    .accept(response -> assertThat(response)
+                    .map(response -> assertThat(response)
                             .as("request ignored")
                             .hasStatus(Response.NotFound)
                             .doesNotHaveHeader("path")
@@ -111,15 +112,15 @@ final class RouterTest {
 
             final Router router=router().path("/path", handler());
 
-            router.handle(request("/path"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/path"), Request::reply).map(response -> assertThat(response)
                     .hasHeader("path", "/path")
             );
 
-            router.handle(request("/path/"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/path/"), Request::reply).map(response -> assertThat(response)
                     .doesNotHaveHeader("path")
             );
 
-            router.handle(request("/path/unknown"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/path/unknown"), Request::reply).map(response -> assertThat(response)
                     .doesNotHaveHeader("path")
             );
 
@@ -129,15 +130,15 @@ final class RouterTest {
 
             final Router router=router().path("/head/{id}/tail", handler());
 
-            router.handle(request("/head/path/tail"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head/path/tail"), Request::reply).map(response -> assertThat(response)
                     .hasHeader("path", "/head/path/tail")
             );
 
-            router.handle(request("/head/tail"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head/tail"), Request::reply).map(response -> assertThat(response)
                     .doesNotHaveHeader("path")
             );
 
-            router.handle(request("/head/path/path/tail"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head/path/path/tail"), Request::reply).map(response -> assertThat(response)
                     .doesNotHaveHeader("path")
             );
 
@@ -147,7 +148,7 @@ final class RouterTest {
 
             router().path("/{head}/{tail}", handler())
                     .handle(request("/one/two"), Request::reply)
-                    .accept(response -> assertThat(response.request())
+                    .map(response -> assertThat(response.request())
                             .as("placeholder values saved as parameters")
                             .hasParameter("head", "one")
                             .hasParameter("tail", "two")
@@ -155,7 +156,7 @@ final class RouterTest {
 
             router().path("/{}/{}", handler())
                     .handle(request("/one/two"), Request::reply)
-                    .accept(response -> assertThat(response.request())
+                    .map(response -> assertThat(response.request())
                             .has(new Condition<>(
                                     request -> request.parameters().isEmpty(),
                                     "empty placeholders ignored")
@@ -168,15 +169,15 @@ final class RouterTest {
 
             final Router router=router().path("/head/*", handler());
 
-            router.handle(request("/head/path"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head/path"), Request::reply).map(response -> assertThat(response)
                     .hasHeader("path", "/head/path")
             );
 
-            router.handle(request("/head/path/path"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head/path/path"), Request::reply).map(response -> assertThat(response)
                     .hasHeader("path", "/head/path/path")
             );
 
-            router.handle(request("/head"), Request::reply).accept(response -> assertThat(response)
+            router.handle(request("/head"), Request::reply).map(response -> assertThat(response)
                     .doesNotHaveHeader("path")
             );
 
@@ -190,8 +191,8 @@ final class RouterTest {
                     .path("/path", (request, forward) -> request.reply(100))
                     .path("/*", (request, forward) -> request.reply(200));
 
-            router.handle(request("/path"), Request::reply).accept(response -> assertThat(response).hasStatus(100));
-            router.handle(request("/path/path"), Request::reply).accept(response -> assertThat(response).hasStatus(200));
+            router.handle(request("/path"), Request::reply).map(response -> assertThat(response).hasStatus(100));
+            router.handle(request("/path/path"), Request::reply).map(response -> assertThat(response).hasStatus(200));
 
         }
 
@@ -217,7 +218,7 @@ final class RouterTest {
 
                     .handle(new Request().method(Request.OPTIONS), Request::reply)
 
-                    .accept(response -> assertThat(response)
+                    .map(response -> assertThat(response)
                             .hasStatus(OK)
                             .hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
                     );
@@ -230,8 +231,8 @@ final class RouterTest {
 
                     .handle(new Request().method(Request.POST), Request::reply)
 
-                    .accept(response -> assertThat(response)
-                            .hasStatus(Response.MethodNotAllowed)
+                    .map(response -> assertThat(response)
+                            .hasStatus(MethodNotAllowed)
                             .hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
                     );
         }
@@ -243,7 +244,7 @@ final class RouterTest {
 
                     .handle(new Request().method(Request.HEAD), Request::reply)
 
-                    .accept(response -> assertThat(response)
+                    .map(response -> assertThat(response)
                             .hasStatus(OK)
                             .hasBody(OutputFormat.output(), target -> {
 
@@ -264,8 +265,8 @@ final class RouterTest {
 
                     .handle(new Request().method(Request.HEAD), Request::reply)
 
-                    .accept(response -> assertThat(response)
-                            .hasStatus(Response.MethodNotAllowed)
+                    .map(response -> assertThat(response)
+                            .hasStatus(MethodNotAllowed)
                     );
         }
 

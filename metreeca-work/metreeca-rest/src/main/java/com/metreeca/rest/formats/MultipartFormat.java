@@ -47,253 +47,259 @@ import static java.util.stream.Collectors.*;
  */
 public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
-	/**
-	 * The default MIME type for multipart messages ({@value}).
-	 */
-	public static final String MIME="multipart/mixed";
+    /**
+     * The default MIME type for multipart messages ({@value}).
+     */
+    public static final String MIME="multipart/mixed";
 
-	/**
-	 * A pattern matching multipart MIME types, for instance {@code multipart/form-data}.
-	 */
-	public static final Pattern MIMEPattern=Pattern.compile("(?i)^multipart/.+$");
+    /**
+     * A pattern matching multipart MIME types, for instance {@code multipart/form-data}.
+     */
+    public static final Pattern MIMEPattern=Pattern.compile("(?i)^multipart/.+$");
 
 
-	private static final byte[] Dashes="--".getBytes(UTF_8);
-	private static final byte[] CRLF="\r\n".getBytes(UTF_8);
-	private static final byte[] Colon=": ".getBytes(UTF_8);
+    private static final byte[] Dashes="--".getBytes(UTF_8);
+    private static final byte[] CRLF="\r\n".getBytes(UTF_8);
+    private static final byte[] Colon=": ".getBytes(UTF_8);
 
-	private static final byte[] BoundaryChars=
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(UTF_8);
+    private static final byte[] BoundaryChars=
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(UTF_8);
 
-	private static final Pattern BoundaryPattern=Pattern.compile(parameter("boundary"));
-	private static final Pattern NamePattern=Pattern.compile(parameter("name"));
-	private static final Pattern ItemPattern=Pattern.compile(parameter("filename"));
+    private static final Pattern BoundaryPattern=Pattern.compile(parameter("boundary"));
+    private static final Pattern NamePattern=Pattern.compile(parameter("name"));
+    private static final Pattern ItemPattern=Pattern.compile(parameter("filename"));
 
 
-	private static String parameter(final String name) {
-		return format(";\\s*(?i:%s)\\s*=\\s*(?:\"(?<quoted>[^\"]*)\"|(?<simple>[^;\\s]*))", name);
-	}
+    private static String parameter(final String name) {
+        return format(";\\s*(?i:%s)\\s*=\\s*(?:\"(?<quoted>[^\"]*)\"|(?<simple>[^;\\s]*))", name);
+    }
 
-	private String parameter(final Matcher matcher) {
-		return Optional.ofNullable(matcher.group("quoted")).orElseGet(() -> matcher.group("simple"));
-	}
+    private String parameter(final Matcher matcher) {
+        return Optional.ofNullable(matcher.group("quoted")).orElseGet(() -> matcher.group("simple"));
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Creates a write-only multipart message format.
-	 *
-	 * @return a new write-only multipart message format with part/body size limit set to 0, intended for configuring
-	 * multipart response bodies
-	 */
-	public static MultipartFormat multipart() {
-		return new MultipartFormat(0, 0);
-	}
-
-	/**
-	 * Creates a multipart message format.
-	 *
-	 * @param part the size limit for individual message parts; includes boundary and headers and applies also to
-	 *                message
-	 *             preamble and epilogue
-	 * @param body the size limit for the complete message body
-	 *
-	 * @return a new read/write multipart message format with the given {@code part}/{@code body} size limits
-	 *
-	 * @throws IllegalArgumentException if either {@code part} or {@code body} is less than 0 or if {@code part} is
-	 *                                  greater than {@code body}
-	 */
-	public static MultipartFormat multipart(final int part, final int body) {
+    /**
+     * Creates a write-only multipart message format.
+     *
+     * @return a new write-only multipart message format with part/body size limit set to 0, intended for configuring
+     * multipart response bodies
+     */
+    public static MultipartFormat multipart() {
+        return new MultipartFormat(0, 0);
+    }
+
+    /**
+     * Creates a multipart message format.
+     *
+     * @param part the size limit for individual message parts; includes boundary and headers and applies also to message
+     *             preamble and epilogue
+     * @param body the size limit for the complete message body
+     *
+     * @return a new read/write multipart message format with the given {@code part}/{@code body} size limits
+     *
+     * @throws IllegalArgumentException if either {@code part} or {@code body} is less than 0 or if {@code part} is
+     *                                  greater than {@code body}
+     */
+    public static MultipartFormat multipart(final int part, final int body) {
 
-		if ( part < 0 ) {
-			throw new IllegalArgumentException("negative part size limit");
-		}
+        if ( part < 0 ) {
+            throw new IllegalArgumentException("negative part size limit");
+        }
 
-		if ( body < 0 ) {
-			throw new IllegalArgumentException("negative body size limit");
-		}
+        if ( body < 0 ) {
+            throw new IllegalArgumentException("negative body size limit");
+        }
 
-		if ( part > body ) {
-			throw new IllegalArgumentException("part size limit greater than body size limit");
-		}
+        if ( part > body ) {
+            throw new IllegalArgumentException("part size limit greater than body size limit");
+        }
 
-		return new MultipartFormat(part, body);
-	}
+        return new MultipartFormat(part, body);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final int part;
-	private final int body;
+    private final int part;
+    private final int body;
 
 
-	private MultipartFormat(final int part, final int body) {
-		this.part=part;
-		this.body=body;
-	}
+    private MultipartFormat(final int part, final int body) {
+        this.part=part;
+        this.body=body;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @return the default MIME type for multipart messages ({@value MIME})
-	 */
-	@Override public String mime() {
-		return MIME;
-	}
+    /**
+     * @return the default MIME type for multipart messages ({@value MIME})
+     */
+    @Override public String mime() {
+        return MIME;
+    }
 
-	/**
-	 * Decodes the multipart {@code message} body from the input stream supplied by the {@code message} {@link
-	 * InputFormat} body, if one is available and the {@code message} {@code Content-Type} header is either missing or
-	 * matched by {@link #MIMEPattern}
-	 */
-	@Override public Either<MessageException, Map<String, Message<?>>> decode(final Message<?> message) {
-		return message
+    /**
+     * Decodes the multipart {@code message} body from the input stream supplied by the {@code message} {@link
+     * InputFormat} body, if one is available and the {@code message} {@code Content-Type} header is either missing or
+     * matched by {@link #MIMEPattern}
+     */
+    @Override public Either<MessageException, Map<String, Message<?>>> decode(final Message<?> message) {
+        return message
 
-				.header("Content-Type")
+                .header("Content-Type")
 
-				.filter(MIMEPattern.asPredicate().or(String::isEmpty))
+                .filter(MIMEPattern.asPredicate().or(String::isEmpty))
 
-				.map(type -> message.body(input()).flatMap(source -> {
+                .map(type -> message.body(input()).flatMap(source -> {
 
-					final String boundary=message
-							.header("Content-Type")
-							.map(BoundaryPattern::matcher)
-							.filter(Matcher::find)
-							.map(this::parameter)
-							.orElse("");
+                    final String boundary=message
+                            .header("Content-Type")
+                            .map(BoundaryPattern::matcher)
+                            .filter(Matcher::find)
+                            .map(this::parameter)
+                            .orElse("");
 
-					final Map<String, Message<?>> parts=new LinkedHashMap<>();
+                    final Map<String, Message<?>> parts=new LinkedHashMap<>();
 
-					try {
+                    try {
 
-						new MultipartParser(part, body, source.get(), boundary, (headers, content) -> {
+                        new MultipartParser(part, body, source.get(), boundary, (headers, content) -> {
 
-							final Optional<String> disposition=headers
-									.stream()
-									.filter(entry ->
-											entry.getKey().equalsIgnoreCase("Content-Disposition")
-									)
-									.map(Map.Entry::getValue)
-									.findFirst();
+                            final Optional<String> disposition=headers
+                                    .stream()
+                                    .filter(entry ->
+                                            entry.getKey().equalsIgnoreCase("Content-Disposition")
+                                    )
+                                    .map(Map.Entry::getValue)
+                                    .findFirst();
 
-							final String name=disposition
-									.map(NamePattern::matcher)
-									.filter(Matcher::find)
-									.map(this::parameter)
-									.filter(match -> !parts.containsKey(match))
-									.orElseGet(() -> format("part%d", parts.size()));
+                            final String name=disposition
+                                    .map(NamePattern::matcher)
+                                    .filter(Matcher::find)
+                                    .map(this::parameter)
+                                    .filter(match -> !parts.containsKey(match))
+                                    .orElseGet(() -> format("part%d", parts.size()));
 
-							final String item=disposition
-									.map(ItemPattern::matcher)
-									.filter(Matcher::find)
-									.map(this::parameter)
-									.map(s -> "file:"+s)
-									.orElseGet(() -> "uuid:"+UUID.randomUUID());
+                            final String item=disposition
+                                    .map(ItemPattern::matcher)
+                                    .filter(Matcher::find)
+                                    .map(this::parameter)
+                                    .map(s -> "file:"+s)
+                                    .orElseGet(() -> "uuid:"+UUID.randomUUID());
 
-							parts.put(name, message.part(item)
+                            parts.put(name, message.part(item)
 
-									.headers((Map<String, List<String>>)headers.stream().collect(groupingBy(
-											Map.Entry::getKey,
-											LinkedHashMap::new,
-											mapping(Map.Entry::getValue, toList())
-									)))
+                                    .map(part -> {
 
-									.body(input(), () -> content)
+                                        headers.stream()
 
-							);
+                                                .collect(groupingBy(
+                                                        Map.Entry::getKey,
+                                                        LinkedHashMap::new,
+                                                        mapping(Map.Entry::getValue, toList())
+                                                ))
 
-						}).parse();
+                                                .forEach(part::headers);
 
-					} catch ( final MessageException e ) {
+                                        return part;
 
-						return Left(e);
+                                    })
 
-					} catch ( final IOException e ) {
+                                    .body(input(), () -> content)
 
-						throw new UncheckedIOException(e);
+                            );
 
-					}
+                        }).parse();
 
-					return Right(parts);
+                    } catch ( final MessageException e ) {
 
-				}))
+                        return Left(e);
 
-				.orElseGet(() -> Left(status(UnsupportedMediaType, "no multipart body")));
-	}
+                    } catch ( final IOException e ) {
 
-	/**
-	 * Configures {@code message} {@code Content-Type} header to {@value #MIME}, unless already defined, defines the
-	 * multipart message boundary, unless already defined and encodes the multipart {@code value} into the output stream
-	 * accepted by the {@code message} {@link OutputFormat} body
-	 */
-	@Override public <M extends Message<M>> M encode(final M message, final Map<String, Message<?>> value) {
+                        throw new UncheckedIOException(e);
 
-		final String type=message
-				.header("Content-Type") // custom value
-				.orElse(MIME); // fallback value
+                    }
 
-		final byte[] boundary; // compute boundary
+                    return Right(parts);
 
-		final Matcher matcher=BoundaryPattern.matcher(type);
+                }))
 
-		if ( matcher.find() ) { // custom boundary set in content-type header
+                .orElseGet(() -> Left(status(UnsupportedMediaType, "no multipart body")));
+    }
 
-			boundary=parameter(matcher).getBytes(UTF_8);
+    /**
+     * Configures {@code message} {@code Content-Type} header to {@value #MIME}, unless already defined, defines the
+     * multipart message boundary, unless already defined and encodes the multipart {@code value} into the output stream
+     * accepted by the {@code message} {@link OutputFormat} body
+     */
+    @Override public <M extends Message<M>> M encode(final M message, final Map<String, Message<?>> value) {
 
-		} else { // generate random boundary and update content-type definition
+        final String type=message
+                .header("Content-Type") // custom value
+                .orElse(MIME); // fallback value
 
-			ThreadLocalRandom.current().nextBytes(boundary=new byte[70]);
+        final byte[] boundary; // compute boundary
 
-			for (int i=0; i < boundary.length; i++) {
-				boundary[i]=BoundaryChars[(boundary[i]&0xFF)%BoundaryChars.length];
-			}
+        final Matcher matcher=BoundaryPattern.matcher(type);
 
-			message.header("Content-Type", format("%s; boundary=\"%s\"", type, new String(boundary, UTF_8)));
+        if ( matcher.find() ) { // custom boundary set in content-type header
 
-		}
+            boundary=parameter(matcher).getBytes(UTF_8);
 
-		return message.body(output(), output -> {
-			try {
+        } else { // generate random boundary and update content-type definition
 
-				for (final Message<?> part : value.values()) {
+            ThreadLocalRandom.current().nextBytes(boundary=new byte[70]);
 
-					output.write(Dashes);
-					output.write(boundary);
-					output.write(CRLF);
+            for (int i=0; i < boundary.length; i++) {
+                boundary[i]=BoundaryChars[(boundary[i]&0xFF)%BoundaryChars.length];
+            }
 
-					for (final Map.Entry<String, List<String>> header : part.headers().entrySet()) {
+            message.header("Content-Type", format("%s; boundary=\"%s\"", type, new String(boundary, UTF_8)));
 
-						final String name=header.getKey();
+        }
 
-						for (final String _value : header.getValue()) {
-							output.write(name.getBytes(UTF_8));
-							output.write(Colon);
-							output.write(_value.getBytes(UTF_8));
-							output.write(CRLF);
-						}
-					}
+        return message.body(output(), output -> {
+            try {
 
-					output.write(CRLF);
+                for (final Message<?> part : value.values()) {
 
-					part.body(output()).fold(
-							unexpected -> { throw unexpected; },
-							task(target -> target.accept(output))
-					);
+                    output.write(Dashes);
+                    output.write(boundary);
+                    output.write(CRLF);
 
-					output.write(CRLF);
-				}
+                    for (final Map.Entry<String, String> header : part.headers().entrySet()) {
 
-				output.write(Dashes);
-				output.write(boundary);
-				output.write(Dashes);
-				output.write(CRLF);
+                        output.write(header.getKey().getBytes(UTF_8));
+                        output.write(Colon);
+                        output.write(header.getValue().getBytes(UTF_8));
+                        output.write(CRLF);
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		});
-	}
+                    }
+
+                    output.write(CRLF);
+
+                    part.body(output()).fold(
+                            unexpected -> { throw unexpected; },
+                            task(target -> target.accept(output))
+                    );
+
+                    output.write(CRLF);
+                }
+
+                output.write(Dashes);
+                output.write(boundary);
+                output.write(Dashes);
+                output.write(CRLF);
+
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
+        });
+    }
 
 }

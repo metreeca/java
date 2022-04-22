@@ -140,7 +140,7 @@ public final class Forwarder implements Wrapper {
 
             return location.equals(original)
                     ? handler.handle(request, next)
-                    : request.reply(status(status, location));
+                    : request.reply().map(status(status, location));
 
         };
 	}

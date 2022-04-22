@@ -17,12 +17,12 @@
 package com.metreeca.rdf4j.services;
 
 import com.metreeca.core.Strings;
+import com.metreeca.http.services.Logger;
 import com.metreeca.json.Shape;
 import com.metreeca.json.Values;
 import com.metreeca.json.shapes.*;
 import com.metreeca.rest.Config;
 import com.metreeca.rest.Scribe;
-import com.metreeca.rest.services.Logger;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -31,6 +31,9 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.shapes.All.all;
 import static com.metreeca.json.shapes.And.and;
@@ -64,9 +67,6 @@ import static com.metreeca.rdf4j.SPARQLScribe.values;
 import static com.metreeca.rdf4j.SPARQLScribe.var;
 import static com.metreeca.rest.Scribe.text;
 import static com.metreeca.rest.Scribe.*;
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.services.Logger.time;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;

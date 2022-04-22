@@ -26,9 +26,9 @@ import org.eclipse.rdf4j.model.*;
 
 import java.util.Optional;
 
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.queries.Items.items;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
 
 
 /**

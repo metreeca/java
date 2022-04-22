@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.services.EngineTest;
 
 import org.eclipse.rdf4j.repository.sail.SailRepository;
@@ -28,7 +28,7 @@ import static com.metreeca.rest.services.Engine.engine;
 final class GraphEngineTest extends EngineTest {
 
 	@Override protected void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 				.set(engine(), GraphEngine::new)
 				.exec(tasks)

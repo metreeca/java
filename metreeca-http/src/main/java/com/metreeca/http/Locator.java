@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.http;
 
-import com.metreeca.rest.services.Logger;
+import com.metreeca.http.services.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,13 +27,13 @@ import static java.lang.String.format;
 
 
 /**
- * Service manager {thread-safe}.
+ * Service locator {thread-safe}.
  *
  * <p>Manages the lifecycle of shared services.</p>
  */
-@SuppressWarnings("unchecked") public final class Toolbox {
+@SuppressWarnings("unchecked") public final class Locator {
 
-	private static final ThreadLocal<Toolbox> scope=new ThreadLocal<>();
+	private static final ThreadLocal<Locator> scope=new ThreadLocal<>();
 
 
 	/**
@@ -48,7 +48,7 @@ import static java.lang.String.format;
 
 
 	/**
-	 * {@linkplain #get(Supplier) Retrieves} a shared service from the current toolbox.
+	 * {@linkplain #get(Supplier) Retrieves} a shared service from the current locator.
 	 *
 	 * @param factory the factory responsible for creating the required shared service; must return a non-null and
 	 *                thread-safe object
@@ -58,7 +58,7 @@ import static java.lang.String.format;
 	 * #set(Supplier, Supplier) specified}
 	 *
 	 * @throws IllegalArgumentException if {@code factory} is null
-	 * @throws IllegalStateException    if called outside an active toolbox or a circular service dependency is
+	 * @throws IllegalStateException    if called outside an active locator or a circular service dependency is
 	 *                                  detected
 	 */
 	public static <T> T service(final Supplier<T> factory) {
@@ -67,11 +67,11 @@ import static java.lang.String.format;
 			throw new NullPointerException("null factory");
 		}
 
-		return toolbox().get(factory);
+		return locator().get(factory);
 	}
 
 	/**
-	 * {@linkplain #get(Supplier, Supplier) Retrieves} a shared assert from the active toolbox.
+	 * {@linkplain #get(Supplier, Supplier) Retrieves} a shared assert from the active locator.
 	 *
 	 * @param factory  the factory responsible for creating the required shared service; must return a non-null and
 	 *                 thread-safe object
@@ -83,7 +83,7 @@ import static java.lang.String.format;
 	 * #set(Supplier, Supplier) specified}
 	 *
 	 * @throws IllegalArgumentException if either {@code factory} or {@code delegate} is null
-	 * @throws IllegalStateException    if called outside an active toolbox
+	 * @throws IllegalStateException    if called outside an active locator
 	 */
 	public static <T> T service(final Supplier<T> factory, final Supplier<T> delegate) {
 
@@ -95,23 +95,20 @@ import static java.lang.String.format;
 			throw new NullPointerException("null delegate");
 		}
 
-		return toolbox().get(factory, delegate);
+		return locator().get(factory, delegate);
 	}
 
 
-	private static Toolbox toolbox() {
+	private static Locator locator() {
 
-		final Toolbox toolbox=scope.get();
+		final Locator locator=scope.get();
 
-		if ( toolbox == null ) {
-			throw new IllegalStateException("not running inside a service toolbox");
+		if ( locator == null ) {
+			throw new IllegalStateException("not running inside a service locator");
 		}
 
-		return toolbox;
+		return locator;
 	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,8 +126,8 @@ import static java.lang.String.format;
 	 *
 	 * <p>The new service is cached so that further calls for the same factory are idempotent.</p>
 	 *
-	 * <p>During object construction, nested shared service dependencies may be retrieved from this toolbox through
-	 * the static {@linkplain  #service(Supplier) service locator} method of the toolbox class. The toolbox used by the
+	 * <p>During object construction, nested shared service dependencies may be retrieved from this locator through
+	 * the static {@linkplain  #service(Supplier) service locator} method of the locator class. The locator used by the
 	 * service locator method is managed through a {@link ThreadLocal} variable, so it won't be available to object
 	 * constructors executed on a different thread.</p>
 	 *
@@ -153,8 +150,8 @@ import static java.lang.String.format;
 	 *
 	 * <p>The new service is cached so that further calls for the same factory are idempotent.</p>
 	 *
-	 * <p>During object construction, nested shared service dependencies may be retrieved from this toolbox through
-	 * the static {@linkplain  #service(Supplier) service locator} method of the toolbox class. The toolbox used by the
+	 * <p>During object construction, nested shared service dependencies may be retrieved from this locator through
+	 * the static {@linkplain  #service(Supplier) service locator} method of the locator class. The locator used by the
 	 * service locator method is managed through a {@link ThreadLocal} variable, so it won't be available to object
 	 * constructors executed on a different thread.</p>
 	 *
@@ -185,7 +182,7 @@ import static java.lang.String.format;
 
 			if ( pending.equals(cached) ) { return delegate.get(); } else {
 
-				return cached != null ? cached : toolbox(() -> {
+				return cached != null ? cached : locator(() -> {
 					try {
 
 						services.put(factory, pending); // mark factory as being acquired
@@ -219,12 +216,12 @@ import static java.lang.String.format;
 	 * @param factory the factory to be replaced
 	 * @param plugin  the replacing factory; must return a non-null and thread-safe object
 	 *
-	 * @return this toolbox
+	 * @return this locator
 	 *
 	 * @throws IllegalArgumentException if either {@code factory} or {@code plugin} is null
 	 * @throws IllegalStateException    if {@code factory} service was already retrieved
 	 */
-	public <T> Toolbox set(final Supplier<T> factory, final Supplier<T> plugin) throws IllegalStateException {
+	public <T> Locator set(final Supplier<T> factory, final Supplier<T> plugin) throws IllegalStateException {
 
 		if ( factory == null ) {
 			throw new NullPointerException("null factory");
@@ -249,14 +246,14 @@ import static java.lang.String.format;
 
 
 	/**
-	 * Clears this toolbox.
+	 * Clears this locator.
 	 *
 	 * <p>All {@linkplain #get(Supplier) cached} service are purged. {@linkplain AutoCloseable Auto-closeable}
 	 * service are closed in inverse creation order before purging.</p>
 	 *
-	 * @return this toolbox
+	 * @return this locator
 	 */
-	public Toolbox clear() {
+	public Locator clear() {
 		synchronized ( services ) {
 			try {
 
@@ -296,26 +293,27 @@ import static java.lang.String.format;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Executes a set of tasks using shared services managed by this toolbox.
+	 * Executes a set of tasks using shared services managed by this locator.
 	 *
-	 * <p>During task execution, shared service may be retrieved from this toolbox through the static {@linkplain
-	 * #service(Supplier) service locator} method of the toolbox class. The toolbox used by the service locator method is
+	 * <p>During task execution, shared service may be retrieved from this locator through the static {@linkplain
+	 * #service(Supplier) service locator} method of the locator class. The locator used by the service locator
+	 * method is
 	 * managed through a {@link ThreadLocal} variable, so it won't be available to methods executed on a different
 	 * thread.</p>
 	 *
 	 * @param tasks the tasks to be executed
 	 *
-	 * @return this toolbox
+	 * @return this locator
 	 *
 	 * @throws NullPointerException if {@code task} is null or contains null items
 	 */
-	public Toolbox exec(final Runnable... tasks) {
+	public Locator exec(final Runnable... tasks) {
 
 		if ( tasks == null ) {
 			throw new NullPointerException("null tasks");
 		}
 
-		return toolbox(() -> {
+		return locator(() -> {
 
 			for (final Runnable task : tasks) {
 
@@ -334,9 +332,9 @@ import static java.lang.String.format;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private <V> V toolbox(final Supplier<V> task) {
+	private <V> V locator(final Supplier<V> task) {
 
-		final Toolbox current=scope.get();
+		final Locator current=scope.get();
 
 		try {
 

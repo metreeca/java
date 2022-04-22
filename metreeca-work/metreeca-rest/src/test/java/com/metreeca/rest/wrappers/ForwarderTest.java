@@ -29,10 +29,10 @@ final class ForwarderTest {
 
     private final Handler relocator=Forwarder.forwarder()
 
-            .rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
-            .rewrite("http:(.*)", "https:$1")
+			.rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
+			.rewrite("http:(.*)", "https:$1")
 
-            .wrap((request, next) -> request.reply(OK));
+			.wrap((request, next) -> request.reply(OK));
 
 
     @Test void testRelocate() {
@@ -44,7 +44,7 @@ final class ForwarderTest {
                         Request::reply
                 )
 
-                .accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
                         .hasStatus(MovedPermanently)
                         .hasHeader("Location", "https://example.com/path")
                 );
@@ -59,7 +59,7 @@ final class ForwarderTest {
                         Request::reply
                 )
 
-                .accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
                         .hasStatus(OK)
                         .doesNotHaveHeader("Location")
                 );

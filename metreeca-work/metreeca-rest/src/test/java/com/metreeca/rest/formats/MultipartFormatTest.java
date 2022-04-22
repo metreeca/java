@@ -153,7 +153,7 @@ final class MultipartFormatTest {
 
 							error -> {
 
-								new Request().reply(error).accept(response -> ResponseAssert.assertThat(response)
+								new Request().reply().map(error).map(response -> ResponseAssert.assertThat(response)
 										.as("missing boundary parameter")
 										.hasStatus(Response.BadRequest)
 								);
@@ -176,15 +176,13 @@ final class MultipartFormatTest {
 	@Nested final class Output {
 
 		@Test void testGenerateRandomBoundary() {
-			new Request().reply(response -> response
+			new Request().reply().map(response1 -> response1
 
 					.status(Response.OK)
 					.body(multipart(), Map.ofEntries((Map.Entry<String, Message<?>>[])new Map.Entry[]{ Map.entry("one",
-							response.part("one").body(text(), "one")), Map.entry("two",
-                            response.part("two").body(text(),
-							"two")) }))
-
-			).accept(response -> MessageAssert.assertThat(response)
+							response1.part("one").body(text(), "one")), Map.entry("two",
+							response1.part("two").body(text(),
+									"two")) }))).map(response -> MessageAssert.assertThat(response)
 
 					.has(new Condition<>(
 							r -> r.header("Content-Type").filter(s -> s.contains("; boundary=")).isPresent(),
@@ -195,17 +193,13 @@ final class MultipartFormatTest {
 		}
 
 		@Test void testPreserveCustomBoundary() {
-			new Request()
-
-					.reply(response -> response
+			new Request().reply().map(response1 -> response1
 
 							.status(Response.OK)
 							.header("Content-Type", "multipart/form-data; boundary=1234567890")
-							.body(multipart(), Map.of())
+							.body(multipart(), Map.of()))
 
-					)
-
-					.accept(response -> MessageAssert.assertThat(response)
+					.map(response -> MessageAssert.assertThat(response)
 
 							.hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
 
@@ -215,7 +209,7 @@ final class MultipartFormatTest {
 
 								target.accept(output);
 
-								assertThat(new String(output.toByteArray(), UTF_8))
+								assertThat(output.toString(UTF_8))
 										.contains("--1234567890--");
 
 							})

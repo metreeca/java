@@ -18,6 +18,8 @@ package com.metreeca.rest.wrappers;
 
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.TextFormat;
+import com.metreeca.http.Locator;
+import com.metreeca.rest.Request;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -26,9 +28,11 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.function.Function;
 
+import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.rest.formats.TextFormat.text;
 import static com.metreeca.rest.wrappers.Server.server;
 
 import static java.util.Arrays.asList;
@@ -46,7 +50,7 @@ final class ServerTest {
 
 
         @Test void testPreprocessQueryParameters() {
-            new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
                     .wrap((request, next) -> {
 
@@ -65,11 +69,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessBodyParameters() {
-            new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
                     .wrap((request, next) -> {
 
@@ -83,15 +87,16 @@ final class ServerTest {
                     })
 
                     .handle(new Request()
-                            .method(Request.POST)
+							.method(POST)
                             .header("Content-Type", "application/x-www-form-urlencoded")
-                            .body(TextFormat.text(), "one=1&two=2&two=2"), Request::reply)
+                            .body(text(), "one=1&two=2&two=2")
+					, Request::reply)
 
-                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessDontOverwriteExistingParameters() {
-            new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
                     .wrap((request, next) -> {
 
@@ -110,11 +115,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessQueryOnlyOnGET() {
-            new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
                     .wrap((request, next) -> {
 
@@ -130,11 +135,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessBodyOnlyOnPOST() {
-            new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
                     .wrap((request, next) -> {
 
@@ -147,11 +152,11 @@ final class ServerTest {
                     .handle(new Request()
                                     .method(Request.PUT)
                                     .header("Content-Type", "application/x-www-form-urlencoded")
-                                    .body(TextFormat.text(), "one=1&two=2&two=2"),
+                                    .body(text(), "one=1&two=2&two=2"),
                             Request::reply
                     )
 
-                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
     }
@@ -159,7 +164,7 @@ final class ServerTest {
     @Nested final class ErrorHandling {
 
         @Test void testTrapStrayExceptions() {
-            new Toolbox().exec(() -> server()
+			new Locator().exec(() -> server()
 
                     .wrap((Request request, final Function<Request, Response> next) -> {
                         throw new UnsupportedOperationException("stray");
@@ -167,7 +172,7 @@ final class ServerTest {
 
                     .handle(new Request(), Request::reply)
 
-                    .accept(response -> assertThat(response)
+					.map(response -> assertThat(response)
                             .hasStatus(InternalServerError)
                             .hasCause(UnsupportedOperationException.class)
                     )

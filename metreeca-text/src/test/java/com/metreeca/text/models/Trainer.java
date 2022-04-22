@@ -26,7 +26,7 @@ public final class Trainer {
 
 	//@Test void fetch() throws IOException {
 	//	try ( final Writer writer=new FileWriter(samples) ) {
-	//		new Toolbox()
+	//		new Locator()
 	//
 	//				.exec(() -> Stream
 	//

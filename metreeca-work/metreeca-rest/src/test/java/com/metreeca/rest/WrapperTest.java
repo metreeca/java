@@ -16,6 +16,8 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.http.Locator;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +30,7 @@ import static com.metreeca.rest.Wrapper.roles;
 final class WrapperTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}
@@ -52,7 +54,7 @@ final class WrapperTest {
 
 					.handle(request().roles("x"), Request::reply)
 
-					.accept(response -> assertThat(response).hasStatus(OK))
+					.map(response -> assertThat(response).hasStatus(OK))
 			);
 		}
 
@@ -63,7 +65,7 @@ final class WrapperTest {
 
 					.handle(request().roles("z"), Request::reply)
 
-					.accept(response -> assertThat(response).hasStatus(Unauthorized))
+					.map(response -> assertThat(response).hasStatus(Unauthorized))
 			);
 		}
 
@@ -74,7 +76,7 @@ final class WrapperTest {
 
 					.handle(request(), Request::reply)
 
-					.accept(response -> assertThat(response).hasStatus(Unauthorized))
+					.map(response -> assertThat(response).hasStatus(Unauthorized))
 			);
 		}
 

@@ -178,38 +178,6 @@ public final class Response extends Message<Response> {
 
 
 	/**
-	 * Retrieves the status message of this response.
-	 *
-	 * @return the a (possibly empty) human readable message detailing the {@link #status() status} code of this
-	 * response
-	 */
-	public String message() {
-		return message;
-	}
-
-	/**
-	 * Configures the status message of this response.
-	 *
-	 * @param message a (possibly empty) human readable message detailing the {@link #status() status} code of this
-	 *                response
-	 *
-	 * @return this response
-	 *
-	 * @throws NullPointerException if {@code message} is null
-	 */
-	public Response message(final String message) {
-
-		if ( message == null ) {
-			throw new NullPointerException("null message");
-		}
-
-		this.message=message;
-
-		return this;
-	}
-
-
-	/**
 	 * Retrieves the cause for the status code.
 	 *
 	 * @return a optional throwable causing the selection of the status code

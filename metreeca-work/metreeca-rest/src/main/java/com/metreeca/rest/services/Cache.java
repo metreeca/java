@@ -16,7 +16,8 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Locator;
+import com.metreeca.http.services.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,9 +27,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Toolbox.storage;
-import static com.metreeca.rest.services.Logger.logger;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Locator.storage;
+import static com.metreeca.http.services.Logger.logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Instant.now;
@@ -75,11 +76,11 @@ import static java.time.Instant.now;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Storage blob cache.
-	 *
-	 * <p>Caches data blobs in the {@code cache} folder of the system file {@linkplain Toolbox#storage storage}.</p>
-	 */
+    /**
+     * Storage blob cache.
+     *
+     * <p>Caches data blobs in the {@code cache} folder of the system file {@linkplain Locator#storage storage}.</p>
+     */
 	public static final class FileCache implements Cache {
 
 		private Duration ttl=Duration.ZERO; // no expiry

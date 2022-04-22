@@ -19,7 +19,7 @@
 package com.metreeca.gcp.services;
 
 
-import com.metreeca.rest.services.Logger;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.services.Store;
 
 import org.eclipse.rdf4j.common.iteration.CloseableIteration;
@@ -38,9 +38,9 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.services.Logger.time;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.rest.services.Store.store;
 
 /**

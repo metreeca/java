@@ -33,13 +33,13 @@ import java.util.function.Function;
 
 import static com.metreeca.core.Identifiers.encode;
 import static com.metreeca.core.Identifiers.md5;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.shapes.Guard.Create;
 import static com.metreeca.json.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.Created;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
@@ -188,11 +188,12 @@ public final class Creator extends Delegator {
             final IRI item=iri(request.item());
             final Shape shape=request.get(shape());
 
-            return request.body(jsonld()).fold(request::reply, frame -> engine.create(frame, shape)
+			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.create(frame,
+                            shape)
 
                     .map(Frame::focus)
 
-                    .map(focus -> request.reply(response -> response.status(Created).header("Location", Optional
+					.map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
                             .of(focus)
 							.filter(Value::isIRI)
 							.map(IRI.class::cast)

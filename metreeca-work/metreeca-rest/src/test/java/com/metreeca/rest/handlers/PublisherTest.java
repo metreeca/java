@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.handlers;
 
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.Toolbox;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 final class PublisherTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}
@@ -62,7 +62,7 @@ final class PublisherTest {
 
 				.handle(new Request().method(POST), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(MethodNotAllowed)
 				)
 		);

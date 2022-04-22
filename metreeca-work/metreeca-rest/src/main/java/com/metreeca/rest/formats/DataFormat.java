@@ -93,8 +93,8 @@ public final class DataFormat extends Format<byte[]> {
 	@Override public <M extends Message<M>> M encode(final M message, final byte... value) {
 		return message
 
-				.header("~Content-Type", MIME)
-				.header("~Content-Length", valueOf(value.length))
+				.header("Content-Type", message.header("Content-Type").orElse(MIME))
+				.header("Content-Length", valueOf(value.length))
 
 				.body(output(), output -> Feeds.data(output, value));
 	}

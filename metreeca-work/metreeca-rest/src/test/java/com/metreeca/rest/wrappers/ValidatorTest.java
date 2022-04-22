@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
+import com.metreeca.http.Locator;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.OutputFormat;
 
@@ -30,7 +31,7 @@ import static java.util.Collections.emptyList;
 final class ValidatorTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}
@@ -47,7 +48,7 @@ final class ValidatorTest {
 
                 .handle(new Request(), Request::reply)
 
-				.accept(response -> ResponseAssert.assertThat(response)
+				.map(response -> ResponseAssert.assertThat(response)
                         .hasStatus(OK)
 				)
 		);
@@ -60,7 +61,7 @@ final class ValidatorTest {
 
                 .handle(new Request(), Request::reply)
 
-				.accept(response -> ResponseAssert.assertThat(response)
+				.map(response -> ResponseAssert.assertThat(response)
 						.hasStatus(Response.UnprocessableEntity)
 						.hasBody(OutputFormat.output())
 				)

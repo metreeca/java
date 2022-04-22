@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.operators;
 
+import com.metreeca.http.Locator;
 import com.metreeca.json.*;
-import com.metreeca.rest.Toolbox;
 import com.metreeca.rest.services.Engine;
 
 import java.util.Optional;
@@ -32,7 +32,7 @@ final class OperatorTest {
 
 
 	static void exec(final Predicate<Frame> success, final Runnable task) {
-		new Toolbox()
+        new Locator()
 				.set(engine(), () -> new MockEngine(success))
 				.exec(task)
 				.clear();

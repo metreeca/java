@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.handlers.Router.router;
 
@@ -168,7 +168,7 @@ public final class Publisher extends Delegator {
             final String jar=path.substring(0, separator);
             final String entry=path.substring(separator+1);
 
-            // load the filesystem from the service toolbox to have it automatically closed
+            // load the filesystem from the service locator to have it automatically closed
             // !!! won't handle multiple publishers from the same filesystem
 
             final FileSystem filesystem=service(checked(() ->
@@ -232,13 +232,13 @@ public final class Publisher extends Delegator {
 
                 .findFirst()
 
-                .map(file -> request.reply(checked(response -> {
+                .map(file -> request.reply().map(checked(response -> {
 
                     final String mime=Format.mime(file.getFileName().toString());
                     final String length=String.valueOf(Files.size(file));
                     final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
 
-                    return request.headers("If-None-Match").stream().anyMatch(etag::equals)
+                    return request.headers("If-None-Match").anyMatch(etag::equals)
 
                             ? response.status(NotModified)
 

@@ -114,7 +114,7 @@ public final class Bearer implements Wrapper {
 	 */
 	private Wrapper challenger() {
 		return handler -> (request, next) -> handler.handle(request, next).map(response ->
-                response.status() == Response.Unauthorized && response.headers("WWW-Authenticate").isEmpty()
+                response.status() == Response.Unauthorized && response.header("WWW-Authenticate").isEmpty()
                         ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
                         : response
         );
@@ -146,12 +146,11 @@ public final class Bearer implements Wrapper {
 
 							// not authenticated > report error
 
-							.orElseGet(() -> request.reply(response -> response
+							.orElseGet(() -> request.reply().map(response -> response
                                     .status(Response.Unauthorized)
                                     .header("WWW-Authenticate", format(
                                             "Bearer realm=\"%s\", error=\"invalid_token\"", response.request().base()
-                                    ))
-                            ))
+									))))
 
                     )
 

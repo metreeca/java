@@ -51,7 +51,7 @@ final class DriverTest {
 
                 .handle(new Request(), Request::reply)
 
-                .accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
                         .hasStatus(OK)
                 );
     }

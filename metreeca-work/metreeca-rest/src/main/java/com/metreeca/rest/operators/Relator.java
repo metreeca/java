@@ -26,6 +26,7 @@ import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Shape.Contains;
 import static com.metreeca.json.Values.iri;
@@ -34,7 +35,6 @@ import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Guard.*;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.Wrapper.wrapper;
 import static com.metreeca.rest.formats.JSONLDFormat.*;
@@ -132,17 +132,16 @@ public final class Relator extends Delegator {
             final IRI item=iri(request.item());
             final Shape shape=request.get(shape());
 
-            return query(item, shape, request.query()).fold(request::reply, query -> engine.relate(frame(item), query)
+			return query(item, shape, request.query()).fold(mapper -> request.reply().map(mapper),
+                    query -> engine.relate(frame(item), query)
 
-                    .map(frame -> request.reply(response -> response.status(OK)
+					.map(frame -> request.reply().map(response -> response.status(OK)
                             .set(shape(), query.map(new ShapeProbe(collection)))
-							.body(jsonld(), frame)
-					))
+							.body(jsonld(), frame)))
 
-					.orElseGet(() -> request.reply(response -> collection
+					.orElseGet(() -> request.reply().map(response -> collection
 							? response.status(OK).set(shape(), and()).body(jsonld(), frame(item)) // virtual container
-							: response.status(NotFound)
-					)));
+							: response.status(NotFound))));
 		};
 	}
 

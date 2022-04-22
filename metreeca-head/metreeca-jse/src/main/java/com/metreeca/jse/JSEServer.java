@@ -16,8 +16,9 @@
 
 package com.metreeca.jse;
 
+import com.metreeca.http.Locator;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
-import com.metreeca.rest.services.Logger;
 
 import com.sun.net.httpserver.*;
 
@@ -32,17 +33,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Lambdas.guarded;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Java SE HTTP server connector.
@@ -52,10 +51,11 @@ import static java.util.stream.Collectors.toMap;
  *
  * <ul>
  *
- * <li>initializes and cleans the {@linkplain Toolbox toolbox} managing shared services required by resource handlers;
+ * <li>initializes and cleans the service {@linkplain Locator toolbox} managing shared services required by resource
+ * handlers;
  * </li>
  *
- * <li>handles HTTP requests using a {@linkplain Handler handler} loaded from the toolbox.</li>
+ * <li>handles HTTP requests using a {@linkplain Handler handler} loaded from the service locator.</li>
  *
  * </ul>
  */
@@ -66,7 +66,7 @@ public final class JSEServer {
     );
 
 
-    private static Supplier<Handler> delegate() { return () -> (request, next) -> request.reply(identity()); }
+    private static Supplier<Handler> delegate() { return () -> (request, next) -> request.reply().map(identity()); }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ public final class JSEServer {
     private String base="";
     private String path="/";
 
-    private final Toolbox toolbox=new Toolbox();
+    private final Locator locator=new Locator();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,13 +148,13 @@ public final class JSEServer {
      *
      * @throws NullPointerException if {@code factory} is null or returns a null value
      */
-    public JSEServer delegate(final Function<Toolbox, Handler> factory) {
+    public JSEServer delegate(final Function<Locator, Handler> factory) {
 
         if ( factory == null ) {
             throw new NullPointerException("null handler factory");
         }
 
-        toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
+        locator.set(delegate(), () -> requireNonNull(factory.apply(locator), "null handler"));
 
         return this;
     }
@@ -165,8 +165,8 @@ public final class JSEServer {
     public void start() {
         try {
 
-            final Handler handler=toolbox.get(delegate());
-            final Logger logger=toolbox.get(logger());
+            final Handler handler=locator.get(delegate());
+            final Logger logger=locator.get(logger());
 
             final HttpServer server=HttpServer.create(address, 0);
 
@@ -175,10 +175,9 @@ public final class JSEServer {
             server.createContext(path, exchange -> {
                 try {
 
-                    toolbox.exec(() -> handler.handle(request(exchange), Request::reply)
-                            .map(response -> response.status() > 0 ? response : response.status(NotFound))
-                            .accept(response -> response(exchange, response))
-                    );
+                    response(exchange, handler.handle(request(exchange), Request::reply).map(response ->
+                            response.status() > 0 ? response : response.status(NotFound)
+                    ));
 
                 } catch ( final RuntimeException e ) {
 
@@ -197,7 +196,7 @@ public final class JSEServer {
                     logger.error(this, "unhandled exception while stopping server", e);
                 }
 
-                try { toolbox.clear(); } catch ( final RuntimeException e ) {
+                try { locator.clear(); } catch ( final RuntimeException e ) {
                     logger.error(this, "unhandled exception while releasing resources", e);
                 }
 
@@ -240,10 +239,19 @@ public final class JSEServer {
 
                 .query(Optional.ofNullable(uri.getRawQuery()).orElse(""))
 
-                .headers(headers.entrySet().stream() // ;( possibly null header names…
-                        .filter(entry -> nonNull(entry.getKey()) && nonNull(entry.getValue()))
-                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
-                )
+                .map(request -> {
+
+                    headers.forEach((name, values) -> {
+
+                        if ( name != null && values != null ) {  // ;( possibly null header names…
+                            request.headers(name, values);
+                        }
+
+                    });
+
+                    return request;
+
+                })
 
                 .body(input(), exchange::getRequestBody);
     }
@@ -253,7 +261,8 @@ public final class JSEServer {
 
             response.headers().entrySet().stream() // Content-Length is generated by server
                     .filter(entry -> !entry.getKey().equalsIgnoreCase("Content-Length"))
-                    .forEachOrdered(entry -> exchange.getResponseHeaders().put(entry.getKey(), entry.getValue()));
+                    .forEachOrdered(entry -> exchange.getResponseHeaders().put(entry.getKey(),
+                            List.of(entry.getValue())));
 
             response.body(output()).accept(
 

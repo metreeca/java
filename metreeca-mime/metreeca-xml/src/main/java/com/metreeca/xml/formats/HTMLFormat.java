@@ -231,7 +231,7 @@ public final class HTMLFormat extends Format<Document> {
 	@Override public <M extends Message<M>> M encode(final M message, final Document value) {
 		return message
 
-				.header("~Content-Type", MIME)
+				.header("Content-Type", MIME)
 
 				.body(output(), output -> html(output, message.charset(), message.item(), value));
 	}

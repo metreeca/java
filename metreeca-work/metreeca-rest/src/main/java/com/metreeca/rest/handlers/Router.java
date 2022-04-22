@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.*;
@@ -33,6 +34,7 @@ import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -115,7 +117,7 @@ public final class Router implements Handler {
 	private final Map<String, Handler> methods=new LinkedHashMap<>();
 
 
-	private Router() {}
+	private Router() { }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,10 +379,12 @@ public final class Router implements Handler {
 	}
 
 	private Response options(final Request request, final Function<Request, Response> forward) {
-		return request.reply(response -> response
+		return request.reply().map(response -> response
 				.status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
-				.header("Allow", OPTIONS)
-				.headers("+Allow", methods.keySet())
+				.headers("Allow", Stream.of(Set.of(OPTIONS), methods.keySet())
+						.flatMap(Collection::stream)
+						.collect(toList())
+				)
 		);
 	}
 

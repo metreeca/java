@@ -16,7 +16,9 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Locator;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,7 @@ import static com.metreeca.rest.ResponseAssert.assertThat;
 final class AliaserTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}
@@ -57,7 +59,7 @@ final class AliaserTest {
 
 				.handle(request("/alias"), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.SeeOther)
 						.hasHeader("Location", "/canonical")
 				)
@@ -71,7 +73,7 @@ final class AliaserTest {
 
 				.handle(request("/alias"), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(OK)
 				)
 		);
@@ -84,7 +86,7 @@ final class AliaserTest {
 
 				.handle(request("/other"), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(OK)
 				)
 		);

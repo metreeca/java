@@ -118,7 +118,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox.get(() ->
+				.delegate(locator -> locator.get(() ->
 
 						server().wrap(request -> request.reply(response ->
 								response.status(OK)
@@ -204,7 +204,7 @@ import static com.metreeca.rest.wrappers.Server.server;
 public final class Server extends JEEServer {
 
 	public Server() {
-		delegate(toolbox -> toolbox.get(() ->
+		delegate(locator -> locator.get(() ->
 
 				server().wrap(request -> request.reply(response ->
 						response.status(OK)
@@ -241,7 +241,7 @@ as well.
 
 ## Sample Data
 
-The [toolbox](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Toolbox.html) argument handled
+The [locator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/http/Locator.html) argument handled
 to the app loader lambda manages the shared system-provided services and can be used to customize them and to run app
 initialization tasks. Copy [`toys.ttl`](toys/toys.ttl)
 to the `src/main/resources/` folder, extend the stub as follows and relaunch the application:
@@ -259,7 +259,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
@@ -267,7 +267,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox
+				.delegate(locator -> locator
 
 						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
@@ -303,8 +303,8 @@ Here we are customizing the shared
 system-wide [graph](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html)
 database as an ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
 
-The
-static [Toolbox.service()](https://javadoc.io/static/com.metreeca/metreeca-rest/1.0.1/com/metreeca/rest/Toolbox.html#service(java.util.function.Supplier))
+The static [Locator.service()](https://javadoc.io/static/com.metreeca/metreeca-rest/1.0.1/com/metreeca/http/Locator.
+html#service(java.util.function.Supplier))
 locator method provides access to shared services.
 
 Complex initialization tasks can be easily factored to a dedicated loader class:
@@ -325,7 +325,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox
+				.delegate(locator -> locator
 
 						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
@@ -349,7 +349,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -401,7 +401,7 @@ import static com.metreeca.json.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.wrappers.Server.server;
@@ -414,11 +414,11 @@ import static java.util.stream.Collectors.toList;
 public final class Server {
 
 	public static void main(final String... args) {
-		new JSEServer()
+      new JSEServer()
 
-				.delegate(toolbox -> toolbox
+              .delegate(locator -> locator
 
-						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                      .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
 						.exec(new Toys())
 
@@ -544,7 +544,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox
+				.delegate(locator -> locator
 
 						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
@@ -582,7 +582,7 @@ import static com.metreeca.json.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.handlers.Router.router;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
@@ -668,7 +668,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox
+				.delegate(locator -> locator
 
 						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 						.set(engine(), GraphEngine::new) // <<< add this line <<<
@@ -787,7 +787,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -1023,7 +1023,7 @@ public final class Server {
 	public static void main(final String... args) {
 		new JSEServer()
 
-				.delegate(toolbox -> toolbox
+				.delegate(locator -> locator
 
 						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 						.set(engine(), GraphEngine::new)
@@ -1120,7 +1120,7 @@ insert { $this toys:stock 0 } where {};
 ```
 
 ```java
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -1138,7 +1138,7 @@ import static com.metreeca.json.shapes.MinInclusive.minInclusive;
 import static com.metreeca.json.shapes.Or.or;
 import static com.metreeca.json.shapes.Pattern.pattern;
 import static com.metreeca.rdf4j.services.Graph.update;
-import static com.metreeca.rest.Toolbox.text;
+import static com.metreeca.http.Locator.text;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.operators.Creator.creator;
@@ -1227,7 +1227,7 @@ import org.eclipse.rdf4j.repository.RepositoryResult;
 import java.util.function.Function;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 
 import static org.eclipse.rdf4j.model.util.Values.literal;

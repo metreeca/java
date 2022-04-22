@@ -144,7 +144,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -155,7 +155,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -166,7 +166,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json)
 								.satisfies(hasBooleanValue(true))
@@ -180,7 +180,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json ->
 								JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))));
@@ -192,7 +192,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
@@ -203,7 +203,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
@@ -214,7 +214,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
@@ -225,7 +225,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(bool())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
@@ -239,7 +239,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -250,7 +250,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -261,7 +261,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -273,7 +273,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -286,7 +286,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -298,7 +298,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -310,7 +310,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -322,7 +322,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(tuple())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
@@ -337,7 +337,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -348,7 +348,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -359,7 +359,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
@@ -372,7 +372,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
@@ -385,7 +385,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
@@ -397,7 +397,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
@@ -409,7 +409,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
@@ -422,7 +422,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(graph())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
@@ -438,7 +438,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(update())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -449,7 +449,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(update())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -460,13 +460,16 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(update())), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
 							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
-					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
+					assertThat(model())
+							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
+
+					return this;
 
 				}));
 	}
@@ -476,13 +479,16 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(update())), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
 							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
-					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
+					assertThat(model())
+							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
+
+					return this;
 
 				}));
 	}
@@ -493,7 +499,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(get(update())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -504,7 +510,7 @@ final class SPARQLTest {
 
 				.handle(anonymous(post(update())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
 						.doesNotHaveBody()
 				));
@@ -515,13 +521,16 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(update())), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
 							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
-					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
+					assertThat(model())
+							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
+
+					return this;
 
 				}));
 	}
@@ -531,13 +540,16 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(update())), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
 							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
-					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
+					assertThat(model())
+							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
+
+					return this;
 
 				}));
 	}
@@ -551,7 +563,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(new Request())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -561,7 +573,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(new Request())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -575,7 +587,7 @@ final class SPARQLTest {
 						.parameter("update", "update")
 				), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -588,7 +600,7 @@ final class SPARQLTest {
 						.parameter("update", "update")
 				), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -599,7 +611,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(malformed("query"))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -609,7 +621,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(malformed("query"))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -619,7 +631,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(get(malformed("update"))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}
@@ -629,7 +641,7 @@ final class SPARQLTest {
 
 				.handle(authenticated(post(malformed("update"))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
 				));
 	}

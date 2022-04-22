@@ -65,7 +65,7 @@ final class CreatorTest {
 								Request::reply
 						)
 
-						.accept(response -> assertThat(response)
+						.map(response -> assertThat(response)
 								.hasStatus(Created)
 								.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(or()))
 								.doesNotHaveBody(jsonld())

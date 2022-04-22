@@ -14,38 +14,38 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.http;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-final class ToolboxTest {
+final class LocatorTest {
 
     @Test void testReplacesToolsWithPlugins() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
 
         final Supplier<Object> target=() -> "target";
         final Supplier<Object> plugin=() -> "plugin";
 
-        toolbox.set(target, plugin);
+        locator.set(target, plugin);
 
-        assertThat(toolbox.get(target))
+        assertThat(locator.get(target))
                 .isEqualTo(plugin.get());
 
     }
 
     @Test void testReleaseAutoCloseableResources() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
 
         final class Resource implements AutoCloseable {
 
@@ -61,11 +61,11 @@ final class ToolboxTest {
 
         }
 
-        final Supplier<Resource> service=() -> new Resource();
+        final Supplier<Resource> service=Resource::new;
 
-        final Resource resource=toolbox.get(service);
+        final Resource resource=locator.get(service);
 
-        toolbox.clear();
+        locator.clear();
 
         assertThat(resource.isClosed())
                 .isTrue();
@@ -74,7 +74,7 @@ final class ToolboxTest {
 
     @Test void testReleaseDependenciesAfterResource() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
 
         final Collection<Object> released=new ArrayList<>();
 
@@ -105,8 +105,8 @@ final class ToolboxTest {
         final Step y=new Step(z);
         final Step x=new Step(y);
 
-        toolbox.get(x); // load the terminal service with its dependencies
-        toolbox.clear(); // release resources
+        locator.get(x); // load the terminal service with its dependencies
+        locator.clear(); // release resources
 
         assertThat(released)
                 .as("dependencies released after relying resources")
@@ -115,13 +115,13 @@ final class ToolboxTest {
 
     @Test void testPreventToolBindingIfAlreadyInUse() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
         final Supplier<Object> service=Object::new;
 
         assertThatThrownBy(() -> {
 
-            toolbox.get(service);
-            toolbox.set(service, Object::new);
+            locator.get(service);
+            locator.set(service, Object::new);
 
         })
                 .isInstanceOf(IllegalStateException.class);
@@ -129,14 +129,14 @@ final class ToolboxTest {
 
     @Test void testTrapCircularDependencies() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
         final Object delegate=new Object();
 
         assertThatThrownBy
 
-                (() -> toolbox.get(new Supplier<Object>() {
+                (() -> locator.get(new Supplier<Object>() {
                     @Override public Object get() {
-                        return toolbox.get(this);
+                        return locator.get(this);
                     }
                 }))
 
@@ -144,9 +144,9 @@ final class ToolboxTest {
 
         assertThat
 
-                (toolbox.get(new Supplier<Object>() {
+                (locator.get(new Supplier<Object>() {
                     @Override public Object get() {
-                        return toolbox.get(this, () -> delegate);
+                        return locator.get(this, () -> delegate);
                     }
                 }))
 
@@ -157,7 +157,7 @@ final class ToolboxTest {
 
     @Test void testHandleExceptionsInFactories() {
 
-        final Toolbox toolbox=new Toolbox();
+        final Locator locator=new Locator();
 
         final Supplier<Object> service=() -> {
             throw new NoSuchElementException("missing resource");
@@ -165,7 +165,7 @@ final class ToolboxTest {
 
         assertThatThrownBy(() ->
 
-                toolbox.get(service)
+                locator.get(service)
         )
                 .isInstanceOf(NoSuchElementException.class);
 

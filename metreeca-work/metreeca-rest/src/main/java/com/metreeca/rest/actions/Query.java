@@ -16,15 +16,15 @@
 
 package com.metreeca.rest.actions;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.services.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 
 import static java.lang.String.format;
 

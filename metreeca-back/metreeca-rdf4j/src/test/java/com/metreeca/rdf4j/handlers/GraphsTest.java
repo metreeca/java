@@ -18,7 +18,6 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.rdf4j.services.GraphTest;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
 import com.metreeca.rest.formats.InputFormat;
 
 import org.eclipse.rdf4j.model.*;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.ValuesTest.encode;
@@ -36,8 +36,8 @@ import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.export;
+import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -159,11 +159,13 @@ final class GraphsTest {
 
 				.handle(anonymous(catalog(request())), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
+
+					return this;
 
 				})
 		);
@@ -174,7 +176,7 @@ final class GraphsTest {
 
 				.handle(authenticated(catalog(request())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
@@ -186,7 +188,7 @@ final class GraphsTest {
 
 				.handle(anonymous(catalog(request())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
@@ -199,7 +201,7 @@ final class GraphsTest {
 
 				.handle(authenticated(catalog(request())), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
@@ -214,13 +216,13 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(get(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response ->
 
-					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
-							.doesNotHaveBody();
+						assertThat(response)
+								.hasStatus(Unauthorized)
+								.doesNotHaveBody()
 
-				}));
+				));
 	}
 
 	@Test void testGETDefaultPrivateAuthenticated() {
@@ -228,7 +230,7 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
@@ -242,7 +244,7 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
@@ -254,7 +256,7 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
@@ -269,8 +271,8 @@ final class GraphsTest {
 
 				.handle(anonymous(named(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
-						.hasStatus(com.metreeca.rest.Response.Unauthorized)
+				.map(response -> assertThat(response)
+						.hasStatus(Unauthorized)
 						.doesNotHaveBody()));
 	}
 
@@ -279,7 +281,7 @@ final class GraphsTest {
 
 				.handle(authenticated(named(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
@@ -291,7 +293,7 @@ final class GraphsTest {
 
 				.handle(anonymous(named(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
@@ -303,7 +305,7 @@ final class GraphsTest {
 
 				.handle(authenticated(named(get(request()))), Request::reply)
 
-				.accept(response -> assertThat(response)
+				.map(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
@@ -318,14 +320,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -335,12 +339,16 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(Rest);
+
+					assertThat(dflt())
+							.isIsomorphicTo(Rest);
+
+					return this;
 
 				}));
 	}
@@ -350,14 +358,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -367,12 +377,16 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(Rest);
+
+					assertThat(dflt())
+							.isIsomorphicTo(Rest);
+
+					return this;
 
 				}));
 	}
@@ -383,14 +397,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -400,12 +416,14 @@ final class GraphsTest {
 
 				.handle(authenticated(named(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
 					assertThat(named()).isIsomorphicTo(Rest);
+
+					return this;
 
 				}));
 	}
@@ -415,14 +433,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -432,7 +452,7 @@ final class GraphsTest {
 
 				.handle(authenticated(named(put(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -440,6 +460,8 @@ final class GraphsTest {
 
 					assertThat(named())
 							.isIsomorphicTo(Rest);
+
+					return this;
 
 				}));
 	}
@@ -452,14 +474,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -469,7 +493,7 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -477,6 +501,8 @@ final class GraphsTest {
 
 					assertThat(dflt())
 							.isEmpty();
+
+					return this;
 
 				}));
 	}
@@ -486,14 +512,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -503,7 +531,7 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -511,6 +539,8 @@ final class GraphsTest {
 
 					assertThat(dflt())
 							.isEmpty();
+
+					return this;
 
 				}));
 	}
@@ -521,14 +551,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -538,12 +570,16 @@ final class GraphsTest {
 
 				.handle(authenticated(named(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isEmpty();
+
+					assertThat(named())
+							.isEmpty();
+
+					return this;
 
 				}));
 	}
@@ -553,14 +589,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -570,12 +608,16 @@ final class GraphsTest {
 
 				.handle(authenticated(named(delete(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isEmpty();
+
+					assertThat(named())
+							.isEmpty();
+
+					return this;
 
 				}));
 	}
@@ -588,14 +630,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -605,12 +649,16 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(model(First, Rest));
+
+					assertThat(dflt())
+							.isIsomorphicTo(model(First, Rest));
+
+					return this;
 
 				}));
 	}
@@ -620,14 +668,16 @@ final class GraphsTest {
 
 				.handle(anonymous(dflt(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -637,7 +687,7 @@ final class GraphsTest {
 
 				.handle(authenticated(dflt(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -645,6 +695,8 @@ final class GraphsTest {
 
 					assertThat(dflt())
 							.isIsomorphicTo(model(First, Rest));
+
+					return this;
 
 				}));
 	}
@@ -655,14 +707,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(com.metreeca.rest.Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -672,7 +726,7 @@ final class GraphsTest {
 
 				.handle(authenticated(named(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -680,6 +734,8 @@ final class GraphsTest {
 
 					assertThat(named())
 							.isIsomorphicTo(model(First, Rest));
+
+					return this;
 
 				}));
 	}
@@ -689,14 +745,16 @@ final class GraphsTest {
 
 				.handle(anonymous(named(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
+
+					return this;
 
 				}));
 	}
@@ -706,12 +764,16 @@ final class GraphsTest {
 
 				.handle(authenticated(named(post(request()))), Request::reply)
 
-				.accept(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isIsomorphicTo(model(First, Rest));
+
+					assertThat(named())
+							.isIsomorphicTo(model(First, Rest));
+
+					return this;
 
 				}));
 	}

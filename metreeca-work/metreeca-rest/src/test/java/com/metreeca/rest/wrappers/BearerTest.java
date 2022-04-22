@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
+import com.metreeca.http.Locator;
 import com.metreeca.rest.*;
 
 import org.junit.jupiter.api.Nested;
@@ -27,7 +28,7 @@ import java.util.Optional;
 final class BearerTest {
 
     private void exec(final Runnable... tasks) {
-        new Toolbox().exec(tasks).clear();
+		new Locator().exec(tasks).clear();
     }
 
 
@@ -58,7 +59,7 @@ final class BearerTest {
                         Request::reply
                 )
 
-                .accept(response -> ResponseAssert.assertThat(response)
+				.map(response -> ResponseAssert.assertThat(response)
 
                         .as("access denied")
                         .hasStatus(Response.Unauthorized)
@@ -83,7 +84,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access granted")
                             .hasStatus(Response.OK)
@@ -103,7 +104,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access denied")
                             .hasStatus(Response.Forbidden)
@@ -123,7 +124,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access denied")
                             .hasStatus(Response.Unauthorized)
@@ -153,7 +154,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access granted")
                             .hasStatus(Response.OK)
@@ -175,7 +176,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access denied")
                             .hasStatus(Response.Unauthorized)
@@ -200,7 +201,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access denied")
                             .hasStatus(Response.Forbidden)
@@ -222,7 +223,7 @@ final class BearerTest {
                             Request::reply
                     )
 
-                    .accept(response -> ResponseAssert.assertThat(response)
+					.map(response -> ResponseAssert.assertThat(response)
 
                             .as("access denied")
                             .hasStatus(Response.Unauthorized)

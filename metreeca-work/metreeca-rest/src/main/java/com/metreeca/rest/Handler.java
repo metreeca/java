@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
             throw new NullPointerException("null pass handler");
         }
 
-        return handler(test, pass, (request, next) -> request.reply(response -> response));
+        return handler(test, pass, (request, next) -> request.reply().map(response -> response));
     }
 
     /**

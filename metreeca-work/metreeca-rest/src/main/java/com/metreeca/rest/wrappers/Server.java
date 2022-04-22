@@ -16,24 +16,24 @@
 
 package com.metreeca.rest.wrappers;
 
+import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONFormat;
 import com.metreeca.rest.formats.TextFormat;
-import com.metreeca.rest.services.Logger;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.parameters;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.Level.*;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.TextFormat.text;
-import static com.metreeca.rest.services.Logger.Level.*;
-import static com.metreeca.rest.services.Logger.logger;
 
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
@@ -95,9 +95,7 @@ public final class Server implements Wrapper {
 
             } catch ( final RuntimeException e ) { // try to send a new response
 
-                return request
-
-                        .reply(status(InternalServerError, e))
+                return request.reply().map(status(InternalServerError, e))
 
                         .map(this::logging);
 

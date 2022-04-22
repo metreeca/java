@@ -106,13 +106,13 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
                 if ( operation == null ) { // !!! return void description for GET
 
-                    return request.reply(status(BadRequest, "missing query/update parameter"));
+                    return request.reply().map(status(BadRequest, "missing query/update parameter"));
 
                 } else if ( operation instanceof Query && !queryable(request.roles())
                         || operation instanceof Update && !updatable(request.roles())
                 ) {
 
-                    return request.reply(response -> response.status(Unauthorized));
+                    return request.reply().map(response -> response.status(Unauthorized));
 
                 } else if ( operation instanceof BooleanQuery ) {
 
@@ -155,23 +155,23 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
                 } else {
 
-                    return request.reply(status(NotImplemented, operation.getClass().getName()));
+                    return request.reply().map(status(NotImplemented, operation.getClass().getName()));
 
                 }
 
             } catch ( final MalformedQueryException|IllegalArgumentException e ) {
 
-                return request.reply(status(BadRequest, e));
+                return request.reply().map(status(BadRequest, e));
 
             } catch ( final UnsupportedOperationException e ) {
 
-                return request.reply(status(NotImplemented, e));
+                return request.reply().map(status(NotImplemented, e));
 
             } catch ( final RuntimeException e ) {
 
                 // !!! fails for QueryInterruptedException (timeout) ≫ response is already committed
 
-                return request.reply(status(InternalServerError, e));
+                return request.reply().map(status(InternalServerError, e));
 
             }
         });
@@ -225,10 +225,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             factory.getWriter(output).handleBoolean(query.evaluate());
 
-            return request.reply(response -> response.status(OK)
+            return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray())
-            );
+                    .body(data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
             throw new UncheckedIOException(e);
@@ -257,7 +256,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             writer.endQueryResult();
 
-            return request.reply(response -> response.status(OK)
+            return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getTupleQueryResultFormat().getDefaultMIMEType())
                     .body(data(), output.toByteArray()));
 
@@ -294,7 +293,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             writer.endRDF();
 
-            return request.reply(response -> response.status(OK)
+            return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getRDFFormat().getDefaultMIMEType())
                     .body(data(), output.toByteArray()));
 
@@ -319,10 +318,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             factory.getWriter(output).handleBoolean(true);
 
-            return request.reply(response -> response.status(OK)
+            return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray())
-            );
+                    .body(data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
 
