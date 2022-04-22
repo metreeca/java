@@ -30,7 +30,8 @@ jobs:
           gpg-passphrase: MAVEN_PWD
 
       - name: Release version to ossrh
-        run: mvn --batch-mode --update-snapshots
+        run: mvn --batch-mode
+          --update-snapshots
           --activate-profiles release
           -Drevision=${{ github.ref_name }}
           deploy

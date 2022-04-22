@@ -35,7 +35,8 @@ jobs:
           name=version::$(echo ${{ github.ref_name }} | sed -r 's:release/([0-9]+\.[0-9]+).*:\1.0-SNAPSHOT:')
 
       - name: Release snapshot version to ossrh
-        run: mvn --batch-mode --update-snapshots
+        run: mvn --batch-mode
+          --update-snapshots
           --activate-profiles release
           -Drevision=${{ steps.revision.outputs.version }}
           deploy
