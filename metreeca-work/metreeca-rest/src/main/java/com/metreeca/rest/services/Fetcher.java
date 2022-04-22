@@ -162,10 +162,7 @@ import static java.lang.String.format;
                 final int code=connection.getResponseCode(); // !!! handle http > https redirection
                 final String encoding=connection.getContentEncoding();
 
-                return new Response(request)
-
-                        .status(min(max(100, code), 599)) // harden against illegal codes
-                        .message(Optional.ofNullable(connection.getResponseMessage()).orElse(""))
+                return request.reply(min(max(100, code), 599)) // harden against illegal codes
 
                         .map(response -> {
 
@@ -245,9 +242,7 @@ import static java.lang.String.format;
 
             } else {
 
-                return new Response(request)
-                        .status(MethodNotAllowed)
-                        .message(format("%s Method Not Allowed", method));
+                return request.reply(MethodNotAllowed);
 
             }
         }
