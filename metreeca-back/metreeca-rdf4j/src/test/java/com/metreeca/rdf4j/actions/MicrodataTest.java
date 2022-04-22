@@ -17,9 +17,9 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.http.Toolbox;
 import com.metreeca.http.services.Logger;
 import com.metreeca.http.services.Logger.Level;
-import com.metreeca.rest.Toolbox;
 import com.metreeca.rest.Xtream;
 
 import org.eclipse.rdf4j.model.Statement;

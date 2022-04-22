@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.json.ValuesTest.encode;
@@ -38,7 +39,6 @@ import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.export;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;

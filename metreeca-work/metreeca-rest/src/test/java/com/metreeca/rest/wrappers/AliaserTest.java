@@ -16,7 +16,9 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Toolbox;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.junit.jupiter.api.Test;
 

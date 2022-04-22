@@ -16,6 +16,8 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.http.Toolbox;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

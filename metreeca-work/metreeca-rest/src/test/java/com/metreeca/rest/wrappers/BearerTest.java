@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.*;
 
 import org.junit.jupiter.api.Nested;

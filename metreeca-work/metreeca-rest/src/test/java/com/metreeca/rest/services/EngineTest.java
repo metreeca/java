@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.json.Focus.focus;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.FrameAssert.assertThat;
@@ -63,7 +64,6 @@ import static com.metreeca.json.shapes.Or.or;
 import static com.metreeca.json.shapes.Pattern.pattern;
 import static com.metreeca.json.shapes.Stem.stem;
 import static com.metreeca.json.shapes.When.when;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.services.Engine.engine;
 import static com.metreeca.rest.services.EngineData.*;
 

@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.handlers.Router.router;
 

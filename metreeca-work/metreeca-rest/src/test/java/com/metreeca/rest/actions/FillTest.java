@@ -17,7 +17,7 @@
 package com.metreeca.rest.actions;
 
 
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.Xtream;
 
 import org.junit.jupiter.api.Test;

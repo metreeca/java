@@ -37,9 +37,9 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Values.*;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

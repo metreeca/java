@@ -259,7 +259,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.rest.wrappers.Server.server;
 
 public final class Server {
@@ -349,7 +349,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -401,7 +401,7 @@ import static com.metreeca.json.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.wrappers.Server.server;
@@ -582,7 +582,7 @@ import static com.metreeca.json.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.rest.handlers.Router.router;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
@@ -787,7 +787,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -1120,7 +1120,7 @@ insert { $this toys:stock 0 } where {};
 ```
 
 ```java
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.Handler.Base;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -1138,7 +1138,7 @@ import static com.metreeca.json.shapes.MinInclusive.minInclusive;
 import static com.metreeca.json.shapes.Or.or;
 import static com.metreeca.json.shapes.Pattern.pattern;
 import static com.metreeca.rdf4j.services.Graph.update;
-import static com.metreeca.rest.Toolbox.text;
+import static com.metreeca.http.Toolbox.text;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.operators.Creator.creator;
@@ -1227,7 +1227,7 @@ import org.eclipse.rdf4j.repository.RepositoryResult;
 import java.util.function.Function;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 
 import static org.eclipse.rdf4j.model.util.Values.literal;

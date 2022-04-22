@@ -41,11 +41,11 @@ import java.util.stream.Stream;
 
 import javax.json.Json;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.util.Map.entry;
 import static java.util.regex.Pattern.compile;

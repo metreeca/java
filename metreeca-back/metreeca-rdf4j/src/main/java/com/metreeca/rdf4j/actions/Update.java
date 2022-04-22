@@ -23,8 +23,8 @@ import org.eclipse.rdf4j.query.Operation;
 
 import java.util.function.Consumer;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.time;
-import static com.metreeca.rest.Toolbox.service;
 
 import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 

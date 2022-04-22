@@ -25,6 +25,7 @@ import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Shape.Contains;
 import static com.metreeca.json.Values.iri;
@@ -33,7 +34,6 @@ import static com.metreeca.json.shapes.Field.field;
 import static com.metreeca.json.shapes.Guard.*;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.Wrapper.wrapper;
 import static com.metreeca.rest.formats.JSONLDFormat.*;

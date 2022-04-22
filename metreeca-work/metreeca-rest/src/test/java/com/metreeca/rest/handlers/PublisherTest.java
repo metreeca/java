@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.handlers;
 
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.Toolbox;
 
 import org.junit.jupiter.api.Test;
 

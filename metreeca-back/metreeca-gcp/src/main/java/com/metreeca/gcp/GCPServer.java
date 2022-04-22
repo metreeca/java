@@ -18,9 +18,9 @@ package com.metreeca.gcp;
 
 import com.metreeca.gcp.services.GCPStore;
 import com.metreeca.gcp.services.GCPVault;
+import com.metreeca.http.Toolbox;
 import com.metreeca.jse.JSEServer;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest.Toolbox;
 
 import com.google.cloud.ServiceOptions;
 
@@ -29,8 +29,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.metreeca.http.Toolbox.storage;
 import static com.metreeca.rest.Response.Forbidden;
-import static com.metreeca.rest.Toolbox.storage;
 import static com.metreeca.rest.services.Store.store;
 import static com.metreeca.rest.services.Vault.vault;
 

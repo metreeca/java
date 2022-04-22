@@ -38,11 +38,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.literal;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;

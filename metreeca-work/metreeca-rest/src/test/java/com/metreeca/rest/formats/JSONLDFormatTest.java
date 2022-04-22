@@ -16,7 +16,9 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Toolbox;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.eclipse.rdf4j.model.BNode;
 import org.eclipse.rdf4j.model.IRI;

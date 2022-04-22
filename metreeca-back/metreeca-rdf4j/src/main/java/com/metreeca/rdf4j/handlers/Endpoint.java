@@ -23,7 +23,7 @@ import com.metreeca.rest.Request;
 
 import java.util.*;
 
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;

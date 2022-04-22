@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.http;
 
 import com.metreeca.http.services.Logger;
 

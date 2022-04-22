@@ -17,8 +17,10 @@
 package com.metreeca.rdf.formats;
 
 import com.metreeca.core.Feeds;
+import com.metreeca.http.Toolbox;
 import com.metreeca.json.Values;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.model.vocabulary.LDP;

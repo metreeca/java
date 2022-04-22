@@ -16,15 +16,15 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Toolbox;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Toolbox.storage;
+import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Toolbox.storage;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.*;

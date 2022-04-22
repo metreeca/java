@@ -16,6 +16,7 @@
 
 package com.metreeca.jee;
 
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.*;
 import com.metreeca.rest.services.Loader;
 

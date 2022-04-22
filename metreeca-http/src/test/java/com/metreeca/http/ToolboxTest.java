@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.http;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.metreeca.rest.Toolbox.service;
+import static com.metreeca.http.Toolbox.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -61,7 +61,7 @@ final class ToolboxTest {
 
         }
 
-        final Supplier<Resource> service=() -> new Resource();
+        final Supplier<Resource> service=Resource::new;
 
         final Resource resource=toolbox.get(service);
 

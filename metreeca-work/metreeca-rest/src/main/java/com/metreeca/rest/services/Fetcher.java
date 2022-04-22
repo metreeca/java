@@ -32,10 +32,10 @@ import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
 import static com.metreeca.core.Feeds.data;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.InputFormat.input;
 
 import static java.lang.Integer.max;

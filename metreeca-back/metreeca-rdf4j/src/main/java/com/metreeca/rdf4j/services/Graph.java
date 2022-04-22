@@ -31,12 +31,12 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.*;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.literal;
-import static com.metreeca.rest.Toolbox.service;
 
 import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 

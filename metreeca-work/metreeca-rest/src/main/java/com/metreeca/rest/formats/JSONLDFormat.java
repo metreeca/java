@@ -31,6 +31,7 @@ import javax.json.*;
 
 import static com.metreeca.http.Either.Left;
 import static com.metreeca.http.Either.Right;
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Trace.trace;
 import static com.metreeca.json.Values.format;
@@ -38,7 +39,6 @@ import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.lang;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
-import static com.metreeca.rest.Toolbox.service;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 

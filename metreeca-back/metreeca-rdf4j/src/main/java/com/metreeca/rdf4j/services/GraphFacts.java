@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Values.*;
@@ -66,7 +67,6 @@ import static com.metreeca.rdf4j.SPARQLScribe.values;
 import static com.metreeca.rdf4j.SPARQLScribe.var;
 import static com.metreeca.rest.Scribe.text;
 import static com.metreeca.rest.Scribe.*;
-import static com.metreeca.rest.Toolbox.service;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;

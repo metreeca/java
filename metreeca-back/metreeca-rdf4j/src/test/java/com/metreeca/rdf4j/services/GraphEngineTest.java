@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.rest.Toolbox;
+import com.metreeca.http.Toolbox;
 import com.metreeca.rest.services.EngineTest;
 
 import org.eclipse.rdf4j.repository.sail.SailRepository;

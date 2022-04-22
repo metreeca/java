@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.services;
 
+import com.metreeca.http.Toolbox;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Toolbox;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,9 +27,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Toolbox.storage;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Toolbox.service;
-import static com.metreeca.rest.Toolbox.storage;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Instant.now;
