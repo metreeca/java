@@ -69,11 +69,9 @@ final class JSONLDFormatTest {
     @Nested final class Decoder {
 
         private Request request(final String json) {
-            return new Request().base(base)
+            return JSONLDFormat.shape(new Request().base(base)
 
-                    .header("Content-Type", MIME)
-
-                    .set(shape(), field(direct, required()))
+                            .header("Content-Type", MIME), field(direct, required()))
 
                     .body(input(), () -> new ByteArrayInputStream(json.getBytes(UTF_8)));
         }
@@ -81,7 +79,7 @@ final class JSONLDFormatTest {
         private Response response(final Request request) {
             return request.reply().map(response -> request.body(jsonld()).fold(
                     response::map,
-                    model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)
+                    model -> JSONLDFormat.shape(response.status(OK), shape(request)).body(jsonld(), model)
             ));
         }
 
@@ -122,9 +120,7 @@ final class JSONLDFormatTest {
             final IRI item=iri(response.item());
             final BNode bnode=bnode();
 
-            return response.status(OK)
-
-                    .set(shape(), and(
+            return JSONLDFormat.shape(response.status(OK), and(
 
                             field(direct, required(),
                                     field(nested, required())
@@ -254,9 +250,7 @@ final class JSONLDFormatTest {
 
                         final IRI item=iri(response1.item());
 
-                        return response1.status(OK)
-
-                                .set(shape(), field(direct, localized()))
+                        return JSONLDFormat.shape(response1.status(OK), field(direct, localized()))
 
                                 .body(jsonld(), frame(item, asList(
 

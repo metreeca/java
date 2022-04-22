@@ -129,8 +129,7 @@ public final class Graphs extends Endpoint<Graphs> {
                 }
             }));
 
-            return request.reply().map(response -> response.status(Response.OK)
-                    .set(JSONLDFormat.shape(), GraphsShape)
+            return request.reply().map(response -> JSONLDFormat.shape(response.status(Response.OK), GraphsShape)
                     .body(rdf(), model));
 
         } else {

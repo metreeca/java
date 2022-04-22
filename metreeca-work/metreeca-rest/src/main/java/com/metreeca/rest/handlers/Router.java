@@ -19,12 +19,10 @@ package com.metreeca.rest.handlers;
 
 import com.metreeca.rest.*;
 
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -34,7 +32,9 @@ import static com.metreeca.rest.Request.*;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 
 
@@ -90,7 +90,9 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Router implements Handler {
 
-	private static final Supplier<String> RoutingPrefix=() -> "";
+	private static final Entry<Class<String>, String> RoutingPrefix=entry(
+			String.class, Router.class.getName()+"RoutingPrefix"
+	);
 
 
 	private static final Pattern KeyPattern=Pattern.compile(
@@ -339,7 +341,7 @@ public final class Router implements Handler {
 
 		return request -> {
 
-			final String head=request.get(RoutingPrefix);
+			final String head=request.attribute(RoutingPrefix).orElse("");
 			final String tail=request.path().substring(head.length());
 
 			return Optional.of(pattern.matcher(tail))
@@ -349,14 +351,10 @@ public final class Router implements Handler {
 					.map(matcher -> {
 
 						keys.forEach(key -> {
-							try {
-								request.parameter(key, URLDecoder.decode(matcher.group(key), "UTF-8"));
-							} catch ( final UnsupportedEncodingException unexpected ) {
-								throw new UncheckedIOException(unexpected);
-							}
+							request.parameter(key, URLDecoder.decode(matcher.group(key), UTF_8));
 						});
 
-						return request.set(RoutingPrefix, head+matcher.group(1));
+						return request.attribute(RoutingPrefix, head+matcher.group(1));
 
 					})
 

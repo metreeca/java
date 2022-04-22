@@ -41,7 +41,6 @@ import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.services.Engine.engine;
 
 import static java.lang.String.format;
@@ -59,7 +58,7 @@ import static java.util.stream.Collectors.toMap;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -90,137 +89,137 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class Creator extends Handler.Base {
 
-	private Function<Request, String> slug=request -> md5();
+    private Function<Request, String> slug=request -> md5();
 
-	private final Engine engine=service(engine());
-
-
-	/**
-	 * Creates a resource creator with a UUID-based slug generator.
-	 */
-	public Creator() {
-		delegate(rewrite().wrap(create()).with( // rewrite immediately before handler, after custom wrappers
-				keeper(Create, Detail)
-		));
-	}
+    private final Engine engine=service(engine());
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Configures the slug generator.
-	 *
-	 * @param slug a function mapping from the creation request to the identifier to be assigned to the newly created
-	 *             resource; must return a non-null non-clashing value
-	 *
-	 * @return this creator handler
-	 *
-	 * @throws NullPointerException if {@code slug} is null or returns null values
-	 */
-	public Creator slug(final Function<Request, String> slug) {
-
-		if ( slug == null ) {
-			throw new NullPointerException("null slug");
-		}
-
-		this.slug=slug;
-
-		return this;
-	}
-
-	/**
-	 * Configures the slug generator.
-	 *
-	 * @param slug a function mapping from the creation request and its {@linkplain JSONLDFormat JSON-LD} payload to the
-	 *             identifier to be assigned to the newly created resource; must return a non-null non-clashing value
-	 *
-	 * @return this creator handler
-	 *
-	 * @throws NullPointerException if {@code slug} is null or returns null values
-	 */
-	public Creator slug(final BiFunction<? super Request, ? super Frame, String> slug) {
-
-		if ( slug == null ) {
-			throw new NullPointerException("null slug");
-		}
-
-		this.slug=request -> slug.apply(request, request.body(jsonld()).fold(
-				error -> frame(iri(request.item())),
-				value -> value
-		));
-
-		return this;
-	}
+    /**
+     * Creates a resource creator with a UUID-based slug generator.
+     */
+    public Creator() {
+        delegate(rewrite().wrap(create()).with( // rewrite immediately before handler, after custom wrappers
+                keeper(Create, Detail)
+        ));
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Wrapper rewrite() {
-		return handler -> request -> {
+    /**
+     * Configures the slug generator.
+     *
+     * @param slug a function mapping from the creation request to the identifier to be assigned to the newly created
+     *             resource; must return a non-null non-clashing value
+     *
+     * @return this creator handler
+     *
+     * @throws NullPointerException if {@code slug} is null or returns null values
+     */
+    public Creator slug(final Function<Request, String> slug) {
 
-			final String name=encode( // encode slug as IRI path component
-					requireNonNull(slug.apply(request), "null resource name")
-			);
+        if ( slug == null ) {
+            throw new NullPointerException("null slug");
+        }
 
-			final IRI source=iri(request.item());
-			final IRI target=iri(source, name);
+        this.slug=slug;
 
-			return handler.handle(request
-					.path(request.path()+name)
-					.map(jsonld(), frame -> rewrite(target, source, frame))
-			);
-		};
-	}
+        return this;
+    }
 
-	private Handler create() {
-		return request -> {
+    /**
+     * Configures the slug generator.
+     *
+     * @param slug a function mapping from the creation request and its {@linkplain JSONLDFormat JSON-LD} payload to the
+     *             identifier to be assigned to the newly created resource; must return a non-null non-clashing value
+     *
+     * @return this creator handler
+     *
+     * @throws NullPointerException if {@code slug} is null or returns null values
+     */
+    public Creator slug(final BiFunction<? super Request, ? super Frame, String> slug) {
 
-			final IRI item=iri(request.item());
-			final Shape shape=request.get(shape());
+        if ( slug == null ) {
+            throw new NullPointerException("null slug");
+        }
 
-			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.create(frame,
+        this.slug=request -> slug.apply(request, request.body(jsonld()).fold(
+                error -> frame(iri(request.item())),
+                value -> value
+        ));
+
+        return this;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private Wrapper rewrite() {
+        return handler -> request -> {
+
+            final String name=encode( // encode slug as IRI path component
+                    requireNonNull(slug.apply(request), "null resource name")
+            );
+
+            final IRI source=iri(request.item());
+            final IRI target=iri(source, name);
+
+            return handler.handle(request
+                    .path(request.path()+name)
+                    .map(jsonld(), frame -> rewrite(target, source, frame))
+            );
+        };
+    }
+
+    private Handler create() {
+        return request -> {
+
+            final IRI item=iri(request.item());
+            final Shape shape=JSONLDFormat.shape(request);
+
+            return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.create(frame,
                             shape)
 
-					.map(Frame::focus)
+                    .map(Frame::focus)
 
-					.map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
-							.of(focus)
-							.filter(Value::isIRI)
-							.map(IRI.class::cast)
-							.map(Value::stringValue)
-							.map(Values::path) // root-relative to support relocation
-							.orElse(focus.stringValue())
-					)))
+                    .map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
+                            .of(focus)
+                            .filter(Value::isIRI)
+                            .map(IRI.class::cast)
+                            .map(Value::stringValue)
+                            .map(Values::path) // root-relative to support relocation
+                            .orElse(focus.stringValue())
+                    )))
 
-					.orElseThrow(() ->
-							new IllegalStateException(format("existing resource identifier %s", format(item)))
-					)
+                    .orElseThrow(() ->
+                            new IllegalStateException(format("existing resource identifier %s", format(item)))
+                    )
 
-			);
+            );
 
-		};
-	}
+        };
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Frame rewrite(final IRI target, final IRI source, final Frame frame) {
-		return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.traits()));
-	}
+    private Frame rewrite(final IRI target, final IRI source, final Frame frame) {
+        return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.traits()));
+    }
 
-	private Value rewrite(final Value target, final Value source, final Value focus) {
-		return source.equals(focus) ? target : focus;
-	}
+    private Value rewrite(final Value target, final Value source, final Value focus) {
+        return source.equals(focus) ? target : focus;
+    }
 
-	private Map<IRI, Collection<Frame>> rewrite(
-			final IRI target, final IRI source, final Map<IRI, Collection<Frame>> traits
-	) {
-		return traits.entrySet().stream().collect(toMap(Map.Entry::getKey, entry ->
-				unmodifiableSet((Set<Frame>)entry.getValue().stream()
-						.map(frame -> rewrite(target, source, frame))
-						.collect(toCollection(LinkedHashSet::new))
-				)
-		));
-	}
+    private Map<IRI, Collection<Frame>> rewrite(
+            final IRI target, final IRI source, final Map<IRI, Collection<Frame>> traits
+    ) {
+        return traits.entrySet().stream().collect(toMap(Map.Entry::getKey, entry ->
+                unmodifiableSet((Set<Frame>)entry.getValue().stream()
+                        .map(frame -> rewrite(target, source, frame))
+                        .collect(toCollection(LinkedHashSet::new))
+                )
+        ));
+    }
 
 }

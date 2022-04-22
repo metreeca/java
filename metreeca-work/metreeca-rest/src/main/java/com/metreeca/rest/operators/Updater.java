@@ -30,7 +30,6 @@ import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.services.Engine.engine;
 
 
@@ -42,7 +41,7 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -92,7 +91,7 @@ public final class Updater extends Handler.Base {
 	private Handler update() {
 		return request -> {
 
-			final Shape shape=request.get(shape());
+			final Shape shape=JSONLDFormat.shape(request);
 
 			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.update(frame,
 							shape)

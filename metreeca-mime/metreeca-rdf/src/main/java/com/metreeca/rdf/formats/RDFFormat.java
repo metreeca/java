@@ -263,21 +263,21 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 
 
 	/**
-	 * Decodes the RDF {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available, taking into account the RDF serialization format defined by the {@code message} {@code
-	 * Content-Type} header, defaulting to {@code text/turtle}
-	 */
-	@Override public Either<MessageException, Collection<Statement>> decode(final Message<?> message) {
-		return message.body(input()).fold(error -> Left(status(UnsupportedMediaType, "no RDF body")), source -> {
+     * Decodes the RDF {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+     * body, if one is available, taking into account the RDF serialization format defined by the {@code message} {@code
+     * Content-Type} header, defaulting to {@code text/turtle}
+     */
+    @Override public <M extends Message<M>> Either<MessageException, Collection<Statement>> decode(final M message) {
+        return message.body(input()).fold(error -> Left(status(UnsupportedMediaType, "no RDF body")), source -> {
 
-			final IRI focus=iri(message.item());
+            final IRI focus=iri(message.item());
 
-			final String base=focus.stringValue();
-			final String type=message.header("Content-Type").orElse("");
+            final String base=focus.stringValue();
+            final String type=message.header("Content-Type").orElse("");
 
-			final RDFParser parser=service(RDFParserRegistry.getInstance(), TURTLE, mimes(type)).getParser();
+            final RDFParser parser=service(RDFParserRegistry.getInstance(), TURTLE, mimes(type)).getParser();
 
-			customizer.accept(parser.getParserConfig());
+            customizer.accept(parser.getParserConfig());
 
 			try ( final InputStream input=source.get() ) {
 

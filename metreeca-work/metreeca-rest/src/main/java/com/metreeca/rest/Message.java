@@ -21,6 +21,7 @@ import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -30,7 +31,9 @@ import java.util.stream.Stream;
 import static com.metreeca.http.Either.Right;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Map.entry;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
@@ -44,7 +47,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param <T> the self-bounded message type supporting fluent setters
  */
-public abstract class Message<T extends Message<T>> extends Setup<T> {
+public abstract class Message<T extends Message<T>> {
 
     private static final String SetCookie=normalize("Set-Cookie");
 
@@ -59,8 +62,14 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private final Map<Object, Object> attributes=new HashMap<>();
     private final Map<String, String> headers=new LinkedHashMap<>();
     private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
+
+
+    Message() { }
+
+    abstract T self();
 
 
     /**
@@ -100,8 +109,6 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
     public abstract Request request();
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Retrieves the charset of this message.
      *
@@ -122,7 +129,98 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Attributes ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> Optional<V> attribute(final Class<V> key) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return attribute(entry(key, key.getName()));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> T attribute(final Class<V> key, final V value) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return attribute(entry(key, key.getName()), value);
+    }
+
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the qualified key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> Optional<V> attribute(final Entry<Class<V>, String> key) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return Optional.ofNullable(attributes.get(key)).map(value -> key.getKey().cast(value));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the qualified key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> T attribute(final Entry<Class<V>, String> key, final V value) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        if ( value == null ) {
+
+            attributes.remove(key);
+
+        } else {
+
+            attributes.put(key, value);
+        }
+
+        return self();
+    }
+
+
+    //// Headers ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Retrieves header values.
@@ -216,7 +314,7 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
             throw new NullPointerException("null values");
         }
 
-        return headers(name, Arrays.asList(values));
+        return headers(name, asList(values));
     }
 
     /**
@@ -321,7 +419,7 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Bodies ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Decodes message body.
@@ -346,7 +444,7 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
         Either<MessageException, ?> body=bodies.get(format);
 
         if ( body == null ) {
-            bodies.put(format, body=format.decode(this));
+            bodies.put(format, body=format.decode(self()));
         }
 
         return (Either<MessageException, V>)body;
@@ -381,6 +479,8 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
         return format.encode(self(), value);
     }
 
+
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Updates message body.
@@ -514,6 +614,11 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
         private Part(final String item, final Message<?> message) {
             this.item=item;
             this.request=message.request();
+        }
+
+
+        @Override Part self() {
+            return this;
         }
 
 

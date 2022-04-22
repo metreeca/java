@@ -147,7 +147,7 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
      * InputFormat} body, if one is available and the {@code message} {@code Content-Type} header is either missing or
      * matched by {@link #MIMEPattern}
      */
-    @Override public Either<MessageException, Map<String, Message<?>>> decode(final Message<?> message) {
+    @Override public <M extends Message<M>> Either<MessageException, Map<String, Message<?>>> decode(final M message) {
         return message
 
                 .header("Content-Type")

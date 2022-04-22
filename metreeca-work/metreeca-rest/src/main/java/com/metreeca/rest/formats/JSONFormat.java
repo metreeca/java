@@ -144,21 +144,21 @@ public final class JSONFormat extends Format<JsonObject> {
 
 
 	/**
-	 * Decodes the JSON {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is either missing or  matched by
-	 * {@link #MIMEPattern}
-	 */
-	@Override public Either<MessageException, JsonObject> decode(final Message<?> message) {
-		return message
+     * Decodes the JSON {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+     * body, if one is available and the {@code message} {@code Content-Type} header is either missing or  matched by
+     * {@link #MIMEPattern}
+     */
+    @Override public <M extends Message<M>> Either<MessageException, JsonObject> decode(final M message) {
+        return message
 
-				.header("Content-Type")
+                .header("Content-Type")
 
-				.filter(MIMEPattern.asPredicate().or(String::isEmpty))
+                .filter(MIMEPattern.asPredicate().or(String::isEmpty))
 
-				.map(type -> message.body(input()).flatMap(source -> {
+                .map(type -> message.body(input()).flatMap(source -> {
 
-					try (
-							final InputStream input=source.get();
+                    try (
+                            final InputStream input=source.get();
 							final Reader reader=new InputStreamReader(input, message.charset())
 					) {
 

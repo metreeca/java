@@ -26,7 +26,6 @@ import static com.metreeca.link.shapes.Clazz.clazz;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +41,7 @@ final class DriverTest {
 				.wrap(request -> {
 
 					assertThat(request)
-							.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(shape));
+							.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(shape));
 
 					return request.reply(OK);
 
