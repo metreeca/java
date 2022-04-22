@@ -20,7 +20,7 @@ package com.metreeca.rdf4j.services;
 
 import com.metreeca.core.Strings;
 import com.metreeca.http.Locator;
-import com.metreeca.json.Frame;
+import com.metreeca.link.Frame;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 
@@ -41,11 +41,11 @@ import java.util.logging.Logger;
 
 import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.ModelAssert.assertThat;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.ValuesTest.Prefixes;
-import static com.metreeca.json.ValuesTest.decode;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.ModelAssert.assertThat;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.ValuesTest.Prefixes;
+import static com.metreeca.link.ValuesTest.decode;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;

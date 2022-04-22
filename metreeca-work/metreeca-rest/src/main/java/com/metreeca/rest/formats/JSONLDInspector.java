@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.*;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.*;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.link.shapes.Guard.*;
 
 import static java.util.stream.Collectors.toSet;
 

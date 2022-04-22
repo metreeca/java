@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf.schemas;
 
-import com.metreeca.json.Shape;
+import com.metreeca.link.Shape;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -26,13 +26,13 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.Shape.multiple;
-import static com.metreeca.json.Shape.optional;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Or.or;
+import static com.metreeca.link.Shape.multiple;
+import static com.metreeca.link.Shape.optional;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Or.or;
 
 /**
  * Schema.org RDF vocabulary.

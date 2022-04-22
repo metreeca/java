@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.Shape;
-import com.metreeca.json.Values;
-import com.metreeca.json.shapes.Field;
+import com.metreeca.link.Shape;
+import com.metreeca.link.Values;
+import com.metreeca.link.shapes.Field;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 
 import javax.json.*;
 
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.Field.labels;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.Field.labels;
 import static com.metreeca.rest.formats.JSONLDInspector.*;
 
 import static java.lang.String.format;

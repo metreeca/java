@@ -21,7 +21,7 @@ may be easily plugged as a specialized component into your framework of choice.
 
 |    area | javadocs                                                     | description                             |
 | ------: | :----------------------------------------------------------- | :-------------------------------------- |
-|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-json) | shape-based JSON modelling framework    |
+|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-link) | shape-based JSON modelling framework    |
 |         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework  |
 |    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities           |
 |         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                |

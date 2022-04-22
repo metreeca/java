@@ -16,17 +16,17 @@
 
 package com.metreeca.rest.operators;
 
-import com.metreeca.json.Shape;
+import com.metreeca.link.Shape;
 import com.metreeca.rest.Request;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.item;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Or.or;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.item;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;

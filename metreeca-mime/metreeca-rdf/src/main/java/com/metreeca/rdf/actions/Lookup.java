@@ -16,13 +16,13 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.json.Frame;
+import com.metreeca.link.Frame;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.iri;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.iri;
 
 
 /**

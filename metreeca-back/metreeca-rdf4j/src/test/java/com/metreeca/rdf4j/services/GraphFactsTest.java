@@ -21,12 +21,12 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.json.Values.inverse;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.shapes.All.all;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Link.link;
+import static com.metreeca.link.Values.inverse;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.shapes.All.all;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Link.link;
 import static com.metreeca.rdf4j.services.GraphFacts.*;
 
 import static org.assertj.core.api.Assertions.assertThat;

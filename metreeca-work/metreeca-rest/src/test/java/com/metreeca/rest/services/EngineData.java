@@ -16,25 +16,25 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.json.Frame;
-import com.metreeca.json.Shape;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.*;
 
 import java.util.Collection;
 
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Shape.*;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.literal;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Clazz.clazz;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.filter;
-import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
-import static com.metreeca.json.shapes.MinInclusive.minInclusive;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Shape.*;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.literal;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Clazz.clazz;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.filter;
+import static com.metreeca.link.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.link.shapes.MinInclusive.minInclusive;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;

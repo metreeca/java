@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.json.*;
-import com.metreeca.json.queries.*;
+import com.metreeca.link.*;
+import com.metreeca.link.queries.*;
 import com.metreeca.rest.Config;
 import com.metreeca.rest.Setup;
 import com.metreeca.rest.services.Engine;
@@ -27,7 +27,7 @@ import org.eclipse.rdf4j.model.*;
 import java.util.Optional;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.queries.Items.items;
+import static com.metreeca.link.queries.Items.items;
 import static com.metreeca.rdf4j.services.Graph.graph;
 
 

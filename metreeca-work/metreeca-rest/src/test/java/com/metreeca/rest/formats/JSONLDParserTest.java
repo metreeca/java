@@ -16,10 +16,10 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.Query;
-import com.metreeca.json.Shape;
-import com.metreeca.json.queries.Terms;
-import com.metreeca.json.queries.*;
+import com.metreeca.link.Query;
+import com.metreeca.link.Shape;
+import com.metreeca.link.queries.Terms;
+import com.metreeca.link.queries.*;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -32,29 +32,29 @@ import java.util.function.Consumer;
 
 import javax.json.JsonException;
 
-import static com.metreeca.json.Order.decreasing;
-import static com.metreeca.json.Order.increasing;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.All.all;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Any.any;
-import static com.metreeca.json.shapes.Clazz.clazz;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.filter;
-import static com.metreeca.json.shapes.Like.like;
-import static com.metreeca.json.shapes.Link.link;
-import static com.metreeca.json.shapes.MaxCount.maxCount;
-import static com.metreeca.json.shapes.MaxExclusive.maxExclusive;
-import static com.metreeca.json.shapes.MaxInclusive.maxInclusive;
-import static com.metreeca.json.shapes.MaxLength.maxLength;
-import static com.metreeca.json.shapes.MinCount.minCount;
-import static com.metreeca.json.shapes.MinExclusive.minExclusive;
-import static com.metreeca.json.shapes.MinInclusive.minInclusive;
-import static com.metreeca.json.shapes.MinLength.minLength;
-import static com.metreeca.json.shapes.Pattern.pattern;
-import static com.metreeca.json.shapes.Range.range;
-import static com.metreeca.json.shapes.Stem.stem;
+import static com.metreeca.link.Order.decreasing;
+import static com.metreeca.link.Order.increasing;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.All.all;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Any.any;
+import static com.metreeca.link.shapes.Clazz.clazz;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.filter;
+import static com.metreeca.link.shapes.Like.like;
+import static com.metreeca.link.shapes.Link.link;
+import static com.metreeca.link.shapes.MaxCount.maxCount;
+import static com.metreeca.link.shapes.MaxExclusive.maxExclusive;
+import static com.metreeca.link.shapes.MaxInclusive.maxInclusive;
+import static com.metreeca.link.shapes.MaxLength.maxLength;
+import static com.metreeca.link.shapes.MinCount.minCount;
+import static com.metreeca.link.shapes.MinExclusive.minExclusive;
+import static com.metreeca.link.shapes.MinInclusive.minInclusive;
+import static com.metreeca.link.shapes.MinLength.minLength;
+import static com.metreeca.link.shapes.Pattern.pattern;
+import static com.metreeca.link.shapes.Range.range;
+import static com.metreeca.link.shapes.Stem.stem;
 
 import static org.assertj.core.api.Assertions.*;
 

@@ -17,8 +17,8 @@
 package com.metreeca.rest.formats;
 
 import com.metreeca.http.Either;
-import com.metreeca.json.*;
-import com.metreeca.json.shapes.Or;
+import com.metreeca.link.*;
+import com.metreeca.link.shapes.Or;
 import com.metreeca.rest.*;
 
 import org.eclipse.rdf4j.model.*;
@@ -32,11 +32,11 @@ import javax.json.*;
 import static com.metreeca.http.Either.Left;
 import static com.metreeca.http.Either.Right;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Trace.trace;
-import static com.metreeca.json.Values.format;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.lang;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Trace.trace;
+import static com.metreeca.link.Values.format;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.lang;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.InputFormat.input;

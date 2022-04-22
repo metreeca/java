@@ -17,8 +17,8 @@
 package com.metreeca.rest.operators;
 
 
-import com.metreeca.json.*;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.*;
+import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
 import com.metreeca.rest.services.Engine;
@@ -33,11 +33,11 @@ import java.util.function.Function;
 import static com.metreeca.core.Identifiers.encode;
 import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.format;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.shapes.Guard.Create;
-import static com.metreeca.json.shapes.Guard.Detail;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.format;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.shapes.Guard.Create;
+import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;

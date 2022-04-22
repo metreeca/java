@@ -125,13 +125,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-json</artifactId>
+				<artifactId>metreeca-link</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-json</artifactId>
+				<artifactId>metreeca-link</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -531,7 +531,7 @@
 
 							<links>
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-link/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
 

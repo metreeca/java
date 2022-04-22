@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.ModelAssert.assertThat;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.ValuesTest.encode;
+import static com.metreeca.link.ModelAssert.assertThat;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.ValuesTest.encode;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rdf4j.services.GraphTest.exec;

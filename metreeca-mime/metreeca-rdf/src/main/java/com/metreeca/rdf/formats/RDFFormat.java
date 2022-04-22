@@ -41,7 +41,7 @@ import javax.json.JsonObjectBuilder;
 
 import static com.metreeca.http.Either.Left;
 import static com.metreeca.http.Either.Right;
-import static com.metreeca.json.Values.iri;
+import static com.metreeca.link.Values.iri;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;

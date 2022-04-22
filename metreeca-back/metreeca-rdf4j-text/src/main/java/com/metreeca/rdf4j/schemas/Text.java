@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.schemas;
 
-import com.metreeca.json.Frame;
+import com.metreeca.link.Frame;
 import com.metreeca.text.Chunk;
 import com.metreeca.text.Match;
 
@@ -27,9 +27,9 @@ import org.eclipse.rdf4j.model.vocabulary.*;
 import java.util.Collection;
 import java.util.Set;
 
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.literal;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.literal;
 
 /**
  * RDF vocabulary for describing textual annotations.

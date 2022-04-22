@@ -16,10 +16,10 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.json.*;
-import com.metreeca.json.queries.Stats;
-import com.metreeca.json.queries.Terms;
-import com.metreeca.json.shapes.*;
+import com.metreeca.link.*;
+import com.metreeca.link.queries.Stats;
+import com.metreeca.link.queries.Terms;
+import com.metreeca.link.shapes.*;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -34,15 +34,15 @@ import javax.json.*;
 
 import static com.metreeca.core.Identifiers.decode;
 import static com.metreeca.core.Identifiers.parameters;
-import static com.metreeca.json.Order.decreasing;
-import static com.metreeca.json.Order.increasing;
-import static com.metreeca.json.Values.format;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.queries.Items.items;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Field.labels;
-import static com.metreeca.json.shapes.Link.link;
+import static com.metreeca.link.Order.decreasing;
+import static com.metreeca.link.Order.increasing;
+import static com.metreeca.link.Values.format;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.queries.Items.items;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Field.labels;
+import static com.metreeca.link.shapes.Link.link;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;

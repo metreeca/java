@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.linkers;
 
-import com.metreeca.json.Frame;
+import com.metreeca.link.Frame;
 import com.metreeca.text.*;
 import com.metreeca.text.actions.Normalize;
 
@@ -31,7 +31,7 @@ import java.util.function.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.metreeca.json.Frame.frame;
+import static com.metreeca.link.Frame.frame;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.*;

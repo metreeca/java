@@ -17,13 +17,13 @@
 package com.metreeca.rest;
 
 
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.Guard;
 
 import java.util.*;
 import java.util.function.*;
 
-import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.Response.Forbidden;
 import static com.metreeca.rest.Response.Unauthorized;

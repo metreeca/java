@@ -18,7 +18,7 @@ package com.metreeca.rdf.formats;
 
 import com.metreeca.core.Feeds;
 import com.metreeca.http.Locator;
-import com.metreeca.json.Values;
+import com.metreeca.link.Values;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 
@@ -30,11 +30,11 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.metreeca.json.ModelAssert.assertThat;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.link.ModelAssert.assertThat;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.statement;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.Response.UnsupportedMediaType;

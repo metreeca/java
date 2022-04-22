@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.Field;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.Field;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
 
@@ -26,9 +26,9 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 
 import java.util.Objects;
 
-import static com.metreeca.json.Values.inverse;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.link.Values.inverse;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
 
 import static java.util.Arrays.stream;

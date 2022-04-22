@@ -17,7 +17,7 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.json.Values;
+import com.metreeca.link.Values;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
@@ -31,8 +31,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.json.Values.literal;
-import static com.metreeca.json.Values.statement;
+import static com.metreeca.link.Values.literal;
+import static com.metreeca.link.Values.statement;
 
 import static java.time.ZoneOffset.UTC;
 import static java.util.Arrays.stream;

@@ -16,13 +16,13 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.json.Shape;
+import com.metreeca.link.Shape;
 import com.metreeca.rest.Request;
 
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.json.shapes.Clazz.clazz;
+import static com.metreeca.link.shapes.Clazz.clazz;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
