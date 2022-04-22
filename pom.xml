@@ -191,6 +191,12 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-json</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-xml</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -533,16 +539,21 @@
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-link/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/</link>
+
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-core/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-http/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
 
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j-text/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>

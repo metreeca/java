@@ -16,29 +16,35 @@
   limitations under the License.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-java</artifactId>
+		<artifactId>metreeca-mime</artifactId>
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>metreeca-mime</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>metreeca-json</artifactId>
 
-	<name>Metreeca Data Connectors</name>
-	<description>Data connector kits.</description>
+	<name>Metreeca JSON Data Connector</name>
+	<description>Connector kit for JSON data.</description>
 
-	<modules>
+	<dependencies>
 
-		<module>metreeca-json</module>
-		<module>metreeca-xml</module>
-		<module>metreeca-rdf</module>
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-http</artifactId>
+		</dependency>
 
-	</modules>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+	</dependencies>
 
 </project>
