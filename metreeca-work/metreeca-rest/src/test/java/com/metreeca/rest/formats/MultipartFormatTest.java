@@ -27,7 +27,6 @@ import java.io.*;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.formats.MultipartFormat.multipart;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
@@ -154,9 +153,10 @@ final class MultipartFormatTest {
 
 							error -> {
 
-								new Request().reply().map(error).map(task(response -> ResponseAssert.assertThat(response)
+								new Request().reply().map(error).map(response -> ResponseAssert.assertThat(response)
 										.as("missing boundary parameter")
-										.hasStatus(Response.BadRequest)));
+										.hasStatus(Response.BadRequest)
+								);
 
 
 								return this;
@@ -182,33 +182,39 @@ final class MultipartFormatTest {
 					.body(multipart(), Map.ofEntries((Map.Entry<String, Message<?>>[])new Map.Entry[]{ Map.entry("one",
 							response1.part("one").body(text(), "one")), Map.entry("two",
 							response1.part("two").body(text(),
-									"two")) }))).map(task(response -> MessageAssert.assertThat(response)
+									"two")) }))).map(response -> MessageAssert.assertThat(response)
 
 					.has(new Condition<>(
 							r -> r.header("Content-Type").filter(s -> s.contains("; boundary=")).isPresent(),
 							"multipart boundary set"
-					))));
+					))
+
+			);
 		}
 
 		@Test void testPreserveCustomBoundary() {
 			new Request().reply().map(response1 -> response1
 
-					.status(Response.OK)
-					.header("Content-Type", "multipart/form-data; boundary=1234567890")
-					.body(multipart(), Map.of())).map(task(response -> MessageAssert.assertThat(response)
+							.status(Response.OK)
+							.header("Content-Type", "multipart/form-data; boundary=1234567890")
+							.body(multipart(), Map.of()))
 
-					.hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
+					.map(response -> MessageAssert.assertThat(response)
 
-					.hasBody(output(), target -> {
+							.hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
 
-						final ByteArrayOutputStream output=new ByteArrayOutputStream();
+							.hasBody(output(), target -> {
 
-						target.accept(output);
+								final ByteArrayOutputStream output=new ByteArrayOutputStream();
 
-						assertThat(new String(output.toByteArray(), UTF_8))
-								.contains("--1234567890--");
+								target.accept(output);
 
-					})));
+								assertThat(output.toString(UTF_8))
+										.contains("--1234567890--");
+
+							})
+
+					);
 		}
 
 	}

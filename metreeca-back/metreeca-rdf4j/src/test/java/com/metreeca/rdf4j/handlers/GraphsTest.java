@@ -18,7 +18,6 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.rdf4j.services.GraphTest;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
 import com.metreeca.rest.formats.InputFormat;
 
 import org.eclipse.rdf4j.model.*;
@@ -29,7 +28,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.http.Toolbox.service;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.*;
@@ -38,6 +36,7 @@ import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.export;
+import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -158,45 +157,55 @@ final class GraphsTest {
 	@Test void testGETCatalogPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(catalog(request()))).map(task(response -> {
+				.handle(anonymous(catalog(request())))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
-				}))
+					return this;
+
+				})
 		);
 	}
 
 	@Test void testGETCatalogPrivateAuthorized() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(catalog(request()))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(catalog(request())))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
-						))));
+						)));
 	}
 
 	@Test void testGETCatalogPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(catalog(request()))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(anonymous(catalog(request())))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
-						))));
+						)));
 	}
 
 
 	@Test void testGETCatalogPublicAuthorized() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(catalog(request()))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(catalog(request())))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(catalog())
-						))));
+						)));
 	}
 
 
@@ -205,44 +214,54 @@ final class GraphsTest {
 	@Test void testGETDefaultPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(get(request())))).map(task(response -> {
+				.handle(anonymous(dflt(get(request()))))
 
-					assertThat(response)
-							.hasStatus(Response.Unauthorized)
-							.doesNotHaveBody();
+				.map(response ->
 
-				})));
+						assertThat(response)
+								.hasStatus(Unauthorized)
+								.doesNotHaveBody()
+
+				));
 	}
 
 	@Test void testGETDefaultPrivateAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(dflt(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
-						)))
+						)
+				)
 		);
 	}
 
 	@Test void testGETDefaultPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(anonymous(dflt(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
-						))));
+						)));
 	}
 
 	@Test void testGETDefaultPublicAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(dflt(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(First)
-						)))
+						)
+				)
 		);
 	}
 
@@ -250,39 +269,47 @@ final class GraphsTest {
 	@Test void testGETNamedPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(named(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody())));
+				.handle(anonymous(named(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(Unauthorized)
+						.doesNotHaveBody()));
 	}
 
 	@Test void testGETNamedPrivateAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(named(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(named(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
-						))));
+						)));
 	}
 
 	@Test void testGETNamedPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(named(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(anonymous(named(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
-						))));
+						)));
 	}
 
 	@Test void testGETNamedPublicAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(named(get(request())))).map(task(response -> assertThat(response)
-						.hasStatus(Response.OK)
+				.handle(authenticated(named(get(request()))))
+
+				.map(response -> assertThat(response)
+						.hasStatus(com.metreeca.rest.Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.isIsomorphicTo(Rest)
-						))));
+						)));
 	}
 
 
@@ -291,107 +318,141 @@ final class GraphsTest {
 	@Test void testPUTDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(put(request())))).map(task(response -> {
+				.handle(anonymous(dflt(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(put(request())))).map(task(response -> {
+				.handle(authenticated(dflt(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(Rest);
 
-				})));
+					assertThat(dflt())
+							.isIsomorphicTo(Rest);
+
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTDefaultPublicAnonymous() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(put(request())))).map(task(response -> {
+				.handle(anonymous(dflt(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTDefaultPublicAuthenticated() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(put(request())))).map(task(response -> {
+				.handle(authenticated(dflt(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(Rest);
 
-				})));
+					assertThat(dflt())
+							.isIsomorphicTo(Rest);
+
+					return this;
+
+				}));
 	}
 
 
 	@Test void testPUTNamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(put(request())))).map(task(response -> {
+				.handle(anonymous(named(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTNamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(put(request())))).map(task(response -> {
+				.handle(authenticated(named(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
 					assertThat(named()).isIsomorphicTo(Rest);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTNamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(put(request())))).map(task(response -> {
+				.handle(anonymous(named(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPUTNamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(put(request())))).map(task(response -> {
+				.handle(authenticated(named(put(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -400,7 +461,9 @@ final class GraphsTest {
 					assertThat(named())
 							.isIsomorphicTo(Rest);
 
-				})));
+					return this;
+
+				}));
 	}
 
 
@@ -409,22 +472,28 @@ final class GraphsTest {
 	@Test void testDELETEDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(delete(request())))).map(task(response -> {
+				.handle(anonymous(dflt(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETEDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(delete(request())))).map(task(response -> {
+				.handle(authenticated(dflt(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -433,28 +502,36 @@ final class GraphsTest {
 					assertThat(dflt())
 							.isEmpty();
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETEDefaultPublicAnonymous() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(delete(request())))).map(task(response -> {
+				.handle(anonymous(dflt(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETEDefaultPublicAuthenticated() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(delete(request())))).map(task(response -> {
+				.handle(authenticated(dflt(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -463,64 +540,86 @@ final class GraphsTest {
 					assertThat(dflt())
 							.isEmpty();
 
-				})));
+					return this;
+
+				}));
 	}
 
 
 	@Test void testDELETENamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(delete(request())))).map(task(response -> {
+				.handle(anonymous(named(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETENamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(delete(request())))).map(task(response -> {
+				.handle(authenticated(named(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isEmpty();
 
-				})));
+					assertThat(named())
+							.isEmpty();
+
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETENamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(delete(request())))).map(task(response -> {
+				.handle(anonymous(named(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testDELETENamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(delete(request())))).map(task(response -> {
+				.handle(authenticated(named(delete(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isEmpty();
 
-				})));
+					assertThat(named())
+							.isEmpty();
+
+					return this;
+
+				}));
 	}
 
 
@@ -529,50 +628,28 @@ final class GraphsTest {
 	@Test void testPOSTDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(post(request())))).map(task(response -> {
+				.handle(anonymous(dflt(post(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(dflt())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPOSTDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(post(request())))).map(task(response -> {
+				.handle(authenticated(dflt(post(request()))))
 
-					assertThat(response)
-							.isSuccess()
-							.doesNotHaveBody();
-					assertThat(dflt()).isIsomorphicTo(model(First, Rest));
-
-				})));
-	}
-
-	@Test void testPOSTDefaultPublicAnonymous() {
-		exec(dflt(First), () -> _public(endpoint())
-
-				.handle(anonymous(dflt(post(request())))).map(task(response -> {
-
-					assertThat(response)
-							.hasStatus(Response.Unauthorized)
-							.doesNotHaveBody();
-
-					assertThat(dflt())
-							.isIsomorphicTo(First);
-
-				})));
-	}
-
-	@Test void testPOSTDefaultPublicAuthenticated() {
-		exec(dflt(First), () -> _public(endpoint())
-
-				.handle(authenticated(dflt(post(request())))).map(task(response -> {
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -581,29 +658,75 @@ final class GraphsTest {
 					assertThat(dflt())
 							.isIsomorphicTo(model(First, Rest));
 
-				})));
+					return this;
+
+				}));
+	}
+
+	@Test void testPOSTDefaultPublicAnonymous() {
+		exec(dflt(First), () -> _public(endpoint())
+
+				.handle(anonymous(dflt(post(request()))))
+
+				.map(response -> {
+
+					assertThat(response)
+							.hasStatus(Unauthorized)
+							.doesNotHaveBody();
+
+					assertThat(dflt())
+							.isIsomorphicTo(First);
+
+					return this;
+
+				}));
+	}
+
+	@Test void testPOSTDefaultPublicAuthenticated() {
+		exec(dflt(First), () -> _public(endpoint())
+
+				.handle(authenticated(dflt(post(request()))))
+
+				.map(response -> {
+
+					assertThat(response)
+							.isSuccess()
+							.doesNotHaveBody();
+
+					assertThat(dflt())
+							.isIsomorphicTo(model(First, Rest));
+
+					return this;
+
+				}));
 	}
 
 
 	@Test void testPOSTNamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(post(request())))).map(task(response -> {
+				.handle(anonymous(named(post(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPOSTNamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(post(request())))).map(task(response -> {
+				.handle(authenticated(named(post(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
@@ -612,35 +735,47 @@ final class GraphsTest {
 					assertThat(named())
 							.isIsomorphicTo(model(First, Rest));
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPOSTNamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(post(request())))).map(task(response -> {
+				.handle(anonymous(named(post(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
-							.hasStatus(Response.Unauthorized)
+							.hasStatus(Unauthorized)
 							.doesNotHaveBody();
 
 					assertThat(named())
 							.isIsomorphicTo(First);
 
-				})));
+					return this;
+
+				}));
 	}
 
 	@Test void testPOSTNamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(post(request())))).map(task(response -> {
+				.handle(authenticated(named(post(request()))))
+
+				.map(response -> {
 
 					assertThat(response)
 							.isSuccess()
 							.doesNotHaveBody();
-					assertThat(named()).isIsomorphicTo(model(First, Rest));
 
-				})));
+					assertThat(named())
+							.isIsomorphicTo(model(First, Rest));
+
+					return this;
+
+				}));
 	}
 
 }

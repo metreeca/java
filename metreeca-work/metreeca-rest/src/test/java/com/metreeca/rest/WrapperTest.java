@@ -21,7 +21,6 @@ import com.metreeca.http.Toolbox;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.ResponseAssert.assertThat;
@@ -53,7 +52,9 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request().roles("x")).map(task(response -> assertThat(response).hasStatus(OK)))
+					.handle(request().roles("x"))
+
+					.map(response -> assertThat(response).hasStatus(OK))
 			);
 		}
 
@@ -62,7 +63,9 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request().roles("z")).map(task(response -> assertThat(response).hasStatus(Unauthorized)))
+					.handle(request().roles("z"))
+
+					.map(response -> assertThat(response).hasStatus(Unauthorized))
 			);
 		}
 
@@ -71,7 +74,9 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request()).map(task(response -> assertThat(response).hasStatus(Unauthorized)))
+					.handle(request())
+
+					.map(response -> assertThat(response).hasStatus(Unauthorized))
 			);
 		}
 

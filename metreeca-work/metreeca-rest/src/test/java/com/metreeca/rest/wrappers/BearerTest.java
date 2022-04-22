@@ -24,8 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static com.metreeca.core.Lambdas.task;
-
 
 final class BearerTest {
 
@@ -58,13 +56,17 @@ final class BearerTest {
 				.handle(new Request()
 						.method(Request.GET)
 						.header("Authorization", "Custom secret")
-				).map(task(response -> ResponseAssert.assertThat(response)
+				)
+
+				.map(response -> ResponseAssert.assertThat(response)
 
 						.as("access denied")
 						.hasStatus(Response.Unauthorized)
 
 						.as("fall-through challenge")
-						.hasHeader("WWW-Authenticate", "Custom")))
+						.hasHeader("WWW-Authenticate", "Custom")
+
+				)
 		);
 	}
 
@@ -78,13 +80,15 @@ final class BearerTest {
 
 					.handle(new Request()
 							.method(Request.GET)
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access granted")
 							.hasStatus(Response.OK)
 
 							.as("challenge not included")
-							.doesNotHaveHeader("WWW-Authenticate")))
+							.doesNotHaveHeader("WWW-Authenticate"))
 			);
 		}
 
@@ -95,13 +99,15 @@ final class BearerTest {
 
 					.handle(new Request()
 							.method(Request.GET)
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access denied")
 							.hasStatus(Response.Forbidden)
 
 							.as("challenge not included")
-							.doesNotHaveHeader("WWW-Authenticate")))
+							.doesNotHaveHeader("WWW-Authenticate"))
 			);
 		}
 
@@ -112,7 +118,9 @@ final class BearerTest {
 
 					.handle(new Request()
 							.method(Request.GET)
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access denied")
 							.hasStatus(Response.Unauthorized)
@@ -121,7 +129,8 @@ final class BearerTest {
 							.matches(r -> r
 									.header("WWW-Authenticate").orElse("")
 									.matches("Bearer realm=\".*\"")
-							)))
+							)
+					)
 			);
 		}
 
@@ -138,13 +147,16 @@ final class BearerTest {
 					.handle(new Request()
 							.method(Request.GET)
 							.header("Authorization", "Bearer token")
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access granted")
 							.hasStatus(Response.OK)
 
 							.as("challenge not included")
-							.doesNotHaveHeader("WWW-Authenticate")))
+							.doesNotHaveHeader("WWW-Authenticate")
+					)
 			);
 		}
 
@@ -156,7 +168,9 @@ final class BearerTest {
 					.handle(new Request()
 							.method(Request.GET)
 							.header("Authorization", "Bearer qwertyuiop")
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access denied")
 							.hasStatus(Response.Unauthorized)
@@ -165,7 +179,8 @@ final class BearerTest {
 							.matches(r -> r
 									.header("WWW-Authenticate").orElse("")
 									.matches("Bearer realm=\".*\", error=\"invalid_token\"")
-							)))
+							)
+					)
 			);
 		}
 
@@ -177,13 +192,16 @@ final class BearerTest {
 					.handle(new Request()
 							.method(Request.GET)
 							.header("Authorization", "Bearer token")
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access denied")
 							.hasStatus(Response.Forbidden)
 
 							.as("challenge not included")
-							.doesNotHaveHeader("WWW-Authenticate")))
+							.doesNotHaveHeader("WWW-Authenticate")
+					)
 			);
 		}
 
@@ -195,7 +213,9 @@ final class BearerTest {
 					.handle(new Request()
 							.method(Request.GET)
 							.header("Authorization", "Bearer token")
-					).map(task(response -> ResponseAssert.assertThat(response)
+					)
+
+					.map(response -> ResponseAssert.assertThat(response)
 
 							.as("access denied")
 							.hasStatus(Response.Unauthorized)
@@ -204,7 +224,8 @@ final class BearerTest {
 							.matches(r -> r
 									.header("WWW-Authenticate").orElse("")
 									.matches("Bearer realm=\".*\"")
-							)))
+							)
+					)
 			);
 		}
 

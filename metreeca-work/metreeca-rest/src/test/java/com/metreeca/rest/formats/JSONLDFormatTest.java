@@ -53,213 +53,239 @@ import static java.util.Collections.singletonMap;
 
 final class JSONLDFormatTest {
 
-	private static final String base="http://example.com/";
+    private static final String base="http://example.com/";
 
-	private final IRI direct=iri(base, "/direct");
-	private final IRI nested=iri(base, "/nested");
-	private final IRI reverse=iri(base, "/reverse");
-	private final IRI outlier=iri(base, "/outlier");
+    private final IRI direct=iri(base, "/direct");
+    private final IRI nested=iri(base, "/nested");
+    private final IRI reverse=iri(base, "/reverse");
+    private final IRI outlier=iri(base, "/outlier");
 
 
-	private void exec(final Runnable task) {
-		new Toolbox().exec(task).clear();
-	}
+    private void exec(final Runnable task) {
+        new Toolbox().exec(task).clear();
+    }
 
 
-	@Nested final class Decoder {
+    @Nested final class Decoder {
 
-		private Request request(final String json) {
-			return new Request().base(base)
+        private Request request(final String json) {
+            return new Request().base(base)
 
-					.header("Content-Type", MIME)
+                    .header("Content-Type", MIME)
 
-					.set(shape(), field(direct, required()))
+                    .set(shape(), field(direct, required()))
 
-					.body(input(), () -> new ByteArrayInputStream(json.getBytes(UTF_8)));
-		}
+                    .body(input(), () -> new ByteArrayInputStream(json.getBytes(UTF_8)));
+        }
 
-		private Response response(final Request request) {
-			return request.reply().map(response -> request.body(jsonld()).fold(
-					response::map,
-					model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)
-			));
-		}
+        private Response response(final Request request) {
+            return request.reply().map(response -> request.body(jsonld()).fold(
+                    response::map,
+                    model -> response.status(OK).set(shape(), request.get(shape())).body(jsonld(), model)
+            ));
+        }
 
 
-		@Test void testReportMalformedPayload() {
-			exec(() -> request("{")
+        @Test void testReportMalformedPayload() {
+            exec(() -> request("{")
 
-					.map(this::response).map(task(response -> assertThat(response)
-							.hasStatus(BadRequest)))
-			);
-		}
+                    .map(this::response)
 
-		@Test void testReportInvalidPayload() {
-			exec(() -> request("{}")
+                    .map(response -> assertThat(response)
+                            .hasStatus(BadRequest)
+                    )
+            );
+        }
 
-					.map(this::response).map(task(response -> assertThat(response)
-							.hasStatus(UnprocessableEntity)))
-			);
-		}
+        @Test void testReportInvalidPayload() {
+            exec(() -> request("{}")
 
-	}
+                    .map(this::response)
 
-	@Nested final class Encoder {
+                    .map(response -> assertThat(response)
+                            .hasStatus(UnprocessableEntity)
+                    )
+            );
+        }
 
-		private Request request() {
-			return new Request().base(base);
-		}
+    }
 
+    @Nested final class Encoder {
 
-		private Response response(final Response response) {
+        private Request request() {
+            return new Request().base(base);
+        }
 
-			final IRI item=iri(response.item());
-			final BNode bnode=bnode();
 
-			return response.status(OK)
+        private Response response(final Response response) {
 
-					.set(shape(), and(
+            final IRI item=iri(response.item());
+            final BNode bnode=bnode();
 
-							field(direct, required(),
-									field(nested, required())
-							),
+            return response.status(OK)
 
-							field("reverse", inverse(reverse), required())
+                    .set(shape(), and(
 
-					))
+                            field(direct, required(),
+                                    field(nested, required())
+                            ),
 
-					.body(jsonld(), frame(item, asList(
+                            field("reverse", inverse(reverse), required())
 
-							statement(item, direct, bnode),
-							statement(bnode, nested, item),
-							statement(bnode, reverse, item),
-							statement(item, outlier, bnode)
+                    ))
 
-					)));
-		}
+                    .body(jsonld(), frame(item, asList(
 
+                            statement(item, direct, bnode),
+                            statement(bnode, nested, item),
+                            statement(bnode, reverse, item),
+                            statement(item, outlier, bnode)
 
-		@Test void testHandleGenericRequests() {
-			exec(() -> request().reply().map(this::response).map(task(response -> assertThat(response)
-					.hasHeader("Content-Type", JSONFormat.MIME)
-					.hasBody(json(), json -> assertThat(json)
-							.doesNotHaveField("@context")
-					)))
+                    )));
+        }
 
-			);
-		}
 
-		@Test void testHandlePlainJSONRequests() {
-			exec(() -> request()
+        @Test void testHandleGenericRequests() {
+            exec(() -> request().reply().map(this::response)
 
-					.header("Accept", JSONFormat.MIME).reply().map(this::response).map(task(response -> assertThat(response)
-							.hasHeader("Content-Type", JSONFormat.MIME)
-							.hasBody(json(), json -> assertThat(json)
-									.doesNotHaveField("@context")
-							)))
+                    .map(response -> assertThat(response)
+                            .hasHeader("Content-Type", JSONFormat.MIME)
+                            .hasBody(json(), json -> assertThat(json)
+                                    .doesNotHaveField("@context")
+                            )
+                    )
 
-			);
-		}
+            );
+        }
 
-		@Test void testHandleJSONLDRequests() {
-			exec(() -> request()
+        @Test void testHandlePlainJSONRequests() {
+            exec(() -> request()
 
-					.header("Accept", MIME).reply().map(this::response).map(task(response -> assertThat(response)
-							.hasHeader("Content-Type", MIME)
-							.hasBody(json(), json -> assertThat(json)
-									.hasField("@context")
-							)))
+                    .header("Accept", JSONFormat.MIME).reply().map(this::response)
 
-			);
-		}
+                    .map(response -> assertThat(response)
+                            .hasHeader("Content-Type", JSONFormat.MIME)
+                            .hasBody(json(), json -> assertThat(json)
+                                    .doesNotHaveField("@context")
+                            )
+                    )
 
-		@Test void testGenerateJSONLDContextObjects() {
-			new Toolbox()
+            );
+        }
 
-					.set(keywords(), () -> singletonMap("@id", "id"))
+        @Test void testHandleJSONLDRequests() {
+            exec(() -> request()
 
-					.exec(() -> request()
+                    .header("Accept", MIME).reply().map(this::response)
 
-							.header("Accept", MIME).reply().map(this::response).map(task(response -> assertThat(response)
+                    .map(response -> assertThat(response)
+                            .hasHeader("Content-Type", MIME)
+                            .hasBody(json(), json -> assertThat(json)
+                                    .hasField("@context")
+                            )
+                    )
 
-									.hasHeader("Content-Type", MIME)
+            );
+        }
 
-									.hasBody(json(), json -> assertThat(json)
+        @Test void testGenerateJSONLDContextObjects() {
+            new Toolbox()
 
-											.hasField("@context", context -> assertThat(context)
+                    .set(keywords(), () -> singletonMap("@id", "id"))
 
-													.hasField("id", "@id") // keywords at top level
+                    .exec(() -> request()
 
-													.hasField("direct", direct.stringValue())
-													.hasField("reverse", Json.createObjectBuilder()
-															.add("@reverse", reverse.stringValue())
-													)
+                            .header("Accept", MIME).reply().map(this::response)
 
-											)
+                            .map(response -> assertThat(response)
 
-											.hasField("direct", value -> assertThat(value)
+                                    .hasHeader("Content-Type", MIME)
 
-													.hasField("@context", context -> assertThat(context)
+                                    .hasBody(json(), json -> assertThat(json)
 
-															.doesNotHaveField("id") // keywords only at top level
+                                            .hasField("@context", context -> assertThat(context)
 
-															.hasField("nested", nested.stringValue())
+                                                    .hasField("id", "@id") // keywords at top level
 
-													)
+                                                    .hasField("direct", direct.stringValue())
+                                                    .hasField("reverse", Json.createObjectBuilder()
+                                                            .add("@reverse", reverse.stringValue())
+                                                    )
 
-											)
+                                            )
 
-									)))
-					)
+                                            .hasField("direct", value -> assertThat(value)
 
-					.clear();
-		}
+                                                    .hasField("@context", context -> assertThat(context)
 
+                                                            .doesNotHaveField("id") // keywords only at top level
 
-		@Test void testTrimPayload() {
-			exec(() -> request().reply().map(this::response).map(task(response -> assertThat(response)
-					.hasBody(json(), json -> assertThat(json)
-							.doesNotHaveField("outlier")
-					)))
+                                                            .hasField("nested", nested.stringValue())
 
-			);
-		}
+                                                    )
 
-		@Test void testLocalizePayload() {
-			exec(() -> new Request()
+                                            )
 
-					.base(base)
-					.header("Accept-Language", "en").reply().map(response1 -> {
+                                    )
+                            )
+                    )
 
-						final IRI item=iri(response1.item());
+                    .clear();
+        }
 
-						return response1.status(OK)
 
-								.set(shape(), field(direct, localized()))
+        @Test void testTrimPayload() {
+            exec(() -> request().reply().map(this::response)
 
-								.body(jsonld(), frame(item, asList(
+                    .map(response -> assertThat(response)
+                            .hasBody(json(), json -> assertThat(json)
+                                    .doesNotHaveField("outlier")
+                            )
+                    )
 
-										statement(item, direct, literal("one", "en")),
-										statement(item, direct, literal("uno", "it")),
-										statement(item, direct, literal("ein", "de"))
+            );
+        }
 
-								)));
-					}).map(task(response -> assertThat(response)
-							.hasBody(json(), json -> assertThat(json)
-									.hasField("direct", "one")
-							)))
-			);
-		}
+        @Test void testLocalizePayload() {
+            exec(() -> new Request()
 
-		@Test void testReportInvalidPayload() {
-			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 -> response(response1).body(jsonld(), frame(iri(response1.item())))).map(task(response -> response.body(output()).accept(e -> { },
-							target -> target.accept(new ByteArrayOutputStream())
-					))))
+                    .base(base)
+                    .header("Accept-Language", "en").reply().map(response1 -> {
 
-			);
+                        final IRI item=iri(response1.item());
 
-		}
+                        return response1.status(OK)
 
-	}
+                                .set(shape(), field(direct, localized()))
+
+                                .body(jsonld(), frame(item, asList(
+
+                                        statement(item, direct, literal("one", "en")),
+                                        statement(item, direct, literal("uno", "it")),
+                                        statement(item, direct, literal("ein", "de"))
+
+                                )));
+                    })
+
+                    .map(response -> assertThat(response)
+                            .hasBody(json(), json -> assertThat(json)
+                                    .hasField("direct", "one")
+                            )
+                    )
+            );
+        }
+
+        @Test void testReportInvalidPayload() {
+            exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 ->
+
+                            response(response1).body(jsonld(), frame(iri(response1.item())))).map(task(response -> response.body(output()).accept(e -> { },
+                            target -> target.accept(new ByteArrayOutputStream())
+                    ))))
+
+            );
+
+        }
+
+    }
 
 }

@@ -23,7 +23,6 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.item;
 import static com.metreeca.json.shapes.Field.field;
@@ -63,10 +62,13 @@ final class CreatorTest {
 								.body(jsonld(), frame(focus)
 										.value(RDF.VALUE, focus)
 								)
-						).map(task(response -> assertThat(response)
+						)
+
+						.map(response -> assertThat(response)
 								.hasStatus(Created)
-								.hasAttribute(shape(), shape1 -> assertThat(shape1).isEqualTo(or()))
-								.doesNotHaveBody(jsonld())))
+								.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(or()))
+								.doesNotHaveBody(jsonld())
+						)
 
 		);
 	}
