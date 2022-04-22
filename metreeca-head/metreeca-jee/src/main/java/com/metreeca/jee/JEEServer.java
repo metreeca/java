@@ -59,7 +59,7 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class JEEServer implements Filter {
 
-	private static Supplier<Handler> delegate() { return () -> Request::reply; }
+	private static Supplier<Handler> delegate() { return () -> (request, next) -> request.reply(); }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ public abstract class JEEServer implements Filter {
 		try {
 
 			toolbox.exec(() -> toolbox.get(delegate())
-					.handle(request((HttpServletRequest)request))
+					.handle(request((HttpServletRequest)request), Request::reply)
 					.accept(_response -> response((HttpServletResponse)response, _response))
 			);
 

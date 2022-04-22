@@ -21,6 +21,7 @@ import com.metreeca.json.Shape;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -74,7 +75,7 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * </ul>
  */
-public final class Deleter extends Handler.Base {
+public final class Deleter extends Delegator {
 
     /**
      * Creates a resource deleter.
@@ -99,16 +100,16 @@ public final class Deleter extends Handler.Base {
 
 
 	private Handler delete() {
-		return request -> {
+        return (request, next) -> {
 
-			final IRI item=iri(request.item());
-			final Shape shape=request.get(shape());
+            final IRI item=iri(request.item());
+            final Shape shape=request.get(shape());
 
-			return engine.delete(frame(item), shape)
+            return engine.delete(frame(item), shape)
 
-					.map(frame -> request.reply(status(NoContent)))
+                    .map(frame -> request.reply(status(NoContent)))
 
-					.orElseGet(() -> request.reply(status(NotFound))); // !!! 410 Gone if previously known
+                    .orElseGet(() -> request.reply(status(NotFound))); // !!! 410 Gone if previously known
 
 		};
 	}

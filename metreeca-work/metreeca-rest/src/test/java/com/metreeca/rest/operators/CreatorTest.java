@@ -58,10 +58,11 @@ final class CreatorTest {
 				() -> creator()
 
 						.handle(new Request()
-								.set(shape(), shape)
-								.body(jsonld(), frame(focus)
-										.value(RDF.VALUE, focus)
-								)
+										.set(shape(), shape)
+										.body(jsonld(), frame(focus)
+												.value(RDF.VALUE, focus)
+										),
+								Request::reply
 						)
 
 						.accept(response -> assertThat(response)
@@ -77,8 +78,9 @@ final class CreatorTest {
 		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> creator()
 
 				.handle(new Request()
-						.set(shape(), shape)
-						.body(jsonld(), frame(item("/")))
+								.set(shape(), shape)
+								.body(jsonld(), frame(item("/"))),
+						Request::reply
 				)
 
 		));

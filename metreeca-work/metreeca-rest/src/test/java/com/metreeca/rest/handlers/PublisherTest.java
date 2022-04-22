@@ -60,7 +60,7 @@ final class PublisherTest {
 	@Test void testRejectUnsafeRequestsRequests() {
 		exec(() -> publisher(getClass().getResource("/"))
 
-				.handle(new Request().method(POST))
+				.handle(new Request().method(POST), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(MethodNotAllowed)

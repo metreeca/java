@@ -80,7 +80,7 @@ public final class Graph implements AutoCloseable {
 
 		final Graph graph=service(graph());
 
-		return handler -> request -> graph.update(connection -> handler.handle(request));
+		return handler -> (request, next) -> graph.update(connection -> handler.handle(request, next));
 	}
 
 

@@ -16,7 +16,11 @@
 
 package com.metreeca.rest;
 
+import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static java.util.Arrays.asList;
 
 
 /**
@@ -51,7 +55,7 @@ import java.util.function.Predicate;
             throw new NullPointerException("null pass handler");
         }
 
-        return handler(test, pass, request -> request.reply(response -> response));
+        return handler(test, pass, (request, next) -> request.reply(response -> response));
     }
 
     /**
@@ -82,56 +86,45 @@ import java.util.function.Predicate;
             throw new NullPointerException("null fail handler");
         }
 
-        return request -> (test.test(request) ? pass : fail).handle(request);
+        return (request, forward) -> (test.test(request) ? pass : fail).handle(request, forward);
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static Handler handler(final Handler... handlers) {
 
-    /**
-     * Creates a browser route handler.
-     *
-     * @param route   the handler for browser {@linkplain Request#route() route} requests
-     * @param handler the default handler
-     *
-     * @return a handler forwarding all browser route requests to {@code route} and other request to {@code handler}
-     *
-     * @throws NullPointerException if either {@code route} or {@code handler} is null
-     */
-    public static Handler route(final Handler route, final Handler handler) {
-
-        if ( route == null ) {
-            throw new NullPointerException("null route handler");
+        if ( handlers == null || Arrays.stream(handlers).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null handlers");
         }
 
-        if ( handler == null ) {
-            throw new NullPointerException("null default handler");
-        }
-
-        return handler(Request::route, route, handler);
+        return handler(asList(handlers));
     }
 
-    /**
-     * Creates a browser asset handler.
-     *
-     * @param asset   the handler for browser {@linkplain Request#asset() asset} requests
-     * @param handler the default handler
-     *
-     * @return a handler forwarding all browser asset requests to {@code asset} and other request to {@code handler}
-     *
-     * @throws NullPointerException if either {@code route} or {@code handler} is null
-     */
-    public static Handler asset(final Handler asset, final Handler handler) {
+    public static Handler handler(final List<Handler> handlers) {
 
-        if ( asset == null ) {
-            throw new NullPointerException("null asset handler");
+        if ( handlers == null || handlers.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null handlers");
         }
 
-        if ( handler == null ) {
-            throw new NullPointerException("null default handler");
+
+        final int size=handlers.size();
+
+        if ( size == 0 ) {
+
+            return (request, forward) -> request.reply();
+
+        } else if ( size == 1 ) {
+
+            return handlers.get(0);
+
+        } else {
+
+            final Handler head=handlers.get(0);
+            final Handler tail=(size == 2) ? handlers.get(1) : handler(handlers.subList(1, handlers.size()));
+
+            return (request, forward) -> head.handle(request, _request -> tail.handle(_request, forward));
+
         }
 
-        return handler(Request::asset, asset, handler);
     }
 
 
@@ -141,11 +134,14 @@ import java.util.function.Predicate;
      * Handles a request.
      *
      * @param request the inbound request for the managed linked data resource
+     * @param forward a function forwarding {@code request} to the tail of the handling pipeline
      *
-     * @return a lazy response generated for the managed linked data resource in reaction to {@code request}; lazy
-     * processing supports streaming processing inside ephemeral context like database connections and transactions
+     * @return a response generated in reaction to {@code request}
+     *
+     * @throws NullPointerException if either {@code request} or {@code forward} is null
+     * @throws NullPointerException if {@code forward} returns a null value
      */
-    public Response handle(final Request request);
+    public Response handle(final Request request, final Function<Request, Response> forward);
 
 
     /**
@@ -188,63 +184,18 @@ import java.util.function.Predicate;
                 return new Chain(this.wrapper.with(wrapper), handler);
             }
 
-            @Override public Response handle(final Request request) {
+            @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
                 if ( request == null ) {
                     throw new NullPointerException("null request");
                 }
 
-                return chained.handle(request);
+                return chained.handle(request, forward);
             }
 
         }
 
         return new Chain(wrapper, this);
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Delegating handler.
-     *
-     * <p>Delegates request processing to a {@linkplain #delegate(Handler) delegate} handler, possibly assembled as a
-     * combination of other handlers and wrappers.</p>
-     */
-    public abstract class Base implements Handler {
-
-        private Handler delegate=Request::reply;
-
-
-        /**
-         * Configures the delegate handler.
-         *
-         * @param delegate the handler request processing is delegated to
-         *
-         * @return this handler
-         *
-         * @throws NullPointerException if {@code delegate} is null
-         */
-        protected Base delegate(final Handler delegate) {
-
-            if ( delegate == null ) {
-                throw new NullPointerException("null delegate");
-            }
-
-            this.delegate=delegate;
-
-            return this;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        @Override public Handler with(final Wrapper wrapper) { return delegate.with(wrapper); }
-
-        @Override public Response handle(final Request request) {
-            return delegate.handle(request);
-        }
-
     }
 
 }

@@ -69,8 +69,8 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
     private SPARQL() {
         delegate(router()
-                .get(this::process)
-                .post(this::process)
+                .get((request, next) -> process(request))
+                .post((request1, next) -> process(request1))
         );
     }
 

@@ -28,6 +28,7 @@ import java.io.*;
 
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
+import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.handlers.Router.router;
 
@@ -36,244 +37,238 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 final class RouterTest {
 
-	@Nested final class Paths {
+    @Nested final class Paths {
 
-		private Request request(final String path) {
-			return new Request().path(path);
-		}
+        private Request request(final String path) {
+            return new Request().path(path);
+        }
 
-		private Handler handler() {
-			return request -> request.reply(response -> response
-					.status(Response.OK)
-					.header("path", request.path())
-			);
-		}
+        private Handler handler() {
+            return (request, forward) -> request.reply()
+                    .status(OK)
+                    .header("path", request.path()
+                    );
+        }
 
 
-		@Test void testCheckPaths() {
+        @Test void testCheckPaths() {
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("empty path")
-					.isThrownBy(() -> router()
-							.path("", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("empty path")
+                    .isThrownBy(() -> router()
+                            .path("", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("missing leading slash path")
-					.isThrownBy(() -> router()
-							.path("path", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("missing leading slash path")
+                    .isThrownBy(() -> router()
+                            .path("path", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("malformed placeholder step")
-					.isThrownBy(() -> router()
-							.path("/pa{}th", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("malformed placeholder step")
+                    .isThrownBy(() -> router()
+                            .path("/pa{}th", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("malformed prefix step")
-					.isThrownBy(() -> router()
-							.path("/pa*th", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("malformed prefix step")
+                    .isThrownBy(() -> router()
+                            .path("/pa*th", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalArgumentException.class)
-					.as("inline prefix step")
-					.isThrownBy(() -> router()
-							.path("/*/path", handler())
-					);
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .as("inline prefix step")
+                    .isThrownBy(() -> router()
+                            .path("/*/path", handler())
+                    );
 
-			assertThatExceptionOfType(IllegalStateException.class)
-					.as("existing path")
-					.isThrownBy(() -> router()
-							.path("/path", handler())
-							.path("/path", handler())
-					);
+            assertThatExceptionOfType(IllegalStateException.class)
+                    .as("existing path")
+                    .isThrownBy(() -> router()
+                            .path("/path", handler())
+                            .path("/path", handler())
+                    );
 
-		}
+        }
 
-		@Test void testIgnoreUnknownPath() {
-			router()
+        @Test void testIgnoreUnknownPath() {
+            router()
 
-					.path("/path", handler())
+                    .path("/path", handler())
 
-					.handle(request("/unknown"))
+                    .handle(request("/unknown"), Request::reply)
 
-					.accept(response -> assertThat(response)
-							.as("request ignored")
-							.hasStatus(Response.NotFound)
-							.doesNotHaveHeader("path")
-					);
-		}
+                    .accept(response -> assertThat(response)
+                            .as("request ignored")
+                            .hasStatus(Response.NotFound)
+                            .doesNotHaveHeader("path")
+                    );
+        }
 
 
-		@Test void testMatchesLiteralPath() {
+        @Test void testMatchesLiteralPath() {
 
-			final Router router=router().path("/path", handler());
+            final Router router=router().path("/path", handler());
 
-			router.handle(request("/path")).accept(response -> assertThat(response)
-					.hasHeader("path", "/path")
-			);
+            router.handle(request("/path"), Request::reply).accept(response -> assertThat(response)
+                    .hasHeader("path", "/path")
+            );
 
-			router.handle(request("/path/")).accept(response -> assertThat(response)
-					.doesNotHaveHeader("path")
-			);
+            router.handle(request("/path/"), Request::reply).accept(response -> assertThat(response)
+                    .doesNotHaveHeader("path")
+            );
 
-			router.handle(request("/path/unknown")).accept(response -> assertThat(response)
-					.doesNotHaveHeader("path")
-			);
+            router.handle(request("/path/unknown"), Request::reply).accept(response -> assertThat(response)
+                    .doesNotHaveHeader("path")
+            );
 
-		}
+        }
 
-		@Test void testMatchesPlaceholderPath() {
+        @Test void testMatchesPlaceholderPath() {
 
-			final Router router=router().path("/head/{id}/tail", handler());
+            final Router router=router().path("/head/{id}/tail", handler());
 
-			router.handle(request("/head/path/tail")).accept(response -> assertThat(response)
-					.hasHeader("path", "/head/path/tail")
-			);
+            router.handle(request("/head/path/tail"), Request::reply).accept(response -> assertThat(response)
+                    .hasHeader("path", "/head/path/tail")
+            );
 
-			router.handle(request("/head/tail")).accept(response -> assertThat(response)
-					.doesNotHaveHeader("path")
-			);
+            router.handle(request("/head/tail"), Request::reply).accept(response -> assertThat(response)
+                    .doesNotHaveHeader("path")
+            );
 
-			router.handle(request("/head/path/path/tail")).accept(response -> assertThat(response)
-					.doesNotHaveHeader("path")
-			);
+            router.handle(request("/head/path/path/tail"), Request::reply).accept(response -> assertThat(response)
+                    .doesNotHaveHeader("path")
+            );
 
-		}
+        }
 
-		@Test void testSavePlaceholderValuesAsRequestParameters() {
+        @Test void testSavePlaceholderValuesAsRequestParameters() {
 
-			router().path("/{head}/{tail}", handler())
-					.handle(request("/one/two"))
-					.accept(response -> assertThat(response.request())
-							.as("placeholder values saved as parameters")
-							.hasParameter("head", "one")
-							.hasParameter("tail", "two")
-					);
+            router().path("/{head}/{tail}", handler())
+                    .handle(request("/one/two"), Request::reply)
+                    .accept(response -> assertThat(response.request())
+                            .as("placeholder values saved as parameters")
+                            .hasParameter("head", "one")
+                            .hasParameter("tail", "two")
+                    );
 
-			router().path("/{}/{}", handler())
-					.handle(request("/one/two"))
-					.accept(response -> assertThat(response.request())
-							.has(new Condition<>(
-									request -> request.parameters().isEmpty(),
-									"empty placeholders ignored")
-							)
-					);
+            router().path("/{}/{}", handler())
+                    .handle(request("/one/two"), Request::reply)
+                    .accept(response -> assertThat(response.request())
+                            .has(new Condition<>(
+                                    request -> request.parameters().isEmpty(),
+                                    "empty placeholders ignored")
+                            )
+                    );
 
-		}
+        }
 
-		@Test void testMatchesPrefixPath() {
+        @Test void testMatchesPrefixPath() {
 
-			final Router router=router().path("/head/*", handler());
+            final Router router=router().path("/head/*", handler());
 
-			router.handle(request("/head/path")).accept(response -> assertThat(response)
-					.hasHeader("path", "/head/path")
-			);
+            router.handle(request("/head/path"), Request::reply).accept(response -> assertThat(response)
+                    .hasHeader("path", "/head/path")
+            );
 
-			router.handle(request("/head/path/path")).accept(response -> assertThat(response)
-					.hasHeader("path", "/head/path/path")
-			);
+            router.handle(request("/head/path/path"), Request::reply).accept(response -> assertThat(response)
+                    .hasHeader("path", "/head/path/path")
+            );
 
-			router.handle(request("/head")).accept(response -> assertThat(response)
-					.doesNotHaveHeader("path")
-			);
+            router.handle(request("/head"), Request::reply).accept(response -> assertThat(response)
+                    .doesNotHaveHeader("path")
+            );
 
-		}
+        }
 
 
-		@Test void testPreferFirstMatch() {
+        @Test void testPreferFirstMatch() {
 
-			final Router router=router()
+            final Router router=router()
 
-					.path("/path", request -> request.reply(response -> response.status(100)))
-					.path("/*", request -> request.reply(response -> response.status(200)));
+                    .path("/path", (request, forward) -> request.reply(100))
+                    .path("/*", (request, forward) -> request.reply(200));
 
-			router.handle(request("/path")).accept(response -> assertThat(response).hasStatus(100));
-			router.handle(request("/path/path")).accept(response -> assertThat(response).hasStatus(200));
+            router.handle(request("/path"), Request::reply).accept(response -> assertThat(response).hasStatus(100));
+            router.handle(request("/path/path"), Request::reply).accept(response -> assertThat(response).hasStatus(200));
 
-		}
+        }
 
-	}
+    }
 
-	@Nested final class Methods {
+    @Nested final class Methods {
 
-		private Response handler(final Request request) {
-			return request.reply(response -> response
+        private Response handler(final Request request) {
+            return request.reply(OK).body(OutputFormat.output(), output -> {
+                try {
+                    output.write("body".getBytes());
+                } catch ( final IOException e ) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        }
 
-					.status(Response.OK)
 
-					.body(OutputFormat.output(), output -> {
-						try {
-							output.write("body".getBytes());
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					})
+        @Test void testHandleOPTIONSByDefault() {
+            router()
 
-			);
-		}
+                    .get((request, forward) -> handler(request))
 
+                    .handle(new Request().method(Request.OPTIONS), Request::reply)
 
-		@Test void testHandleOPTIONSByDefault() {
-			router()
+                    .accept(response -> assertThat(response)
+                            .hasStatus(OK)
+                            .hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
+                    );
+        }
 
-					.get(this::handler)
+        @Test void testIncludeAllowHeaderOnUnsupportedMethods() {
+            router()
 
-					.handle(new Request().method(Request.OPTIONS))
+                    .get((request, forward) -> handler(request))
 
-					.accept(response -> assertThat(response)
-							.hasStatus(Response.OK)
-							.hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
-					);
-		}
+                    .handle(new Request().method(Request.POST), Request::reply)
 
-		@Test void testIncludeAllowHeaderOnUnsupportedMethods() {
-			router()
+                    .accept(response -> assertThat(response)
+                            .hasStatus(Response.MethodNotAllowed)
+                            .hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
+                    );
+        }
 
-					.get(this::handler)
+        @Test void testHandleHEADByDefault() {
+            router()
 
-					.handle(new Request().method(Request.POST))
+                    .get((request, forward) -> handler(request))
 
-					.accept(response -> assertThat(response)
-							.hasStatus(Response.MethodNotAllowed)
-							.hasHeaders("Allow", Request.OPTIONS, Request.HEAD, Request.GET)
-					);
-		}
+                    .handle(new Request().method(Request.HEAD), Request::reply)
 
-		@Test void testHandleHEADByDefault() {
-			router()
+                    .accept(response -> assertThat(response)
+                            .hasStatus(OK)
+                            .hasBody(OutputFormat.output(), target -> {
 
-					.get(this::handler)
+                                final ByteArrayOutputStream output=new ByteArrayOutputStream();
 
-					.handle(new Request().method(Request.HEAD))
+                                target.accept(output);
 
-					.accept(response -> assertThat(response)
-							.hasStatus(Response.OK)
-							.hasBody(OutputFormat.output(), target -> {
+                                Assertions.assertThat(output.toByteArray()).isEmpty();
 
-								final ByteArrayOutputStream output=new ByteArrayOutputStream();
+                            })
+                    );
+        }
 
-								target.accept(output);
+        @Test void testRejectHEADIfGetIsNotSupported() {
+            router()
 
-								Assertions.assertThat(output.toByteArray()).isEmpty();
+                    .post(status(Response.Created))
 
-							})
-					);
-		}
+                    .handle(new Request().method(Request.HEAD), Request::reply)
 
-		@Test void testRejectHEADIfGetIsNotSupported() {
-			router()
+                    .accept(response -> assertThat(response)
+                            .hasStatus(Response.MethodNotAllowed)
+                    );
+        }
 
-					.post(status(Response.Created))
-
-					.handle(new Request().method(Request.HEAD))
-
-					.accept(response -> assertThat(response)
-							.hasStatus(Response.MethodNotAllowed)
-					);
-		}
-
-	}
+    }
 
 }

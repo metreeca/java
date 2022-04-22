@@ -157,7 +157,7 @@ final class GraphsTest {
 	@Test void testGETCatalogPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(catalog(request())))
+				.handle(anonymous(catalog(request())), Request::reply)
 
 				.accept(response -> {
 
@@ -172,7 +172,7 @@ final class GraphsTest {
 	@Test void testGETCatalogPrivateAuthorized() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(catalog(request())))
+				.handle(authenticated(catalog(request())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -184,7 +184,7 @@ final class GraphsTest {
 	@Test void testGETCatalogPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(catalog(request())))
+				.handle(anonymous(catalog(request())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -197,7 +197,7 @@ final class GraphsTest {
 	@Test void testGETCatalogPublicAuthorized() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(catalog(request())))
+				.handle(authenticated(catalog(request())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -212,7 +212,7 @@ final class GraphsTest {
 	@Test void testGETDefaultPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(get(request()))))
+				.handle(anonymous(dflt(get(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -226,7 +226,7 @@ final class GraphsTest {
 	@Test void testGETDefaultPrivateAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(get(request()))))
+				.handle(authenticated(dflt(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -240,7 +240,7 @@ final class GraphsTest {
 	@Test void testGETDefaultPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(get(request()))))
+				.handle(anonymous(dflt(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -252,7 +252,7 @@ final class GraphsTest {
 	@Test void testGETDefaultPublicAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(get(request()))))
+				.handle(authenticated(dflt(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -267,7 +267,7 @@ final class GraphsTest {
 	@Test void testGETNamedPrivateAnonymous() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(anonymous(named(get(request()))))
+				.handle(anonymous(named(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.Unauthorized)
@@ -277,7 +277,7 @@ final class GraphsTest {
 	@Test void testGETNamedPrivateAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _private(endpoint())
 
-				.handle(authenticated(named(get(request()))))
+				.handle(authenticated(named(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -289,7 +289,7 @@ final class GraphsTest {
 	@Test void testGETNamedPublicAnonymous() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(anonymous(named(get(request()))))
+				.handle(anonymous(named(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -301,7 +301,7 @@ final class GraphsTest {
 	@Test void testGETNamedPublicAuthenticated() {
 		exec(dflt(First), named(Rest), () -> _public(endpoint())
 
-				.handle(authenticated(named(get(request()))))
+				.handle(authenticated(named(get(request()))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(com.metreeca.rest.Response.OK)
@@ -316,7 +316,7 @@ final class GraphsTest {
 	@Test void testPUTDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(put(request()))))
+				.handle(anonymous(dflt(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -333,7 +333,7 @@ final class GraphsTest {
 	@Test void testPUTDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(put(request()))))
+				.handle(authenticated(dflt(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -348,7 +348,7 @@ final class GraphsTest {
 	@Test void testPUTDefaultPublicAnonymous() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(put(request()))))
+				.handle(anonymous(dflt(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -365,7 +365,7 @@ final class GraphsTest {
 	@Test void testPUTDefaultPublicAuthenticated() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(put(request()))))
+				.handle(authenticated(dflt(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -381,7 +381,7 @@ final class GraphsTest {
 	@Test void testPUTNamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(put(request()))))
+				.handle(anonymous(named(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -398,7 +398,7 @@ final class GraphsTest {
 	@Test void testPUTNamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(put(request()))))
+				.handle(authenticated(named(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -413,7 +413,7 @@ final class GraphsTest {
 	@Test void testPUTNamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(put(request()))))
+				.handle(anonymous(named(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -430,7 +430,7 @@ final class GraphsTest {
 	@Test void testPUTNamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(put(request()))))
+				.handle(authenticated(named(put(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -450,7 +450,7 @@ final class GraphsTest {
 	@Test void testDELETEDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(delete(request()))))
+				.handle(anonymous(dflt(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -467,7 +467,7 @@ final class GraphsTest {
 	@Test void testDELETEDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(delete(request()))))
+				.handle(authenticated(dflt(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -484,7 +484,7 @@ final class GraphsTest {
 	@Test void testDELETEDefaultPublicAnonymous() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(delete(request()))))
+				.handle(anonymous(dflt(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -501,7 +501,7 @@ final class GraphsTest {
 	@Test void testDELETEDefaultPublicAuthenticated() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(delete(request()))))
+				.handle(authenticated(dflt(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -519,7 +519,7 @@ final class GraphsTest {
 	@Test void testDELETENamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(delete(request()))))
+				.handle(anonymous(named(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -536,7 +536,7 @@ final class GraphsTest {
 	@Test void testDELETENamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(delete(request()))))
+				.handle(authenticated(named(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -551,7 +551,7 @@ final class GraphsTest {
 	@Test void testDELETENamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(delete(request()))))
+				.handle(anonymous(named(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -568,7 +568,7 @@ final class GraphsTest {
 	@Test void testDELETENamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(delete(request()))))
+				.handle(authenticated(named(delete(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -586,7 +586,7 @@ final class GraphsTest {
 	@Test void testPOSTDefaultPrivateAnonymous() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(anonymous(dflt(post(request()))))
+				.handle(anonymous(dflt(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -603,7 +603,7 @@ final class GraphsTest {
 	@Test void testPOSTDefaultPrivateAuthenticated() {
 		exec(dflt(First), () -> _private(endpoint())
 
-				.handle(authenticated(dflt(post(request()))))
+				.handle(authenticated(dflt(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -618,7 +618,7 @@ final class GraphsTest {
 	@Test void testPOSTDefaultPublicAnonymous() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(anonymous(dflt(post(request()))))
+				.handle(anonymous(dflt(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -635,7 +635,7 @@ final class GraphsTest {
 	@Test void testPOSTDefaultPublicAuthenticated() {
 		exec(dflt(First), () -> _public(endpoint())
 
-				.handle(authenticated(dflt(post(request()))))
+				.handle(authenticated(dflt(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -653,7 +653,7 @@ final class GraphsTest {
 	@Test void testPOSTNamedPrivateAnonymous() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(anonymous(named(post(request()))))
+				.handle(anonymous(named(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -670,7 +670,7 @@ final class GraphsTest {
 	@Test void testPOSTNamedPrivateAuthenticated() {
 		exec(named(First), () -> _private(endpoint())
 
-				.handle(authenticated(named(post(request()))))
+				.handle(authenticated(named(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -687,7 +687,7 @@ final class GraphsTest {
 	@Test void testPOSTNamedPublicAnonymous() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(anonymous(named(post(request()))))
+				.handle(anonymous(named(post(request()))), Request::reply)
 
 				.accept(response -> {
 
@@ -704,7 +704,7 @@ final class GraphsTest {
 	@Test void testPOSTNamedPublicAuthenticated() {
 		exec(named(First), () -> _public(endpoint())
 
-				.handle(authenticated(named(post(request()))))
+				.handle(authenticated(named(post(request()))), Request::reply)
 
 				.accept(response -> {
 

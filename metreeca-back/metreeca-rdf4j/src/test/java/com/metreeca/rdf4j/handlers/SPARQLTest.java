@@ -142,7 +142,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(bool())))
+				.handle(anonymous(get(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -153,7 +153,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(bool())))
+				.handle(anonymous(post(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -164,7 +164,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(bool())))
+				.handle(authenticated(get(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -178,7 +178,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(bool())))
+				.handle(authenticated(post(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -190,7 +190,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(bool())))
+				.handle(anonymous(get(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -201,7 +201,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(bool())))
+				.handle(anonymous(post(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -212,7 +212,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(bool())))
+				.handle(authenticated(get(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -223,7 +223,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(bool())))
+				.handle(authenticated(post(bool())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -237,7 +237,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(tuple())))
+				.handle(anonymous(get(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -248,7 +248,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(tuple())))
+				.handle(anonymous(post(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -259,7 +259,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(tuple())))
+				.handle(authenticated(get(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -271,7 +271,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(tuple())))
+				.handle(authenticated(post(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -284,7 +284,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(tuple())))
+				.handle(anonymous(get(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -296,7 +296,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(tuple())))
+				.handle(anonymous(post(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -308,7 +308,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(tuple())))
+				.handle(authenticated(get(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -320,7 +320,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(tuple())))
+				.handle(authenticated(post(tuple())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -335,7 +335,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(graph())))
+				.handle(anonymous(get(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -346,7 +346,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(graph())))
+				.handle(anonymous(post(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -357,7 +357,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(graph())))
+				.handle(authenticated(get(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -370,7 +370,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(graph())))
+				.handle(authenticated(post(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -383,7 +383,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(graph())))
+				.handle(anonymous(get(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -395,7 +395,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(graph())))
+				.handle(anonymous(post(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -407,7 +407,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(graph())))
+				.handle(authenticated(get(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -420,7 +420,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(graph())))
+				.handle(authenticated(post(graph())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.OK)
@@ -436,7 +436,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(anonymous(get(update())))
+				.handle(anonymous(get(update())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -447,7 +447,7 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(anonymous(post(update())))
+				.handle(anonymous(post(update())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -458,7 +458,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(get(update())))
+				.handle(authenticated(get(update())), Request::reply)
 
 				.accept(response -> {
 
@@ -474,7 +474,7 @@ final class SPARQLTest {
 	@Test void testPrivateAuthenticatedPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
+				.handle(authenticated(post(update())), Request::reply)
 
 				.accept(response -> {
 
@@ -491,7 +491,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousGETUpdate() {
 		exec(model(singletonList(First)), () -> _public(endpoint())
 
-				.handle(anonymous(get(update())))
+				.handle(anonymous(get(update())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -502,7 +502,7 @@ final class SPARQLTest {
 	@Test void testPublicAnonymousPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _public(endpoint())
 
-				.handle(anonymous(post(update())))
+				.handle(anonymous(post(update())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
@@ -513,7 +513,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
+				.handle(authenticated(post(update())), Request::reply)
 
 				.accept(response -> {
 
@@ -529,7 +529,7 @@ final class SPARQLTest {
 	@Test void testPublicAuthenticatedPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
+				.handle(authenticated(post(update())), Request::reply)
 
 				.accept(response -> {
 
@@ -549,7 +549,7 @@ final class SPARQLTest {
 	@Test void testGETNoAction() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(new Request())))
+				.handle(authenticated(get(new Request())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -559,7 +559,7 @@ final class SPARQLTest {
 	@Test void testPOSTNoAction() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(new Request())))
+				.handle(authenticated(post(new Request())), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -573,7 +573,7 @@ final class SPARQLTest {
 				.handle(authenticated(get(new Request())
 						.parameter("query", "query")
 						.parameter("update", "update")
-				))
+				), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -586,7 +586,7 @@ final class SPARQLTest {
 				.handle(authenticated(post(new Request())
 						.parameter("query", "query")
 						.parameter("update", "update")
-				))
+				), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -597,7 +597,7 @@ final class SPARQLTest {
 	@Test void testGETQueryMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(malformed("query"))))
+				.handle(authenticated(get(malformed("query"))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -607,7 +607,7 @@ final class SPARQLTest {
 	@Test void testPOSTQueryMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(malformed("query"))))
+				.handle(authenticated(post(malformed("query"))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -617,7 +617,7 @@ final class SPARQLTest {
 	@Test void testGETUpdateMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(malformed("update"))))
+				.handle(authenticated(get(malformed("update"))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)
@@ -627,7 +627,7 @@ final class SPARQLTest {
 	@Test void testPOSTUpdateMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(malformed("update"))))
+				.handle(authenticated(post(malformed("update"))), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.BadRequest)

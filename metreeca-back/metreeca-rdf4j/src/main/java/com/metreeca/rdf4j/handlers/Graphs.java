@@ -83,10 +83,10 @@ public final class Graphs extends Endpoint<Graphs> {
 
     private Graphs() {
         delegate(router()
-                .get(this::get)
-                .put(this::put)
-                .delete(this::delete)
-                .post(this::post)
+                .get((request, next) -> get(request))
+                .put((request1, next) -> put(request1))
+                .delete((request2, next) -> delete(request2))
+                .post((request3, next) -> post(request3))
         );
     }
 

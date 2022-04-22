@@ -113,51 +113,51 @@ public final class Bearer implements Wrapper {
 	 * authorization schemes
 	 */
 	private Wrapper challenger() {
-		return handler -> request -> handler.handle(request).map(response ->
-				response.status() == Response.Unauthorized && response.headers("WWW-Authenticate").isEmpty()
-						? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
-						: response
-		);
+		return handler -> (request, next) -> handler.handle(request, next).map(response ->
+                response.status() == Response.Unauthorized && response.headers("WWW-Authenticate").isEmpty()
+                        ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
+                        : response
+        );
 	}
 
 	/**
 	 * @return a wrapper managing token-based authentication
 	 */
 	private Wrapper authenticator() {
-		return handler -> request -> {
+        return handler -> (request, next) -> {
 
-			// !!! handle token in form/query parameter (https://tools.ietf.org/html/rfc6750#section-2)
+            // !!! handle token in form/query parameter (https://tools.ietf.org/html/rfc6750#section-2)
 
-			final String authorization=request.header("Authorization").orElse("");
+            final String authorization=request.header("Authorization").orElse("");
 
-			return Optional
+            return Optional
 
-					.of(BearerPattern.matcher(authorization))
-					.filter(Matcher::matches)
-					.map(matcher -> matcher.group("token"))
+                    .of(BearerPattern.matcher(authorization))
+                    .filter(Matcher::matches)
+                    .map(matcher -> matcher.group("token"))
 
 					// bearer token > authenticate
 
 					.map(token -> authenticator.apply(token, request)
 
-							// authenticated > handle request
+                            // authenticated > handle request
 
-							.map(handler::handle)
+                            .map(request1 -> handler.handle(request1, next))
 
 							// not authenticated > report error
 
 							.orElseGet(() -> request.reply(response -> response
-									.status(Response.Unauthorized)
-									.header("WWW-Authenticate", format(
-											"Bearer realm=\"%s\", error=\"invalid_token\"", response.request().base()
-									))
-							))
+                                    .status(Response.Unauthorized)
+                                    .header("WWW-Authenticate", format(
+                                            "Bearer realm=\"%s\", error=\"invalid_token\"", response.request().base()
+                                    ))
+                            ))
 
-					)
+                    )
 
-					// no bearer token > fall-through to other authorization schemes
+                    // no bearer token > fall-through to other authorization schemes
 
-					.orElseGet(() -> handler.handle(request));
+                    .orElseGet(() -> handler.handle(request, next));
 		};
 	}
 

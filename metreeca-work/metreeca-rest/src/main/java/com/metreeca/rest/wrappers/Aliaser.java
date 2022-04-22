@@ -72,7 +72,7 @@ public final class Aliaser implements Wrapper {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Handler wrap(final Handler handler) {
-		return request -> alias(request).orElseGet(() -> handler.handle(request));
+		return (request, next) -> alias(request).orElseGet(() -> handler.handle(request, next));
 	}
 
 

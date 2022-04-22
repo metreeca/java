@@ -570,7 +570,7 @@ public final class Server {
 ```
 
 ```java
-import com.metreeca.rest.Handler.Base;
+import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;
@@ -707,7 +707,7 @@ Let's start by defining a barebone model stating that all resources of class `Pr
 items exposing only `rdf:type`, `rdfs:label`  and `rdfs:comment` properties.
 
 ```java
-import com.metreeca.rest.Handler.Base;
+import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -845,7 +845,7 @@ public final class Toys implements Runnable {
 ```
 
 ```java
-import com.metreeca.rest.Handler.Base;
+import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
 
@@ -1121,7 +1121,7 @@ insert { $this toys:stock 0 } where {};
 
 ```java
 import com.metreeca.rest.Toolbox;
-import com.metreeca.rest.Handler.Base;
+import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
 

@@ -21,47 +21,48 @@ import com.metreeca.rest.Request;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.MovedPermanently;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 
 final class ForwarderTest {
 
-	private final Handler relocator=Forwarder.forwarder()
+    private final Handler relocator=Forwarder.forwarder()
 
             .rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
             .rewrite("http:(.*)", "https:$1")
 
-            .wrap(request -> request.reply(status(OK)));
+            .wrap((request, next) -> request.reply(OK));
 
 
-	@Test void testRelocate() {
-		relocator
+    @Test void testRelocate() {
+        relocator
 
-				.handle(new Request()
-						.base("http://example.org/")
-						.path("/path")
-				)
+                .handle(new Request()
+                                .base("http://example.org/")
+                                .path("/path"),
+                        Request::reply
+                )
 
-				.accept(response -> assertThat(response)
-						.hasStatus(MovedPermanently)
-						.hasHeader("Location", "https://example.com/path")
-				);
-	}
+                .accept(response -> assertThat(response)
+                        .hasStatus(MovedPermanently)
+                        .hasHeader("Location", "https://example.com/path")
+                );
+    }
 
-	@Test void testForward() {
-		relocator
+    @Test void testForward() {
+        relocator
 
-				.handle(new Request()
-						.base("https://example.com/")
-						.path("/path")
-				)
+                .handle(new Request()
+                                .base("https://example.com/")
+                                .path("/path"),
+                        Request::reply
+                )
 
-				.accept(response -> assertThat(response)
-						.hasStatus(OK)
-						.doesNotHaveHeader("Location")
-				);
-	}
+                .accept(response -> assertThat(response)
+                        .hasStatus(OK)
+                        .doesNotHaveHeader("Location")
+                );
+    }
 
 }

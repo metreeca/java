@@ -23,7 +23,6 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
 import static com.metreeca.json.shapes.Clazz.clazz;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
@@ -35,26 +34,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 final class DriverTest {
 
-	@Test void testConfigureRequestShape() {
+    @Test void testConfigureRequestShape() {
 
-		final Shape test=clazz(RDF.NIL);
+        final Shape test=clazz(RDF.NIL);
 
-		driver(test)
+        driver(test)
 
-					.wrap(request -> {
+                .wrap((request, next) -> {
 
-					assertThat(request)
-							.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(shape));
+                    assertThat(request)
+                            .hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(shape));
 
-						return request.reply(status(OK));
+                    return request.reply(OK);
 
-					})
+                })
 
-				.handle(new Request())
+                .handle(new Request(), Request::reply)
 
-				.accept(response -> assertThat(response)
-							.hasStatus(OK)
-					);
-		}
+                .accept(response -> assertThat(response)
+                        .hasStatus(OK)
+                );
+    }
 
 }

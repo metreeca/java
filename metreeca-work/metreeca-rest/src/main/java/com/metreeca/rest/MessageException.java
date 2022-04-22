@@ -17,6 +17,7 @@
 package com.metreeca.rest;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import javax.json.JsonObject;
@@ -215,7 +216,7 @@ public final class MessageException extends RuntimeException implements Handler,
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Response handle(final Request request) {
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
         return request.reply(report);
     }
 

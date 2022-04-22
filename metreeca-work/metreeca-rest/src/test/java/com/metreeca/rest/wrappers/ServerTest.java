@@ -16,8 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Toolbox;
+import com.metreeca.rest.*;
 import com.metreeca.rest.formats.TextFormat;
 
 import org.assertj.core.api.Assertions;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
@@ -37,134 +37,144 @@ import static java.util.Collections.singletonList;
 
 final class ServerTest {
 
-	@Nested final class QueryParsing {
+    @Nested final class QueryParsing {
 
-		private Map.Entry<String, ? extends List<String>> parameter(final String name,
-				final List<String> values) {
-			return new AbstractMap.SimpleImmutableEntry<>(name, values);
-		}
+        private Map.Entry<String, ? extends List<String>> parameter(final String name,
+                final List<String> values) {
+            return new AbstractMap.SimpleImmutableEntry<>(name, values);
+        }
 
 
-		@Test void testPreprocessQueryParameters() {
-			new Toolbox().get(Server::server)
+        @Test void testPreprocessQueryParameters() {
+            new Toolbox().get(Server::server)
 
-					.wrap(request -> {
+                    .wrap((request, next) -> {
 
-						Assertions.assertThat(request.parameters()).containsExactly(
-								parameter("one", singletonList("1")),
-								parameter("two", asList("2", "2"))
-						);
+                        Assertions.assertThat(request.parameters()).containsExactly(
+                                parameter("one", singletonList("1")),
+                                parameter("two", asList("2", "2"))
+                        );
 
-						return request.reply(response -> response.status(OK));
+                        return request.reply(OK);
 
-					})
+                    })
 
-					.handle(new Request()
-							.method(Request.GET)
-							.query("one=1&two=2&two=2"))
+                    .handle(new Request()
+                                    .method(Request.GET)
+                                    .query("one=1&two=2&two=2"),
+                            Request::reply
+                    )
 
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
-		}
+                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+        }
 
-		@Test void testPreprocessBodyParameters() {
-			new Toolbox().get(Server::server)
+        @Test void testPreprocessBodyParameters() {
+            new Toolbox().get(Server::server)
 
-					.wrap(request -> {
+                    .wrap((request, next) -> {
 
-						Assertions.assertThat(request.parameters()).containsExactly(
-								parameter("one", singletonList("1")),
-								parameter("two", asList("2", "2"))
-						);
+                        Assertions.assertThat(request.parameters()).containsExactly(
+                                parameter("one", singletonList("1")),
+                                parameter("two", asList("2", "2"))
+                        );
 
-						return request.reply(response -> response.status(OK));
+                        return request.reply(OK);
 
-					})
+                    })
 
-					.handle(new Request()
-							.method(Request.POST)
-							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(TextFormat.text(), "one=1&two=2&two=2"))
+                    .handle(new Request()
+                            .method(Request.POST)
+                            .header("Content-Type", "application/x-www-form-urlencoded")
+                            .body(TextFormat.text(), "one=1&two=2&two=2"), Request::reply)
 
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
-		}
+                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+        }
 
-		@Test void testPreprocessDontOverwriteExistingParameters() {
-			new Toolbox().get(Server::server)
+        @Test void testPreprocessDontOverwriteExistingParameters() {
+            new Toolbox().get(Server::server)
 
-					.wrap(request -> {
+                    .wrap((request, next) -> {
 
-						Assertions.assertThat(request.parameters()).containsExactly(
-								parameter("existing", singletonList("true"))
-						);
+                        Assertions.assertThat(request.parameters()).containsExactly(
+                                parameter("existing", singletonList("true"))
+                        );
 
-						return request.reply(response -> response.status(OK));
+                        return request.reply(OK);
 
-					})
+                    })
 
-					.handle(new Request()
-							.method(Request.GET)
-							.query("one=1&two=2&two=2")
-							.parameter("existing", "true"))
+                    .handle(new Request()
+                                    .method(Request.GET)
+                                    .query("one=1&two=2&two=2")
+                                    .parameter("existing", "true"),
+                            Request::reply
+                    )
 
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
-		}
+                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+        }
 
-		@Test void testPreprocessQueryOnlyOnGET() {
-			new Toolbox().get(Server::server)
+        @Test void testPreprocessQueryOnlyOnGET() {
+            new Toolbox().get(Server::server)
 
-					.wrap(request -> {
+                    .wrap((request, next) -> {
 
-						Assertions.assertThat(request.parameters()).isEmpty();
+                        Assertions.assertThat(request.parameters()).isEmpty();
 
-						return request.reply(response -> response.status(OK));
+                        return request.reply(OK);
 
-					})
+                    })
 
-					.handle(new Request()
-							.method(Request.PUT)
-							.query("one=1&two=2&two=2"))
+                    .handle(new Request()
+                                    .method(Request.PUT)
+                                    .query("one=1&two=2&two=2"),
+                            Request::reply
+                    )
 
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
-		}
+                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+        }
 
-		@Test void testPreprocessBodyOnlyOnPOST() {
-			new Toolbox().get(Server::server)
+        @Test void testPreprocessBodyOnlyOnPOST() {
+            new Toolbox().get(Server::server)
 
-					.wrap(request -> {
+                    .wrap((request, next) -> {
 
-						Assertions.assertThat(request.parameters()).isEmpty();
+                        Assertions.assertThat(request.parameters()).isEmpty();
 
-						return request.reply(response -> response.status(OK));
+                        return request.reply(OK);
 
-					})
+                    })
 
-					.handle(new Request()
-							.method(Request.PUT)
-							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(TextFormat.text(), "one=1&two=2&two=2"))
+                    .handle(new Request()
+                                    .method(Request.PUT)
+                                    .header("Content-Type", "application/x-www-form-urlencoded")
+                                    .body(TextFormat.text(), "one=1&two=2&two=2"),
+                            Request::reply
+                    )
 
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
-		}
+                    .accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+        }
 
-	}
+    }
 
-	@Nested final class ErrorHandling {
+    @Nested final class ErrorHandling {
 
-		@Test void testTrapStrayExceptions() {
-			new Toolbox().exec(() -> server()
+        @Test void testTrapStrayExceptions() {
+            new Toolbox().exec(() -> server()
 
-					.wrap((Request request) -> { throw new UnsupportedOperationException("stray"); })
+                    .wrap((Request request, final Function<Request, Response> next) -> {
+                        throw new UnsupportedOperationException("stray");
+                    })
 
-					.handle(new Request())
+                    .handle(new Request(), Request::reply)
 
-					.accept(response -> assertThat(response)
-							.hasStatus(InternalServerError)
-							.hasCause(UnsupportedOperationException.class)
-					)
+                    .accept(response -> assertThat(response)
+                            .hasStatus(InternalServerError)
+                            .hasCause(UnsupportedOperationException.class)
+                    )
 
-			);
-		}
+            );
+        }
 
-	}
+    }
 
 }

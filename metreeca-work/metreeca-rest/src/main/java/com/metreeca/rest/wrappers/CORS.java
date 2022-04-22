@@ -51,17 +51,17 @@ public final class CORS implements Wrapper {
 	// !!! https://www.html5rocks.com/static/images/cors_server_flowchart.png
 
 	@Override public Handler wrap(final Handler handler) {
-		return request -> handler.handle(request).map(response -> response
+		return (request, next) -> handler.handle(request, next).map(response -> response
 
-				.header("Access-Control-Allow-Origin", request.header("Origin").orElse("*"))
-				.header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Origin", request.header("Origin").orElse("*"))
+                .header("Access-Control-Allow-Credentials", "true")
 
-				.header("Access-Control-Allow-Methods", join(", ",
-						Request.OPTIONS,
-						Request.GET,
-						Request.HEAD,
-						Request.POST,
-						Request.PUT,
+                .header("Access-Control-Allow-Methods", join(", ",
+                        Request.OPTIONS,
+                        Request.GET,
+                        Request.HEAD,
+                        Request.POST,
+                        Request.PUT,
 						Request.DELETE
 				))
 

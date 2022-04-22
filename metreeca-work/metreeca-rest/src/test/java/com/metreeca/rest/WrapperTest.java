@@ -19,7 +19,6 @@ package com.metreeca.rest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.ResponseAssert.assertThat;
@@ -40,7 +39,7 @@ final class WrapperTest {
 	}
 
 	private Handler handler() {
-		return request -> request.reply(status(OK));
+		return (request, next) -> request.reply(OK);
 	}
 
 
@@ -51,7 +50,7 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request().roles("x"))
+					.handle(request().roles("x"), Request::reply)
 
 					.accept(response -> assertThat(response).hasStatus(OK))
 			);
@@ -62,7 +61,7 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request().roles("z"))
+					.handle(request().roles("z"), Request::reply)
 
 					.accept(response -> assertThat(response).hasStatus(Unauthorized))
 			);
@@ -73,7 +72,7 @@ final class WrapperTest {
 
 					.wrap(handler())
 
-					.handle(request())
+					.handle(request(), Request::reply)
 
 					.accept(response -> assertThat(response).hasStatus(Unauthorized))
 			);

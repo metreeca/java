@@ -21,6 +21,7 @@ import com.metreeca.json.queries.*;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -98,7 +99,7 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * </ul>
  */
-public final class Relator extends Handler.Base {
+public final class Relator extends Delegator {
 
     /**
      * Creates a resource relator.
@@ -124,17 +125,17 @@ public final class Relator extends Handler.Base {
 
 
 	private Handler relate() {
-		return request -> {
+        return (request, next) -> {
 
-			final boolean collection=request.collection();
+            final boolean collection=request.collection();
 
-			final IRI item=iri(request.item());
-			final Shape shape=request.get(shape());
+            final IRI item=iri(request.item());
+            final Shape shape=request.get(shape());
 
-			return query(item, shape, request.query()).fold(request::reply, query -> engine.relate(frame(item), query)
+            return query(item, shape, request.query()).fold(request::reply, query -> engine.relate(frame(item), query)
 
-					.map(frame -> request.reply(response -> response.status(OK)
-							.set(shape(), query.map(new ShapeProbe(collection)))
+                    .map(frame -> request.reply(response -> response.status(OK)
+                            .set(shape(), query.map(new ShapeProbe(collection)))
 							.body(jsonld(), frame)
 					))
 

@@ -21,8 +21,8 @@ import com.metreeca.rest.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.function.Function;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 
@@ -53,9 +53,9 @@ final class AliaserTest {
 	@Test void testRedirectAliasedItem() {
 		exec(() -> aliaser("/canonical")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
 
-				.handle(request("/alias"))
+				.handle(request("/alias"), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(Response.SeeOther)
@@ -67,9 +67,9 @@ final class AliaserTest {
 	@Test void testForwardIdempotentItems() {
 		exec(() -> aliaser("/alias")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
 
-				.handle(request("/alias"))
+				.handle(request("/alias"), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(OK)
@@ -80,9 +80,9 @@ final class AliaserTest {
 	@Test void testForwardOtherItems() {
 		exec(() -> aliaser("/canonical")
 
-				.wrap((Request request) -> request.reply(status(OK)))
+				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
 
-				.handle(request("/other"))
+				.handle(request("/other"), Request::reply)
 
 				.accept(response -> assertThat(response)
 						.hasStatus(OK)

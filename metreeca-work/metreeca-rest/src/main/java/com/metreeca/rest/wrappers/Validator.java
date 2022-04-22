@@ -96,23 +96,23 @@ public final class Validator implements Wrapper {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Handler wrap(final Handler handler) {
-		return request -> Optional
+		return (request, next) -> Optional
 
-				.of(rules.stream()
-						.flatMap(rule -> rule.apply(request).stream())
-						.collect(toList())
-				)
+                .of(rules.stream()
+                        .flatMap(rule -> rule.apply(request).stream())
+                        .collect(toList())
+                )
 
-				.filter(issues -> !issues.isEmpty())
+                .filter(issues -> !issues.isEmpty())
 
-				.map(issues -> Json.createObjectBuilder()
-						.add("", Json.createArrayBuilder(issues)) // !!! align with JSON validator format
-						.build()
-				)
+                .map(issues -> Json.createObjectBuilder()
+                        .add("", Json.createArrayBuilder(issues)) // !!! align with JSON validator format
+                        .build()
+                )
 
-				.map(details -> request.reply(status(UnprocessableEntity, details)))
+                .map(details -> request.reply(status(UnprocessableEntity, details)))
 
-				.orElseGet(() -> handler.handle(request));
+                .orElseGet(() -> handler.handle(request, next));
 	}
 
 }

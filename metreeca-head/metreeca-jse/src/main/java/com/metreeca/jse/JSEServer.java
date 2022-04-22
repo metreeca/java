@@ -66,7 +66,7 @@ public final class JSEServer {
     );
 
 
-    private static Supplier<Handler> delegate() { return () -> request -> request.reply(identity()); }
+    private static Supplier<Handler> delegate() { return () -> (request, next) -> request.reply(identity()); }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ public final class JSEServer {
             server.createContext(path, exchange -> {
                 try {
 
-                    toolbox.exec(() -> handler.handle(request(exchange))
+                    toolbox.exec(() -> handler.handle(request(exchange), Request::reply)
                             .map(response -> response.status() > 0 ? response : response.status(NotFound))
                             .accept(response -> response(exchange, response))
                     );

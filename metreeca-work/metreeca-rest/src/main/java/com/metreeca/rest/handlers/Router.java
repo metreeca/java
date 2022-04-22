@@ -19,8 +19,6 @@ package com.metreeca.rest.handlers;
 
 import com.metreeca.rest.*;
 
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Function;
@@ -33,6 +31,7 @@ import static com.metreeca.rest.Request.*;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 
 
@@ -112,7 +111,7 @@ public final class Router implements Handler {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Map<String, Function<Request, Optional<Response>>> routes=new LinkedHashMap<>();
+	private final Map<String, Handler> routes=new LinkedHashMap<>();
 	private final Map<String, Handler> methods=new LinkedHashMap<>();
 
 
@@ -152,7 +151,7 @@ public final class Router implements Handler {
 		final String prefix=matcher.group("prefix");
 		final String suffix=matcher.group("suffix");
 
-		final Function<Request, Optional<Response>> route=route(
+		final Handler route=route(
 				prefix == null ? "" : prefix,
 				suffix == null ? "" : suffix,
 				handler
@@ -283,7 +282,7 @@ public final class Router implements Handler {
 		}
 
 		if ( method.equals(GET) ) {
-			methods.putIfAbsent(HEAD, request -> head(request));
+			methods.putIfAbsent(HEAD, this::head);
 		}
 
 		methods.put(method, handler);
@@ -294,7 +293,7 @@ public final class Router implements Handler {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Response handle(final Request request) {
+	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
 		if ( request == null ) {
 			throw new NullPointerException("null request");
@@ -302,24 +301,23 @@ public final class Router implements Handler {
 
 		return routes.values().stream()
 
-				.map(route -> route.apply(request))
+				.map(route -> route.handle(request, forward))
 
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.filter(Objects::nonNull)
 				.findFirst()
 
 				.orElseGet(() -> (
 
 						methods.isEmpty() ? status(NotFound)
-								: methods.getOrDefault(request.method(), request1 -> options(request1))
+								: methods.getOrDefault(request.method(), this::options)
 
-				).handle(request));
+				).handle(request, forward));
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Function<Request, Optional<Response>> route(
+	private Handler route(
 			final String prefix, final String suffix, final Handler handler
 	) {
 
@@ -327,7 +325,7 @@ public final class Router implements Handler {
 
 		final Matcher scanner=KeyPattern.matcher(prefix.isEmpty() ? "" : Pattern.quote(prefix));
 
-		final StringBuffer buffer=new StringBuffer(2*(prefix.length()+suffix.length())).append("(");
+		final StringBuilder buffer=new StringBuilder(2*(prefix.length()+suffix.length())).append("(");
 
 		while ( scanner.find() ) { // collect placeholder keys and replace with wildcard step patterns
 
@@ -348,7 +346,7 @@ public final class Router implements Handler {
 
 		final Pattern pattern=Pattern.compile(buffer.toString());
 
-		return request -> {
+		return (request, forward) -> {
 
 			final String head=request.get(RoutingPrefix);
 			final String tail=request.path().substring(head.length());
@@ -359,32 +357,26 @@ public final class Router implements Handler {
 
 					.map(matcher -> {
 
-						keys.forEach(key -> {
-							try {
-								request.parameter(key, URLDecoder.decode(matcher.group(key), "UTF-8"));
-							} catch ( final UnsupportedEncodingException unexpected ) {
-								throw new UncheckedIOException(unexpected);
-							}
-						});
+						keys.forEach(key -> request.parameter(key, URLDecoder.decode(matcher.group(key), UTF_8)));
 
-						return request.set(RoutingPrefix, head+matcher.group(1));
+						return handler.handle(request.set(RoutingPrefix, head+matcher.group(1)), forward);
 
 					})
 
-					.map(handler::handle);
+					.orElse(null);
 
 		};
 	}
 
 
-	private Response head(final Request request) {
-		return handle(request.method(GET)).map(response -> response
+	private Response head(final Request request, final Function<Request, Response> forward) {
+		return handle(request.method(GET), forward).map(response -> response
 				.headers("Content-Length", emptyList())
 				.body(output(), target -> { })
 		);
 	}
 
-	private Response options(final Request request) {
+	private Response options(final Request request, final Function<Request, Response> forward) {
 		return request.reply(response -> response
 				.status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
 				.header("Allow", OPTIONS)

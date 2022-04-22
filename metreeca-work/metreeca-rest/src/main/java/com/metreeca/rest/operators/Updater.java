@@ -21,6 +21,7 @@ import com.metreeca.json.Shape;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import static com.metreeca.json.shapes.Guard.Detail;
@@ -75,7 +76,7 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * </ul>
  */
-public final class Updater extends Handler.Base {
+public final class Updater extends Delegator {
 
     /**
      * Creates a resource updater.
@@ -100,17 +101,17 @@ public final class Updater extends Handler.Base {
 
 
 	private Handler update() {
-		return request -> {
+        return (request, next) -> {
 
-			final Shape shape=request.get(shape());
+            final Shape shape=request.get(shape());
 
-			return request.body(jsonld()).fold(request::reply, frame -> engine.update(frame, shape)
+            return request.body(jsonld()).fold(request::reply, frame -> engine.update(frame, shape)
 
-					.map(iri -> request.reply(status(NoContent)))
+                    .map(iri -> request.reply(status(NoContent)))
 
-					.orElseGet(() -> request.reply(status(NotFound))) // !!! 410 Gone if previously known
+                    .orElseGet(() -> request.reply(status(NotFound))) // !!! 410 Gone if previously known
 
-			);
+            );
 
 		};
 	}

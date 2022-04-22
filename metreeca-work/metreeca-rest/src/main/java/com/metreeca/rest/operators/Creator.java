@@ -21,6 +21,7 @@ import com.metreeca.json.*;
 import com.metreeca.json.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -88,7 +89,7 @@ import static java.util.stream.Collectors.toMap;
  *
  * </ul>
  */
-public final class Creator extends Handler.Base {
+public final class Creator extends Delegator {
 
     /**
      * Creates a resource creator with a UUID-based slug generator.
@@ -165,34 +166,34 @@ public final class Creator extends Handler.Base {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Wrapper rewrite() {
-		return handler -> request -> {
+        return handler -> (request, next) -> {
 
-			final String name=encode( // encode slug as IRI path component
-					requireNonNull(slug.apply(request), "null resource name")
-			);
+            final String name=encode( // encode slug as IRI path component
+                    requireNonNull(slug.apply(request), "null resource name")
+            );
 
-			final IRI source=iri(request.item());
-			final IRI target=iri(source, name);
+            final IRI source=iri(request.item());
+            final IRI target=iri(source, name);
 
-			return handler.handle(request
-					.path(request.path()+name)
-					.map(jsonld(), frame -> rewrite(target, source, frame))
-			);
+            return handler.handle(request
+                            .path(request.path()+name)
+                            .map(jsonld(), frame -> rewrite(target, source, frame)),
+                    next);
 		};
 	}
 
 	private Handler create() {
-		return request -> {
+        return (request, next) -> {
 
-			final IRI item=iri(request.item());
-			final Shape shape=request.get(shape());
+            final IRI item=iri(request.item());
+            final Shape shape=request.get(shape());
 
-			return request.body(jsonld()).fold(request::reply, frame -> engine.create(frame, shape)
+            return request.body(jsonld()).fold(request::reply, frame -> engine.create(frame, shape)
 
-					.map(Frame::focus)
+                    .map(Frame::focus)
 
-					.map(focus -> request.reply(response -> response.status(Created).header("Location", Optional
-							.of(focus)
+                    .map(focus -> request.reply(response -> response.status(Created).header("Location", Optional
+                            .of(focus)
 							.filter(Value::isIRI)
 							.map(IRI.class::cast)
 							.map(Value::stringValue)

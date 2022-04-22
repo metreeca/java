@@ -21,6 +21,8 @@ import com.metreeca.rest.formats.OutputFormat;
 
 import org.junit.jupiter.api.Test;
 
+import static com.metreeca.rest.Response.OK;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
@@ -34,19 +36,19 @@ final class ValidatorTest {
 	}
 
 	private Handler handler() {
-		return request -> request.reply(response -> response.status(Response.OK));
+        return (request, next) -> request.reply(OK);
 	}
 
 
 	@Test void testAcceptValidRequests() {
 		exec(() -> Validator.validator(request -> emptyList())
 
-				.wrap(handler())
+                .wrap(handler())
 
-				.handle(new Request())
+                .handle(new Request(), Request::reply)
 
 				.accept(response -> ResponseAssert.assertThat(response)
-						.hasStatus(Response.OK)
+                        .hasStatus(OK)
 				)
 		);
 	}
@@ -54,9 +56,9 @@ final class ValidatorTest {
 	@Test void testRejectInvalidRequests() {
 		exec(() -> Validator.validator(request -> asList("issue", "issue"))
 
-				.wrap(handler())
+                .wrap(handler())
 
-				.handle(new Request())
+                .handle(new Request(), Request::reply)
 
 				.accept(response -> ResponseAssert.assertThat(response)
 						.hasStatus(Response.UnprocessableEntity)

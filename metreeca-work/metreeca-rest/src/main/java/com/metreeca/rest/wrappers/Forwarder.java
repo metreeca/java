@@ -133,16 +133,16 @@ public final class Forwarder implements Wrapper {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Handler wrap(final Handler handler) {
-		return request -> {
+		return (request, next) -> {
 
-			final String original=request.item();
-			final String location=rewriter.apply(original);
+            final String original=request.item();
+            final String location=rewriter.apply(original);
 
-			return location.equals(original)
-					? handler.handle(request)
-					: request.reply(status(status, location));
+            return location.equals(original)
+                    ? handler.handle(request, next)
+                    : request.reply(status(status, location));
 
-		};
+        };
 	}
 
 }

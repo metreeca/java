@@ -17,8 +17,8 @@
 package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.Handler;
 import com.metreeca.rest.Request;
+import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Logger;
 
 import java.util.*;
@@ -39,17 +39,17 @@ import static java.util.Collections.*;
  *
  * @see <a href="https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/">SPARQL 1.1 Overview</a>
  */
-public abstract class Endpoint<T extends Endpoint<T>> extends Handler.Base {
+public abstract class Endpoint<T extends Endpoint<T>> extends Delegator {
 
-	private Graph graph=service(Graph.graph());
+    private Graph graph=service(Graph.graph());
 
-	private Set<Object> query=singleton(new Object()); // roles enabled for query operations (unmatchable by default)
-	private Set<Object> update=singleton(new Object()); // roles enabled for update operations (unmatchable by default)
+    private Set<Object> query=singleton(new Object()); // roles enabled for query operations (unmatchable by default)
+    private Set<Object> update=singleton(new Object()); // roles enabled for update operations (unmatchable by default)
 
-	private final Logger logger=service(Logger.logger());
+    private final Logger logger=service(Logger.logger());
 
 
-	@SuppressWarnings("unchecked") private T self() {
+    @SuppressWarnings("unchecked") private T self() {
 		return (T)this;
 	}
 

@@ -79,7 +79,7 @@ public final class Server implements Wrapper {
             throw new NullPointerException("null handler");
         }
 
-        return request -> {
+        return (request, next) -> {
             try {
 
                 return request
@@ -88,7 +88,7 @@ public final class Server implements Wrapper {
                         .map(this::query)
                         .map(this::form)
 
-                        .map(handler::handle)
+                        .map(request1 -> handler.handle(request1, next))
 
                         .map(this::logging)
                         .map(this::charset);

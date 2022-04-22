@@ -114,14 +114,14 @@ import static java.util.Objects.requireNonNull;
 	 */
 	public static Wrapper preprocessor(final Function<Request, Request> mapper) {
 
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
 
-		return handler -> request -> handler.handle(
-				requireNonNull(mapper.apply(request), "null mapper return value")
-		);
-	}
+        return handler -> (request, next) -> handler.handle(
+                requireNonNull(mapper.apply(request), "null mapper return value"),
+                next);
+    }
 
 	/**
 	 * Creates a  {@linkplain Response#success() successful} post-processing wrapper.
@@ -138,10 +138,10 @@ import static java.util.Objects.requireNonNull;
 			throw new NullPointerException("null mapper");
 		}
 
-		return handler -> request -> handler.handle(request).map(response -> response.success()
-				? requireNonNull(mapper.apply(response), "null mapper return value")
-				: response
-		);
+        return handler -> (request, next) -> handler.handle(request, next).map(response -> response.success()
+                ? requireNonNull(mapper.apply(response), "null mapper return value")
+                : response
+        );
 	}
 
 
@@ -165,11 +165,11 @@ import static java.util.Objects.requireNonNull;
 			throw new NullPointerException("null mapper");
 		}
 
-		return handler -> request ->
-				request.body(format).fold(request::reply, value -> handler.handle(
-						request.body(format, requireNonNull(mapper.apply(request, value), "null mapper return value"))
-						)
-				);
+        return handler -> (request, next) ->
+                request.body(format).fold(request::reply, value -> handler.handle(
+                        request.body(format, requireNonNull(mapper.apply(request, value), "null mapper return value")),
+                        next)
+                );
 	}
 
 	/**
@@ -193,12 +193,12 @@ import static java.util.Objects.requireNonNull;
 			throw new NullPointerException("null mapper");
 		}
 
-		return handler -> request -> handler.handle(request).map(response ->
-				response.success() ? response.body(format).fold(error -> { throw error; },
-						value -> response.body(format,
-								requireNonNull(mapper.apply(response, value), "null mapper return value")
-						)) : response
-		);
+        return handler -> (request, next) -> handler.handle(request, next).map(response ->
+                response.success() ? response.body(format).fold(error -> { throw error; },
+                        value -> response.body(format,
+                                requireNonNull(mapper.apply(response, value), "null mapper return value")
+                        )) : response
+        );
 	}
 
 
@@ -237,13 +237,13 @@ import static java.util.Objects.requireNonNull;
 	 */
 	public static Wrapper roles(final Collection<Object> roles) {
 
-		if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null roles");
-		}
+        if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null roles");
+        }
 
-		return handler -> request -> request.roles().stream().anyMatch(roles::contains)
-				? handler.handle(request) : request.reply(status(Unauthorized)); // !!! 404 under strict security
-	}
+        return handler -> (request, next) -> request.roles().stream().anyMatch(roles::contains)
+                ? handler.handle(request, next) : request.reply(status(Unauthorized)); // !!! 404 under strict security
+    }
 
 
 	/**
@@ -257,17 +257,17 @@ import static java.util.Objects.requireNonNull;
 	 * @throws NullPointerException if either {@code task} or {@code view} is null
 	 */
 	public static Wrapper keeper(final Object task, final Object view) {
-		return handler -> request -> {
+        return handler -> (request, next) -> {
 
-			final Shape shape=request.get(shape()) // visible taking into account task/area
+            final Shape shape=request.get(shape()) // visible taking into account task/area
 
-					.redact(Task, task)
-					.redact(View, view)
-					.redact(Mode, Convey);
+                    .redact(Task, task)
+                    .redact(View, view)
+                    .redact(Mode, Convey);
 
-			final Shape baseline=shape // visible to anyone
+            final Shape baseline=shape // visible to anyone
 
-					.redact(Role);
+                    .redact(Role);
 
 			final Shape authorized=shape // visible to user
 
@@ -295,9 +295,9 @@ import static java.util.Objects.requireNonNull;
 
 			);
 
-			return baseline.empty() ? request.reply(status(Forbidden))
-					: authorized.empty() ? request.reply(status(Unauthorized))
-					: handler.handle(request.map(incoming)).map(outgoing);
+            return baseline.empty() ? request.reply(status(Forbidden))
+                    : authorized.empty() ? request.reply(status(Unauthorized))
+                    : handler.handle(request.map(incoming), next).map(outgoing);
 
 		};
 	}

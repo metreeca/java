@@ -40,7 +40,7 @@ import static java.util.Collections.emptyMap;
 /**
  * Static content publisher.
  */
-public final class Publisher extends Handler.Base {
+public final class Publisher extends Delegator {
 
     private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
 
@@ -211,8 +211,8 @@ public final class Publisher extends Handler.Base {
     private Publisher(final Path root) {
         delegate(router()
 
-                .head(request -> handle(request, root))
-                .get(request -> handle(request, root))
+                .head((request, next) -> handle(request, root))
+                .get((request, next) -> handle(request, root))
 
         );
     }
