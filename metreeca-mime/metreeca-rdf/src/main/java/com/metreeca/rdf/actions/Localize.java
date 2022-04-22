@@ -26,8 +26,8 @@ import org.eclipse.rdf4j.model.vocabulary.*;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.metreeca.json.Values.literal;
-import static com.metreeca.json.Values.statement;
+import static com.metreeca.link.Values.literal;
+import static com.metreeca.link.Values.statement;
 
 /**
  * RDF default text localization.

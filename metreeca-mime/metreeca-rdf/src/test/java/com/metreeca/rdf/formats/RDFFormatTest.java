@@ -18,9 +18,10 @@ package com.metreeca.rdf.formats;
 
 import com.metreeca.core.Feeds;
 import com.metreeca.http.Locator;
-import com.metreeca.json.Values;
+import com.metreeca.link.Values;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
+import com.metreeca.rest.formats.JSONLDFormat;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.model.vocabulary.LDP;
@@ -30,17 +31,16 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.metreeca.json.ModelAssert.assertThat;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
-import static com.metreeca.json.shapes.Datatype.datatype;
-import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.link.ModelAssert.assertThat;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.statement;
+import static com.metreeca.link.shapes.Datatype.datatype;
+import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.formats.TextFormat.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,12 +153,11 @@ final class RDFFormatTest {
     @Nested final class Encoder {
 
         @Test void testConfigureWriterBaseIRI() {
-            exec(() -> new Request()
+            exec(() -> JSONLDFormat.shape(new Request()
 
-                    .base("http://example.com/base/")
-                    .path("/").reply()
-                    .status(Response.OK)
-                    .set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
+                            .base("http://example.com/base/")
+                            .path("/").reply()
+                            .status(Response.OK), field(LDP.CONTAINS, datatype(Values.IRIType)))
                     .body(rdf(), singletonList(statement(
                             iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
                                     +".com/base/x")

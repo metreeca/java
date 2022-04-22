@@ -16,22 +16,21 @@
 
 package com.metreeca.rest.operators;
 
-import com.metreeca.json.Frame;
-import com.metreeca.json.Shape;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
+import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.shapes.Guard.Detail;
-import static com.metreeca.json.shapes.Guard.Update;
+import static com.metreeca.link.shapes.Guard.Detail;
+import static com.metreeca.link.shapes.Guard.Update;
 import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
 import static com.metreeca.rest.services.Engine.engine;
 
 
@@ -43,7 +42,7 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -93,7 +92,7 @@ public final class Updater extends Delegator {
 	private Handler update() {
         return (request, next) -> {
 
-            final Shape shape=request.get(shape());
+			final Shape shape=JSONLDFormat.shape(request);
 
 			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.update(frame,
 							shape)

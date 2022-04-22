@@ -19,7 +19,6 @@ package com.metreeca.rest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 import static java.util.Objects.requireNonNull;
 
@@ -86,33 +85,6 @@ public abstract class Setup<T extends Setup<T>> implements Config {
 		}
 
 		options.put(option, value);
-
-		return self();
-	}
-
-	/**
-	 * Updates an option.
-	 *
-	 * @param option the option to be update; must return a non-null default value
-	 * @param mapper a function mapping from the current to the updated value of {@code option}; must return a non-null
-	 *               value
-	 * @param <V>    the type of the option to be updated
-	 *
-	 * @return this setup
-	 *
-	 * @throws NullPointerException if either {@code option} or {@code value} is null
-	 */
-	public <V> T map(final Supplier<V> option, final UnaryOperator<V> mapper) {
-
-		if ( option == null ) {
-			throw new NullPointerException("null option");
-		}
-
-		if ( mapper == null ) {
-			throw new NullPointerException("null mapper");
-		}
-
-		options.computeIfPresent(option, (key, value) -> mapper.apply((V)value));
 
 		return self();
 	}

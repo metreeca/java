@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.operators;
 
-import com.metreeca.json.*;
-import com.metreeca.json.queries.*;
-import com.metreeca.json.shapes.Guard;
+import com.metreeca.link.*;
+import com.metreeca.link.queries.*;
+import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
@@ -27,17 +27,18 @@ import com.metreeca.rest.services.Engine;
 import org.eclipse.rdf4j.model.IRI;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Shape.Contains;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.shapes.And.and;
-import static com.metreeca.json.shapes.Field.field;
-import static com.metreeca.json.shapes.Guard.*;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Shape.Contains;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.keeper;
 import static com.metreeca.rest.Wrapper.wrapper;
-import static com.metreeca.rest.formats.JSONLDFormat.*;
+import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+import static com.metreeca.rest.formats.JSONLDFormat.query;
 import static com.metreeca.rest.services.Engine.*;
 
 
@@ -49,7 +50,7 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape() shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -121,17 +122,17 @@ public final class Relator extends Delegator {
             final boolean collection=request.collection();
 
             final IRI item=iri(request.item());
-            final Shape shape=request.get(shape());
+			final Shape shape=JSONLDFormat.shape(request);
 
 			return query(item, shape, request.query()).fold(mapper -> request.reply().map(mapper),
                     query -> engine.relate(frame(item), query)
 
-					.map(frame -> request.reply().map(response -> response.status(OK)
-                            .set(shape(), query.map(new ShapeProbe(collection)))
-							.body(jsonld(), frame)))
+		                    .map(frame -> request.reply().map(response -> JSONLDFormat.shape(response.status(OK),
+                                            query.map(new ShapeProbe(collection)))
+				                    .body(jsonld(), frame)))
 
 					.orElseGet(() -> request.reply().map(response -> collection
-							? response.status(OK).set(shape(), and()).body(jsonld(), frame(item)) // virtual container
+							? JSONLDFormat.shape(response.status(OK), and()).body(jsonld(), frame(item)) // virtual container
 							: response.status(NotFound))));
 		};
 	}

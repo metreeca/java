@@ -17,7 +17,7 @@
 package com.metreeca.rest.operators;
 
 import com.metreeca.http.Locator;
-import com.metreeca.json.*;
+import com.metreeca.link.*;
 import com.metreeca.rest.services.Engine;
 
 import java.util.Optional;

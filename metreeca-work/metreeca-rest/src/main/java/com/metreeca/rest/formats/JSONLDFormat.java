@@ -17,8 +17,8 @@
 package com.metreeca.rest.formats;
 
 import com.metreeca.http.Either;
-import com.metreeca.json.*;
-import com.metreeca.json.shapes.Or;
+import com.metreeca.link.*;
+import com.metreeca.link.shapes.Or;
 import com.metreeca.rest.*;
 
 import org.eclipse.rdf4j.model.*;
@@ -32,11 +32,11 @@ import javax.json.*;
 import static com.metreeca.http.Either.Left;
 import static com.metreeca.http.Either.Right;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Trace.trace;
-import static com.metreeca.json.Values.format;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.lang;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Trace.trace;
+import static com.metreeca.link.Values.format;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.lang;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.InputFormat.input;
@@ -53,412 +53,448 @@ import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
  */
 public final class JSONLDFormat extends Format<Frame> {
 
-	/**
-	 * The default MIME type for JSON-LD messages ({@value}).
-	 */
-	public static final String MIME="application/ld+json";
-
-
-	/**
-	 * Creates a JSON-LD message format.
-	 *
-	 * @return a new JON-LD message format
-	 */
-	public static JSONLDFormat jsonld() {
-		return new JSONLDFormat();
-	}
-
-
-	/**
-	 * Retrieves the default JSON-LD shape service factory.
-	 *
-	 * @return the default shape factory, which returns an {@linkplain Or#or() empty disjunction}, that is a shape the
-	 * always fails to validate
-	 */
-	public static Supplier<Shape> shape() {
-		return Or::or;
-	}
-
-	/**
-	 * Retrieves the default JSON-LD keywords service factory.
-	 *
-	 * <p>The keywords service maps JSON-LD {@code @keywords} to user-defined aliases.</p>
-	 *
-	 * @return the default keywords factory, which returns an empty map
-	 */
-	public static Supplier<Map<String, String>> keywords() {
-		return Collections::emptyMap;
-	}
-
-
-	private static final JsonWriterFactory JsonWriters=Json.createWriterFactory(singletonMap(PRETTY_PRINTING, true));
-
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Decodes a shape-based query.
-	 *
-	 * @param focus the target IRI for the decoding process; relative IRIs will be resolved against it
-	 * @param shape the base shape for the decoded query
-	 * @param query the query to be decoded
-	 *
-	 * @return either a message exception reporting a decoding issue or the decoded query
-	 *
-	 * @throws NullPointerException if any parameter is null
-	 */
-	public static Either<MessageException, Query> query(final IRI focus, final Shape shape, final String query) {
-
-		if ( query == null ) {
-			throw new NullPointerException("null query");
-		}
-
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
-		}
-
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
-		}
-
-		try {
-
-			return Right(new JSONLDParser(focus, shape, service(keywords())).parse(query));
-
-		} catch ( final JsonException e ) {
-
-			return Left(status(BadRequest, e));
-
-		} catch ( final NoSuchElementException e ) {
-
-			return Left(status(UnprocessableEntity, e));
-
-		}
-	}
-
-
-	/**
-	 * Decodes a shape-based JSON-LD entity.
-	 *
-	 * @param focus    the target IRI for the decoding process; relative IRIs will be resolved against it
-	 * @param shape    the expected shape for the JSON-LD entity
-	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
-	 * @param json     the JSON-LD entity to be decoded
-	 *
-	 * @return an RDF representation of the decoded {@code entity}
-	 *
-	 * @throws NullPointerException if any parameter is null or contains null values
-	 */
-	public static Collection<Statement> decode(
-			final IRI focus, final Shape shape, final Map<String, String> keywords,
-			final JsonObject json
-	) {
-
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
-		}
-
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
-		}
-
-		if ( keywords == null
-				|| keywords.keySet().stream().anyMatch(Objects::isNull)
-				|| keywords.values().stream().anyMatch(Objects::isNull)
-		) {
-			throw new NullPointerException("null keywords");
-		}
-
-		if ( json == null ) {
-			throw new NullPointerException("null json");
-		}
-
-		return new JSONLDDecoder(
-
-				focus,
-				shape,
-				keywords
-
-		).decode(json);
-
-	}
-
-	/**
-	 * Encodes a shape-based JSON-LD entity.
-	 *
-	 * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
-	 * @param shape    the target shape for the entity to be encoded
-	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
-	 * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
-	 *
-	 * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
-	 *
-	 * @throws NullPointerException if any parameter is null or contains null values
-	 */
-	public static JsonObject encode(
-			final IRI focus, final Shape shape, final Map<String, String> keywords,
-			final Collection<Statement> model
-	) {
-
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
-		}
-
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
-		}
-
-		if ( keywords == null
-				|| keywords.keySet().stream().anyMatch(Objects::isNull)
-				|| keywords.values().stream().anyMatch(Objects::isNull)
-		) {
-			throw new NullPointerException("null keywords");
-		}
-
-		if ( model == null ) {
-			throw new NullPointerException("null model");
-		}
-
-		return new JSONLDEncoder(
-
-				focus,
-				shape,
-				keywords,
-				false
-
-		).encode(model);
-
-	}
-
-	/**
-	 * Encodes a shape-based JSON-LD entity.
-	 *
-	 * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
-	 * @param shape    the target shape for the entity to be encoded
-	 * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
-	 * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
-	 * @param context  a flag declaring if the JSON-LD {@code @context} should be included in the generated description
-	 *
-	 * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
-	 *
-	 * @throws NullPointerException if any parameter is null or contains null values
-	 */
-	public static JsonObject encode(
-			final IRI focus, final Shape shape, final Map<String, String> keywords,
-			final Collection<Statement> model,
-			final boolean context
-	) {
-
-		return new JSONLDEncoder(
-
-				focus,
-				shape,
-				keywords,
-				context
-
-		).encode(model);
+    /**
+     * The default MIME type for JSON-LD messages ({@value}).
+     */
+    public static final String MIME="application/ld+json";
+
+
+    /**
+     * Creates a JSON-LD message format.
+     *
+     * @return a new JON-LD message format
+     */
+    public static JSONLDFormat jsonld() {
+        return new JSONLDFormat();
+    }
+
+
+    /**
+     * Retrieves the default JSON-LD keywords service factory.
+     *
+     * <p>The keywords service maps JSON-LD {@code @keywords} to user-defined aliases.</p>
+     *
+     * @return the default keywords factory, which returns an empty map
+     */
+    public static Supplier<Map<String, String>> keywords() {
+        return Collections::emptyMap;
+    }
+
+
+    /**
+     * Retrieves the JSON-LD shape of a message.
+     *
+     * @param message the message whose shape is to be retrieved
+     *
+     * @return the shape associated with {@code message} i f one is fouund; an {@linkplain Or#or() empty disjunction},
+     * that is a shape the always fails to validate, otherwise
+     *
+     * @throws NullPointerException if {@code message} is null
+     */
+    public static <M extends Message<M>> Shape shape(final M message) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        return message.attribute(Shape.class).orElseGet(Or::or);
+    }
+
+    /**
+     * Configures the JSON-LD shape of a message.
+     *
+     * @param message the message whose shape is to be configured
+     * @param shape   the shape to be associted with {@code message}
+     *
+     * @return the shape associated with {@code message} i f one is fouund; an {@linkplain Or#or() empty disjunction},
+     * that is a shape the always fails to validate, otherwise
+     *
+     * @throws NullPointerException if either {@code message} or {@code shape} is null
+     */
+
+    public static <M extends Message<M>> M shape(final M message, final Shape shape) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        return message.attribute(Shape.class, shape);
+    }
+
+
+    private static final JsonWriterFactory JsonWriters=Json.createWriterFactory(singletonMap(PRETTY_PRINTING, true));
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Decodes a shape-based query.
+     *
+     * @param focus the target IRI for the decoding process; relative IRIs will be resolved against it
+     * @param shape the base shape for the decoded query
+     * @param query the query to be decoded
+     *
+     * @return either a message exception reporting a decoding issue or the decoded query
+     *
+     * @throws NullPointerException if any parameter is null
+     */
+    public static Either<MessageException, Query> query(final IRI focus, final Shape shape, final String query) {
+
+        if ( query == null ) {
+            throw new NullPointerException("null query");
+        }
+
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        try {
+
+            return Right(new JSONLDParser(focus, shape, service(keywords())).parse(query));
+
+        } catch ( final JsonException e ) {
+
+            return Left(status(BadRequest, e));
+
+        } catch ( final NoSuchElementException e ) {
+
+            return Left(status(UnprocessableEntity, e));
+
+        }
+    }
+
+
+    /**
+     * Decodes a shape-based JSON-LD entity.
+     *
+     * @param focus    the target IRI for the decoding process; relative IRIs will be resolved against it
+     * @param shape    the expected shape for the JSON-LD entity
+     * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+     * @param json     the JSON-LD entity to be decoded
+     *
+     * @return an RDF representation of the decoded {@code entity}
+     *
+     * @throws NullPointerException if any parameter is null or contains null values
+     */
+    public static Collection<Statement> decode(
+            final IRI focus, final Shape shape, final Map<String, String> keywords,
+            final JsonObject json
+    ) {
+
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        if ( keywords == null
+                || keywords.keySet().stream().anyMatch(Objects::isNull)
+                || keywords.values().stream().anyMatch(Objects::isNull)
+        ) {
+            throw new NullPointerException("null keywords");
+        }
+
+        if ( json == null ) {
+            throw new NullPointerException("null json");
+        }
+
+        return new JSONLDDecoder(
+
+                focus,
+                shape,
+                keywords
+
+        ).decode(json);
+
+    }
+
+    /**
+     * Encodes a shape-based JSON-LD entity.
+     *
+     * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
+     * @param shape    the target shape for the entity to be encoded
+     * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+     * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
+     *
+     * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
+     *
+     * @throws NullPointerException if any parameter is null or contains null values
+     */
+    public static JsonObject encode(
+            final IRI focus, final Shape shape, final Map<String, String> keywords,
+            final Collection<Statement> model
+    ) {
+
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        if ( keywords == null
+                || keywords.keySet().stream().anyMatch(Objects::isNull)
+                || keywords.values().stream().anyMatch(Objects::isNull)
+        ) {
+            throw new NullPointerException("null keywords");
+        }
+
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
+
+        return new JSONLDEncoder(
+
+                focus,
+                shape,
+                keywords,
+                false
+
+        ).encode(model);
+
+    }
+
+    /**
+     * Encodes a shape-based JSON-LD entity.
+     *
+     * @param focus    the IRI of the entity to be encoded; absolute IRIs will be relativized against it
+     * @param shape    the target shape for the entity to be encoded
+     * @param keywords a map from JSON-LD {@code @keywords} to user-defined aliases
+     * @param model    the {@code focus}-centered RDF representation of the entity to be encoded
+     * @param context  a flag declaring if the JSON-LD {@code @context} should be included in the generated description
+     *
+     * @return a frame-based JSON-LD representation of the {@code focus} entity as described in {@code model}
+     *
+     * @throws NullPointerException if any parameter is null or contains null values
+     */
+    public static JsonObject encode(
+            final IRI focus, final Shape shape, final Map<String, String> keywords,
+            final Collection<Statement> model,
+            final boolean context
+    ) {
 
-	}
+        return new JSONLDEncoder(
 
+                focus,
+                shape,
+                keywords,
+                context
 
-	/**
-	 * Validate a JSON-LD model against a shape.
-	 *
-	 * @param focus the target IRI for the validation process
-	 * @param shape the target shape for the validation process
-	 * @param model the JSON-LD model to be validated
-	 *
-	 * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
-	 * from the target {@code focus} according to {@code shape}
-	 *
-	 * @throws NullPointerException if any parameter is null
-	 */
-	public static Either<Trace, Collection<Statement>> validate(
-			final Value focus, final Shape shape, final Collection<Statement> model
-	) {
+        ).encode(model);
 
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
-		}
+    }
 
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
-		}
 
-		if ( model == null ) {
-			throw new NullPointerException("null model");
-		}
+    /**
+     * Validate a JSON-LD model against a shape.
+     *
+     * @param focus the target IRI for the validation process
+     * @param shape the target shape for the validation process
+     * @param model the JSON-LD model to be validated
+     *
+     * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
+     * from the target {@code focus} according to {@code shape}
+     *
+     * @throws NullPointerException if any parameter is null
+     */
+    public static Either<Trace, Collection<Statement>> validate(
+            final Value focus, final Shape shape, final Collection<Statement> model
+    ) {
 
-		return JSONLDScanner.scan(focus, shape, model);
-	}
-
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private JSONLDFormat() { }
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
 
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        return JSONLDScanner.scan(focus, shape, model);
+    }
 
-	/**
-	 * @return the default MIME type for JSON-LD messages ({@value MIME})
-	 */
-	@Override public String mime() {
-		return MIME;
-	}
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Decodes the JSON-LD {@code message} body from the input stream supplied by the {@code message}
-	 * {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is either missing or matched by
-	 * {@link JSONFormat#MIMEPattern}
-	 *
-	 * <p><strong>Warning</strong> / Decoding is completely driven by the {@code message}
-	 * {@linkplain JSONLDFormat#shape() shape attribute}: embedded {@code @context} objects are ignored.</p>
-	 */
-	@Override public Either<MessageException, Frame> decode(final Message<?> message) {
-		return message
+    private JSONLDFormat() { }
 
-				.header("Content-Type")
 
-				.filter(JSONFormat.MIMEPattern.asPredicate().or(String::isEmpty))
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				.map(type -> message.body(input()).flatMap(source -> {
+    /**
+     * @return the default MIME type for JSON-LD messages ({@value MIME})
+     */
+    @Override public String mime() {
+        return MIME;
+    }
 
-					try (
-							final InputStream input=source.get();
-							final Reader reader=new InputStreamReader(input, message.charset());
-							final JsonReader jsonReader=Json.createReader(reader)
-					) {
 
-						final IRI focus=iri(message.item());
-						final Shape shape=message.get(shape());
-						final Map<String, String> keywords=service(keywords());
+    /**
+     * Decodes the JSON-LD {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+     * body, if one is available and the {@code message} {@code Content-Type} header is either missing or matched by
+     * {@link JSONFormat#MIMEPattern}
+     *
+     * <p><strong>Warning</strong> / Decoding is completely driven by the {@code message}
+     * {@linkplain JSONLDFormat#shape(Message) shape attribute}: embedded {@code @context} objects are ignored.</p>
+     */
 
-						final Collection<Statement> model=decode(focus, shape, keywords, jsonReader.readObject());
+    @Override public <M extends Message<M>> Either<MessageException, Frame> decode(final M message) {
+        return message
 
-						return validate(focus, shape, model).fold(
+                .header("Content-Type")
 
-								trace -> Left(status(UnprocessableEntity, trace.toJSON())),
+                .filter(JSONFormat.MIMEPattern.asPredicate().or(String::isEmpty))
 
-								value -> Right(frame(focus, model)) // use model to include inferred statements
+                .map(type -> message.body(input()).flatMap(source -> {
 
-						);
+                    try (
+                            final InputStream input=source.get();
+                            final Reader reader=new InputStreamReader(input, message.charset());
+                            final JsonReader jsonReader=Json.createReader(reader)
+                    ) {
 
-					} catch ( final JsonException e ) {
+                        final IRI focus=iri(message.item());
+                        final Shape shape=shape(message);
+                        final Map<String, String> keywords=service(keywords());
 
-						if ( e.getCause() instanceof IOException ) {
-							throw new UncheckedIOException((IOException)e.getCause());
-						}
+                        final Collection<Statement> model=decode(focus, shape, keywords, jsonReader.readObject());
 
-						return Left(status(BadRequest, e));
+                        return validate(focus, shape, model).fold(
 
-					} catch ( final UnsupportedEncodingException e ) {
+                                trace -> Left(status(UnprocessableEntity, trace.toJSON())),
 
-						return Left(status(BadRequest, e));
+                                value -> Right(frame(focus, model)) // use model to include inferred statements
 
-					} catch ( final IOException e ) {
+                        );
 
-						throw new UncheckedIOException(e);
+                    } catch ( final JsonException e ) {
 
-					}
+                        if ( e.getCause() instanceof IOException ) {
+                            throw new UncheckedIOException((IOException)e.getCause());
+                        }
 
-				}))
+                        return Left(status(BadRequest, e));
 
-				.orElseGet(() -> Left(status(UnsupportedMediaType, "no JSON-LD body")));
-	}
+                    } catch ( final UnsupportedEncodingException e ) {
 
-	/**
-	 * Configures {@code message} {@code Content-Type} header to {@value JSONFormat#MIME}, unless already defined, and
-	 * encodes the JSON-LD model {@code value} into the output stream accepted by the {@code message} {@link
-	 * OutputFormat} body.
-	 *
-	 * <p>If the originating {@code message} {@linkplain Message#request() request} includes an {@code Accept-Language}
-	 * header, a suitably {@linkplain Shape#localize localized} version of the message shape is used in the conversion
-	 * process and only matching tagged literals from {@code value} are included in the response body.</p>
-	 *
-	 * <p><strong>Warning</strong> / {@code @context} objects generated from the {@code message}
-	 * {@linkplain JSONLDFormat#shape() shape attribute} are embedded only if {@code Content-Type} is {@value MIME}.</p>
-	 */
-	@Override public <M extends Message<M>> M encode(final M message, final Frame value) {
+                        return Left(status(BadRequest, e));
 
-		final String item=message.item();
-		final Value focus=value.focus();
+                    } catch ( final IOException e ) {
 
-		if ( !focus.isIRI() || !focus.stringValue().equals(item) ) {
-			throw new IllegalArgumentException(format(
-					"message item <%s> and frame focus %s don't match", item, format(focus)
-			));
-		}
+                        throw new UncheckedIOException(e);
 
-		final Shape shape=message.get(shape());
-		final List<String> langs=message.request().langs();
+                    }
 
-		final boolean global=langs.isEmpty() || langs.contains("*");
+                }))
 
-		final String mime=message
+                .orElseGet(() -> Left(status(UnsupportedMediaType, "no JSON-LD body")));
+    }
 
-				.header("Content-Type") // content-type explicitly defined by handler
+    /**
+     * Configures {@code message} {@code Content-Type} header to {@value JSONFormat#MIME}, unless already defined, and
+     * encodes the JSON-LD model {@code value} into the output stream accepted by the {@code message} {@link
+     * OutputFormat} body.
+     *
+     * <p>If the originating {@code message} {@linkplain Message#request() request} includes an {@code Accept-Language}
+     * header, a suitably {@linkplain Shape#localize localized} version of the message shape is used in the conversion
+     * process and only matching tagged literals from {@code value} are included in the response body.</p>
+     *
+     * <p><strong>Warning</strong> / {@code @context} objects generated from the {@code message}
+     * {@linkplain JSONLDFormat#shape(Message) shape attribute} are embedded only if {@code Content-Type} is {@value
+     * MIME}.</p>
+     */
+    @Override public <M extends Message<M>> M encode(final M message, final Frame value) {
 
-				.orElseGet(() -> mimes(message.request().header("Accept").orElse("")).stream()
+        final String item=message.item();
+        final Value focus=value.focus();
 
-						// application/ld+json or application/json accepted?
+        if ( !focus.isIRI() || !focus.stringValue().equals(item) ) {
+            throw new IllegalArgumentException(format(
+                    "message item <%s> and frame focus %s don't match", item, format(focus)
+            ));
+        }
 
-						.filter(type -> type.equals(MIME) || type.equals(JSONFormat.MIME)).findFirst()
+        final Shape shape=shape(message);
+        final List<String> langs=message.request().langs();
 
-						// default to application/json
+        final boolean global=langs.isEmpty() || langs.contains("*");
 
-						.orElse(JSONFormat.MIME)
+        final String mime=message
 
-				);
+                .header("Content-Type") // content-type explicitly defined by handler
 
+                .orElseGet(() -> mimes(message.request().header("Accept").orElse("")).stream()
 
-		final Collection<Statement> localized=value.model().filter(statement -> {
+                        // application/ld+json or application/json accepted?
 
-			if ( global ) { return true; } else { // retain only tagged literals with an accepted language
+                        .filter(type -> type.equals(MIME) || type.equals(JSONFormat.MIME)).findFirst()
 
-				final String lang=lang(statement.getObject());
+                        // default to application/json
 
-				return lang.isEmpty() || langs.contains(lang);
+                        .orElse(JSONFormat.MIME)
 
-			}
+                );
 
-		}).collect(toList());
 
-		final Collection<Statement> validated=validate(value.focus(), shape, localized).fold(trace -> {
+        final Collection<Statement> localized=value.model().filter(statement -> {
 
-			throw status(InternalServerError, trace(trace("invalid JSON-LD payload"), trace).toJSON());
+            if ( global ) { return true; } else { // retain only tagged literals with an accepted language
 
-		});
+                final String lang=lang(statement.getObject());
 
-		return message
+                return lang.isEmpty() || langs.contains(lang);
 
-				.header("Content-Type", mime)
+            }
 
-				.body(output(), output -> {
+        }).collect(toList());
 
-					try (
-							final Writer writer=new OutputStreamWriter(output, message.charset());
-							final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
-					) {
+        final Collection<Statement> validated=validate(value.focus(), shape, localized).fold(trace -> {
 
+            throw status(InternalServerError, trace(trace("invalid JSON-LD payload"), trace).toJSON());
 
-						jsonWriter.writeObject(encode(
-								iri(item),
-								shape.localize(langs),
-								service(keywords()), validated,
-								mime.equals(MIME) // include context objects for application/ld+json
-						));
+        });
 
+        return message
 
-					} catch ( final IOException e ) {
+                .header("Content-Type", mime)
 
-						throw new UncheckedIOException(e);
+                .body(output(), output -> {
 
-					}
+                    try (
+                            final Writer writer=new OutputStreamWriter(output, message.charset());
+                            final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
+                    ) {
 
-				});
-	}
+
+                        jsonWriter.writeObject(encode(
+                                iri(item),
+                                shape.localize(langs),
+                                service(keywords()), validated,
+                                mime.equals(MIME) // include context objects for application/ld+json
+                        ));
+
+
+                    } catch ( final IOException e ) {
+
+                        throw new UncheckedIOException(e);
+
+                    }
+
+                });
+    }
 
 }

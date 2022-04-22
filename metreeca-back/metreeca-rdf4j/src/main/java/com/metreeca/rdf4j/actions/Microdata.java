@@ -20,7 +20,7 @@ package com.metreeca.rdf4j.actions;
 
 import com.metreeca.core.Identifiers;
 import com.metreeca.http.services.Logger;
-import com.metreeca.json.Values;
+import com.metreeca.link.Values;
 import com.metreeca.rdf.schemas.Schema;
 
 import org.eclipse.rdf4j.model.*;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.json.Values.*;
+import static com.metreeca.link.Values.*;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

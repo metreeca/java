@@ -18,7 +18,7 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.core.Feeds;
 import com.metreeca.core.Identifiers;
-import com.metreeca.json.Shape;
+import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
@@ -36,10 +36,10 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.json.Shape.exactly;
-import static com.metreeca.json.Values.iri;
-import static com.metreeca.json.Values.statement;
-import static com.metreeca.json.shapes.Field.field;
+import static com.metreeca.link.Shape.exactly;
+import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.Values.statement;
+import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.MessageException.status;
@@ -129,8 +129,7 @@ public final class Graphs extends Endpoint<Graphs> {
                 }
             }));
 
-            return request.reply().map(response -> response.status(Response.OK)
-                    .set(JSONLDFormat.shape(), GraphsShape)
+            return request.reply().map(response -> JSONLDFormat.shape(response.status(Response.OK), GraphsShape)
                     .body(rdf(), model));
 
         } else {

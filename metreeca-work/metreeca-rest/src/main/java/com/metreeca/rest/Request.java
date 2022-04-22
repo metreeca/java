@@ -69,6 +69,11 @@ public final class Request extends Message<Request> {
     private final Map<String, List<String>> parameters=new LinkedHashMap<>();
 
 
+    @Override Request self() {
+        return this;
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**

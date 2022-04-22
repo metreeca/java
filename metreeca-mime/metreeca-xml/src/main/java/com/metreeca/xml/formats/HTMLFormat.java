@@ -198,21 +198,21 @@ public final class HTMLFormat extends Format<Document> {
 
 
 	/**
-	 * Decodes the HTML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
-	 * taking into account the {@code message} {@linkplain Message#charset() charset}
-	 */
-	@Override public Either<MessageException, Document> decode(final Message<?> message) {
-		return message.header("Content-Type").filter(MIMEPattern.asPredicate())
+     * Decodes the HTML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+     * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
+     * taking into account the {@code message} {@linkplain Message#charset() charset}
+     */
+    @Override public <M extends Message<M>> Either<MessageException, Document> decode(final M message) {
+        return message.header("Content-Type").filter(MIMEPattern.asPredicate())
 
-				.map(type -> message.body(input()).flatMap(source -> {
+                .map(type -> message.body(input()).flatMap(source -> {
 
-					try ( final InputStream input=source.get() ) {
+                    try ( final InputStream input=source.get() ) {
 
-						return html(input, message.charset(), message.item()).fold(e -> Left(status(BadRequest, e)),
-								Either::Right);
+                        return html(input, message.charset(), message.item()).fold(e -> Left(status(BadRequest, e)),
+                                Either::Right);
 
-					} catch ( final IOException e ) {
+                    } catch ( final IOException e ) {
 
 						throw new UncheckedIOException(e);
 

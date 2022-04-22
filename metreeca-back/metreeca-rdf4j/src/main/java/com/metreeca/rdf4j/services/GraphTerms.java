@@ -17,9 +17,9 @@
 package com.metreeca.rdf4j.services;
 
 import com.metreeca.core.Identifiers;
-import com.metreeca.json.Frame;
-import com.metreeca.json.Shape;
-import com.metreeca.json.queries.Terms;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
+import com.metreeca.link.queries.Terms;
 import com.metreeca.rest.Config;
 import com.metreeca.rest.services.Engine;
 
@@ -33,9 +33,9 @@ import java.util.*;
 
 import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.*;
-import static com.metreeca.json.shapes.And.and;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Scribe.text;

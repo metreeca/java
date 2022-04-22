@@ -18,8 +18,8 @@ package com.metreeca.rdf4j.processors;
 
 import com.metreeca.core.Strings;
 import com.metreeca.http.services.Logger;
-import com.metreeca.json.Frame;
-import com.metreeca.json.Values;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.linkers.GraphLinker;
 import com.metreeca.rdf4j.schemas.Text;
@@ -40,8 +40,8 @@ import java.util.stream.Stream;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.json.Frame.frame;
-import static com.metreeca.json.Values.literal;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Values.literal;
 import static com.metreeca.rdf4j.services.Graph.graph;
 
 import static java.util.Arrays.asList;
