@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
@@ -62,9 +63,7 @@ final class ServerTest {
 
 					.handle(new Request()
 							.method(Request.GET)
-							.query("one=1&two=2&two=2"))
-
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+							.query("one=1&two=2&two=2")).map(task(response1 -> Assertions.assertThat(response1.status()).isEqualTo(OK)));
 		}
 
 		@Test void testPreprocessBodyParameters() {
@@ -85,9 +84,7 @@ final class ServerTest {
 							.method(POST)
 							.header("Content-Type", "application/x-www-form-urlencoded")
 							.body(text(), "one=1&two=2&two=2")
-					)
-
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+					).map(task(response -> Assertions.assertThat(response.status()).isEqualTo(OK)));
 		}
 
 		@Test void testPreprocessDontOverwriteExistingParameters() {
@@ -106,9 +103,7 @@ final class ServerTest {
 					.handle(new Request()
 							.method(Request.GET)
 							.query("one=1&two=2&two=2")
-							.parameter("existing", "true"))
-
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+							.parameter("existing", "true")).map(task(response1 -> Assertions.assertThat(response1.status()).isEqualTo(OK)));
 		}
 
 		@Test void testPreprocessQueryOnlyOnGET() {
@@ -124,9 +119,7 @@ final class ServerTest {
 
 					.handle(new Request()
 							.method(Request.PUT)
-							.query("one=1&two=2&two=2"))
-
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+							.query("one=1&two=2&two=2")).map(task(response1 -> Assertions.assertThat(response1.status()).isEqualTo(OK)));
 		}
 
 		@Test void testPreprocessBodyOnlyOnPOST() {
@@ -143,9 +136,7 @@ final class ServerTest {
 					.handle(new Request()
 							.method(Request.PUT)
 							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(text(), "one=1&two=2&two=2"))
-
-					.accept(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+							.body(text(), "one=1&two=2&two=2")).map(task(response1 -> Assertions.assertThat(response1.status()).isEqualTo(OK)));
 		}
 
 	}
@@ -157,12 +148,9 @@ final class ServerTest {
 
 					.wrap((Request request) -> { throw new UnsupportedOperationException("stray"); })
 
-					.handle(new Request())
-
-					.accept(response -> assertThat(response)
+					.handle(new Request()).map(task(response -> assertThat(response)
 							.hasStatus(InternalServerError)
-							.hasCause(UnsupportedOperationException.class)
-					)
+							.hasCause(UnsupportedOperationException.class)))
 
 			);
 		}

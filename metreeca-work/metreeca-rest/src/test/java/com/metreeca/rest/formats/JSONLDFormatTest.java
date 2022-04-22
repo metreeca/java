@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 
 import javax.json.Json;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Shape.required;
 import static com.metreeca.json.Values.*;
@@ -86,22 +87,16 @@ final class JSONLDFormatTest {
 		@Test void testReportMalformedPayload() {
 			exec(() -> request("{")
 
-					.map(this::response)
-
-					.accept(response -> assertThat(response)
-							.hasStatus(BadRequest)
-					)
+					.map(this::response).map(task(response -> assertThat(response)
+							.hasStatus(BadRequest)))
 			);
 		}
 
 		@Test void testReportInvalidPayload() {
 			exec(() -> request("{}")
 
-					.map(this::response)
-
-					.accept(response -> assertThat(response)
-							.hasStatus(UnprocessableEntity)
-					)
+					.map(this::response).map(task(response -> assertThat(response)
+							.hasStatus(UnprocessableEntity)))
 			);
 		}
 
@@ -143,14 +138,11 @@ final class JSONLDFormatTest {
 
 
 		@Test void testHandleGenericRequests() {
-			exec(() -> request().reply().map(this::response)
-
-					.accept(response -> assertThat(response)
-							.hasHeader("Content-Type", JSONFormat.MIME)
-							.hasBody(json(), json -> assertThat(json)
-									.doesNotHaveField("@context")
-							)
-					)
+			exec(() -> request().reply().map(this::response).map(task(response -> assertThat(response)
+					.hasHeader("Content-Type", JSONFormat.MIME)
+					.hasBody(json(), json -> assertThat(json)
+							.doesNotHaveField("@context")
+					)))
 
 			);
 		}
@@ -158,14 +150,11 @@ final class JSONLDFormatTest {
 		@Test void testHandlePlainJSONRequests() {
 			exec(() -> request()
 
-					.header("Accept", JSONFormat.MIME).reply().map(this::response)
-
-					.accept(response -> assertThat(response)
+					.header("Accept", JSONFormat.MIME).reply().map(this::response).map(task(response -> assertThat(response)
 							.hasHeader("Content-Type", JSONFormat.MIME)
 							.hasBody(json(), json -> assertThat(json)
 									.doesNotHaveField("@context")
-							)
-					)
+							)))
 
 			);
 		}
@@ -173,14 +162,11 @@ final class JSONLDFormatTest {
 		@Test void testHandleJSONLDRequests() {
 			exec(() -> request()
 
-					.header("Accept", MIME).reply().map(this::response)
-
-					.accept(response -> assertThat(response)
+					.header("Accept", MIME).reply().map(this::response).map(task(response -> assertThat(response)
 							.hasHeader("Content-Type", MIME)
 							.hasBody(json(), json -> assertThat(json)
 									.hasField("@context")
-							)
-					)
+							)))
 
 			);
 		}
@@ -192,9 +178,7 @@ final class JSONLDFormatTest {
 
 					.exec(() -> request()
 
-							.header("Accept", MIME).reply().map(this::response)
-
-							.accept(response -> assertThat(response)
+							.header("Accept", MIME).reply().map(this::response).map(task(response -> assertThat(response)
 
 									.hasHeader("Content-Type", MIME)
 
@@ -223,8 +207,7 @@ final class JSONLDFormatTest {
 
 											)
 
-									)
-							)
+									)))
 					)
 
 					.clear();
@@ -232,13 +215,10 @@ final class JSONLDFormatTest {
 
 
 		@Test void testTrimPayload() {
-			exec(() -> request().reply().map(this::response)
-
-					.accept(response -> assertThat(response)
-							.hasBody(json(), json -> assertThat(json)
-									.doesNotHaveField("outlier")
-							)
-					)
+			exec(() -> request().reply().map(this::response).map(task(response -> assertThat(response)
+					.hasBody(json(), json -> assertThat(json)
+							.doesNotHaveField("outlier")
+					)))
 
 			);
 		}
@@ -262,22 +242,17 @@ final class JSONLDFormatTest {
 										statement(item, direct, literal("ein", "de"))
 
 								)));
-					})
-
-					.accept(response -> assertThat(response)
+					}).map(task(response -> assertThat(response)
 							.hasBody(json(), json -> assertThat(json)
 									.hasField("direct", "one")
-							)
-					)
+							)))
 			);
 		}
 
 		@Test void testReportInvalidPayload() {
-			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 -> response(response1).body(jsonld(), frame(iri(response1.item()))))
-
-					.accept(response -> response.body(output()).accept(e -> { },
+			exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 -> response(response1).body(jsonld(), frame(iri(response1.item())))).map(task(response -> response.body(output()).accept(e -> { },
 							target -> target.accept(new ByteArrayOutputStream())
-					)))
+					))))
 
 			);
 

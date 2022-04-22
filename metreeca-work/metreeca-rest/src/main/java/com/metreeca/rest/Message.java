@@ -21,7 +21,8 @@ import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -62,25 +63,6 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
     private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Retrieves the focus item of this message.
-     *
-     * @return an absolute IRI identifying the focus item of this message
-     */
-    public abstract String item();
-
-    /**
-     * Retrieves the originating request for this message.
-     *
-     * @return the originating request for this message
-     */
-    public abstract Request request();
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Maps this message.
      *
@@ -100,21 +82,22 @@ public abstract class Message<T extends Message<T>> extends Setup<T> {
         return requireNonNull(mapper.apply(self()), "null mapper return value");
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * Process this message.
+     * Retrieves the focus item of this message.
      *
-     * @param consumer the message processing consumer
-     *
-     * @throws NullPointerException if {@code consumer} is null
+     * @return an absolute IRI identifying the focus item of this message
      */
-    public void accept(final Consumer<T> consumer) {
+    public abstract String item();
 
-        if ( consumer == null ) {
-            throw new NullPointerException("null consumer");
-        }
-
-        consumer.accept(self());
-    }
+    /**
+     * Retrieves the originating request for this message.
+     *
+     * @return the originating request for this message
+     */
+    public abstract Request request();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

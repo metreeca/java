@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.formats.MultipartFormat.multipart;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
@@ -153,10 +154,9 @@ final class MultipartFormatTest {
 
 							error -> {
 
-                                new Request().reply().map(error).accept(response -> ResponseAssert.assertThat(response)
-		                                .as("missing boundary parameter")
-		                                .hasStatus(Response.BadRequest)
-                                );
+								new Request().reply().map(error).map(task(response -> ResponseAssert.assertThat(response)
+										.as("missing boundary parameter")
+										.hasStatus(Response.BadRequest)));
 
 
 								return this;
@@ -182,39 +182,33 @@ final class MultipartFormatTest {
 					.body(multipart(), Map.ofEntries((Map.Entry<String, Message<?>>[])new Map.Entry[]{ Map.entry("one",
 							response1.part("one").body(text(), "one")), Map.entry("two",
 							response1.part("two").body(text(),
-									"two")) }))).accept(response -> MessageAssert.assertThat(response)
+									"two")) }))).map(task(response -> MessageAssert.assertThat(response)
 
 					.has(new Condition<>(
 							r -> r.header("Content-Type").filter(s -> s.contains("; boundary=")).isPresent(),
 							"multipart boundary set"
-					))
-
-			);
+					))));
 		}
 
 		@Test void testPreserveCustomBoundary() {
 			new Request().reply().map(response1 -> response1
 
-							.status(Response.OK)
-							.header("Content-Type", "multipart/form-data; boundary=1234567890")
-							.body(multipart(), Map.of()))
+					.status(Response.OK)
+					.header("Content-Type", "multipart/form-data; boundary=1234567890")
+					.body(multipart(), Map.of())).map(task(response -> MessageAssert.assertThat(response)
 
-					.accept(response -> MessageAssert.assertThat(response)
+					.hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
 
-							.hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
+					.hasBody(output(), target -> {
 
-							.hasBody(output(), target -> {
+						final ByteArrayOutputStream output=new ByteArrayOutputStream();
 
-								final ByteArrayOutputStream output=new ByteArrayOutputStream();
+						target.accept(output);
 
-								target.accept(output);
+						assertThat(new String(output.toByteArray(), UTF_8))
+								.contains("--1234567890--");
 
-								assertThat(new String(output.toByteArray(), UTF_8))
-										.contains("--1234567890--");
-
-							})
-
-					);
+					})));
 		}
 
 	}

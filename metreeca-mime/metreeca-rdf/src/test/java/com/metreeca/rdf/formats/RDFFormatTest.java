@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.Values.statement;
@@ -154,22 +155,19 @@ final class RDFFormatTest {
 		@Test void testConfigureWriterBaseIRI() {
 			exec(() -> new Request()
 
-                    .base("http://example.com/base/")
-                    .path("/").reply().map(response1 -> {
-                        return response1
-                                .status(Response.OK)
-                                .set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
-                                .body(rdf(), singletonList(statement(
-                                        iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
-                                                +".com/base/x")
-                                )));
-                    })
-
-                    .accept(response -> assertThat(response)
-                            .hasBody(text(), text -> assertThat(text)
-                                    .contains("@base <"+"http://example.com/base/"+">")
-                            )
-                    )
+					.base("http://example.com/base/")
+					.path("/").reply().map(response1 -> {
+						return response1
+								.status(Response.OK)
+								.set(shape(), field(LDP.CONTAINS, datatype(Values.IRIType)))
+								.body(rdf(), singletonList(statement(
+										iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
+												+".com/base/x")
+								)));
+					}).map(task(response -> assertThat(response)
+							.hasBody(text(), text -> assertThat(text)
+									.contains("@base <"+"http://example.com/base/"+">")
+							)))
             );
 		}
 

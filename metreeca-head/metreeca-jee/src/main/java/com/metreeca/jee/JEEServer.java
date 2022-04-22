@@ -94,43 +94,43 @@ public abstract class JEEServer implements Filter {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public void init(final FilterConfig config) {
+    @Override public void init(final FilterConfig config) {
 
-		final ServletContext context=config.getServletContext();
+	    final ServletContext context=config.getServletContext();
 
-		try {
+	    try {
 
-			toolbox
+		    toolbox
 
-					.set(Toolbox.storage(), () -> storage(context))
-					.set(Loader.loader(), () -> loader(context))
+				    .set(Toolbox.storage(), () -> storage(context))
+				    .set(Loader.loader(), () -> loader(context))
 
-					.get(delegate()); // force handler loading during filter initialization
+				    .get(delegate()); // force handler loading during filter initialization
 
-		} catch ( final Throwable t ) {
+	    } catch ( final Throwable t ) {
 
-			try ( final StringWriter message=new StringWriter() ) {
+		    try ( final StringWriter message=new StringWriter() ) {
 
-				t.printStackTrace(new PrintWriter(message));
+			    t.printStackTrace(new PrintWriter(message));
 
-				toolbox.get(logger()).error(this, "error during initialization: "+message);
+			    toolbox.get(logger()).error(this, "error during initialization: "+message);
 
-				context.log("error during initialization", t);
+			    context.log("error during initialization", t);
 
-				throw t;
+			    throw t;
 
-			} catch ( final IOException e ) {
+		    } catch ( final IOException e ) {
 
-				throw new UncheckedIOException(e);
+			    throw new UncheckedIOException(e);
 
-			} finally {
+		    } finally {
 
-				this.toolbox.clear();
+			    this.toolbox.clear();
 
-			}
+		    }
 
-		}
-	}
+	    }
+    }
 
 	@Override public void destroy() {
 
@@ -172,10 +172,9 @@ public abstract class JEEServer implements Filter {
 
 		try {
 
-			toolbox.exec(() -> toolbox.get(delegate())
-					.handle(request((HttpServletRequest)request))
-					.accept(_response -> response((HttpServletResponse)response, _response))
-			);
+			toolbox.exec(() -> response((HttpServletResponse)response,
+					toolbox.get(delegate()).handle(request((HttpServletRequest)request))
+			));
 
 			if ( !response.isCommitted() ) {
 				chain.doFilter(request, response);
@@ -230,7 +229,7 @@ public abstract class JEEServer implements Filter {
 	}
 
 	private void response(final HttpServletResponse http, final Response response) {
-		if ( response.status() > 0 ) { // unprocessed requests fall through the host container
+		if ( response.status() > 0 ) { // unprocessed requests fall through to the host container
 
 			http.setStatus(response.status());
 

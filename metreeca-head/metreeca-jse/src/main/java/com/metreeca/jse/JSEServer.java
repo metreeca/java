@@ -173,10 +173,9 @@ public final class JSEServer {
             server.createContext(path, exchange -> {
                 try {
 
-                    toolbox.exec(() -> handler.handle(request(exchange))
-                            .map(response -> response.status() > 0 ? response : response.status(NotFound))
-                            .accept(response -> response(exchange, response))
-                    );
+                    response(exchange, handler.handle(request(exchange)).map(response ->
+                            response.status() > 0 ? response : response.status(NotFound)
+                    ));
 
                 } catch ( final RuntimeException e ) {
 

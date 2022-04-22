@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 import javax.json.JsonValue;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.statement;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
@@ -142,93 +143,70 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAnonymousPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAuthenticatedGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json)
 								.satisfies(hasBooleanValue(true))
-						)
-				)
+						)))
 		);
 	}
 
 	@Test void testPrivateAuthenticatedPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json ->
-								JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))));
+								JSONAssert.assertThat(json).satisfies(hasBooleanValue(true))))));
 	}
 
 
 	@Test void testPublicAnonymousGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
-				));
+						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true))))));
 	}
 
 	@Test void testPublicAnonymousPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
-				));
+						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true))))));
 	}
 
 	@Test void testPublicAuthenticatedGETBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
-				));
+						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true))))));
 	}
 
 	@Test void testPublicAuthenticatedPOSTBooleanQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(bool())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(bool()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
-				));
+						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true))))));
 	}
 
 
@@ -237,96 +215,72 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAnonymousPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAuthenticatedGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 	@Test void testPrivateAuthenticatedPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 
 	@Test void testPublicAnonymousGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 	@Test void testPublicAnonymousPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 	@Test void testPublicAuthenticatedGETTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 	@Test void testPublicAuthenticatedPOSTTupleQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(tuple())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(tuple()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
-								RDF.REST)))
-				));
+								RDF.REST))))));
 	}
 
 
@@ -335,99 +289,75 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(get(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAnonymousPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(anonymous(post(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAuthenticatedGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(get(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
-						)
-				));
+						))));
 	}
 
 	@Test void testPrivateAuthenticatedPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _private(endpoint())
 
-				.handle(authenticated(post(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
-								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
-				));
+								.satisfies(hasObjects(RDF.FIRST, RDF.REST))))));
 	}
 
 
 	@Test void testPublicAnonymousGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(get(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
-								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
-				));
+								.satisfies(hasObjects(RDF.FIRST, RDF.REST))))));
 	}
 
 	@Test void testPublicAnonymousPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(anonymous(post(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
-								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
-				));
+								.satisfies(hasObjects(RDF.FIRST, RDF.REST))))));
 	}
 
 	@Test void testPublicAuthenticatedGETGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(get(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(get(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
-						)
-				));
+						))));
 	}
 
 	@Test void testPublicAuthenticatedPOSTGraphQuery() {
 		exec(model(asList(First, Rest)), () -> _public(endpoint())
 
-				.handle(authenticated(post(graph())))
-
-				.accept(response -> assertThat(response)
+				.handle(authenticated(post(graph()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(rdf(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
-						)
-				));
+						))));
 	}
 
 
@@ -436,31 +366,23 @@ final class SPARQLTest {
 	@Test void testPrivateAnonymousGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(anonymous(get(update())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(update()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAnonymousPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(anonymous(post(update())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(update()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPrivateAuthenticatedGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(get(update())))
-
-				.accept(response -> {
+				.handle(authenticated(get(update()))).map(task(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
@@ -468,15 +390,13 @@ final class SPARQLTest {
 
 					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
 
-				}));
+				})));
 	}
 
 	@Test void testPrivateAuthenticatedPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
-
-				.accept(response -> {
+				.handle(authenticated(post(update()))).map(task(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
@@ -484,38 +404,30 @@ final class SPARQLTest {
 
 					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
 
-				}));
+				})));
 	}
 
 
 	@Test void testPublicAnonymousGETUpdate() {
 		exec(model(singletonList(First)), () -> _public(endpoint())
 
-				.handle(anonymous(get(update())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(get(update()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPublicAnonymousPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _public(endpoint())
 
-				.handle(anonymous(post(update())))
-
-				.accept(response -> assertThat(response)
+				.handle(anonymous(post(update()))).map(task(response -> assertThat(response)
 						.hasStatus(Response.Unauthorized)
-						.doesNotHaveBody()
-				));
+						.doesNotHaveBody())));
 	}
 
 	@Test void testPublicAuthenticatedGETUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
-
-				.accept(response -> {
+				.handle(authenticated(post(update()))).map(task(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
@@ -523,15 +435,13 @@ final class SPARQLTest {
 
 					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
 
-				}));
+				})));
 	}
 
 	@Test void testPublicAuthenticatedPOSTUpdate() {
 		exec(model(singletonList(First)), () -> _private(endpoint())
 
-				.handle(authenticated(post(update())))
-
-				.accept(response -> {
+				.handle(authenticated(post(update()))).map(task(response -> {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
@@ -539,7 +449,7 @@ final class SPARQLTest {
 
 					assertThat(model()).satisfies(hasObjects(RDF.FIRST, RDF.REST));
 
-				}));
+				})));
 	}
 
 
@@ -549,21 +459,15 @@ final class SPARQLTest {
 	@Test void testGETNoAction() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(new Request())))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(get(new Request()))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 	@Test void testPOSTNoAction() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(new Request())))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(post(new Request()))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 
@@ -573,11 +477,8 @@ final class SPARQLTest {
 				.handle(authenticated(get(new Request())
 						.parameter("query", "query")
 						.parameter("update", "update")
-				))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				)).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 	@Test void testPOSTBothQueryAndUpdate() {
@@ -586,52 +487,37 @@ final class SPARQLTest {
 				.handle(authenticated(post(new Request())
 						.parameter("query", "query")
 						.parameter("update", "update")
-				))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				)).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 
 	@Test void testGETQueryMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(malformed("query"))))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(get(malformed("query")))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 	@Test void testPOSTQueryMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(malformed("query"))))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(post(malformed("query")))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 	@Test void testGETUpdateMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(get(malformed("update"))))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(get(malformed("update")))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 	@Test void testPOSTUpdateMalformed() {
 		exec(model(emptyList()), () -> _private(endpoint())
 
-				.handle(authenticated(post(malformed("update"))))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(Response.BadRequest)
-				));
+				.handle(authenticated(post(malformed("update")))).map(task(response -> assertThat(response)
+						.hasStatus(Response.BadRequest))));
 	}
 
 }

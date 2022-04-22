@@ -21,6 +21,7 @@ import com.metreeca.rest.Toolbox;
 
 import org.junit.jupiter.api.Test;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.ResponseAssert.assertThat;
@@ -60,11 +61,8 @@ final class PublisherTest {
 	@Test void testRejectUnsafeRequestsRequests() {
 		exec(() -> publisher(getClass().getResource("/"))
 
-				.handle(new Request().method(POST))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(MethodNotAllowed)
-				)
+				.handle(new Request().method(POST)).map(task(response -> assertThat(response)
+						.hasStatus(MethodNotAllowed)))
 		);
 	}
 

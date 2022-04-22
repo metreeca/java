@@ -22,6 +22,7 @@ import com.metreeca.rest.Request;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.json.shapes.Clazz.clazz;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.OK;
@@ -40,20 +41,17 @@ final class DriverTest {
 
 		driver(test)
 
-					.wrap(request -> {
+				.wrap(request -> {
 
 					assertThat(request)
 							.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(shape));
 
-						return request.reply(OK);
+					return request.reply(OK);
 
-					})
+				})
 
-				.handle(new Request())
-
-				.accept(response -> assertThat(response)
-							.hasStatus(OK)
-					);
-		}
+				.handle(new Request()).map(task(response -> assertThat(response)
+						.hasStatus(OK)));
+	}
 
 }

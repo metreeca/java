@@ -21,6 +21,7 @@ import com.metreeca.rest.Request;
 
 import org.junit.jupiter.api.Test;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.Response.MovedPermanently;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
@@ -41,12 +42,9 @@ final class ForwarderTest {
 				.handle(new Request()
 						.base("http://example.org/")
 						.path("/path")
-				)
-
-				.accept(response -> assertThat(response)
+				).map(task(response -> assertThat(response)
 						.hasStatus(MovedPermanently)
-						.hasHeader("Location", "https://example.com/path")
-				);
+						.hasHeader("Location", "https://example.com/path")));
 	}
 
 	@Test void testForward() {
@@ -55,12 +53,9 @@ final class ForwarderTest {
 				.handle(new Request()
 						.base("https://example.com/")
 						.path("/path")
-				)
-
-				.accept(response -> assertThat(response)
+				).map(task(response -> assertThat(response)
 						.hasStatus(OK)
-						.doesNotHaveHeader("Location")
-				);
+						.doesNotHaveHeader("Location")));
 	}
 
 }

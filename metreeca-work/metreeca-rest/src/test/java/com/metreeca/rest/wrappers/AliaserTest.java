@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 
@@ -54,12 +55,9 @@ final class AliaserTest {
 
 				.wrap((Request request) -> request.reply(OK))
 
-				.handle(request("/alias"))
-
-				.accept(response -> assertThat(response)
+				.handle(request("/alias")).map(task(response -> assertThat(response)
 						.hasStatus(Response.SeeOther)
-						.hasHeader("Location", "/canonical")
-				)
+						.hasHeader("Location", "/canonical")))
 		);
 	}
 
@@ -68,11 +66,8 @@ final class AliaserTest {
 
 				.wrap((Request request) -> request.reply(OK))
 
-				.handle(request("/alias"))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(OK)
-				)
+				.handle(request("/alias")).map(task(response -> assertThat(response)
+						.hasStatus(OK)))
 		);
 	}
 
@@ -81,11 +76,8 @@ final class AliaserTest {
 
 				.wrap((Request request) -> request.reply(OK))
 
-				.handle(request("/other"))
-
-				.accept(response -> assertThat(response)
-						.hasStatus(OK)
-				)
+				.handle(request("/other")).map(task(response -> assertThat(response)
+						.hasStatus(OK)))
 		);
 	}
 
