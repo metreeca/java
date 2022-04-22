@@ -25,7 +25,7 @@ import com.metreeca.json.Shape;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.rest.formats.JSONLDFormat.validate;

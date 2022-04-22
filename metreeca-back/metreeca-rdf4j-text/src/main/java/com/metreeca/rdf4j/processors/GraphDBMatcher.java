@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 import javax.json.Json;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.*;

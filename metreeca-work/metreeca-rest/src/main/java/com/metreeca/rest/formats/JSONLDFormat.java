@@ -31,7 +31,7 @@ import javax.json.*;
 
 import static com.metreeca.http.Either.Left;
 import static com.metreeca.http.Either.Right;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Trace.trace;
 import static com.metreeca.json.Values.format;

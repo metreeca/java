@@ -17,7 +17,7 @@
 
 package com.metreeca.rdf4j.actions;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.http.services.Logger.Level;
 import com.metreeca.rest.Xtream;
@@ -48,7 +48,7 @@ final class MicrodataTest {
 		final Logger logger=logger().get();
 		final AtomicReference<Level> status=new AtomicReference<>(Level.info);
 
-		new Toolbox()
+		new Locator()
 				.set(logger(), () -> new Logger() {
 					@Override public Logger entry(
 							final Level level, final Object source,

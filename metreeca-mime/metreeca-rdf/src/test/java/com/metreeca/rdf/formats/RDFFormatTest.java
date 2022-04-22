@@ -17,7 +17,7 @@
 package com.metreeca.rdf.formats;
 
 import com.metreeca.core.Feeds;
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.json.Values;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
@@ -54,7 +54,7 @@ import static java.util.Collections.singletonList;
 final class RDFFormatTest {
 
     private void exec(final Runnable... tasks) {
-        new Toolbox().exec(tasks).clear();
+        new Locator().exec(tasks).clear();
     }
 
 

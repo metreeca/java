@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 final class PublisherTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}

@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.services;
 
 
 import com.metreeca.core.Strings;
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.json.Frame;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.ModelAssert.assertThat;
 import static com.metreeca.json.Values.*;
@@ -66,7 +66,7 @@ public final class GraphTest {
 
 
 	public static void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.set(Graph.graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 				.exec(tasks)
 				.clear();

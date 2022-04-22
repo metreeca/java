@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest.formats.OutputFormat.output;
@@ -168,7 +168,7 @@ public final class Publisher extends Handler.Base {
             final String jar=path.substring(0, separator);
             final String entry=path.substring(separator+1);
 
-            // load the filesystem from the service toolbox to have it automatically closed
+            // load the filesystem from the service locator to have it automatically closed
             // !!! won't handle multiple publishers from the same filesystem
 
             final FileSystem filesystem=service(checked(() ->

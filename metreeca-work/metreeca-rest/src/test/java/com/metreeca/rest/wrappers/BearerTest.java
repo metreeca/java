@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.*;
 
 import org.junit.jupiter.api.Nested;
@@ -28,7 +28,7 @@ import java.util.Optional;
 final class BearerTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox().exec(tasks).clear();
+		new Locator().exec(tasks).clear();
 	}
 
 

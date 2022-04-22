@@ -26,7 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.parameters;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.Level.*;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.MessageException.status;

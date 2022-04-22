@@ -31,7 +31,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.*;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Frame.frame;

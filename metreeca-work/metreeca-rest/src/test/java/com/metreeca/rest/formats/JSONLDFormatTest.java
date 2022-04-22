@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 
@@ -62,7 +62,7 @@ final class JSONLDFormatTest {
 
 
     private void exec(final Runnable task) {
-        new Toolbox().exec(task).clear();
+        new Locator().exec(task).clear();
     }
 
 
@@ -189,7 +189,7 @@ final class JSONLDFormatTest {
         }
 
         @Test void testGenerateJSONLDContextObjects() {
-            new Toolbox()
+            new Locator()
 
                     .set(keywords(), () -> singletonMap("@id", "id"))
 

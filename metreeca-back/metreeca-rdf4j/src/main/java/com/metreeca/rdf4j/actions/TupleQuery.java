@@ -25,7 +25,7 @@ import org.eclipse.rdf4j.query.Operation;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.time;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;

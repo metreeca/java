@@ -17,7 +17,7 @@
 package com.metreeca.rest.actions;
 
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Xtream;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ import static java.util.stream.Collectors.toList;
 final class FillTest {
 
 	private void exec(final Runnable task) {
-		new Toolbox().exec(task).clear();
+        new Locator().exec(task).clear();
 	}
 
 

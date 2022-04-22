@@ -16,7 +16,7 @@
 
 package com.metreeca.jee;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.*;
 import com.metreeca.rest.services.Loader;
 
@@ -49,10 +49,12 @@ import static java.util.Objects.requireNonNull;
  *
  * <ul>
  *
- * <li>initializes and cleans the {@linkplain Toolbox toolbox} managing shared services required by resource handlers;
+ * <li>initializes and cleans the service {@linkplain Locator locator} managing shared services required by resource
+ * handlers;
  * </li>
  *
- * <li>intercepts HTTP requests and handles them using a {@linkplain Handler handler} loaded from the toolbox;</li>
+ * <li>intercepts HTTP requests and handles them using a {@linkplain Handler handler} loaded from the service locator;
+ * </li>
  *
  * <li>forwards HTTP requests to the enclosing web application if no response is committed by REST handlers.</li>
  *
@@ -65,7 +67,7 @@ public abstract class JEEServer implements Filter {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Toolbox toolbox=new Toolbox();
+	private final Locator locator=new Locator();
 
 
 	/**
@@ -81,13 +83,13 @@ public abstract class JEEServer implements Filter {
 	 *
 	 * @throws NullPointerException if {@code factory} is null or returns a null value
 	 */
-	protected JEEServer delegate(final Function<Toolbox, Handler> factory) {
+	protected JEEServer delegate(final Function<Locator, Handler> factory) {
 
 		if ( factory == null ) {
 			throw new NullPointerException("null factory");
 		}
 
-		toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
+		locator.set(delegate(), () -> requireNonNull(factory.apply(locator), "null handler"));
 
 		return this;
 	}
@@ -101,9 +103,9 @@ public abstract class JEEServer implements Filter {
 
 	    try {
 
-		    toolbox
+		    locator
 
-				    .set(Toolbox.storage(), () -> storage(context))
+				    .set(Locator.storage(), () -> storage(context))
 				    .set(Loader.loader(), () -> loader(context))
 
 				    .get(delegate()); // force handler loading during filter initialization
@@ -114,7 +116,7 @@ public abstract class JEEServer implements Filter {
 
 			    t.printStackTrace(new PrintWriter(message));
 
-			    toolbox.get(logger()).error(this, "error during initialization: "+message);
+			    locator.get(logger()).error(this, "error during initialization: "+message);
 
 			    context.log("error during initialization", t);
 
@@ -126,7 +128,7 @@ public abstract class JEEServer implements Filter {
 
 		    } finally {
 
-			    this.toolbox.clear();
+			    this.locator.clear();
 
 		    }
 
@@ -135,7 +137,7 @@ public abstract class JEEServer implements Filter {
 
 	@Override public void destroy() {
 
-		toolbox.clear();
+		locator.clear();
 
 	}
 
@@ -173,8 +175,8 @@ public abstract class JEEServer implements Filter {
 
 		try {
 
-			toolbox.exec(() -> response((HttpServletResponse)response,
-					toolbox.get(delegate()).handle(request((HttpServletRequest)request))
+			locator.exec(() -> response((HttpServletResponse)response,
+					locator.get(delegate()).handle(request((HttpServletRequest)request))
 			));
 
 			if ( !response.isCommitted() ) {
@@ -184,7 +186,7 @@ public abstract class JEEServer implements Filter {
 		} catch ( final RuntimeException e ) {
 
 			if ( !e.toString().toLowerCase(Locale.ROOT).contains("broken pipe") ) {
-				toolbox.get(logger()).error(this, "unhandled exception", e);
+				locator.get(logger()).error(this, "unhandled exception", e);
 			}
 
 		}

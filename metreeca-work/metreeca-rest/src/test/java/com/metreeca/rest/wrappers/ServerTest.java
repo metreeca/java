@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
 
 import org.assertj.core.api.Assertions;
@@ -47,7 +47,7 @@ final class ServerTest {
 
 
 		@Test void testPreprocessQueryParameters() {
-			new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
 					.wrap(request -> {
 
@@ -68,7 +68,7 @@ final class ServerTest {
 		}
 
 		@Test void testPreprocessBodyParameters() {
-			new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
 					.wrap(request -> {
 
@@ -91,7 +91,7 @@ final class ServerTest {
 		}
 
 		@Test void testPreprocessDontOverwriteExistingParameters() {
-			new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
 					.wrap(request -> {
 
@@ -112,7 +112,7 @@ final class ServerTest {
 		}
 
 		@Test void testPreprocessQueryOnlyOnGET() {
-			new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
 					.wrap(request -> {
 
@@ -130,7 +130,7 @@ final class ServerTest {
 		}
 
 		@Test void testPreprocessBodyOnlyOnPOST() {
-			new Toolbox().get(Server::server)
+			new Locator().get(Server::server)
 
 					.wrap(request -> {
 
@@ -153,7 +153,7 @@ final class ServerTest {
 	@Nested final class ErrorHandling {
 
 		@Test void testTrapStrayExceptions() {
-			new Toolbox().exec(() -> server()
+			new Locator().exec(() -> server()
 
 					.wrap((Request request) -> { throw new UnsupportedOperationException("stray"); })
 

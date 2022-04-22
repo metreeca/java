@@ -32,7 +32,7 @@ import java.util.function.Function;
 
 import static com.metreeca.core.Identifiers.encode;
 import static com.metreeca.core.Identifiers.md5;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.format;
 import static com.metreeca.json.Values.iri;

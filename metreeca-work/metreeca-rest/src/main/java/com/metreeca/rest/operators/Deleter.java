@@ -25,7 +25,7 @@ import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.json.Frame.frame;
 import static com.metreeca.json.Values.iri;
 import static com.metreeca.json.shapes.Guard.Delete;

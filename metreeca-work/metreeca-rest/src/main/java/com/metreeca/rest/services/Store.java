@@ -16,15 +16,15 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.metreeca.http.Toolbox.service;
-import static com.metreeca.http.Toolbox.storage;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Locator.storage;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.*;
@@ -103,11 +103,11 @@ public interface Store {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Storage blob store.
-	 *
-	 * <p>Stores data blobs in the {@code store} folder of the system file {@linkplain Toolbox#storage storage}.</p>
-	 */
+    /**
+     * Storage blob store.
+     *
+     * <p>Stores data blobs in the {@code store} folder of the system file {@linkplain Locator#storage storage}.</p>
+     */
 	public static class FileStore implements Store {
 
 		private final Path path=service(storage()).resolve("store");

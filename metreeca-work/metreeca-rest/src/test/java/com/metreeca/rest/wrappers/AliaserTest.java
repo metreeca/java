@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 
@@ -31,7 +31,7 @@ import static com.metreeca.rest.ResponseAssert.assertThat;
 final class AliaserTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}

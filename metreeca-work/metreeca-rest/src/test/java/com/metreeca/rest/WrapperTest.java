@@ -16,7 +16,7 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import static com.metreeca.rest.Wrapper.roles;
 final class WrapperTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}

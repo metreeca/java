@@ -22,7 +22,7 @@ import com.metreeca.rest.*;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 
 
 /**

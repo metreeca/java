@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.OutputFormat;
 
@@ -29,7 +29,7 @@ import static java.util.Collections.emptyList;
 final class ValidatorTest {
 
 	private void exec(final Runnable... tasks) {
-		new Toolbox()
+		new Locator()
 				.exec(tasks)
 				.clear();
 	}

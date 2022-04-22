@@ -16,7 +16,7 @@
 
 package com.metreeca.jse;
 
-import com.metreeca.http.Toolbox;
+import com.metreeca.http.Locator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
 
@@ -51,10 +51,11 @@ import static java.util.function.Function.identity;
  *
  * <ul>
  *
- * <li>initializes and cleans the {@linkplain Toolbox toolbox} managing shared services required by resource handlers;
+ * <li>initializes and cleans the service {@linkplain Locator toolbox} managing shared services required by resource
+ * handlers;
  * </li>
  *
- * <li>handles HTTP requests using a {@linkplain Handler handler} loaded from the toolbox.</li>
+ * <li>handles HTTP requests using a {@linkplain Handler handler} loaded from the service locator.</li>
  *
  * </ul>
  */
@@ -78,7 +79,7 @@ public final class JSEServer {
     private String base="";
     private String path="/";
 
-    private final Toolbox toolbox=new Toolbox();
+    private final Locator locator=new Locator();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,13 +148,13 @@ public final class JSEServer {
      *
      * @throws NullPointerException if {@code factory} is null or returns a null value
      */
-    public JSEServer delegate(final Function<Toolbox, Handler> factory) {
+    public JSEServer delegate(final Function<Locator, Handler> factory) {
 
         if ( factory == null ) {
             throw new NullPointerException("null handler factory");
         }
 
-        toolbox.set(delegate(), () -> requireNonNull(factory.apply(toolbox), "null handler"));
+        locator.set(delegate(), () -> requireNonNull(factory.apply(locator), "null handler"));
 
         return this;
     }
@@ -164,8 +165,8 @@ public final class JSEServer {
     public void start() {
         try {
 
-            final Handler handler=toolbox.get(delegate());
-            final Logger logger=toolbox.get(logger());
+            final Handler handler=locator.get(delegate());
+            final Logger logger=locator.get(logger());
 
             final HttpServer server=HttpServer.create(address, 0);
 
@@ -195,7 +196,7 @@ public final class JSEServer {
                     logger.error(this, "unhandled exception while stopping server", e);
                 }
 
-                try { toolbox.clear(); } catch ( final RuntimeException e ) {
+                try { locator.clear(); } catch ( final RuntimeException e ) {
                     logger.error(this, "unhandled exception while releasing resources", e);
                 }
 

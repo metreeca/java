@@ -37,7 +37,7 @@ import java.util.function.*;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.http.Toolbox.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
 import static com.metreeca.json.Values.*;
