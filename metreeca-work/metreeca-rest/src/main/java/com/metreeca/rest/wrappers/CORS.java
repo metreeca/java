@@ -34,20 +34,6 @@ import static java.lang.String.join;
  */
 public final class CORS implements Wrapper {
 
-	/**
-	 * Creates a CORS filter
-	 *
-	 * @return a new CORS filter
-	 */
-	public static CORS cors() {
-		return new CORS();
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private CORS() {}
-
 	// !!! https://www.html5rocks.com/static/images/cors_server_flowchart.png
 
 	@Override public Handler wrap(final Handler handler) {

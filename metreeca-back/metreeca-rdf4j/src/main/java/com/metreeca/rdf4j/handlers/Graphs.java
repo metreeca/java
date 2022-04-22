@@ -23,6 +23,7 @@ import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
 import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -46,7 +47,6 @@ import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.handlers.Router.router;
 
 import static java.lang.String.format;
 
@@ -82,7 +82,7 @@ public final class Graphs extends Endpoint<Graphs> {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Graphs() {
-        delegate(router()
+        delegate(new Router()
                 .get((request, next) -> get(request))
                 .put((request1, next) -> put(request1))
                 .delete((request2, next) -> delete(request2))

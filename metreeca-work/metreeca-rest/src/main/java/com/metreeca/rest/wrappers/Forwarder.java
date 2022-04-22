@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.rest.MessageException.status;
-import static com.metreeca.rest.Response.MovedPermanently;
 
 import static java.util.function.UnaryOperator.identity;
 
@@ -36,42 +35,24 @@ import static java.util.function.UnaryOperator.identity;
  */
 public final class Forwarder implements Wrapper {
 
-	/**
-	 * Creates a relocating preprocessor.
-	 *
-	 * @return a new relocating preprocessor redirecting requests with a {@link Response#MovedPermanently} status code
-	 */
-	public static Forwarder forwarder() {
-		return forwarder(MovedPermanently);
-	}
+	private final int status;
+
+	private Function<String, String> rewriter=identity();
+
 
 	/**
 	 * Creates a relocating preprocessor with a custom status code.
 	 *
 	 * @param status the status code to be used for relocation
 	 *
-	 * @return a new relocating preprocessor redirecting requests with the given {@code status} code
-	 *
 	 * @throws IllegalArgumentException if {@code status} is less than 100 or greater than 599
 	 */
-	public static Forwarder forwarder(final int status) {
+	public Forwarder(final int status) {
 
 		if ( status < 100 || status > 599 ) {
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
 		}
 
-		return new Forwarder(status);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private final int status;
-
-	private Function<String, String> rewriter=identity();
-
-
-	private Forwarder(final int status) {
 		this.status=status;
 	}
 

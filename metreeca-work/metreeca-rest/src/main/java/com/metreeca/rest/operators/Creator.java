@@ -91,24 +91,15 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class Creator extends Delegator {
 
-    /**
-     * Creates a resource creator with a UUID-based slug generator.
-     *
-     * @return a new resource creator
-     */
-    public static Creator creator() {
-        return new Creator();
-    }
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private Function<Request, String> slug=request -> md5();
 
 	private final Engine engine=service(engine());
 
 
-	private Creator() {
+	/**
+	 * Creates a resource creator with a UUID-based slug generator.
+	 */
+	public Creator() {
 		delegate(rewrite().wrap(create()).with( // rewrite immediately before handler, after custom wrappers
 				keeper(Create, Detail)
 		));

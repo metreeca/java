@@ -37,82 +37,78 @@ import static java.lang.String.format;
  */
 public final class Bearer implements Wrapper {
 
-	private static final Pattern BearerPattern=Pattern.compile("\\s*Bearer\\s*(?<token>\\S*)\\s*");
-
-	/**
-	 * Creates a key-based bearer token authenticator.
-	 *
-	 * @param key   the fixed key to be presented as bearer token; will match no request if empty
-	 * @param roles a collection of values uniquely identifying the roles to be {@linkplain Request#role(Object...)
-	 *              assigned} to the request user on successful {@code key} validation
-	 *
-	 * @return a new key-based bearer token authenticator
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains a {@code null} value
-	 */
-	public static Bearer bearer(final String key, final Object... roles) {
-
-		if ( key == null ) {
-			throw new NullPointerException("null key");
-		}
-
-		if ( roles == null || Stream.of(roles).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null roles");
-		}
-
-		return new Bearer(key.isEmpty()
-				? (token, request) -> Optional.empty()
-				: (token, request) -> token.equals(key) ? Optional.of(request.roles(roles)) : Optional.empty()
-		);
-	}
-
-	/**
-	 * Creates a bearer token authenticator.
-	 *
-	 * @param authenticator the delegated authentication service; takes as argument the bearer token presented with the
-	 *                      request and the request itself; returns an optional configured request on successful token
-	 *                      validation or an empty optional otherwise
-	 *
-	 * @return a new a bearer token authenticator
-	 *
-	 * @throws NullPointerException if {@code authenticator} is null
-	 */
-	public static Bearer bearer(final BiFunction<? super String, ? super Request, Optional<Request>> authenticator) {
-
-		if ( authenticator == null ) {
-			throw new NullPointerException("null authenticator");
-		}
-
-		return new Bearer(authenticator);
-	}
+    private static final Pattern BearerPattern=Pattern.compile("\\s*Bearer\\s*(?<token>\\S*)\\s*");
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final BiFunction<? super String, ? super Request, Optional<Request>> authenticator;
-
-
-	private Bearer(final BiFunction<? super String, ? super Request, Optional<Request>> authenticator) {
-		this.authenticator=authenticator;
-	}
+    private final BiFunction<? super String, ? super Request, Optional<Request>> authenticator;
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Creates a key-based bearer token authenticator.
+     *
+     * @param key   the fixed key to be presented as bearer token; will match no request if empty
+     * @param roles a collection of values uniquely identifying the roles to be {@linkplain Request#role(Object...)
+     *              assigned} to the request user on successful {@code key} validation
+     *
+     * @return a new key-based bearer token authenticator
+     *
+     * @throws NullPointerException if {@code roles} is null or contains a {@code null} value
+     */
+    public Bearer(final String key, final Object... roles) {
 
-	@Override public Handler wrap(final Handler handler) {
-		return handler
-				.with(challenger())
-				.with(authenticator());
-	}
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        if ( roles == null || Stream.of(roles).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null roles");
+        }
+
+        this.authenticator=key.isEmpty()
+                ? (token, request) -> Optional.empty()
+                : (token, request) -> token.equals(key) ? Optional.of(request.roles(roles)) : Optional.empty();
+
+    }
+
+    /**
+     * Creates a bearer token authenticator.
+     *
+     * @param authenticator the delegated authentication service; takes as argument the bearer token presented with the
+     *                      request and the request itself; returns an optional configured request on successful token
+     *                      validation or an empty optional otherwise
+     *
+     * @return a new a bearer token authenticator
+     *
+     * @throws NullPointerException if {@code authenticator} is null
+     */
+    public Bearer(final BiFunction<? super String, ? super Request, Optional<Request>> authenticator) {
+
+        if ( authenticator == null ) {
+            throw new NullPointerException("null authenticator");
+        }
+
+        this.authenticator=authenticator;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @return a wrapper adding authentication challenge to unauthorized responses, unless already provided by nested
-	 * authorization schemes
-	 */
-	private Wrapper challenger() {
+    @Override public Handler wrap(final Handler handler) {
+        return handler
+                .with(challenger())
+                .with(authenticator());
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return a wrapper adding authentication challenge to unauthorized responses, unless already provided by nested
+     * authorization schemes
+     */
+    private Wrapper challenger() {
 		return handler -> (request, next) -> handler.handle(request, next).map(response ->
                 response.status() == Response.Unauthorized && response.header("WWW-Authenticate").isEmpty()
                         ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
@@ -120,10 +116,10 @@ public final class Bearer implements Wrapper {
         );
 	}
 
-	/**
-	 * @return a wrapper managing token-based authentication
-	 */
-	private Wrapper authenticator() {
+    /**
+     * @return a wrapper managing token-based authentication
+     */
+    private Wrapper authenticator() {
         return handler -> (request, next) -> {
 
             // !!! handle token in form/query parameter (https://tools.ietf.org/html/rfc6750#section-2)
@@ -136,15 +132,15 @@ public final class Bearer implements Wrapper {
                     .filter(Matcher::matches)
                     .map(matcher -> matcher.group("token"))
 
-					// bearer token > authenticate
+                    // bearer token > authenticate
 
-					.map(token -> authenticator.apply(token, request)
+                    .map(token -> authenticator.apply(token, request)
 
                             // authenticated > handle request
 
                             .map(request1 -> handler.handle(request1, next))
 
-							// not authenticated > report error
+                            // not authenticated > report error
 
 							.orElseGet(() -> request.reply().map(response -> response
                                     .status(Response.Unauthorized)
@@ -157,7 +153,7 @@ public final class Bearer implements Wrapper {
                     // no bearer token > fall-through to other authorization schemes
 
                     .orElseGet(() -> handler.handle(request, next));
-		};
-	}
+        };
+    }
 
 }

@@ -33,7 +33,6 @@ import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.TextFormat.text;
-import static com.metreeca.rest.wrappers.Server.server;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -50,7 +49,7 @@ final class ServerTest {
 
 
         @Test void testPreprocessQueryParameters() {
-			new Locator().get(Server::server)
+			new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -73,7 +72,7 @@ final class ServerTest {
         }
 
         @Test void testPreprocessBodyParameters() {
-			new Locator().get(Server::server)
+			new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -96,7 +95,7 @@ final class ServerTest {
         }
 
         @Test void testPreprocessDontOverwriteExistingParameters() {
-			new Locator().get(Server::server)
+			new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -119,7 +118,7 @@ final class ServerTest {
         }
 
         @Test void testPreprocessQueryOnlyOnGET() {
-			new Locator().get(Server::server)
+			new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -139,7 +138,7 @@ final class ServerTest {
         }
 
         @Test void testPreprocessBodyOnlyOnPOST() {
-			new Locator().get(Server::server)
+			new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -164,7 +163,7 @@ final class ServerTest {
     @Nested final class ErrorHandling {
 
         @Test void testTrapStrayExceptions() {
-			new Locator().exec(() -> server()
+			new Locator().exec(() -> new Server()
 
                     .wrap((Request request, final Function<Request, Response> next) -> {
                         throw new UnsupportedOperationException("stray");

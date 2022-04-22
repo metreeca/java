@@ -54,21 +54,9 @@ public final class Server implements Wrapper {
     private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
 
 
-    /**
-     * Creates an API server.
-     *
-     * @return a new API server
-     */
-    public static Server server() {
-        return new Server();
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private final Logger logger=service(logger());
-
-    private Server() { }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

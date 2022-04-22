@@ -27,7 +27,7 @@ import static com.metreeca.rest.ResponseAssert.assertThat;
 
 final class ForwarderTest {
 
-    private final Handler relocator=Forwarder.forwarder()
+	private final Handler relocator=new Forwarder(MovedPermanently)
 
 			.rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
 			.rewrite("http:(.*)", "https:$1")

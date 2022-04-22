@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Resource aliaser.
  *
- * <p>Redirects request for alias resources to the canonical resource they {@linkplain #aliaser(Function) resolve}
+ * <p>Redirects request for alias resources to the canonical resource they {@linkplain #Aliaser(Function) resolve}
  * to.</p>
  *
  * <p>Empty or idempotent requests, that is requests whose {@link Request#item() focus item} is resolved to an empty
@@ -39,32 +39,27 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Aliaser implements Wrapper {
 
+	private final Function<Request, Optional<String>> resolver;
+
+
 	/**
 	 * Creates a resource aliaser.
 	 *
 	 * @param resolver the resource resolving function; takes as argument a request and returns the canonical IRI for
-	 *                 the aliased request {@linkplain Request#item() item}, if one was identified, or an empty
-	 *                 optional, otherwise
+	 *                   the
+	 *                 aliased request {@linkplain Request#item() item}, if one was identified, or an empty optional,
+	 *                 otherwise
 	 *
 	 * @return a new resource aliaser
 	 *
 	 * @throws NullPointerException if {@code resolver} is null or returns a null value
 	 */
-	public static Aliaser aliaser(final Function<Request, Optional<String>> resolver) {
+	public Aliaser(final Function<Request, Optional<String>> resolver) {
 
 		if ( resolver == null ) {
 			throw new NullPointerException("null resolver");
 		}
 
-		return new Aliaser(resolver);
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private final Function<Request, Optional<String>> resolver;
-
-
-	private Aliaser(final Function<Request, Optional<String>> resolver) {
 		this.resolver=resolver;
 	}
 

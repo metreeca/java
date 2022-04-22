@@ -31,7 +31,6 @@ import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
-import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.OperatorTest.exec;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +54,7 @@ final class CreatorTest {
 
 				},
 
-				() -> creator()
+                () -> new Creator()
 
 						.handle(new Request()
 										.set(shape(), shape)
@@ -63,19 +62,19 @@ final class CreatorTest {
 												.value(RDF.VALUE, focus)
 										),
 								Request::reply
-						)
+		                )
 
-						.map(response -> assertThat(response)
-								.hasStatus(Created)
-								.hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(or()))
-								.doesNotHaveBody(jsonld())
-						)
+		                .map(response -> assertThat(response)
+				                .hasStatus(Created)
+				                .hasAttribute(shape(), shape -> assertThat(shape).isEqualTo(or()))
+				                .doesNotHaveBody(jsonld())
+		                )
 
 		);
 	}
 
 	@Test void testReportClash() {
-		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> creator()
+		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> new Creator()
 
 				.handle(new Request()
 								.set(shape(), shape)

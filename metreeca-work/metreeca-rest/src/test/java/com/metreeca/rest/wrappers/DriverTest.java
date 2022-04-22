@@ -27,7 +27,6 @@ import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.JSONLDFormat.shape;
-import static com.metreeca.rest.wrappers.Driver.driver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +37,7 @@ final class DriverTest {
 
         final Shape test=clazz(RDF.NIL);
 
-        driver(test)
+        new Driver(test)
 
                 .wrap((request, next) -> {
 

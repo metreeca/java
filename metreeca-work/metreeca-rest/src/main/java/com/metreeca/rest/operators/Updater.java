@@ -77,22 +77,13 @@ import static com.metreeca.rest.services.Engine.engine;
  */
 public final class Updater extends Delegator {
 
-    /**
-     * Creates a resource updater.
-     *
-     * @return a new resource updater
-     */
-    public static Updater updater() {
-        return new Updater();
-    }
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private final Engine engine=service(engine());
 
 
-	private Updater() {
+	/**
+	 * Creates a resource updater.
+	 */
+	public Updater() {
 		delegate(update().with(
 				keeper(Update, Detail)
 		));
