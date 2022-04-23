@@ -41,7 +41,7 @@ import static java.util.Arrays.asList;
      *             the request
      *
      * @return a conditional handler that routes requests and responses to the {@code pass} handler if the {@code test}
-     * predicate evaluates to {@code true} on the request or to a dummy handler otherwise
+     * predicate evaluates to {@code true} on the request or falls through to the processing pipeline otherwise
      *
      * @throws NullPointerException if either {@code test} or {@code pass} is null
      */
@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
             throw new NullPointerException("null pass handler");
         }
 
-        return handler(test, pass, (request, next) -> request.reply().map(response -> response));
+        return handler(test, pass, (request, forward) -> forward.apply(request));
     }
 
     /**

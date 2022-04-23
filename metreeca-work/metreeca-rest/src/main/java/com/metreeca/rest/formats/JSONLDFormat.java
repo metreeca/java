@@ -96,7 +96,7 @@ public final class JSONLDFormat extends Format<Frame> {
             throw new NullPointerException("null message");
         }
 
-        return message.attribute(Shape.class).orElseGet(Or::or);
+        return message.payload(Shape.class).orElseGet(Or::or);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class JSONLDFormat extends Format<Frame> {
             throw new NullPointerException("null shape");
         }
 
-        return message.attribute(Shape.class, shape);
+        return message.payload(Shape.class, shape);
     }
 
 

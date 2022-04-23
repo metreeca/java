@@ -81,7 +81,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		actual.attribute(key).ifPresentOrElse(assertions, () ->
+		actual.payload(key).ifPresentOrElse(assertions, () ->
 				failWithMessage("expected message to have <%s> attribute", key)
 		);
 

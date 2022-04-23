@@ -338,7 +338,7 @@ public final class Router implements Handler {
 
 		return (request, forward) -> {
 
-			final String head=request.attribute(RoutingPrefix).orElse("");
+			final String head=request.payload(RoutingPrefix).orElse("");
 			final String tail=request.path().substring(head.length());
 
 			return Optional.of(pattern.matcher(tail))
@@ -349,7 +349,7 @@ public final class Router implements Handler {
 
 						keys.forEach(key -> request.parameter(key, URLDecoder.decode(matcher.group(key), UTF_8)));
 
-						return handler.handle(request.attribute(RoutingPrefix, head+matcher.group(1)), forward);
+						return handler.handle(request.payload(RoutingPrefix, head+matcher.group(1)), forward);
 
 					})
 

@@ -40,14 +40,7 @@ final class MessageTest {
 	}
 
 
-	@Nested final class Headers {
-
-		@Test void testHeadersNormalizeHeaderNames() {
-			assertThat(message()
-					.headers("TEST-header", "value")
-			)
-					.hasHeader("TEST-Header");
-		}
+	@Nested final class HeadersTest {
 
 		@Test void testHeadersIgnoreHeaderCase() {
 			assertThat(message()
@@ -73,7 +66,7 @@ final class MessageTest {
 
 	}
 
-	@Nested final class Body {
+	@Nested final class BodyTest {
 
 		@Test void testBodyCaching() {
 

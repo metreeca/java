@@ -62,9 +62,8 @@ public abstract class Message<T extends Message<T>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final Map<Object, Object> attributes=new HashMap<>();
     private final Map<String, String> headers=new LinkedHashMap<>();
-    private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
+    private final Map<Object, Object> payload=new HashMap<>();
 
 
     Message() { }
@@ -129,97 +128,6 @@ public abstract class Message<T extends Message<T>> {
                 .map(matcher -> Charset.forName(matcher.group("charset")))
 
                 .orElse(UTF_8);
-    }
-
-
-    //// Attributes ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Retrieves an attribute.
-     *
-     * @param key the key of the attribute to be retrieved
-     * @param <V> the expected type of the attribute value
-     *
-     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
-     *
-     * @throws NullPointerException if {@code key} is null
-     */
-    public <V> Optional<V> attribute(final Class<V> key) {
-
-        if ( key == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return attribute(entry(key, key.getName()));
-    }
-
-    /**
-     * Configures an attribute.
-     *
-     * @param key   the key of the attribute to be configured
-     * @param value the (possibly null) value of the attribute
-     * @param <V>   the type of the attribute {@code value}
-     *
-     * @return this message
-     *
-     * @throws NullPointerException if {@code key} is null
-     */
-    public <V> T attribute(final Class<V> key, final V value) {
-
-        if ( key == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return attribute(entry(key, key.getName()), value);
-    }
-
-
-    /**
-     * Retrieves an attribute.
-     *
-     * @param key the qualified key of the attribute to be retrieved
-     * @param <V> the expected type of the attribute value
-     *
-     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
-     *
-     * @throws NullPointerException if {@code key} is null or contains null values
-     */
-    public <V> Optional<V> attribute(final Entry<Class<V>, String> key) {
-
-        if ( key == null || key.getKey() == null || key.getValue() == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return Optional.ofNullable(attributes.get(key)).map(value -> key.getKey().cast(value));
-    }
-
-    /**
-     * Configures an attribute.
-     *
-     * @param key   the qualified key of the attribute to be configured
-     * @param value the (possibly null) value of the attribute
-     * @param <V>   the type of the attribute {@code value}
-     *
-     * @return this message
-     *
-     * @throws NullPointerException if {@code key} is null or contains null values
-     */
-    public <V> T attribute(final Entry<Class<V>, String> key, final V value) {
-
-        if ( key == null || key.getKey() == null || key.getValue() == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        if ( value == null ) {
-
-            attributes.remove(key);
-
-        } else {
-
-            attributes.put(key, value);
-        }
-
-        return self();
     }
 
 
@@ -418,7 +326,101 @@ public abstract class Message<T extends Message<T>> {
     }
 
 
+    //// Payload ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> Optional<V> payload(final Class<V> key) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return payload(entry(key, key.getName()));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> T payload(final Class<V> key, final V value) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return payload(entry(key, key.getName()), value);
+    }
+
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the qualified key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> Optional<V> payload(final Entry<Class<V>, String> key) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return Optional.ofNullable(payload.get(key)).map(value -> key.getKey().cast(value));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the qualified key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> T payload(final Entry<Class<V>, String> key, final V value) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        if ( value == null ) {
+
+            payload.remove(key);
+
+        } else {
+
+            payload.put(key, value);
+        }
+
+        return self();
+    }
+
+
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
+
 
     /**
      * Decodes message body.
