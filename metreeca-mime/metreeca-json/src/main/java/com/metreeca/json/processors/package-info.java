@@ -15,7 +15,7 @@
  */
 
 /**
- * JSON payloads.
+ * JSON data processors.
  */
 
-package com.metreeca.json;
+package com.metreeca.json.processors;
