@@ -48,9 +48,8 @@ import static java.util.stream.Collectors.joining;
  */
 public abstract class Message<T extends Message<T>> {
 
-    private static final String SetCookie=normalize("Set-Cookie");
-
     private static final Pattern SplitPattern=Pattern.compile("\\s*,\\s*");
+    private static final Pattern ExpiresPattern=Pattern.compile("(?i)\\bExpires\\b");
     private static final Pattern CharsetPattern=Pattern.compile(";\\s*charset\\s*=\\s*(?<charset>[-\\w]+)\\b");
 
 
@@ -120,9 +119,7 @@ public abstract class Message<T extends Message<T>> {
     public String charset() {
         return header("Content-Type")
 
-                .map(CharsetPattern::matcher)
-                .filter(Matcher::find)
-                .map(matcher -> matcher.group("charset"))
+                .map(CharsetPattern::matcher).filter(Matcher::find).map(matcher -> matcher.group("charset"))
 
                 .orElse(UTF_8.name());
     }
@@ -234,24 +231,22 @@ public abstract class Message<T extends Message<T>> {
      * Configures header values.
      *
      * <p><strong>Warning</strong> / The {@code Expires} attribute of the {@code Set-Cookie} header is not compliant
-     * with combined multiple header value as specified by RFC 7230 and will cause an exception to be thrown: replace its
-     * usages with {@code Max-Age} attributes.</p>
+     * with comma-combined multiple header values as specified by RFC 7230 and will be rejected with an exception:
+     * replace its usages with {@code Max-Age} attributes.</p>
      *
      * @param headers the new header values; blank values are ignored
      *
      * @return this message
      *
      * @throws NullPointerException     if {@code headers} is null or contains null values
-     * @throws IllegalArgumentException if {@code headers} includes a {@code Set-Cookie} with a value containing a comma
-     *                                  ('{@code ,}')
+     * @throws IllegalArgumentException if {@code headers} includes a {@code Set-Cookie} value containing an {@code
+     *                                  Expires} attribute
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
     public T headers(final Map<String, String> headers) {
 
-        if ( headers == null || headers.entrySet().stream().anyMatch(entry ->
-                isNull(entry.getKey()) || isNull(entry.getValue())
-        ) ) {
+        if ( headers == null || headers.entrySet().stream().anyMatch(entry -> isNull(entry.getKey()) || isNull(entry.getValue())) ) {
             throw new NullPointerException("null headers");
         }
 
@@ -287,8 +282,8 @@ public abstract class Message<T extends Message<T>> {
      * <p>Provided values are combined by joining them with a comma ('{@code ,}').</p>
      *
      * <p><strong>Warning</strong> / The {@code Expires} attribute of the {@code Set-Cookie} header is not compliant
-     * with combined multiple header value as specified by RFC 7230 and will cause an exception to be thrown: replace its
-     * usages with {@code Max-Age} attributes.</p>
+     * with comma-combined multiple header values as specified by RFC 7230 and will be rejected with an exception:
+     * replace its usages with {@code Max-Age} attributes.</p>
      *
      * @param name   the name of the header whose values are to be appended
      * @param values the new values for {@code name}; blank values are ignored; empty arrays cause the header to be
@@ -298,8 +293,8 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException     if either {@code name} or {@code values} is null or {@code values} contains null
      *                                  items
-     * @throws IllegalArgumentException if {@code name} is {@code Set-Cookie} and {@code values} contains a value
-     *                                  containing a comma ('{@code ,}')
+     * @throws IllegalArgumentException if {@code name} is {@code Set-Cookie} and {@code values} includes a value
+     *                                  containing an {@code Expires} attribute
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
@@ -374,8 +369,8 @@ public abstract class Message<T extends Message<T>> {
      * Configures header value.
      *
      * <p><strong>Warning</strong> / The {@code Expires} attribute of the {@code Set-Cookie} header is not compliant
-     * with combined multiple header value as specified by RFC 7230 and will cause an exception to be thrown: replace its
-     * usages with {@code Max-Age} attributes.</p>
+     * with comma-combined multiple header values as specified by RFC 7230 and will be rejected with an exception:
+     * replace its usages with {@code Max-Age} attributes.</p>
      *
      * @param name  the name of the header whose value is to be configured
      * @param value the new value for {@code name}; blank values cause the header to be removed
@@ -383,8 +378,8 @@ public abstract class Message<T extends Message<T>> {
      * @return this message
      *
      * @throws NullPointerException     if either {@code name} or {@code value} is null
-     * @throws IllegalArgumentException if {@code name} is {@code Set-Cookie} and {@code value} includes a value
-     *                                  containing a comma ('{@code ,}')
+     * @throws IllegalArgumentException if {@code name} is {@code Set-Cookie} and {@code value} contains an {@code
+     *                                  Expires} attribute
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
@@ -398,19 +393,17 @@ public abstract class Message<T extends Message<T>> {
             throw new NullPointerException("null value");
         }
 
-        final String normalized=normalize(name);
-
-        if ( normalized.equals(SetCookie) && value.contains(",") ) {
-            throw new IllegalArgumentException("null values");
+        if ( name.equalsIgnoreCase("Set-Cookie") && ExpiresPattern.matcher(value).find() ) {
+            throw new IllegalArgumentException("<Set-Cookie> header includes <Expires> attribute");
         }
 
         if ( value.isBlank() ) {
 
-            headers.remove(normalized);
+            headers.remove(normalize(name));
 
         } else {
 
-            headers.put(normalized, value);
+            headers.put(normalize(name), value);
 
         }
 
@@ -431,8 +424,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if {@code format} is null
      */
-    @SuppressWarnings("unchecked")
-    public <V> Either<MessageException, V> body(final Format<V> format) {
+    @SuppressWarnings("unchecked") public <V> Either<MessageException, V> body(final Format<V> format) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -493,8 +485,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if either {@code name} or {@code value} is null
      */
-    @SuppressWarnings("unchecked")
-    public <V> T map(final Format<? super V> format, final UnaryOperator<V> mapper) {
+    @SuppressWarnings("unchecked") public <V> T map(final Format<? super V> format, final UnaryOperator<V> mapper) {
 
         if ( format == null ) {
             throw new NullPointerException("null format");
