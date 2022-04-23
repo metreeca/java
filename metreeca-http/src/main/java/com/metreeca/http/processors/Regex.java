@@ -1,4 +1,4 @@
-package com.metreeca.rest.processors;
+package com.metreeca.http.processors;
 
 import com.metreeca.core.Xtream;
 

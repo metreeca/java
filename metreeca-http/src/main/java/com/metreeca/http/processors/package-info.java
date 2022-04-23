@@ -18,4 +18,4 @@
  * Basic data processors.
  */
 
-package com.metreeca.rest.processors;
+package com.metreeca.http.processors;

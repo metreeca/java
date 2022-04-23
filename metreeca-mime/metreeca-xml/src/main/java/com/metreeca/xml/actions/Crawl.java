@@ -17,10 +17,10 @@
 package com.metreeca.xml.actions;
 
 import com.metreeca.core.Xtream;
+import com.metreeca.http.processors.Regex;
 import com.metreeca.rest.Message;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.actions.*;
-import com.metreeca.rest.processors.Regex;
 import com.metreeca.xml.formats.HTMLFormat;
 import com.metreeca.xml.processors.XPath;
 
