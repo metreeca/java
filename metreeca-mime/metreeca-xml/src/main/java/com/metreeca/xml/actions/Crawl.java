@@ -20,7 +20,9 @@ import com.metreeca.core.Xtream;
 import com.metreeca.rest.Message;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.actions.*;
+import com.metreeca.rest.processors.Regex;
 import com.metreeca.xml.formats.HTMLFormat;
+import com.metreeca.xml.processors.XPath;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -46,236 +48,236 @@ import static java.lang.Runtime.getRuntime;
  */
 public final class Crawl implements Function<String, Stream<String>> {
 
-	// !!! inline after linking context to threads in the execution service
-
-	private final Function<String, Optional<Request>> head=new Query(request -> request.method(HEAD));
-	private final Function<String, Optional<Request>> get=new Query();
+    // !!! inline after linking context to threads in the execution service
+
+    private final Function<String, Optional<Request>> head=new Query(request -> request.method(HEAD));
+    private final Function<String, Optional<Request>> get=new Query();
 
-	private final Function<Message<?>, Optional<Document>> parse=new Parse<>(html()); // !!! support xhtml
+    private final Function<Message<?>, Optional<Document>> parse=new Parse<>(html()); // !!! support xhtml
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// !!! honour robots.txt
-	// !!! session state
+    // !!! honour robots.txt
+    // !!! session state
 
 
-	private int threads;
+    private int threads;
 
-	private Fetch fetch=new Fetch();
-
-	private Function<? super Node, Optional<Node>> focus=Optional::of;
-	private BiPredicate<String, String> prune=(root, link) -> true;
+    private Fetch fetch=new Fetch();
+
+    private Function<? super Node, Optional<Node>> focus=Optional::of;
+    private BiPredicate<String, String> prune=(root, link) -> true;
 
 
-	/**
-	 * Configures the number of concurrent requests (defaults to the number of processors)
-	 *
-	 * @param threads the maximum number of concurrent resource fetches; equivalent to the number of system
-	 *                processors if equal to zero
-	 *
-	 * @return this action
-	 *
-	 * @throws IllegalArgumentException if {@code threads} is negative
-	 */
-	public Crawl threads(final int threads) {
+    /**
+     * Configures the number of concurrent requests (defaults to the number of processors)
+     *
+     * @param threads the maximum number of concurrent resource fetches; equivalent to the number of system processors if
+     *                equal to zero
+     *
+     * @return this action
+     *
+     * @throws IllegalArgumentException if {@code threads} is negative
+     */
+    public Crawl threads(final int threads) {
 
-		if ( threads < 0 ) {
-			throw new IllegalArgumentException("negative thread count");
-		}
+        if ( threads < 0 ) {
+            throw new IllegalArgumentException("negative thread count");
+        }
 
-		this.threads=threads;
+        this.threads=threads;
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Configures the fetch action (defaults to {@link Fetch}.
-	 *
-	 * @param fetch the action used to fetch pages
-	 *
-	 * @return this action
-	 *
-	 * @throws NullPointerException if {@code fetch} is null
-	 */
-	public Crawl fetch(final Fetch fetch) {
+    /**
+     * Configures the fetch action (defaults to {@link Fetch}.
+     *
+     * @param fetch the action used to fetch pages
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code fetch} is null
+     */
+    public Crawl fetch(final Fetch fetch) {
 
-		if ( fetch == null ) {
-			throw new NullPointerException("null fetch");
-		}
+        if ( fetch == null ) {
+            throw new NullPointerException("null fetch");
+        }
 
-		this.fetch=fetch;
+        this.fetch=fetch;
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Configures the content focus action (defaults to the identity function).
-	 *
-	 * @param focus a function taking as argument an element and returning an optional partial/restructured focus
-	 *              element, if one was identified, or an empty optional, otherwise
-	 *
-	 * @return this action
-	 *
-	 * @throws NullPointerException if {@code focus} is null
-	 */
-	public Crawl focus(final Function<? super Node, Optional<Node>> focus) {
+    /**
+     * Configures the content focus action (defaults to the identity function).
+     *
+     * @param focus a function taking as argument an element and returning an optional partial/restructured focus
+     *              element, if one was identified, or an empty optional, otherwise
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code focus} is null
+     */
+    public Crawl focus(final Function<? super Node, Optional<Node>> focus) {
 
-		if ( focus == null ) {
-			throw new NullPointerException("null focus");
-		}
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
 
-		this.focus=focus;
+        this.focus=focus;
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Configures the prune action (defaults to always pass).
-	 *
-	 * @param prune a bi-predicate taking as arguments the site root URL and a link URL and returning {@code true} if
-	 *              the link targets a site page or {@code false} otherwise
-	 *
-	 * @return this action
-	 *
-	 * @throws NullPointerException if {@code prune} is null
-	 */
-	public Crawl prune(final BiPredicate<String, String> prune) {
+    /**
+     * Configures the prune action (defaults to always pass).
+     *
+     * @param prune a bi-predicate taking as arguments the site root URL and a link URL and returning {@code true} if the
+     *              link targets a site page or {@code false} otherwise
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code prune} is null
+     */
+    public Crawl prune(final BiPredicate<String, String> prune) {
 
-		if ( prune == null ) {
-			throw new NullPointerException("null prune");
-		}
+        if ( prune == null ) {
+            throw new NullPointerException("null prune");
+        }
 
-		this.prune=prune;
+        this.prune=prune;
 
-		return this;
-	}
+        return this;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Crawls a site.
-	 *
-	 * @param root the root URL of the site to be crawled
-	 *
-	 * @return a stream of links to nested HTML pages reachable from the root {@code root}; empty if {@code root} is
-	 * null or empty
-	 */
-	@Override public Stream<String> apply(final String root) {
-		return root == null || root.isEmpty() ? Stream.empty() : new Crawler(root).crawl();
-	}
+    /**
+     * Crawls a site.
+     *
+     * @param root the root URL of the site to be crawled
+     *
+     * @return a stream of links to nested HTML pages reachable from the root {@code root}; empty if {@code root} is null
+     * or empty
+     */
+    @Override public Stream<String> apply(final String root) {
+        return root == null || root.isEmpty() ? Stream.empty() : new Crawler(root).crawl();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final class Crawler {
+    private final class Crawler {
 
-		private final String root;
-		private final Map<String, Boolean> pages=new ConcurrentHashMap<>();
+        private final String root;
+        private final Map<String, Boolean> pages=new ConcurrentHashMap<>();
 
-		private final Phaser phaser=new Phaser(); // !!! handle 65k limit with tiered phasers
-		private final ExecutorService executor=Executors.newFixedThreadPool(
-				threads > 0 ? threads : getRuntime().availableProcessors()
-				// !!! custom thread factory for linking context
-		);
+        private final Phaser phaser=new Phaser(); // !!! handle 65k limit with tiered phasers
+        private final ExecutorService executor=Executors.newFixedThreadPool(
+                threads > 0 ? threads : getRuntime().availableProcessors()
+                // !!! custom thread factory for linking context
+        );
 
 
-		private Crawler(final String root) {
-			this.root=root;
-		}
+        private Crawler(final String root) {
+            this.root=root;
+        }
 
 
-		private Stream<String> crawl() {
-			try {
+        private Stream<String> crawl() {
+            try {
 
-				phaser.register();
+                phaser.register();
 
-				crawl(root);
+                crawl(root);
 
-				phaser.arriveAndAwaitAdvance();
+                phaser.arriveAndAwaitAdvance();
 
-				return pages
-						.entrySet().stream()
-						.filter(Map.Entry::getValue)
-						.map(Map.Entry::getKey);
+                return pages
+                        .entrySet().stream()
+                        .filter(Map.Entry::getValue)
+                        .map(Map.Entry::getKey);
 
 
-			} finally {
+            } finally {
 
-				executor.shutdown();
+                executor.shutdown();
 
-			}
-		}
+            }
+        }
 
 
-		private void crawl(final String page) {
-			if ( pages.putIfAbsent(page, false) == null ) { // mark as pending
+        private void crawl(final String page) {
+            if ( pages.putIfAbsent(page, false) == null ) { // mark as pending
 
-				phaser.register();
+                phaser.register();
 
-				executor.execute(() -> {
-					try {
+                executor.execute(() -> {
+                    try {
 
-						Xtream
+                        Xtream
 
-								.of(page)
+                                .of(page)
 
-								.filter(link -> Xtream.of(link)
+                                .filter(link -> Xtream.of(link)
 
-										.optMap(head)
-										.optMap(fetch)
+                                        .optMap(head)
+                                        .optMap(fetch)
 
-										.anyMatch(response -> response
-												.header("Content-Type")
-												.filter(HTMLFormat.MIMEPattern.asPredicate())
-												.isPresent()
-										)
+                                        .anyMatch(response -> response
+                                                .header("Content-Type")
+                                                .filter(HTMLFormat.MIMEPattern.asPredicate())
+                                                .isPresent()
+                                        )
 
-								)
+                                )
 
-								.optMap(get)
-								.optMap(fetch)
+                                .optMap(get)
+                                .optMap(fetch)
 
-								.optMap(parse)
-								.optMap(focus)
+                                .optMap(parse)
+                                .optMap(focus)
 
-								.peek(node -> pages.put(page, true)) // successfully processed
+                                .peek(node -> pages.put(page, true)) // successfully processed
 
-								.flatMap(new XPath<>(p -> p.links("//html:a/@href")))
+                                .map(XPath::new).flatMap(xpath -> xpath.links("//html:a/@href"))
 
-								.map(new Regex<>(r -> r.replace("#.*$", ""))) // remove anchor
-								.map(new Regex<>(r1 -> r1.replace("\\?.*$", ""))) // remove query // !!! ?
+                                .map(Regex::new).map(regex -> regex.replace("#.*$", "")) // remove anchor
+                                .map(Regex::new).map(regex -> regex.replace("\\?.*$", "")) // remove query // !!! ?
 
-								.filter(link -> { // keep only nested resources
-									try {
+                                .filter(link -> { // keep only nested resources
+                                    try {
 
-										final URI origin=new URI(root).normalize();
-										final URI target=new URI(link).normalize();
+                                        final URI origin=new URI(root).normalize();
+                                        final URI target=new URI(link).normalize();
 
-										return !origin.relativize(target).equals(target);
+                                        return !origin.relativize(target).equals(target);
 
-									} catch ( final URISyntaxException e ) {
+                                    } catch ( final URISyntaxException e ) {
 
-										return false;
+                                        return false;
 
-									}
-								})
+                                    }
+                                })
 
-								.filter(link -> prune.test(root, link))
+                                .filter(link -> prune.test(root, link))
 
-								.forEach(this::crawl);
+                                .forEach(this::crawl);
 
-					} finally {
+                    } finally {
 
-						phaser.arrive();
+                        phaser.arrive();
 
-					}
-				});
+                    }
+                });
 
-			}
-		}
+            }
+        }
 
-	}
+    }
 
 }

@@ -14,43 +14,42 @@
  * limitations under the License.
  */
 
-package com.metreeca.xml.actions;
+package com.metreeca.xml.processors;
 
 import com.metreeca.core.Xtream;
 import com.metreeca.rest.Either;
 import com.metreeca.xml.formats.XMLFormat;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static com.metreeca.xml.actions.XPath.decode;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.metreeca.xml.processors.XPath.decode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 final class XPathTest {
 
-	@Test void testDecodeNumericEntities() {
-		assertThat(decode("Italy&#x2019;s &#8220;most powerful&#8221; car"))
-				.isEqualTo("Italy’s “most powerful” car");
-	}
+    @Test void testDecodeNumericEntities() {
+        Assertions.assertThat(decode("Italy&#x2019;s &#8220;most powerful&#8221; car"))
+                .isEqualTo("Italy’s “most powerful” car");
+    }
 
-	@Test void testUseEnclosingNamespaces() {
-		assertThat(Xtream
+    @Test void testUseEnclosingNamespaces() {
+        Assertions.assertThat(Xtream
 
-				.of("<ns:x xmlns:ns='http://example.com/o'><ns:y><ns:z>text</ns:z></ns:y></ns:x>")
+                .of("<ns:x xmlns:ns='http://example.com/o'><ns:y><ns:z>text</ns:z></ns:y></ns:x>")
 
-				.map(x -> XMLFormat.xml(new ByteArrayInputStream(x.getBytes(UTF_8))))
+                .map(x -> XMLFormat.xml(new ByteArrayInputStream(x.getBytes(UTF_8))))
 
-				.optMap(Either::get)
+                .optMap(Either::get)
 
-				.flatMap(new XPath<>(m -> m.nodes("//ns:y")))
-				.flatMap(new XPath<>(m1 -> m1.strings("//ns:z")))
+                .map(XPath::new).flatMap(xpath -> xpath.nodes("//ns:y"))
+                .map(XPath::new).flatMap(xpath -> xpath.strings("//ns:z"))
 
-		).containsExactly("text");
-	}
+        ).containsExactly("text");
+    }
 
 }

@@ -17,6 +17,7 @@
 package com.metreeca.xml.actions;
 
 import com.metreeca.core.Xtream;
+import com.metreeca.xml.processors.XPath;
 
 import org.w3c.dom.*;
 
@@ -58,7 +59,7 @@ public final class Extract implements Function<Node, Optional<Node>> {
 
 					.of(annotate(root))
 
-					.flatMap(new XPath<>(x -> x.nodes("//*")))
+					.map(XPath::new).flatMap(xpath -> xpath.nodes("//*"))
 
 					.max(comparingDouble(value -> get(value, "echars", 0.0)))
 
