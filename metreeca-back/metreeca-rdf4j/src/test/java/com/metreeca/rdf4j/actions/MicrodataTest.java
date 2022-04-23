@@ -73,7 +73,7 @@ final class MicrodataTest {
 		return Xtream.of(document)
 
 				.optMap(html -> html(
-						new ByteArrayInputStream(html.getBytes(UTF_8)), UTF_8.name(), "http://example.net/"
+						new ByteArrayInputStream(html.getBytes(UTF_8)), UTF_8, "http://example.net/"
 				).get())
 
 				.flatMap(new Microdata());

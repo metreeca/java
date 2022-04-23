@@ -226,7 +226,7 @@ public final class XMLFormat extends Format<Document> {
 
                         inputSource.setSystemId(message.item());
                         inputSource.setByteStream(input);
-						inputSource.setEncoding(message.charset());
+	                    inputSource.setEncoding(message.charset().name());
 
 						final SAXSource saxSource=(parser != null)
 								? new SAXSource(parser, inputSource)

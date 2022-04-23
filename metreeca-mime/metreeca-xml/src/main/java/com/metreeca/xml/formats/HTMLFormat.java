@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import javax.xml.transform.*;
@@ -85,7 +86,7 @@ public final class HTMLFormat extends Format<Document> {
 	 * @throws NullPointerException if either {@code input} or {@code charset} is null
 	 */
 	public static Either<TransformerException, Document> html(
-			final InputStream input, final String charset, final String base
+			final InputStream input, final Charset charset, final String base
 	) {
 
 		if ( input == null ) {
@@ -102,7 +103,7 @@ public final class HTMLFormat extends Format<Document> {
 
 		try {
 
-			final Document document=W3CDom.convert(Jsoup.parse(input, charset, base));
+			final Document document=W3CDom.convert(Jsoup.parse(input, charset.name(), base));
 
 			document.normalize();
 
@@ -127,7 +128,7 @@ public final class HTMLFormat extends Format<Document> {
 	 * @throws NullPointerException if {@code output} or {@code charset} or {@code node} is null
 	 */
 	public static <O extends OutputStream> O html(
-			final O output, final String charset, final String base, final Node node
+			final O output, final Charset charset, final String base, final Node node
 	) {
 
 		if ( output == null ) {

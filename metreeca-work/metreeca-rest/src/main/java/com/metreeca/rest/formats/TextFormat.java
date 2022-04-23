@@ -21,6 +21,8 @@ import com.metreeca.http.Either;
 import com.metreeca.rest.*;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.regex.Pattern;
 
 import static com.metreeca.rest.MessageException.status;
@@ -106,7 +108,7 @@ public final class TextFormat extends Format<String> {
 	@Override public <M extends Message<M>> M encode(final M message, final String value) {
 		try {
 
-			final String charset=message.charset();
+			final Charset charset=message.charset();
 			final byte[] bytes=value.getBytes(charset);
 
 			return message
@@ -127,9 +129,9 @@ public final class TextFormat extends Format<String> {
 						}
 					});
 
-		} catch ( final UnsupportedEncodingException e ) {
+		} catch ( final UnsupportedCharsetException e ) {
 
-			throw new UncheckedIOException(e); // !!! report to client as 4/5xx? how?
+			throw e; // !!! report to client as 4/5xx? how?
 
 		}
 	}
