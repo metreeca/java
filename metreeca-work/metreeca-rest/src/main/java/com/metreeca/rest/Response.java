@@ -18,6 +18,7 @@ package com.metreeca.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 
 /**
@@ -61,6 +62,7 @@ public final class Response extends Message<Response> {
 	private final Request request; // the originating request
 
 	private int status; // the HTTP status code
+	private Throwable cause; // a (possibly null) optional cause for an error status code
 
 
 	/**
@@ -174,6 +176,28 @@ public final class Response extends Message<Response> {
 		}
 
 		this.status=status;
+
+		return this;
+	}
+
+
+	/**
+	 * Retrieves the cause for the status code.
+	 *
+	 * @return a optional throwable causing the selection of the status code
+	 */
+	public Optional<Throwable> cause() { return Optional.ofNullable(cause); }
+
+	/**
+	 * Configures the cause for the status code.
+	 *
+	 * @param cause the (possibly null) throwable causing the selection of the status code
+	 *
+	 * @return this response
+	 */
+	public Response cause(final Throwable cause) {
+
+		this.cause=cause;
 
 		return this;
 	}

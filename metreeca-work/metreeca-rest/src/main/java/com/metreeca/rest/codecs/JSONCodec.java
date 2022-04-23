@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.metreeca.rest.Response.BadRequest;
+import static com.metreeca.rest.Response.InternalServerError;
 
 public final class JSONCodec extends Codec<JsonElement> {
 
@@ -35,50 +36,36 @@ public final class JSONCodec extends Codec<JsonElement> {
 
         try {
 
-            request.payload(Type);
+            return forward.apply(process(request)).map(response -> {
 
-        } catch ( final UnsupportedCharsetException e ) {
+                try {
 
-            return request.reply(BadRequest);
+                    return process(response);
+
+                } catch ( final UnsupportedCharsetException|JsonSyntaxException e ) {
+
+                    return request.reply(InternalServerError).cause(e);
+
+                }
+
+            });
+
+        } catch ( final UnsupportedCharsetException|JsonSyntaxException e ) {
+
+            return request.reply(BadRequest).payload(String.class, e.getMessage());
 
         }
 
-        return request.header("Content-Type").filter(MIMEPattern.asPredicate()).map(type -> {
-
-                    try (
-                            final InputStream input=request.payload(Input.class).orElseGet(() -> Feeds::input).get();
-                            final Reader reader=new InputStreamReader(input, request.charset())
-                    ) {
-
-                        final JsonElement element=JsonParser.parseReader(reader);
-
-                        return forward.apply(request.payload(Type, element));
-
-                    } catch ( final UnsupportedEncodingException|JsonSyntaxException e ) {
-
-                        return request.reply(BadRequest); // !!! payload
-
-                    } catch ( final JsonIOException e ) {
-
-                        throw new UncheckedIOException(new IOException(e));
-
-                    } catch ( final IOException e ) {
-
-                        throw new UncheckedIOException(e);
-
-                    }
-
-                })
-
-                .orElseGet(() -> forward.apply(request).map(response -> encode(response)
-
-                        .orElse(response)
-
-                ));
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private <M extends Message<M>> M process(final M message) {
+        return encode(message)
+                .or(() -> decode(message))
+                .orElse(message);
+    }
 
     private <M extends Message<M>> Optional<M> encode(final M message) throws UnsupportedCharsetException {
         return message.payload(Type).map(element -> message
@@ -106,6 +93,32 @@ public final class JSONCodec extends Codec<JsonElement> {
                 })
 
         );
+    }
+
+    private <M extends Message<M>> Optional<M> decode(final M message) throws UnsupportedCharsetException,
+            JsonSyntaxException {
+        return message.header("Content-Type").filter(MIMEPattern.asPredicate()).map(type -> {
+
+            try (
+                    final InputStream input=message.payload(Input.class).orElseGet(() -> Feeds::input).get();
+                    final Reader reader=new InputStreamReader(input, message.charset())
+            ) {
+
+                final JsonElement element=JsonParser.parseReader(reader);
+
+                return message.payload(Type, element);
+
+            } catch ( final JsonIOException e ) {
+
+                throw new UncheckedIOException(new IOException(e));
+
+            } catch ( final IOException e ) {
+
+                throw new UncheckedIOException(e);
+
+            }
+
+        });
     }
 
 }
