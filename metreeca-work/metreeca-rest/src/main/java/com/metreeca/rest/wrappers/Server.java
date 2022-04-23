@@ -29,7 +29,6 @@ import static com.metreeca.core.Identifiers.parameters;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.Level.*;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
@@ -67,7 +66,7 @@ public final class Server implements Wrapper {
             throw new NullPointerException("null handler");
         }
 
-        return (request, next) -> {
+        return (request, forward) -> {
             try {
 
                 return request
@@ -76,16 +75,16 @@ public final class Server implements Wrapper {
                         .map(this::query)
                         .map(this::form)
 
-                        .map(request1 -> handler.handle(request1, next))
+                        .map(request1 -> handler.handle(request1, forward))
 
                         .map(this::logging)
                         .map(this::charset);
 
             } catch ( final RuntimeException e ) { // try to send a new response
 
-                return request.reply().map(status(InternalServerError, e))
+                logger.error(this, () -> format("%s %s > %d", request.method(), request.item(), InternalServerError), e);
 
-                        .map(this::logging);
+                return request.reply(InternalServerError);
 
             }
         };
@@ -145,13 +144,12 @@ public final class Server implements Wrapper {
         final String item=request.item();
 
         final int status=response.status();
-        final Throwable cause=response.cause().orElse(null);
 
         final Logger.Level level=(status < 400) ? info
                 : (status < 500) ? warning
                 : error;
 
-        logger.entry(level, this, () -> format("%s %s > %d", method, item, status), cause);
+        logger.entry(level, this, () -> format("%s %s > %d", method, item, status), null);
 
         return response;
     }

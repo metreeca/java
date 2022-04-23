@@ -16,10 +16,9 @@
 
 package com.metreeca.rest.wrappers;
 
-import com.metreeca.rest.*;
-import com.metreeca.rest.formats.TextFormat;
 import com.metreeca.http.Locator;
 import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -173,7 +172,6 @@ final class ServerTest {
 
 					.map(response -> assertThat(response)
                             .hasStatus(InternalServerError)
-                            .hasCause(UnsupportedOperationException.class)
                     )
 
             );

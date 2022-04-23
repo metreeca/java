@@ -87,7 +87,7 @@ public final class Parse<R> implements Function<Message<?>, Optional<R>> {
 
 				logger.error(this,
 						String.format("unable to parse message body as <%s>", media),
-						new RuntimeException(error.toString(), parse.cause().orElse(null))
+						new RuntimeException(error.toString(), error)
 				);
 
 			}

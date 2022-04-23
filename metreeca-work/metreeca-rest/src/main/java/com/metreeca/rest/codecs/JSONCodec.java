@@ -1,12 +1,13 @@
 package com.metreeca.rest.codecs;
 
 import com.metreeca.core.Feeds;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
+import com.metreeca.rest.*;
 
 import com.google.gson.*;
 
 import java.io.*;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,20 @@ public final class JSONCodec extends Codec<JsonElement> {
     );
 
 
+    private static final Class<JsonElement> Type=JsonElement.class;
+
+
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+
+        try {
+
+            request.payload(Type);
+
+        } catch ( final UnsupportedCharsetException e ) {
+
+            return request.reply(BadRequest);
+
+        }
 
         return request.header("Content-Type").filter(MIMEPattern.asPredicate()).map(type -> {
 
@@ -38,11 +52,11 @@ public final class JSONCodec extends Codec<JsonElement> {
 
                         final JsonElement element=JsonParser.parseReader(reader);
 
-                        return forward.apply(request.payload(JsonElement.class, element));
+                        return forward.apply(request.payload(Type, element));
 
                     } catch ( final UnsupportedEncodingException|JsonSyntaxException e ) {
 
-                        return request.reply(BadRequest).cause(e); // !!! payload
+                        return request.reply(BadRequest); // !!! payload
 
                     } catch ( final JsonIOException e ) {
 
@@ -56,39 +70,42 @@ public final class JSONCodec extends Codec<JsonElement> {
 
                 })
 
-                .orElseGet(() -> forward.apply(request).map(response -> response.payload(JsonElement.class).map(element -> response
+                .orElseGet(() -> forward.apply(request).map(response -> encode(response)
 
-                                        .header("Content-Type", MIME)
-
-                                        .payload(Output.class, output -> {
-                                            try ( final Writer writer=new OutputStreamWriter(output,
-                                                    response.charset()) ) {
-
-                                                final Gson gson=new Gson(); // !!! service
-
-                                                gson.toJson(element, writer);
-
-                                                //} catch ( final UnsupportedEncodingException|JsonSyntaxException e ) {
-                                                //
-                                                //    return request.reply(BadRequest).cause(e); // !!! payload
-
-                                            } catch ( final JsonIOException e ) {
-
-                                                throw new UncheckedIOException(new IOException(e));
-
-                                            } catch ( final IOException e ) {
-
-                                                throw new UncheckedIOException(e);
-
-                                            }
-
-                                        })
-
-                                )
-
-                                .orElse(response)
+                        .orElse(response)
 
                 ));
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private <M extends Message<M>> Optional<M> encode(final M message) throws UnsupportedCharsetException {
+        return message.payload(Type).map(element -> message
+
+                .header("Content-Type", MIME)
+
+                .payload(Output.class, output -> {
+
+                    try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
+
+                        final Gson gson=new Gson(); // !!! service
+
+                        gson.toJson(element, writer);
+
+                    } catch ( final JsonIOException e ) {
+
+                        throw new UncheckedIOException(new IOException(e));
+
+                    } catch ( final IOException e ) {
+
+                        throw new UncheckedIOException(e);
+
+                    }
+
+                })
+
+        );
     }
 
 }
