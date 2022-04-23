@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest.actions;
+package com.metreeca.http.actions;
 
 
 import com.metreeca.core.Xtream;
