@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.actions;
 
-import com.metreeca.rest.Xtream;
+import com.metreeca.core.Xtream;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

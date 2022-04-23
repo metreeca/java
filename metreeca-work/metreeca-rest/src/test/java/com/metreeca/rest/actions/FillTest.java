@@ -17,8 +17,8 @@
 package com.metreeca.rest.actions;
 
 
+import com.metreeca.core.Xtream;
 import com.metreeca.http.Locator;
-import com.metreeca.rest.Xtream;
 
 import org.junit.jupiter.api.Test;
 

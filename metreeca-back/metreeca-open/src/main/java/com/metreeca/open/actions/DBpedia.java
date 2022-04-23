@@ -16,8 +16,8 @@
 
 package com.metreeca.open.actions;
 
+import com.metreeca.core.Xtream;
 import com.metreeca.link.Frame;
-import com.metreeca.rest.Xtream;
 import com.metreeca.rest.actions.*;
 import com.metreeca.rest.formats.JSONFormat;
 

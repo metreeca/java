@@ -45,6 +45,11 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 
+		<dependency> <!-- !!! remove -->
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+		</dependency>
+
 	</dependencies>
 
 </project>
