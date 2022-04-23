@@ -2,7 +2,7 @@
  * Copyright © 2021 EC2U Consortium. All rights reserved.
  */
 
-package com.metreeca.rest.actions;
+package com.metreeca.json;
 
 import com.metreeca.core.Xtream;
 

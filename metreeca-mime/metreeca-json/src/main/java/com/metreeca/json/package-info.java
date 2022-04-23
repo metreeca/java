@@ -15,7 +15,7 @@
  */
 
 /**
- * JSON processing actions.
+ * JSON payloads.
  */
 
-package com.metreeca.json.actions;
+package com.metreeca.json;
