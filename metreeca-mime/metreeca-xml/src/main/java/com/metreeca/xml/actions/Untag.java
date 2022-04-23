@@ -51,7 +51,7 @@ public final class Untag implements Function<Node, String> {
             throw new NullPointerException("null cocument");
         }
 
-        return html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8.name(), "").fold(
+        return html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8, "").fold(
 
                 error -> document, value -> new Untag().apply(value)
 

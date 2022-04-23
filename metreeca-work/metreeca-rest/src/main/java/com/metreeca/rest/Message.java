@@ -19,6 +19,8 @@ package com.metreeca.rest;
 import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -113,15 +115,20 @@ public abstract class Message<T extends Message<T>> {
      * <p><strong>Warning</strong> / The {@code Accept-Charset} header or the originating request is
      * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset">ignored</a>.</p>
      *
-     * @return the charset defined in the {@code Content-Type} header of this message, defaulting to {@code UTF-8} if no
-     * charset is explicitly defined
+     * @return the charset specified in the {@code Content-Type} header of this message, defaulting to {@code UTF-8} if
+     * no charset is explicitly specified
+     *
+     * @throws UnsupportedCharsetException if the specified charset is not supported in this instance of the Java virtual
+     *                                     machine
      */
-    public String charset() {
+    public Charset charset() {
         return header("Content-Type")
 
-                .map(CharsetPattern::matcher).filter(Matcher::find).map(matcher -> matcher.group("charset"))
+                .map(CharsetPattern::matcher)
+                .filter(Matcher::find)
+                .map(matcher -> Charset.forName(matcher.group("charset")))
 
-                .orElse(UTF_8.name());
+                .orElse(UTF_8);
     }
 
 
