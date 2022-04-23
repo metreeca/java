@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.core;
 
 import java.util.*;
 import java.util.Map.Entry;

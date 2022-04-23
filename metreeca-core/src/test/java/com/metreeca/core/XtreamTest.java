@@ -1,4 +1,4 @@
-package com.metreeca.rest;
+package com.metreeca.core;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

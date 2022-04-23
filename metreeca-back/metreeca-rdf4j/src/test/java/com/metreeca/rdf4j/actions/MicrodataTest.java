@@ -17,10 +17,10 @@
 
 package com.metreeca.rdf4j.actions;
 
+import com.metreeca.core.Xtream;
 import com.metreeca.http.Locator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.http.services.Logger.Level;
-import com.metreeca.rest.Xtream;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;

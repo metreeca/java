@@ -2,9 +2,9 @@
  * Copyright © 2021 EC2U Consortium. All rights reserved.
  */
 
-package com.metreeca.rest.actions;
+package com.metreeca.json;
 
-import com.metreeca.rest.Xtream;
+import com.metreeca.core.Xtream;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

@@ -16,8 +16,8 @@
 
 package com.metreeca.xml.actions;
 
+import com.metreeca.core.Xtream;
 import com.metreeca.rest.Either;
-import com.metreeca.rest.Xtream;
 import com.metreeca.xml.formats.XMLFormat;
 
 import org.junit.jupiter.api.Test;

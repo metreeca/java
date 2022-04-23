@@ -17,6 +17,8 @@
 package com.metreeca.rdf4j.processors;
 
 import com.metreeca.core.Strings;
+import com.metreeca.core.Xtream;
+import com.metreeca.http.actions.Fill;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Values;
@@ -24,8 +26,6 @@ import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.linkers.GraphLinker;
 import com.metreeca.rdf4j.schemas.Text;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.Xtream;
-import com.metreeca.rest.actions.Fill;
 import com.metreeca.text.*;
 import com.metreeca.text.tokenizers.PatternTokenizer;
 

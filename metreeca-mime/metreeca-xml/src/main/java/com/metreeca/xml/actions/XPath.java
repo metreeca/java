@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.rest.Xtream;
+import com.metreeca.core.Xtream;
 
 import org.w3c.dom.*;
 

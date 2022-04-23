@@ -16,14 +16,12 @@
 
 package com.metreeca.open.actions;
 
-import com.metreeca.core.Identifiers;
-import com.metreeca.core.Strings;
+import com.metreeca.core.*;
+import com.metreeca.http.actions.Fill;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.Xtream;
-import com.metreeca.rest.actions.Fill;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;

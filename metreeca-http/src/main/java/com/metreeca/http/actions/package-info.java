@@ -15,7 +15,7 @@
  */
 
 /**
- * JSON processing actions.
+ * Basic data processing actions.
  */
 
-package com.metreeca.json.actions;
+package com.metreeca.http.actions;
