@@ -15,7 +15,7 @@
  */
 
 /**
- * JSON message formats.
+ * Basic message codecs.
  */
 
-package com.metreeca.json.formats;
+package com.metreeca.rest.codecs;

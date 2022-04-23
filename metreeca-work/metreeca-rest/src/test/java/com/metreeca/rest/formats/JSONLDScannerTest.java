@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.http.Either;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Trace;
+import com.metreeca.rest.Either;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static com.metreeca.http.EitherAssert.assertThat;
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Shape.required;
 import static com.metreeca.link.Values.*;
@@ -56,6 +55,7 @@ import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.link.shapes.Range.range;
 import static com.metreeca.link.shapes.Stem.stem;
 import static com.metreeca.link.shapes.When.when;
+import static com.metreeca.rest.EitherAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

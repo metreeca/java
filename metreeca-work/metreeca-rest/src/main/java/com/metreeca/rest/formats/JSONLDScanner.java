@@ -16,9 +16,9 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.http.Either;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.*;
+import com.metreeca.rest.Either;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -26,8 +26,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Either.Left;
-import static com.metreeca.http.Either.Right;
 import static com.metreeca.link.Trace.trace;
 import static com.metreeca.link.Values.compare;
 import static com.metreeca.link.Values.direct;
@@ -36,6 +34,8 @@ import static com.metreeca.link.Values.is;
 import static com.metreeca.link.Values.lang;
 import static com.metreeca.link.Values.text;
 import static com.metreeca.link.Values.traverse;
+import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;

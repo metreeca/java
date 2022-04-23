@@ -16,7 +16,6 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.http.EitherAssert;
 import com.metreeca.rest.Request;
 
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,10 @@ import java.io.*;
 import javax.json.Json;
 import javax.json.JsonObject;
 
+import static com.metreeca.rest.EitherAssert.assertThat;
+import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.JSONFormat.json;
+import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,18 +49,18 @@ final class JSONFormatTest {
 
 		final Request request=new Request()
 				.header("content-type", JSONFormat.MIME)
-				.body(InputFormat.input(), () -> new ByteArrayInputStream(TestJSON.toString().getBytes(UTF_8)));
+				.body(input(), () -> new ByteArrayInputStream(TestJSON.toString().getBytes(UTF_8)));
 
-		EitherAssert.assertThat(request.body(json()))
+		assertThat(request.body(json()))
 				.hasRight(TestJSON);
 	}
 
 	@Test void testRetrieveJSONChecksContentType() {
 
 		final Request request=new Request()
-				.body(InputFormat.input(), () -> new ByteArrayInputStream(TestJSON.toString().getBytes(UTF_8)));
+				.body(input(), () -> new ByteArrayInputStream(TestJSON.toString().getBytes(UTF_8)));
 
-		EitherAssert.assertThat(request.body(json()))
+		assertThat(request.body(json()))
 				.hasLeft();
 	}
 
@@ -66,11 +68,11 @@ final class JSONFormatTest {
 
 		final Request request=new Request().body(json(), TestJSON);
 
-		EitherAssert.assertThat
+		assertThat
 
 				(request
 
-						.body(OutputFormat.output())
+						.body(output())
 
 						.map(target -> {
 							try ( final ByteArrayOutputStream output=new ByteArrayOutputStream() ) {

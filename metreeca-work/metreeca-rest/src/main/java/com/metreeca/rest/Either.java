@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http;
+package com.metreeca.rest;
 
 import java.util.Optional;
 import java.util.function.*;

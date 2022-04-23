@@ -16,7 +16,6 @@
 
 package com.metreeca.xml.formats;
 
-import com.metreeca.http.Either;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.InputFormat;
 import com.metreeca.rest.formats.OutputFormat;
@@ -35,8 +34,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import static com.metreeca.http.Either.Left;
-import static com.metreeca.http.Either.Right;
+import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;

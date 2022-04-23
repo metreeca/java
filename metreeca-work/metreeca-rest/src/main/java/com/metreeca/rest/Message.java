@@ -16,7 +16,6 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.http.Either;
 import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
@@ -28,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Either.Right;
+import static com.metreeca.rest.Either.Right;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;

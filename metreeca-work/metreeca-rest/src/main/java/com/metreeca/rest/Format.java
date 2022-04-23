@@ -16,8 +16,6 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.http.Either;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -27,7 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Resources.input;
-import static com.metreeca.http.Either.Left;
+import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.MessageException.status;
 
 import static java.lang.Float.parseFloat;

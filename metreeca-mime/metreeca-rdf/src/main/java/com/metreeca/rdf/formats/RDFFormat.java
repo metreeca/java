@@ -16,7 +16,6 @@
 
 package com.metreeca.rdf.formats;
 
-import com.metreeca.http.Either;
 import com.metreeca.rest.*;
 import com.metreeca.rest.formats.InputFormat;
 import com.metreeca.rest.formats.OutputFormat;
@@ -39,9 +38,9 @@ import java.util.function.Function;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
-import static com.metreeca.http.Either.Left;
-import static com.metreeca.http.Either.Right;
 import static com.metreeca.link.Values.iri;
+import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
