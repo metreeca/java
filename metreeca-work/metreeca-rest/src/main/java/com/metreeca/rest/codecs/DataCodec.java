@@ -17,58 +17,48 @@
 package com.metreeca.rest.codecs;
 
 import com.metreeca.core.Feeds;
-import com.metreeca.http.Input;
 import com.metreeca.http.Output;
 import com.metreeca.rest.Codec;
 import com.metreeca.rest.Message;
-
-import com.google.gson.*;
 
 import java.io.*;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static com.metreeca.core.Feeds.text;
+import static com.metreeca.http.Input.Input;
+
 /**
- * JSON message codec.
- *
- * @see <a href="https://github.com/google/gson">Gson</a>
+ * Binary message codec.
  */
-public final class JSONCodec extends Codec<JsonElement> {
+public final class DataCodec extends Codec<String> {
 
     /**
-     * The default MIME type for JSON messages ({@value}).
+     * The default MIME type for binary messages ({@value}).
      */
-    public static final String MIME="application/json";
+    public static final String MIME="application/octet-stream";
 
     /**
-     * A pattern matching JSON-based MIME types, for instance {@code application/ld+json}.
+     * A pattern matching binary MIME types, for instance {@code application/zip or image/png}.
      */
-    public static final Pattern MIMEPattern=Pattern.compile(
-            "(?i:^(text/json|application/(?:.*\\+)?json)(?:\\s*;.*)?$)"
-    );
+    public static final Pattern MIMEPattern=Pattern.compile("(?i)^(application|image)/.+$");
 
 
-    private static final Class<JsonElement> Type=JsonElement.class;
+    public static final Class<String> Data=String.class;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override protected <M extends Message<M>> Optional<M> encode(final M message) {
-        return message.payload(Type).map(element -> message
+        return message.payload(Data).map(text -> message
 
-                .header("Content-Type", MIME)
+                .header("Content-Type", message.header("Content-Type").orElse(MIME))
 
                 .payload(Output.class, output -> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        final Gson gson=new Gson(); // !!! service
-
-                        gson.toJson(element, writer);
-
-                    } catch ( final JsonIOException e ) {
-
-                        throw new UncheckedIOException(new IOException(e));
+                        writer.write(text);
 
                     } catch ( final IOException e ) {
 
@@ -85,21 +75,11 @@ public final class JSONCodec extends Codec<JsonElement> {
         return message.header("Content-Type").filter(MIMEPattern.asPredicate()).map(type -> {
 
             try (
-                    final InputStream input=message.payload(Input.class).orElseGet(() -> Feeds::input).get();
+                    final InputStream input=message.payload(Input).orElseGet(() -> Feeds::input).get();
                     final Reader reader=new InputStreamReader(input, message.charset())
             ) {
 
-                final JsonElement element=JsonParser.parseReader(reader);
-
-                return message.payload(Type, element);
-
-            } catch ( final JsonSyntaxException e ) {
-
-                throw new IllegalArgumentException(e);
-
-            } catch ( final JsonIOException e ) {
-
-                throw new UncheckedIOException(new IOException(e));
+                return message.payload(Data, text(reader));
 
             } catch ( final IOException e ) {
 

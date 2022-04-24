@@ -25,4 +25,8 @@ import java.util.function.Supplier;
  * <p>Supplies an input stream for reading message content.</p>
  */
 @FunctionalInterface
-public interface Input extends Supplier<InputStream> { }
+public interface Input extends Supplier<InputStream> {
+
+    public static Class<Input> Input=Input.class;
+
+}

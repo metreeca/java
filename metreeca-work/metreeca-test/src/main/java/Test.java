@@ -14,41 +14,34 @@
  * limitations under the License.
  */
 
-import com.metreeca.core.Feeds;
-import com.metreeca.http.Input;
-import com.metreeca.http.Output;
 import com.metreeca.jse.JSEServer;
+import com.metreeca.rest.codecs.TextCodec;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
+import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.OK;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.metreeca.rest.codecs.TextCodec.Text;
 
 public final class Test {
 
     public static void main(final String... args) {
         new JSEServer()
 
-                .delegate(locator -> locator.get(() -> (request, forward) -> request.payload(Input.class)
+                .delegate(locator -> locator.get(() -> handler(
 
-                        .map(input -> request.reply(OK)
+                        new TextCodec(),
 
-                                .payload(Output.class, stream -> {
-                                    try {
-                                        stream.write(("ciao "+new String(Feeds.data(input.get()), UTF_8)
-                                                +"!").getBytes(UTF_8));
-                                    } catch ( final IOException e ) {
-                                        throw new UncheckedIOException(e);
-                                    }
+                        (request, forward) -> request.payload(Text)
 
-                                }))
+                                .map(text -> request.reply(OK)
 
-                        .orElseGet(() -> request.reply(BadRequest))
+                                        .payload(Text, "ciao "+text+"!!!")
 
-                ))
+                                )
+
+                                .orElseGet(() -> request.reply(BadRequest))
+
+                )))
 
                 .start();
     }
