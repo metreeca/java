@@ -16,6 +16,9 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.core.Feeds;
+import com.metreeca.http.Input;
+import com.metreeca.http.Output;
 import com.metreeca.rest.formats.MultipartFormat;
 
 import java.net.URI;
@@ -414,6 +417,17 @@ public abstract class Message<T extends Message<T>> {
         }
 
         return self();
+    }
+
+
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public Input input() {
+        return payload(Input.class).orElseGet(() -> Feeds::input);
+    }
+
+    public T output(final Output output) {
+        return payload(Output.class, output);
     }
 
 

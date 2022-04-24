@@ -27,6 +27,4 @@ import java.util.function.Supplier;
 @FunctionalInterface
 public interface Input extends Supplier<InputStream> {
 
-    public static Class<Input> Input=Input.class;
-
 }
