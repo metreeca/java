@@ -33,7 +33,6 @@ import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 
@@ -90,290 +89,290 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Router implements Handler {
 
-	private static final Entry<Class<String>, String> RoutingPrefix=entry(
-			String.class, Router.class.getName()+"RoutingPrefix"
-	);
-
-
-	private static final Pattern KeyPattern=Pattern.compile(
-			"\\{(?<key>[^}]*)}"
-	);
-
-	private static final Pattern PathPattern=Pattern.compile(String.format(
-			"(?<prefix>(/[^/*{}]*|/%s)*)(?<suffix>/\\*)?", KeyPattern.pattern()
-	));
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private final Map<String, Handler> routes=new LinkedHashMap<>();
-	private final Map<String, Handler> methods=new LinkedHashMap<>();
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Adds a handler to this router.
-	 *
-	 * @param path    the path pattern the handler to be added will be bound to
-	 * @param handler the handler to be added to this router at {@code path}
-	 *
-	 * @return this router
-	 *
-	 * @throws NullPointerException     if either {@code path} or {@code handler} is null
-	 * @throws IllegalArgumentException if {@code path} is not a well-formed sequence of steps
-	 * @throws IllegalStateException    if {@code path} is already bound to a handler
-	 */
-	public Router path(final String path, final Handler handler) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( handler == null ) {
-			throw new NullPointerException("null handler");
-		}
-
-		final Matcher matcher=PathPattern.matcher(path);
-
-		if ( path.isEmpty() || !matcher.matches() ) {
-			throw new IllegalArgumentException("malformed path <"+path+">");
-		}
-
-		final String prefix=matcher.group("prefix");
-		final String suffix=matcher.group("suffix");
-
-		final Handler route=route(
-				prefix == null ? "" : prefix,
-				suffix == null ? "" : suffix,
-				handler
-		);
-
-		if ( routes.putIfAbsent(path, route) != null ) {
-			throw new IllegalStateException("path already mapped <"+path+">");
-		}
-
-		return this;
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Configures the handler for the OPTIONS HTTP method.
-	 *
-	 * @param handler the handler to be delegated for OPTIONS HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router options(final Handler handler) {
-		return method(OPTIONS, handler);
-	}
-
-
-	/**
-	 * Configures the handler for the HEAD HTTP method.
-	 *
-	 * @param handler the handler to be delegated for HEAD HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router head(final Handler handler) {
-		return method(HEAD, handler);
-	}
-
-	/**
-	 * Configures the handler for the GET HTTP method.
-	 *
-	 * @param handler the handler to be delegated for GET HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router get(final Handler handler) {
-		return method(GET, handler);
-	}
-
-
-	/**
-	 * Configures the handler for the POST HTTP method.
-	 *
-	 * @param handler the handler to be delegated for POST HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router post(final Handler handler) {
-		return method(POST, handler);
-	}
-
-	/**
-	 * Configures the handler for the PUT HTTP method.
-	 *
-	 * @param handler the handler to be delegated for HTTP PUT method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router put(final Handler handler) {
-		return method(PUT, handler);
-	}
-
-	/**
-	 * Configures the handler for the PATCH HTTP method.
-	 *
-	 * @param handler the handler to be delegated for PATCH HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router patch(final Handler handler) {
-		return method(PATCH, handler);
-	}
-
-	/**
-	 * Configures the handler for the DELETE HTTP method.
-	 *
-	 * @param handler the handler to be delegated for DELETE HTTP method
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if {@code handler} is null
-	 */
-	public Router delete(final Handler handler) {
-		return method(DELETE, handler);
-	}
+    private static final Entry<Class<String>, String> RoutingPrefix=entry(
+            String.class, Router.class.getName()+"RoutingPrefix"
+    );
+
+
+    private static final Pattern KeyPattern=Pattern.compile(
+            "\\{(?<key>[^}]*)}"
+    );
+
+    private static final Pattern PathPattern=Pattern.compile(String.format(
+            "(?<prefix>(/[^/*{}]*|/%s)*)(?<suffix>/\\*)?", KeyPattern.pattern()
+    ));
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private final Map<String, Handler> routes=new LinkedHashMap<>();
+    private final Map<String, Handler> methods=new LinkedHashMap<>();
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Adds a handler to this router.
+     *
+     * @param path    the path pattern the handler to be added will be bound to
+     * @param handler the handler to be added to this router at {@code path}
+     *
+     * @return this router
+     *
+     * @throws NullPointerException     if either {@code path} or {@code handler} is null
+     * @throws IllegalArgumentException if {@code path} is not a well-formed sequence of steps
+     * @throws IllegalStateException    if {@code path} is already bound to a handler
+     */
+    public Router path(final String path, final Handler handler) {
+
+        if ( path == null ) {
+            throw new NullPointerException("null path");
+        }
+
+        if ( handler == null ) {
+            throw new NullPointerException("null handler");
+        }
+
+        final Matcher matcher=PathPattern.matcher(path);
+
+        if ( path.isEmpty() || !matcher.matches() ) {
+            throw new IllegalArgumentException("malformed path <"+path+">");
+        }
+
+        final String prefix=matcher.group("prefix");
+        final String suffix=matcher.group("suffix");
+
+        final Handler route=route(
+                prefix == null ? "" : prefix,
+                suffix == null ? "" : suffix,
+                handler
+        );
+
+        if ( routes.putIfAbsent(path, route) != null ) {
+            throw new IllegalStateException("path already mapped <"+path+">");
+        }
+
+        return this;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Configures the handler for the OPTIONS HTTP method.
+     *
+     * @param handler the handler to be delegated for OPTIONS HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router options(final Handler handler) {
+        return method(OPTIONS, handler);
+    }
+
+
+    /**
+     * Configures the handler for the HEAD HTTP method.
+     *
+     * @param handler the handler to be delegated for HEAD HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router head(final Handler handler) {
+        return method(HEAD, handler);
+    }
+
+    /**
+     * Configures the handler for the GET HTTP method.
+     *
+     * @param handler the handler to be delegated for GET HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router get(final Handler handler) {
+        return method(GET, handler);
+    }
+
+
+    /**
+     * Configures the handler for the POST HTTP method.
+     *
+     * @param handler the handler to be delegated for POST HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router post(final Handler handler) {
+        return method(POST, handler);
+    }
+
+    /**
+     * Configures the handler for the PUT HTTP method.
+     *
+     * @param handler the handler to be delegated for HTTP PUT method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router put(final Handler handler) {
+        return method(PUT, handler);
+    }
+
+    /**
+     * Configures the handler for the PATCH HTTP method.
+     *
+     * @param handler the handler to be delegated for PATCH HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router patch(final Handler handler) {
+        return method(PATCH, handler);
+    }
+
+    /**
+     * Configures the handler for the DELETE HTTP method.
+     *
+     * @param handler the handler to be delegated for DELETE HTTP method
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if {@code handler} is null
+     */
+    public Router delete(final Handler handler) {
+        return method(DELETE, handler);
+    }
 
 
-	/**
-	 * Configures the handler for a HTTP method.
-	 *
-	 * @param method  the HTTP method whose handler is to be configured
-	 * @param handler the handler to be delegated for {@code method}
-	 *
-	 * @return this dispatcher
-	 *
-	 * @throws NullPointerException if either {@code method} or {@code handler} is null
-	 */
-	public Router method(final String method, final Handler handler) {
+    /**
+     * Configures the handler for a HTTP method.
+     *
+     * @param method  the HTTP method whose handler is to be configured
+     * @param handler the handler to be delegated for {@code method}
+     *
+     * @return this dispatcher
+     *
+     * @throws NullPointerException if either {@code method} or {@code handler} is null
+     */
+    public Router method(final String method, final Handler handler) {
 
-		if ( method == null ) {
-			throw new NullPointerException("null method");
-		}
+        if ( method == null ) {
+            throw new NullPointerException("null method");
+        }
 
-		if ( handler == null ) {
-			throw new NullPointerException("null handler");
-		}
+        if ( handler == null ) {
+            throw new NullPointerException("null handler");
+        }
 
-		if ( method.equals(GET) ) {
-			methods.putIfAbsent(HEAD, this::head);
-		}
-
-		methods.put(method, handler);
-
-		return this;
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
-
-		if ( request == null ) {
-			throw new NullPointerException("null request");
-		}
-
-		return routes.values().stream()
-
-				.map(route -> route.handle(request, forward))
-
-				.filter(Objects::nonNull)
-				.findFirst()
-
-				.orElseGet(() -> methods.isEmpty()
-						? forward.apply(request) // fall through
-						: methods.getOrDefault(request.method(), this::options).handle(request, forward)
-				);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Handler route(
-			final String prefix, final String suffix, final Handler handler
-	) {
-
-		final Collection<String> keys=new LinkedHashSet<>();
-
-		final Matcher scanner=KeyPattern.matcher(prefix.isEmpty() ? "" : Pattern.quote(prefix));
-
-		final StringBuilder buffer=new StringBuilder(2*(prefix.length()+suffix.length())).append("(");
-
-		while ( scanner.find() ) { // collect placeholder keys and replace with wildcard step patterns
-
-			final String key=scanner.group("key");
-
-			if ( !key.isEmpty() && !keys.add(key) ) {
-				throw new IllegalArgumentException("repeated placeholder key <"+key+">");
-			}
-
-			scanner.appendReplacement(buffer, key.isEmpty()
-					? "\\\\E[^/]*\\\\Q"
-					: "\\\\E(?<${key}>[^/]*)\\\\Q"
-			);
-
-		}
-
-		scanner.appendTail(buffer).append(suffix.isEmpty() ? ")" : ")(/.*)");
-
-		final Pattern pattern=Pattern.compile(buffer.toString());
-
-		return (request, forward) -> {
-
-			final String head=request.payload(RoutingPrefix).orElse("");
-			final String tail=request.path().substring(head.length());
-
-			return Optional.of(pattern.matcher(tail))
-
-					.filter(Matcher::matches)
-
-					.map(matcher -> {
-
-						keys.forEach(key -> request.parameter(key, URLDecoder.decode(matcher.group(key), UTF_8)));
-
-						return handler.handle(request.payload(RoutingPrefix, head+matcher.group(1)), forward);
-
-					})
-
-					.orElse(null);
-
-		};
-	}
-
-
-	private Response head(final Request request, final Function<Request, Response> forward) {
-		return handle(request.method(GET), forward).map(response -> response
-				.headers("Content-Length", emptyList())
-				.body(output(), target -> { })
-		);
-	}
-
-	private Response options(final Request request, final Function<Request, Response> forward) {
-		return request.reply().map(response -> response
-				.status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
-				.headers("Allow", Stream.of(Set.of(OPTIONS), methods.keySet())
-						.flatMap(Collection::stream)
-						.collect(toList())
-				)
-		);
-	}
+        if ( method.equals(GET) ) {
+            methods.putIfAbsent(HEAD, this::head);
+        }
+
+        methods.put(method, handler);
+
+        return this;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+
+        if ( request == null ) {
+            throw new NullPointerException("null request");
+        }
+
+        return routes.values().stream()
+
+                .map(route -> route.handle(request, forward))
+
+                .filter(Objects::nonNull)
+                .findFirst()
+
+                .orElseGet(() -> methods.isEmpty()
+                        ? forward.apply(request) // fall through
+                        : methods.getOrDefault(request.method(), this::options).handle(request, forward)
+                );
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private Handler route(
+            final String prefix, final String suffix, final Handler handler
+    ) {
+
+        final Collection<String> keys=new LinkedHashSet<>();
+
+        final Matcher scanner=KeyPattern.matcher(prefix.isEmpty() ? "" : Pattern.quote(prefix));
+
+        final StringBuilder buffer=new StringBuilder(2*(prefix.length()+suffix.length())).append("(");
+
+        while ( scanner.find() ) { // collect placeholder keys and replace with wildcard step patterns
+
+            final String key=scanner.group("key");
+
+            if ( !key.isEmpty() && !keys.add(key) ) {
+                throw new IllegalArgumentException("repeated placeholder key <"+key+">");
+            }
+
+            scanner.appendReplacement(buffer, key.isEmpty()
+                    ? "\\\\E[^/]*\\\\Q"
+                    : "\\\\E(?<${key}>[^/]*)\\\\Q"
+            );
+
+        }
+
+        scanner.appendTail(buffer).append(suffix.isEmpty() ? ")" : ")(/.*)");
+
+        final Pattern pattern=Pattern.compile(buffer.toString());
+
+        return (request, forward) -> {
+
+            final String head=request.attribute(RoutingPrefix).orElse("");
+            final String tail=request.path().substring(head.length());
+
+            return Optional.of(pattern.matcher(tail))
+
+                    .filter(Matcher::matches)
+
+                    .map(matcher -> {
+
+                        keys.forEach(key -> request.parameter(key, URLDecoder.decode(matcher.group(key), UTF_8)));
+
+                        return handler.handle(request.attribute(RoutingPrefix, head+matcher.group(1)), forward);
+
+                    })
+
+                    .orElse(null);
+
+        };
+    }
+
+
+    private Response head(final Request request, final Function<Request, Response> forward) {
+        return handle(request.method(GET), forward).map(response -> response
+                .header("Content-Length", "")
+                .body(output(), target -> { })
+        );
+    }
+
+    private Response options(final Request request, final Function<Request, Response> forward) {
+        return request.reply().map(response -> response
+                .status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
+                .headers("Allow", Stream.of(Set.of(OPTIONS), methods.keySet())
+                        .flatMap(Collection::stream)
+                        .collect(toList())
+                )
+        );
+    }
 
 }

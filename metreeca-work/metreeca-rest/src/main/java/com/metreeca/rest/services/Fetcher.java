@@ -16,7 +16,6 @@
 
 package com.metreeca.rest.services;
 
-import com.metreeca.core.Feeds;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
@@ -38,6 +37,7 @@ import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.formats.InputFormat.input;
 
+import static java.io.InputStream.nullInputStream;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 import static java.lang.String.format;
@@ -202,7 +202,7 @@ import static java.lang.String.format;
                                             }
                                         })
 
-                                        .orElseGet(Feeds::input);
+                                        .orElseGet(() -> nullInputStream());
 
                             } catch ( final IOException e ) {
                                 throw new UncheckedIOException(e);

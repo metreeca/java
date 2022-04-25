@@ -16,7 +16,6 @@
 
 package com.metreeca.rdf4j.handlers;
 
-import com.metreeca.core.Feeds;
 import com.metreeca.core.Identifiers;
 import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
@@ -48,6 +47,7 @@ import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.InputFormat.input;
 
+import static java.io.InputStream.nullInputStream;
 import static java.lang.String.format;
 
 
@@ -191,7 +191,7 @@ public final class Graphs extends Endpoint<Graphs> {
             );
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> Feeds.input(), Supplier::get) ) {
+                try ( final InputStream input=request.body(input()).fold(e -> nullInputStream(), Supplier::get) ) {
 
                     final boolean exists=exists(connection, context);
 
@@ -298,7 +298,7 @@ public final class Graphs extends Endpoint<Graphs> {
             );
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> Feeds.input(),
+                try ( final InputStream input=request.body(input()).fold(e -> nullInputStream(),
                         Supplier::get) ) {
 
                     final boolean exists=exists(connection, context);

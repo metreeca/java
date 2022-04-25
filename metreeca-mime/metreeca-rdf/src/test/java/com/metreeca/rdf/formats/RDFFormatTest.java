@@ -16,7 +16,6 @@
 
 package com.metreeca.rdf.formats;
 
-import com.metreeca.core.Feeds;
 import com.metreeca.http.Locator;
 import com.metreeca.link.Values;
 import com.metreeca.rest.Request;
@@ -47,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import static java.io.InputStream.nullInputStream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -142,7 +142,7 @@ final class RDFFormatTest {
         }
 
         @Test void testHandleEmptyInput() {
-            exec(() -> new Request().body(input(), Feeds::input).body(rdf()).fold(
+            exec(() -> new Request().body(input(), () -> nullInputStream()).body(rdf()).fold(
                     error -> fail("unexpected error {"+error+"}"),
                     value -> assertThat(value).isEmpty()
             ));

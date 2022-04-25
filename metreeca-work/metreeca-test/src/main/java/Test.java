@@ -15,31 +15,26 @@
  */
 
 import com.metreeca.jse.JSEServer;
-import com.metreeca.rest.codecs.TextCodec;
+import com.metreeca.rest.codecs.Text;
 
-import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.codecs.TextCodec.Text;
+
+import static java.lang.String.format;
 
 public final class Test {
 
     public static void main(final String... args) {
         new JSEServer()
 
-                .delegate(locator -> locator.get(() -> handler(
+                .delegate(locator -> locator.get(() -> (request, forward) -> request.input(new Text()).map(
 
-                        new TextCodec(),
+                        () -> request.reply(BadRequest, new IllegalArgumentException("missing body")),
 
-                        (request, forward) -> request.payload(Text)
+                        error -> request.reply(BadRequest, error),
 
-                                .map(text -> request.reply(OK)
-
-                                        .payload(Text, "ciao "+text+"!!!")
-
-                                )
-
-                                .orElseGet(() -> request.reply(BadRequest))
+                        value -> request.reply(OK)
+                                .output(new Text(), format("ciao %s!!!", value))
 
                 )))
 

@@ -16,18 +16,17 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.core.Feeds;
-import com.metreeca.http.Input;
-import com.metreeca.http.Output;
+import com.metreeca.rest.codecs.Payload;
 import com.metreeca.rest.formats.MultipartFormat;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -49,9 +48,9 @@ import static java.util.stream.Collectors.joining;
  *
  * <p>Handles shared state/behaviour for HTTP messages and message parts.</p>
  *
- * @param <T> the self-bounded message type supporting fluent setters
+ * @param <M> the self-bounded message type supporting fluent setters
  */
-public abstract class Message<T extends Message<T>> {
+public abstract class Message<M extends Message<M>> {
 
     private static final Pattern SplitPattern=Pattern.compile("\\s*,\\s*");
     private static final Pattern ExpiresPattern=Pattern.compile("(?i)\\bExpires\\b");
@@ -65,13 +64,13 @@ public abstract class Message<T extends Message<T>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private final Map<Object, Object> attributes=new HashMap<>();
     private final Map<String, String> headers=new LinkedHashMap<>();
-    private final Map<Object, Object> payload=new HashMap<>();
 
 
     Message() { }
 
-    abstract T self();
+    abstract M self();
 
 
     /**
@@ -84,7 +83,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if {@code mapper} is null or returns a null value
      */
-    public <R> R map(final Function<T, R> mapper) {
+    public <R> R map(final Function<M, R> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
@@ -134,6 +133,97 @@ public abstract class Message<T extends Message<T>> {
     }
 
 
+    //// Attributes ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> Optional<V> attribute(final Class<V> key) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return attribute(entry(key, key.getName()));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null
+     */
+    public <V> M attribute(final Class<V> key, final V value) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return attribute(entry(key, key.getName()), value);
+    }
+
+
+    /**
+     * Retrieves an attribute.
+     *
+     * @param key the qualified key of the attribute to be retrieved
+     * @param <V> the expected type of the attribute value
+     *
+     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> Optional<V> attribute(final Entry<Class<V>, String> key) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return Optional.ofNullable(attributes.get(key)).map(value -> key.getKey().cast(value));
+    }
+
+    /**
+     * Configures an attribute.
+     *
+     * @param key   the qualified key of the attribute to be configured
+     * @param value the (possibly null) value of the attribute
+     * @param <V>   the type of the attribute {@code value}
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code key} is null or contains null values
+     */
+    public <V> M attribute(final Entry<Class<V>, String> key, final V value) {
+
+        if ( key == null || key.getKey() == null || key.getValue() == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        if ( value == null ) {
+
+            attributes.remove(key);
+
+        } else {
+
+            attributes.put(key, value);
+        }
+
+        return self();
+    }
+
+
     //// Headers ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -162,7 +252,7 @@ public abstract class Message<T extends Message<T>> {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
-    public T headers(final Map<String, String> headers) {
+    public M headers(final Map<String, String> headers) {
 
         if ( headers == null || headers.entrySet().stream().anyMatch(entry -> isNull(entry.getKey()) || isNull(entry.getValue())) ) {
             throw new NullPointerException("null headers");
@@ -216,7 +306,7 @@ public abstract class Message<T extends Message<T>> {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
-    public T headers(final String name, final String... values) {
+    public M headers(final String name, final String... values) {
 
         if ( name == null ) {
             throw new NullPointerException("null name");
@@ -251,7 +341,7 @@ public abstract class Message<T extends Message<T>> {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
-    public T headers(final String name, final Collection<String> values) {
+    public M headers(final String name, final Collection<String> values) {
 
         if ( name == null ) {
             throw new NullPointerException("null name");
@@ -301,7 +391,7 @@ public abstract class Message<T extends Message<T>> {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2">RFC 7230 - 3.2.2 Field Order</a>
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">Set-Cookie</a>
      */
-    public T header(final String name, final String value) {
+    public M header(final String name, final String value) {
 
         if ( name == null ) {
             throw new NullPointerException("null name");
@@ -329,105 +419,46 @@ public abstract class Message<T extends Message<T>> {
     }
 
 
-    //// Payload ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Body //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Retrieves an attribute.
-     *
-     * @param key the key of the attribute to be retrieved
-     * @param <V> the expected type of the attribute value
-     *
-     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
-     *
-     * @throws NullPointerException if {@code key} is null
-     */
-    public <V> Optional<V> payload(final Class<V> key) {
-
-        if ( key == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return payload(entry(key, key.getName()));
+    public Supplier<InputStream> input() {
+        return attribute(Input.class).orElseGet(() -> InputStream::nullInputStream);
     }
 
-    /**
-     * Configures an attribute.
-     *
-     * @param key   the key of the attribute to be configured
-     * @param value the (possibly null) value of the attribute
-     * @param <V>   the type of the attribute {@code value}
-     *
-     * @return this message
-     *
-     * @throws NullPointerException if {@code key} is null
-     */
-    public <V> T payload(final Class<V> key, final V value) {
-
-        if ( key == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return payload(entry(key, key.getName()), value);
+    public M input(final Supplier<? extends InputStream> input) {
+        return attribute(Input.class, input::get);
     }
 
 
-    /**
-     * Retrieves an attribute.
-     *
-     * @param key the qualified key of the attribute to be retrieved
-     * @param <V> the expected type of the attribute value
-     *
-     * @return an optional value associated with the given {@code key}, if one is found; an empty optional, otherwise
-     *
-     * @throws NullPointerException if {@code key} is null or contains null values
-     */
-    public <V> Optional<V> payload(final Entry<Class<V>, String> key) {
-
-        if ( key == null || key.getKey() == null || key.getValue() == null ) {
-            throw new NullPointerException("null key");
-        }
-
-        return Optional.ofNullable(payload.get(key)).map(value -> key.getKey().cast(value));
+    public Consumer<OutputStream> output() {
+        return attribute(Output.class).orElseGet(() -> stream -> { });
     }
 
-    /**
-     * Configures an attribute.
-     *
-     * @param key   the qualified key of the attribute to be configured
-     * @param value the (possibly null) value of the attribute
-     * @param <V>   the type of the attribute {@code value}
-     *
-     * @return this message
-     *
-     * @throws NullPointerException if {@code key} is null or contains null values
-     */
-    public <V> T payload(final Entry<Class<V>, String> key, final V value) {
+    public M output(final Consumer<OutputStream> output) {
+        return attribute(Output.class, output::accept);
+    }
 
-        if ( key == null || key.getKey() == null || key.getValue() == null ) {
-            throw new NullPointerException("null key");
+
+    public <V> Payload<V> input(final Payload<V> payload) {
+
+        if ( payload == null ) {
+            throw new NullPointerException("null payload");
+        }
+
+        return payload.decode(self());
+    }
+
+    public <V> M output(final Payload<V> payload, final V value) {
+
+        if ( payload == null ) {
+            throw new NullPointerException("null payload");
         }
 
         if ( value == null ) {
-
-            payload.remove(key);
-
-        } else {
-
-            payload.put(key, value);
+            throw new NullPointerException("null value");
         }
 
-        return self();
-    }
-
-
-    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public Input input() {
-        return payload(Input.class).orElseGet(() -> Feeds::input);
-    }
-
-    public T output(final Output output) {
-        return payload(Output.class, output);
+        return payload.encode(self(), value);
     }
 
 
@@ -478,7 +509,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if either {@code format} or {@code value} is null
      */
-    public <V> T body(final Format<? super V> format, final V value) {
+    public <V> M body(final Format<? super V> format, final V value) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -506,7 +537,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if either {@code name} or {@code value} is null
      */
-    @SuppressWarnings("unchecked") public <V> T map(final Format<? super V> format, final UnaryOperator<V> mapper) {
+    @SuppressWarnings("unchecked") public <V> M map(final Format<? super V> format, final UnaryOperator<V> mapper) {
 
         if ( format == null ) {
             throw new NullPointerException("null format");
@@ -602,7 +633,7 @@ public abstract class Message<T extends Message<T>> {
      *
      * @throws NullPointerException if {@code message} is null
      */
-    public T lift(final Message<?> message) {
+    public M lift(final Message<?> message) {
 
         if ( message == null ) {
             throw new NullPointerException("null message");
@@ -642,5 +673,14 @@ public abstract class Message<T extends Message<T>> {
         }
 
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @FunctionalInterface
+    private static interface Input extends Supplier<InputStream> { }
+
+    @FunctionalInterface
+    private static interface Output extends Consumer<OutputStream> { }
 
 }

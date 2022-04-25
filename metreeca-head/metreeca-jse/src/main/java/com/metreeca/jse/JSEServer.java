@@ -16,9 +16,10 @@
 
 package com.metreeca.jse;
 
-import com.metreeca.http.*;
+import com.metreeca.http.Locator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
+import com.metreeca.rest.wrappers.Server;
 
 import com.sun.net.httpserver.*;
 
@@ -32,9 +33,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.Lambdas.guarded;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.NotFound;
 
 import static java.lang.String.format;
@@ -152,7 +151,9 @@ public final class JSEServer {
             throw new NullPointerException("null handler factory");
         }
 
-        locator.set(delegate(), () -> requireNonNull(factory.apply(locator), "null handler"));
+        locator.set(delegate(), () ->
+                new Server().wrap(requireNonNull(factory.apply(locator), "null handler"))
+        );
 
         return this;
     }
@@ -251,7 +252,7 @@ public final class JSEServer {
 
                 })
 
-                .payload(Input.class, exchange::getRequestBody);
+                .input(exchange::getRequestBody);
     }
 
     private void response(final HttpExchange exchange, final Response response) {
@@ -263,19 +264,17 @@ public final class JSEServer {
                     .filter(entry -> !entry.getKey().equalsIgnoreCase("Content-Length"))
                     .forEachOrdered(entry -> headers.put(entry.getKey(), List.of(entry.getValue())));
 
-            response.payload(Output.class).ifPresentOrElse(
+            response.header("Content-Type").ifPresentOrElse(
 
-                    value -> {
+                    type -> {
                         try ( final OutputStream output=exchange.getResponseBody() ) {
 
-                            final long length=exchange.getRequestMethod().equals(HEAD) ? -1L : response
-                                    .header("Content-Length")
-                                    .map(guarded(Long::parseUnsignedLong))
-                                    .orElse(0L); // chunked transfer
+                            exchange.sendResponseHeaders(response.status(), response.header("Content-Length")
+                                    .map(Long::parseUnsignedLong)
+                                    .orElse(0L) // chunked
+                            );
 
-                            exchange.sendResponseHeaders(response.status(), length);
-
-                            value.accept(output);
+                            response.output().accept(output);
 
                         } catch ( final IOException e ) {
                             throw new UncheckedIOException(e);
@@ -291,6 +290,7 @@ public final class JSEServer {
                             throw new UncheckedIOException(e);
                         }
                     }
+
             );
 
         } finally {
