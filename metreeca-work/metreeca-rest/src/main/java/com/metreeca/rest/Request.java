@@ -167,34 +167,38 @@ public final class Request extends Message<Request> {
             throw new IllegalArgumentException("illegal status code ["+status+"]");
         }
 
-        return new Response(this).status(status).cause(cause).map(response -> Optional
+        return new Response(this)
 
-                .ofNullable(cause.getMessage())
+                .status(status)
+                .cause(cause)
 
-                .map(message -> response
+                .map(response -> Optional
 
-                        .header("Content-Type", "application/json")
-                        .header("Content-Length", "0")
+                        .ofNullable(cause.getMessage())
 
-                        .output(output -> {
+                        .map(message -> response
 
-                            try {
+                                .header("Content-Type", "application/json")
 
-                                output.write(Strings.quote(message, '"').getBytes(UTF_8));
+                                .output(output -> {
 
-                            } catch ( final IOException e ) {
+                                    try {
 
-                                throw new UncheckedIOException(e);
+                                        output.write(Strings.quote(message, '"').getBytes(UTF_8));
 
-                            }
+                                    } catch ( final IOException e ) {
 
-                        })
+                                        throw new UncheckedIOException(e);
 
-                )
+                                    }
 
-                .orElse(response)
+                                })
 
-        );
+                        )
+
+                        .orElse(response)
+
+                );
     }
 
 
