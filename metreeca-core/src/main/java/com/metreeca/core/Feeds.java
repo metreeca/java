@@ -7,28 +7,6 @@ import java.io.*;
  */
 public final class Feeds {
 
-    private static final byte[] Empty=new byte[0];
-
-
-    /**
-     * Creates an empty input stream.
-     *
-     * @return a new empty input stream
-     */
-    public static InputStream input() {
-        return new ByteArrayInputStream(Empty);
-    }
-
-    /**
-     * Creates an empty reader.
-     *
-     * @return a new empty reader
-     */
-    public static Reader reader() {
-        return new StringReader("");
-    }
-
-
     /**
      * Reads data from an input stream.
      *
