@@ -224,17 +224,43 @@ public final class Strings {
             throw new NullPointerException("null string");
         }
 
+        return quote(string, '\''); // use single quote to support embedding within Java/JSON string
+    }
+
+    /**
+     * Quotes and escapes content.
+     *
+     * @param string the string to be quoted
+     * @param quote  the quote character
+     *
+     * @return a copy of {@code string} surrounded by single quotes and with control characters replaced by escape
+     * control sequences; the quoted string may be safely embedded within Java/JSON strings
+     *
+     * @throws NullPointerException if {@code string} is null
+     */
+    public static String quote(final String string, final char quote) {
+
+        if ( string == null ) {
+            throw new NullPointerException("null string");
+        }
+
         final StringBuilder builder=new StringBuilder(string.length()+string.length()/10);
 
-        builder.append('\''); // use single quote to support embedding within Java/JSON string
+        builder.append(quote);
 
         for (int i=0, n=string.length(); i < n; ++i) {
-            switch ( string.charAt(i) ) {
+
+            final char c=string.charAt(i);
+
+            switch ( c ) {
                 case '\\':
                     builder.append("\\\\");
                     break;
                 case '\'':
-                    builder.append("\\'");
+                    builder.append(c == quote ? "\\'" : c);
+                    break;
+                case '\"':
+                    builder.append(c == quote ? "\\\"" : c);
                     break;
                 case '\r':
                     builder.append("\\r");
@@ -246,12 +272,12 @@ public final class Strings {
                     builder.append("\\t");
                     break;
                 default:
-                    builder.append(string.charAt(i));
+                    builder.append(c);
                     break;
             }
         }
 
-        builder.append('\'');
+        builder.append(quote);
 
         return builder.toString();
 
