@@ -419,7 +419,7 @@ public abstract class Message<M extends Message<M>> {
     }
 
 
-    //// Body //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public Supplier<InputStream> input() {
         return attribute(Input.class).orElseGet(() -> InputStream::nullInputStream);
@@ -445,7 +445,7 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null payload");
         }
 
-        return payload.decode(self());
+        return payload.get(self());
     }
 
     public <V> M output(final Payload<V> payload, final V value) {
@@ -458,7 +458,7 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null value");
         }
 
-        return payload.encode(self(), value);
+        return payload.set(self(), value);
     }
 
 
@@ -647,6 +647,16 @@ public abstract class Message<M extends Message<M>> {
         return self();
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @FunctionalInterface
+    private static interface Input extends Supplier<InputStream> { }
+
+    @FunctionalInterface
+    private static interface Output extends Consumer<OutputStream> { }
+
+
     private static final class Part extends Message<Part> {
 
         private final String item;
@@ -673,14 +683,5 @@ public abstract class Message<M extends Message<M>> {
         }
 
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    @FunctionalInterface
-    private static interface Input extends Supplier<InputStream> { }
-
-    @FunctionalInterface
-    private static interface Output extends Consumer<OutputStream> { }
 
 }

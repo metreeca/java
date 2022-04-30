@@ -46,29 +46,37 @@ public final class Text extends Payload<String> {
         return String.class;
     }
 
+    @Override public String mime() {
+        return MIME;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override protected <M extends Message<M>> Optional<String> _decode(final M message) {
-        return message.header("Content-Type").filter(MIMEPattern.asPredicate()).map(type -> {
+    @Override protected <M extends Message<M>> Optional<String> decode(final M message) {
+        return message
 
-            try (
-                    final InputStream stream=message.input().get();
-                    final Reader reader=new InputStreamReader(stream, message.charset())
-            ) {
+                .header("Content-Type").filter(MIMEPattern.asPredicate())
 
-                return text(reader);
+                .map(type -> {
 
-            } catch ( final IOException e ) {
+                    try (
+                            final InputStream stream=message.input().get();
+                            final Reader reader=new InputStreamReader(stream, message.charset())
+                    ) {
 
-                throw new UncheckedIOException(e);
+                        return text(reader);
 
-            }
+                    } catch ( final IOException e ) {
 
-        });
+                        throw new UncheckedIOException(e);
+
+                    }
+
+                });
     }
 
-    @Override protected <M extends Message<M>> M _encode(final M message, final String value) {
+    @Override protected <M extends Message<M>> M encode(final M message, final String value) {
         return message
 
                 .header("Content-Type", message.header("Content-Type").orElse(MIME))

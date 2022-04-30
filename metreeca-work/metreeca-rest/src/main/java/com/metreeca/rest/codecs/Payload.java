@@ -25,10 +25,9 @@ import java.util.function.Supplier;
 /**
  * Message payload.
  *
- * <p>Manages structured {@linkplain Message message} payloads:</p>
- * *
+ * <p>Manages structured {@linkplain Message message} payloads.</p>
  *
- * @param <V> the type of the message payload managed by the codec
+ * @param <V> the type of the managed message payload
  */
 public abstract class Payload<V> {
 
@@ -38,31 +37,33 @@ public abstract class Payload<V> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Retrieves the payload value type.
+     *
+     * @return the type of the structured value managed by this payload
+     */
     public abstract Class<V> type();
 
-
-    public <R> R map(final Supplier<? extends R> empty, final Function<Throwable, R> error, final Function<V, R> value) {
-
-        if ( empty == null ) {
-            throw new NullPointerException("null empty");
-        }
-
-        if ( value == null ) {
-            throw new NullPointerException("null value");
-        }
-
-        if ( error == null ) {
-            throw new NullPointerException("null error");
-        }
-
-        return this.value != null ? value.apply(this.value)
-                : this.error != null ? error.apply(this.error)
-                : empty.get();
-
-    }
+    /**
+     * Retrieves the payload MIME type.
+     *
+     * @return the MIME type for this payload
+     */
+    public abstract String mime();
 
 
-    public <M extends Message<M>> Payload<V> decode(final M message) {
+    /**
+     * Retrieves the structured message payload.
+     *
+     * @param message the message whose payload is to be retrieved
+     * @param <M>     the type of {@code message}
+     *
+     * @return this payload, updated with the value retrieved from {@code message} or the error that occurred in the
+     * process
+     *
+     * @throws NullPointerException if {@code message} is {@code null}
+     */
+    public <M extends Message<M>> Payload<V> get(final M message) {
 
         if ( message == null ) {
             throw new NullPointerException("null message");
@@ -75,7 +76,7 @@ public abstract class Payload<V> {
 
             try {
 
-                _decode(message).ifPresent(v -> message.attribute(type(), this.value=v));
+                decode(message).ifPresent(v -> message.attribute(type(), this.value=v));
 
             } catch ( final IllegalArgumentException e ) {
 
@@ -88,7 +89,17 @@ public abstract class Payload<V> {
         return this;
     }
 
-    public <M extends Message<M>> M encode(final M message, final V value) {
+    /**
+     * Configures the structured message payload.
+     *
+     * @param message the message whose payload is to be configured
+     * @param <M>     the type of {@code message}
+     *
+     * @return this payload, updated with the contatnet retrieved from {@code message}
+     *
+     * @throws NullPointerException if {@code message} is {@code null}
+     */
+    public <M extends Message<M>> M set(final M message, final V value) {
 
         if ( message == null ) {
             throw new NullPointerException("null message");
@@ -101,14 +112,35 @@ public abstract class Payload<V> {
         this.value=value;
         this.error=null;
 
-        return _encode(message.attribute(type(), value), value);
+        return encode(message.attribute(type(), value), value);
+    }
+
+
+    public <R> R map(final Supplier<? extends R> empty, final Function<Throwable, R> error, final Function<V, R> value) {
+
+        if ( empty == null ) {
+            throw new NullPointerException("null empty");
+        }
+
+        if ( error == null ) {
+            throw new NullPointerException("null error");
+        }
+
+        if ( value == null ) {
+            throw new NullPointerException("null value");
+        }
+
+        return this.value != null ? value.apply(this.value)
+                : this.error != null ? error.apply(this.error)
+                : empty.get();
+
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected abstract <M extends Message<M>> Optional<V> _decode(final M message) throws IllegalArgumentException;
+    protected abstract <M extends Message<M>> Optional<V> decode(final M message) throws IllegalArgumentException;
 
-    protected abstract <M extends Message<M>> M _encode(M message, V value) throws IllegalArgumentException;
+    protected abstract <M extends Message<M>> M encode(M message, V value) throws IllegalArgumentException;
 
 }
