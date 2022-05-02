@@ -70,20 +70,20 @@ public final class DataFormat extends Format<byte[]> {
 
 
 	/**
-     * Decodes the binary {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-     * body, if one is available
-     */
-    @Override public <M extends Message<M>> Either<MessageException, byte[]> decode(final M message) {
-        return message.body(input()).map(source -> {
-            try ( final InputStream input=source.get() ) {
+	 * Decodes the binary {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+	 * body, if one is available
+	 */
+	@Override public <M extends Message<M>> _Either<MessageException, byte[]> decode(final M message) {
+		return message.body(input()).map(source -> {
+			try ( final InputStream input=source.get() ) {
 
-                return Feeds.data(input);
+				return Feeds.data(input);
 
-            } catch ( final IOException e ) {
-                throw new UncheckedIOException(e);
-            }
-        });
-    }
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
+		});
+	}
 
 	/**
 	 * Configures {@code message} {@code Content-Type} header to {@value #MIME}, unless already defined, and encodes the

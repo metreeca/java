@@ -18,8 +18,8 @@ package com.metreeca.rdf4j.services;
 
 import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
-import com.metreeca.rest.Config;
 import com.metreeca.rest.Setup;
+import com.metreeca.rest._Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -113,11 +113,11 @@ public final class GraphEngine extends Setup<GraphEngine> implements Engine {
 
 	private static final class QueryProbe extends Query.Probe<Frame> {
 
-		private final Config config;
+		private final _Config config;
 		private final Value focus;
 
 
-		QueryProbe(final Config config, final Value focus) {
+		QueryProbe(final _Config config, final Value focus) {
 			this.config=config;
 			this.focus=focus;
 		}

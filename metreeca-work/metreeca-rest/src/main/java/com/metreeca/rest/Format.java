@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Resources.input;
-import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.MessageException.status;
+import static com.metreeca.rest._Either.Left;
 
 import static java.lang.Float.parseFloat;
 import static java.lang.Math.max;
@@ -212,7 +212,7 @@ public abstract class Format<V> {
 	 *
 	 * @throws NullPointerException if {@code message} is null
 	 */
-	public <M extends Message<M>> Either<MessageException, V> decode(final M message) {
+	public <M extends Message<M>> _Either<MessageException, V> decode(final M message) {
 
 		if ( message == null ) {
 			throw new NullPointerException("null message");

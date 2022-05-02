@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.codecs;
 
+import com.metreeca.rest.Codec;
 import com.metreeca.rest.Message;
 
 import java.io.*;
@@ -27,7 +28,7 @@ import static com.metreeca.core.Feeds.text;
 /**
  * Textual message codec.
  */
-public final class Text extends Payload<String> {
+public final class Text implements Codec<String> {
 
     /**
      * The default MIME type for textual messages ({@value}).
@@ -53,10 +54,11 @@ public final class Text extends Payload<String> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override protected <M extends Message<M>> Optional<String> decode(final M message) {
+    @Override public <M extends Message<M>> Optional<String> decode(final M message) {
         return message
 
-                .header("Content-Type").filter(MIMEPattern.asPredicate())
+                .header("Content-Type")
+                .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {
 
@@ -76,7 +78,7 @@ public final class Text extends Payload<String> {
                 });
     }
 
-    @Override protected <M extends Message<M>> M encode(final M message, final String value) {
+    @Override public <M extends Message<M>> M encode(final M message, final String value) {
         return message
 
                 .header("Content-Type", message.header("Content-Type").orElse(MIME))

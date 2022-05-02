@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.queries.Stats;
-import com.metreeca.rest.Config;
+import com.metreeca.rest._Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -47,7 +47,7 @@ final class GraphStats extends GraphFacts {
 	private final Graph graph=service(graph());
 
 
-	GraphStats(final Config config) {
+	GraphStats(final _Config config) {
 		super(config);
 	}
 

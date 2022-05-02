@@ -18,7 +18,7 @@ package com.metreeca.rest.formats;
 
 import com.metreeca.link.Shape;
 import com.metreeca.link.Trace;
-import com.metreeca.rest.Either;
+import com.metreeca.rest._Either;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -79,7 +79,7 @@ final class JSONLDScannerTest {
 
 	@Nested final class Validation {
 
-		private Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
+		private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
 			return JSONLDScanner.scan(s, shape, asList(model));
 		}
 
@@ -191,7 +191,7 @@ final class JSONLDScannerTest {
 
 	@Nested final class Constraints {
 
-		private Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
+		private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
 
 			return JSONLDScanner.scan(s, field(p, shape), Arrays
 					.stream(values)

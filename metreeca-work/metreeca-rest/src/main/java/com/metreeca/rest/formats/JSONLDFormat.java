@@ -34,10 +34,10 @@ import static com.metreeca.link.Trace.trace;
 import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.lang;
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
+import static com.metreeca.rest._Either.Left;
+import static com.metreeca.rest._Either.Right;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -141,7 +141,7 @@ public final class JSONLDFormat extends Format<Frame> {
      *
      * @throws NullPointerException if any parameter is null
      */
-    public static Either<MessageException, Query> query(final IRI focus, final Shape shape, final String query) {
+    public static _Either<MessageException, Query> query(final IRI focus, final Shape shape, final String query) {
 
         if ( query == null ) {
             throw new NullPointerException("null query");
@@ -307,7 +307,7 @@ public final class JSONLDFormat extends Format<Frame> {
      *
      * @throws NullPointerException if any parameter is null
      */
-    public static Either<Trace, Collection<Statement>> validate(
+    public static _Either<Trace, Collection<Statement>> validate(
             final Value focus, final Shape shape, final Collection<Statement> model
     ) {
 
@@ -351,7 +351,7 @@ public final class JSONLDFormat extends Format<Frame> {
      * {@linkplain JSONLDFormat#shape(Message) shape attribute}: embedded {@code @context} objects are ignored.</p>
      */
 
-    @Override public <M extends Message<M>> Either<MessageException, Frame> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<MessageException, Frame> decode(final M message) {
         return message
 
                 .header("Content-Type")

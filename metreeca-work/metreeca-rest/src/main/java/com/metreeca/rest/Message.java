@@ -16,7 +16,7 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.rest.codecs.Payload;
+import com.metreeca.http.Either;
 import com.metreeca.rest.formats.MultipartFormat;
 
 import java.io.InputStream;
@@ -31,8 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Either.Right;
+import static com.metreeca.http.Either.Left;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
@@ -66,6 +67,9 @@ public abstract class Message<M extends Message<M>> {
 
     private final Map<Object, Object> attributes=new HashMap<>();
     private final Map<String, String> headers=new LinkedHashMap<>();
+
+    private Supplier<InputStream> input=new Input(InputStream::nullInputStream);
+    private Consumer<OutputStream> output=new Output(stream -> { });
 
 
     Message() { }
@@ -419,157 +423,128 @@ public abstract class Message<M extends Message<M>> {
     }
 
 
-    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Payload ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Retrieves the raw input.
+     *
+     * @return a supplier returning an input stream for reading the raw message body
+     */
     public Supplier<InputStream> input() {
-        return attribute(Input.class).orElseGet(() -> InputStream::nullInputStream);
-    }
-
-    public M input(final Supplier<? extends InputStream> input) {
-        return attribute(Input.class, input::get);
-    }
-
-
-    public Consumer<OutputStream> output() {
-        return attribute(Output.class).orElseGet(() -> stream -> { });
-    }
-
-    public M output(final Consumer<OutputStream> output) {
-        return attribute(Output.class, output::accept);
-    }
-
-
-    public <V> Payload<V> input(final Payload<V> payload) {
-
-        if ( payload == null ) {
-            throw new NullPointerException("null payload");
-        }
-
-        return payload.get(self());
-    }
-
-    public <V> M output(final Payload<V> payload, final V value) {
-
-        if ( payload == null ) {
-            throw new NullPointerException("null payload");
-        }
-
-        if ( value == null ) {
-            throw new NullPointerException("null value");
-        }
-
-        return payload.set(self(), value);
-    }
-
-
-    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
-
-
-    /**
-     * Decodes message body.
-     *
-     * @param format the expected body format
-     * @param <V>    the type of the body to be decoded
-     *
-     * @return either a message exception reporting a decoding issue or the message body {@linkplain
-     * Format#decode(Message) decoded} by {@code format}
-     *
-     * @throws NullPointerException if {@code format} is null
-     */
-    @SuppressWarnings("unchecked") public <V> Either<MessageException, V> body(final Format<V> format) {
-
-        if ( format == null ) {
-            throw new NullPointerException("null body");
-        }
-
-        // ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
-
-        Either<MessageException, ?> body=bodies.get(format);
-
-        if ( body == null ) {
-            bodies.put(format, body=format.decode(self()));
-        }
-
-        return (Either<MessageException, V>)body;
+        return input;
     }
 
     /**
-     * Encodes message body.
+     * Configures the raw input.
      *
-     * <p>Subsequent calls to {@link #body(Format)} with the same body format will return the specified value.</p>
-     *
-     * @param format the body format
-     * @param value  the body to be encoded
-     * @param <V>    the type of the body to be encoded
-     *
-     * @return this message with the {@code value} {@linkplain Format#encode(Message, Object) encoded} by {@code format}
-     * as body
-     *
-     * @throws NullPointerException if either {@code format} or {@code value} is null
-     */
-    public <V> M body(final Format<? super V> format, final V value) {
-
-        if ( format == null ) {
-            throw new NullPointerException("null body");
-        }
-
-        if ( value == null ) {
-            throw new NullPointerException("null value");
-        }
-
-        bodies.put(format, Right(value));
-
-        return format.encode(self(), value);
-    }
-
-
-    /**
-     * Updates message body.
-     *
-     * @param format the body format
-     * @param mapper a function mapping from the current to the updated value of the {@code format} body; must return a
-     *               non-null value
-     * @param <V>    the type of the body to be updated
+     * @param input a supplier returning an input stream for reading the raw message body
      *
      * @return this message
      *
-     * @throws NullPointerException if either {@code name} or {@code value} is null
+     * @throws NullPointerException if {@code input} is null
      */
-    @SuppressWarnings("unchecked") public <V> M map(final Format<? super V> format, final UnaryOperator<V> mapper) {
+    public M input(final Supplier<? extends InputStream> input) {
 
-        if ( format == null ) {
-            throw new NullPointerException("null format");
+        if ( input == null ) {
+            throw new NullPointerException("null input");
         }
 
-        if ( mapper == null ) {
-            throw new NullPointerException("null mapper");
-        }
-
-        // ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
-
-        final Either<MessageException, ?> value=bodies.get(format);
-
-        if ( value != null ) {
-
-            final Either<MessageException, V> mapped=value.map(body -> requireNonNull(
-
-                    mapper.apply((V)body), "null mapper return value"
-
-            ));
-
-            bodies.put(format, mapped);
-
-            mapped.map(body ->
-
-                    format.encode(self(), body)
-
-            );
-
-        }
+        this.input=new Input(input);
 
         return self();
+    }
+
+
+    /**
+     * Retrieves the raw output.
+     *
+     * @return a consumer accepting an output stream for writing the raw message body
+     */
+    public Consumer<OutputStream> output() {
+        return output;
+    }
+
+    /**
+     * Configures the raw output.
+     *
+     * @param output a consumer accepting an output stream for writing the raw message body
+     *
+     * @return this message
+     *
+     * @throws NullPointerException if {@code output is null
+     */
+    public M output(final Consumer<OutputStream> output) {
+
+        if ( output == null ) {
+            throw new NullPointerException("null output");
+        }
+
+        this.output=new Output(output);
+
+        return self();
+    }
+
+
+    /**
+     * Decodes the message body.
+     *
+     * @param codec the message codec
+     * @param <V>   the expected message body type
+     *
+     * @return either an exception reporting a decoding issue or the {@linkplain Codec#decode(Message) decoded} body of
+     * this message
+     *
+     * @throws NullPointerException if {@code codec} is null
+     */
+    public <V> Either<IllegalArgumentException, V> body(final Codec<V> codec) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        try {
+
+            return attribute(codec.type())
+
+                    .or(() -> codec.decode(self()))
+
+                    .map(Either::<IllegalArgumentException, V>Right)
+
+                    .orElseGet(() -> Left(new IllegalArgumentException(format(
+                            "missing <%s> message body", codec.mime()
+                    ))));
+
+        } catch ( final IllegalArgumentException e ) {
+
+            return Left(e);
+
+        }
+
+    }
+
+    /**
+     * Encodes the message body.
+     *
+     * @param codec the message coded
+     * @param value the body to be encoded
+     * @param <V>   the type of the value to be encoded
+     *
+     * @return this message with {@code value} {@linkplain Codec#encode(Message, Object) encoded} by {@code codec} as
+     * body
+     *
+     * @throws NullPointerException if either {@code codec} or {@code value} is null
+     */
+    public <V> M body(final Codec<V> codec, final V value) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        if ( value == null ) {
+            throw new NullPointerException("null value");
+        }
+
+        return codec.encode(self().attribute(codec.type(), value), value);
     }
 
 
@@ -648,14 +623,81 @@ public abstract class Message<M extends Message<M>> {
     }
 
 
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private final Map<Format<?>, _Either<MessageException, ?>> bodies=new HashMap<>();
+
+
+    @SuppressWarnings("unchecked") public <V> _Either<MessageException, V> body(final Format<V> format) {
+
+        if ( format == null ) {
+            throw new NullPointerException("null body");
+        }
+
+        // ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
+
+        _Either<MessageException, ?> body=bodies.get(format);
+
+        if ( body == null ) {
+            bodies.put(format, body=format.decode(self()));
+        }
+
+        return (_Either<MessageException, V>)body;
+    }
+
+    public <V> M body(final Format<? super V> format, final V value) {
+
+        if ( format == null ) {
+            throw new NullPointerException("null body");
+        }
+
+        if ( value == null ) {
+            throw new NullPointerException("null value");
+        }
+
+        bodies.put(format, _Either.Right(value));
+
+        return format.encode(self(), value);
+    }
+
+
+    @SuppressWarnings("unchecked") public <V> M map(final Format<? super V> format, final UnaryOperator<V> mapper) {
+
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
+
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
+
+        // ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
+
+        final _Either<MessageException, ?> value=bodies.get(format);
+
+        if ( value != null ) {
+
+            final _Either<MessageException, V> mapped=value.map(body -> requireNonNull(
+
+                    mapper.apply((V)body), "null mapper return value"
+
+            ));
+
+            bodies.put(format, mapped);
+
+            mapped.map(body ->
+
+                    format.encode(self(), body)
+
+            );
+
+        }
+
+        return self();
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    @FunctionalInterface
-    private static interface Input extends Supplier<InputStream> { }
-
-    @FunctionalInterface
-    private static interface Output extends Consumer<OutputStream> { }
-
 
     private static final class Part extends Message<Part> {
 
@@ -683,5 +725,60 @@ public abstract class Message<M extends Message<M>> {
         }
 
     }
+
+
+    private static final class Input implements Supplier<InputStream> {
+
+        private Supplier<? extends InputStream> input;
+
+
+        private Input(final Supplier<? extends InputStream> input) { this.input=input; }
+
+
+        @Override public InputStream get() {
+
+            if ( input == null ) {
+                throw new IllegalStateException("closed message input");
+            }
+
+            try {
+
+                return input.get();
+
+            } finally {
+
+                input=null;
+
+            }
+        }
+
+    }
+
+    private static final class Output implements Consumer<OutputStream> {
+
+        private Consumer<OutputStream> output;
+
+
+        private Output(final Consumer<OutputStream> output) { this.output=output; }
+
+        @Override public void accept(final OutputStream stream) {
+
+            if ( output == null ) {
+                throw new IllegalStateException("closed message output");
+            }
+
+            try {
+
+                output.accept(stream);
+
+            } finally {
+
+                output=null;
+
+            }
+        }
+
+    }
+
 
 }

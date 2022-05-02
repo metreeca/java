@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.core.Identifiers.IRIPattern;
+import static com.metreeca.rest.Response.BadRequest;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -148,6 +149,16 @@ public final class Request extends Message<Request> {
         }
 
         return new Response(this).status(status).header("Location", location);
+    }
+
+
+    public Response reply(final IllegalArgumentException exception) {
+
+        if ( exception == null ) {
+            throw new NullPointerException("null exception");
+        }
+
+        return reply(BadRequest, exception);
     }
 
     /**

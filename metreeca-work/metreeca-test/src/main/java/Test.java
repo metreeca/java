@@ -15,15 +15,8 @@
  */
 
 import com.metreeca.jse.JSEServer;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
-import com.metreeca.rest.codecs.Payload;
 import com.metreeca.rest.codecs.Text;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.OK;
 
 import static java.lang.String.format;
@@ -33,51 +26,15 @@ public final class Test {
     public static void main(final String... args) {
         new JSEServer()
 
-                .delegate(locator -> locator.get(() -> (request, forward) ->
-                        reply(request, new Text(), value ->
-                                request.reply(OK).output(new Text(), format("ciao %s!!!", value))
+                .delegate(locator -> locator.get(() ->
+
+                        (request, forward) -> request.body(new Text()).fold(request::reply, text ->
+                                request.reply(OK).body(new Text(), format("ciao %s!!!", text))
                         )
+
                 ))
 
                 .start();
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static <V> Response reply(
-            final Request request,
-            final Payload<V> payload,
-            final Function<? super V, Response> handler
-    ) {
-        return reply(request,
-
-                payload,
-
-                () -> request.reply(BadRequest, new IllegalArgumentException(format(
-                        "missing <%s> body", payload.mime()
-                ))),
-
-                handler
-
-        );
-    }
-
-    private static <V> Response reply(
-            final Request request,
-            final Payload<V> payload,
-            final Supplier<Response> missing,
-            final Function<? super V, Response> value
-    ) {
-        return request.input(payload).map(
-
-                missing,
-
-                error -> request.reply(BadRequest, error),
-
-                value::apply
-
-        );
     }
 
 }

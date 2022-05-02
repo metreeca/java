@@ -21,8 +21,8 @@ import com.metreeca.http.services.Logger;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Values;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rest.Config;
 import com.metreeca.rest.Scribe;
+import com.metreeca.rest._Config;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -102,19 +102,19 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Config config;
+	private final _Config config;
 
 	private int label=1; // the next label available for tagging (0 reserved for the root node)
 
 	private final Logger logger=service(logger());
 
 
-	GraphFacts(final Config config) {
+	GraphFacts(final _Config config) {
 		this.config=config;
 	}
 
 
-	Config config() {
+	_Config config() {
 		return config;
 	}
 

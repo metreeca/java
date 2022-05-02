@@ -18,7 +18,7 @@ package com.metreeca.rest.formats;
 
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rest.Either;
+import com.metreeca.rest._Either;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -34,8 +34,8 @@ import static com.metreeca.link.Values.is;
 import static com.metreeca.link.Values.lang;
 import static com.metreeca.link.Values.text;
 import static com.metreeca.link.Values.traverse;
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.Either.Right;
+import static com.metreeca.rest._Either.Left;
+import static com.metreeca.rest._Either.Right;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;
@@ -46,14 +46,14 @@ import static java.util.stream.Collectors.*;
 /**
  * Shape-driven RDF validator.
  */
-final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> {
+final class JSONLDScanner extends Shape.Probe<_Either<Trace, Stream<Statement>>> {
 
-	static Either<Trace, Collection<Statement>> scan(
+	static _Either<Trace, Collection<Statement>> scan(
 			final Value focus, final Shape shape, final Collection<Statement> model
 	) {
 		return driver(shape)
 				.map(new JSONLDScanner(focus, singleton(focus), model))
-				.fold(Either::Left, stream -> Right(stream.collect(toList())));
+				.fold(_Either::Left, stream -> Right(stream.collect(toList())));
 	}
 
 
@@ -78,16 +78,16 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		return predicate.negate();
 	}
 
-	private Either<Trace, Stream<Statement>> report(final Trace trace) {
+	private _Either<Trace, Stream<Statement>> report(final Trace trace) {
 		return trace.empty() ? Right(Stream.empty()) : Left(trace);
 	}
 
-	private Either<Trace, Stream<Statement>> merge(
-			final Either<Trace, Stream<Statement>> x, final Either<Trace, Stream<Statement>> y
+	private _Either<Trace, Stream<Statement>> merge(
+			final _Either<Trace, Stream<Statement>> x, final _Either<Trace, Stream<Statement>> y
 	) {
 		return x.fold(
 				xtrace -> y.fold(ytrace -> Left(trace(xtrace, ytrace)), ystream -> Left(xtrace)),
-				xstream -> y.fold(Either::Left, ystream -> Right(Stream.concat(xstream, ystream)))
+				xstream -> y.fold(_Either::Left, ystream -> Right(Stream.concat(xstream, ystream)))
 		);
 	}
 
@@ -101,12 +101,12 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Guard guard) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Guard guard) {
 		throw new UnsupportedOperationException(guard.toString());
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Datatype datatype) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Datatype datatype) {
 
 		final IRI iri=datatype.iri();
 
@@ -117,7 +117,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Range range) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Range range) {
 
 		final Set<Value> values=resolve(range.values());
 
@@ -127,7 +127,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Lang lang) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Lang lang) {
 
 		final Set<String> tags=lang.tags();
 
@@ -145,7 +145,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MinExclusive minExclusive) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MinExclusive minExclusive) {
 
 		final Value limit=resolve(minExclusive.limit());
 
@@ -155,7 +155,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MaxExclusive maxExclusive) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MaxExclusive maxExclusive) {
 
 		final Value limit=resolve(maxExclusive.limit());
 
@@ -165,7 +165,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MinInclusive minInclusive) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MinInclusive minInclusive) {
 
 		final Value limit=resolve(minInclusive.limit());
 
@@ -175,7 +175,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MaxInclusive maxInclusive) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MaxInclusive maxInclusive) {
 
 		final Value limit=resolve(maxInclusive.limit());
 
@@ -186,7 +186,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MinLength minLength) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MinLength minLength) {
 
 		final int limit=minLength.limit();
 
@@ -196,7 +196,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MaxLength maxLength) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MaxLength maxLength) {
 
 		final int limit=maxLength.limit();
 
@@ -206,7 +206,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Pattern pattern) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Pattern pattern) {
 
 		final String expression=pattern.expression();
 		final String flags=pattern.flags();
@@ -222,7 +222,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Like like) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Like like) {
 
 		final String expression=like.toExpression();
 
@@ -234,7 +234,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Stem stem) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Stem stem) {
 
 		final String prefix=stem.prefix();
 
@@ -247,7 +247,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MinCount minCount) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MinCount minCount) {
 
 		final int count=group.size();
 		final int limit=minCount.limit();
@@ -257,7 +257,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		)));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final MaxCount maxCount) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final MaxCount maxCount) {
 
 		final int count=group.size();
 		final int limit=maxCount.limit();
@@ -267,7 +267,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		)));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final All all) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final All all) {
 
 		final Set<Value> values=resolve(all.values());
 
@@ -276,7 +276,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		)));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Any any) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Any any) {
 
 		final Set<Value> values=resolve(any.values());
 
@@ -285,7 +285,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 		)));
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Localized localized) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Localized localized) {
 		return report(trace(group.stream()
 
 				.collect(groupingBy(Values::lang, toList()))
@@ -299,11 +299,11 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Link link) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Link link) {
 		return link.shape().map(this);
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Field field) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Field field) {
 		return group.stream().map(value -> {
 
 			final IRI iri=field.iri();
@@ -324,7 +324,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 
 					shape.map(new JSONLDScanner(focus, values, model)).fold(
 							trace -> Left(trace(iri.toString(), trace)),
-							Either::Right
+							_Either::Right
 					),
 
 					Right(statements.stream())
@@ -334,11 +334,11 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final When when) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final When when) {
 		return when.test().map(this).fold(trace -> when.fail(), stream -> when.pass()).map(this);
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final And and) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final And and) {
 		return and.shapes().stream()
 
 				.map(s -> s.map(this))
@@ -346,9 +346,9 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 				.reduce(Right(Stream.empty()), this::merge);
 	}
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Or or) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Or or) {
 
-		final List<Either<Trace, Stream<Statement>>> reports=or.shapes().stream()
+		final List<_Either<Trace, Stream<Statement>>> reports=or.shapes().stream()
 
 				.map(s -> s.map(this))
 
@@ -363,7 +363,7 @@ final class JSONLDScanner extends Shape.Probe<Either<Trace, Stream<Statement>>> 
 	}
 
 
-	@Override public Either<Trace, Stream<Statement>> probe(final Shape shape) {
+	@Override public _Either<Trace, Stream<Statement>> probe(final Shape shape) {
 		return Right(Stream.empty());
 	}
 

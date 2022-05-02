@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.Items;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rest.Config;
+import com.metreeca.rest._Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -47,12 +47,12 @@ import static java.util.stream.Collectors.toList;
 
 final class GraphItems extends GraphFacts {
 
-	private final Config config=config();
+	private final _Config config=config();
 
 	private final Graph graph=service(graph());
 
 
-	GraphItems(final Config config) {
+	GraphItems(final _Config config) {
 		super(config);
 	}
 

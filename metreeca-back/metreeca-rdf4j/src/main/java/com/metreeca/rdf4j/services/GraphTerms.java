@@ -20,7 +20,7 @@ import com.metreeca.core.Identifiers;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.queries.Terms;
-import com.metreeca.rest.Config;
+import com.metreeca.rest._Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -46,7 +46,7 @@ final class GraphTerms extends GraphFacts {
 	private final Graph graph=service(graph());
 
 
-	GraphTerms(final Config config) {
+	GraphTerms(final _Config config) {
 		super(config);
 	}
 

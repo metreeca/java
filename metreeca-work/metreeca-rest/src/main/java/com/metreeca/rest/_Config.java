@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * <p>Provides access to customizable configuration parameters.</p>
  */
-@FunctionalInterface public interface Config {
+@FunctionalInterface public interface _Config {
 
 	/**
 	 * Retrieves an option.

@@ -71,27 +71,27 @@ public final class JSONFormat extends Format<JsonObject> {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Parses a JSON object.
-	 *
-	 * @param reader the reader the JSON object is to be parsed from
-	 *
-	 * @return either a parsing exception or the JSON object parsed from {@code reader}
-	 *
-	 * @throws NullPointerException if {@code reader} is null
-	 */
-	public static Either<JsonParsingException, JsonObject> json(final Reader reader) {
+     * Parses a JSON object.
+     *
+     * @param reader the reader the JSON object is to be parsed from
+     *
+     * @return either a parsing exception or the JSON object parsed from {@code reader}
+     *
+     * @throws NullPointerException if {@code reader} is null
+     */
+    public static _Either<JsonParsingException, JsonObject> json(final Reader reader) {
 
-		if ( reader == null ) {
-			throw new NullPointerException("null reader");
-		}
+        if ( reader == null ) {
+            throw new NullPointerException("null reader");
+        }
 
-		try ( final JsonReader jsonReader=Json.createReader(reader) ) {
+        try ( final JsonReader jsonReader=Json.createReader(reader) ) {
 
-			return Either.Right(jsonReader.readObject());
+            return _Either.Right(jsonReader.readObject());
 
-		} catch ( final JsonParsingException e ) {
+        } catch ( final JsonParsingException e ) {
 
-			return Either.Left(e);
+            return _Either.Left(e);
 
 		}
 	}
@@ -138,16 +138,16 @@ public final class JSONFormat extends Format<JsonObject> {
 	 * @return the default MIME type for JSON messages ({@value MIME})
 	 */
 	@Override public String mime() {
-		return MIME;
-	}
+        return MIME;
+    }
 
 
-	/**
+    /**
      * Decodes the JSON {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
      * body, if one is available and the {@code message} {@code Content-Type} header is either missing or  matched by
      * {@link #MIMEPattern}
      */
-    @Override public <M extends Message<M>> Either<MessageException, JsonObject> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<MessageException, JsonObject> decode(final M message) {
         return message
 
                 .header("Content-Type")
@@ -159,23 +159,23 @@ public final class JSONFormat extends Format<JsonObject> {
                     try (
                             final InputStream input=source.get();
 							final Reader reader=new InputStreamReader(input, message.charset())
-					) {
+                    ) {
 
-						return json(reader).fold(e -> Either.Left(status(BadRequest, e)), Either::Right);
+                        return json(reader).fold(e -> _Either.Left(status(BadRequest, e)), _Either::Right);
 
 					} catch ( final UnsupportedEncodingException e ) {
 
-						return Either.Left(status(BadRequest, e));
+                        return _Either.Left(status(BadRequest, e));
 
-					} catch ( final IOException e ) {
+                    } catch ( final IOException e ) {
 
-						throw new UncheckedIOException(e);
+                        throw new UncheckedIOException(e);
 
-					}
+                    }
 
-				}))
+                }))
 
-				.orElseGet(() -> Either.Left(status(UnsupportedMediaType, "no JSON body")));
+                .orElseGet(() -> _Either.Left(status(UnsupportedMediaType, "no JSON body")));
 	}
 
 	/**
