@@ -272,11 +272,18 @@ final class JSONLDFormatTest {
         @Test void testReportInvalidPayload() {
             exec(() -> assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> request().reply().map(response1 ->
 
-                            response(response1).body(jsonld(), frame(iri(response1.item())))).map(task(response -> response.body(output()).accept(e -> { },
-                            target -> target.accept(new ByteArrayOutputStream())
-                    ))))
+                    response(response1).body(jsonld(), frame(iri(response1.item())))).map(task(response ->
+                    response.body(output())
 
-            );
+                            .fold(e -> this, target -> {
+
+                                target.accept(new ByteArrayOutputStream());
+
+                                return this;
+
+                            })
+
+            ))));
 
         }
 

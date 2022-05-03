@@ -33,11 +33,11 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
-import static com.metreeca.rest._Either.Left;
-import static com.metreeca.rest._Either.Right;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -74,27 +74,27 @@ public final class HTMLFormat extends Format<Document> {
 	 * Parses an HTML document.
 	 *
 	 * <p><strong>Warning</strong> / The {@code .getElementById()} method of the parsed document will return always
-	 * {@code null}, as HTML id attributes aren't recognized as ID XML attributes.</p>
-	 *
-	 * @param input   the input the HTML document is to be parsed from
-	 * @param charset the charset used to decode {@code input}
-	 * @param base    the possibly null base URL for the HTML document to be parsed
-	 *
-	 * @return either a parsing exception or the HTML document parsed from {@code input}
-	 *
-	 * @throws NullPointerException if either {@code input} or {@code charset} is null
-	 */
-	public static _Either<TransformerException, Document> html(
-			final InputStream input, final Charset charset, final String base
-	) {
+     * {@code null}, as HTML id attributes aren't recognized as ID XML attributes.</p>
+     *
+     * @param input   the input the HTML document is to be parsed from
+     * @param charset the charset used to decode {@code input}
+     * @param base    the possibly null base URL for the HTML document to be parsed
+     *
+     * @return either a parsing exception or the HTML document parsed from {@code input}
+     *
+     * @throws NullPointerException if either {@code input} or {@code charset} is null
+     */
+    public static Either<TransformerException, Document> html(
+            final InputStream input, final Charset charset, final String base
+    ) {
 
-		if ( input == null ) {
-			throw new NullPointerException("null input stream");
-		}
+        if ( input == null ) {
+            throw new NullPointerException("null input stream");
+        }
 
-		if ( charset == null ) {
-			throw new NullPointerException("null charset");
-		}
+        if ( charset == null ) {
+            throw new NullPointerException("null charset");
+        }
 
 		if ( base == null ) {
 			throw new NullPointerException("null base URL");
@@ -197,22 +197,22 @@ public final class HTMLFormat extends Format<Document> {
 	}
 
 
-	/**
-	 * Decodes the HTML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
-	 * taking into account the {@code message} {@linkplain Message#charset() charset}
-	 */
-	@Override public <M extends Message<M>> _Either<MessageException, Document> decode(final M message) {
-		return message.header("Content-Type").filter(MIMEPattern.asPredicate())
+    /**
+     * Decodes the HTML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+     * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
+     * taking into account the {@code message} {@linkplain Message#charset() charset}
+     */
+    @Override public <M extends Message<M>> Either<MessageException, Document> decode(final M message) {
+        return message.header("Content-Type").filter(MIMEPattern.asPredicate())
 
-				.map(type -> message.body(input()).flatMap(source -> {
+                .map(type -> message.body(input()).flatMap(source -> {
 
-					try ( final InputStream input=source.get() ) {
+                    try ( final InputStream input=source.get() ) {
 
-						return html(input, message.charset(), message.item()).fold(e -> Left(status(BadRequest, e)),
-								_Either::Right);
+                        return html(input, message.charset(), message.item()).fold(e -> Left(status(BadRequest, e)),
+                                Either::Right);
 
-					} catch ( final IOException e ) {
+                    } catch ( final IOException e ) {
 
 						throw new UncheckedIOException(e);
 

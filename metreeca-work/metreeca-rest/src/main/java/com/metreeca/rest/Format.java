@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Resources.input;
+import static com.metreeca.rest.Either.Left;
 import static com.metreeca.rest.MessageException.status;
-import static com.metreeca.rest._Either.Left;
 
 import static java.lang.Float.parseFloat;
 import static java.lang.Math.max;
@@ -48,47 +48,46 @@ import static java.util.stream.Collectors.toMap;
  */
 public abstract class Format<V> {
 
-	/**
-	 * The default MIME type ({@value}).
-	 */
-	public static final String MIMEDefault="application/octet-stream";
+    /**
+     * The default MIME type ({@value}).
+     */
+    public static final String MIMEDefault="application/octet-stream";
 
 
-	private static final Pattern QualityPattern=Pattern.compile("(?:\\s*;\\s*q\\s*=\\s*(\\d*(?:\\.\\d+)?))?");
+    private static final Pattern QualityPattern=Pattern.compile("(?:\\s*;\\s*q\\s*=\\s*(\\d*(?:\\.\\d+)?))?");
 
-	private static final Pattern MIMEPattern=Pattern.compile("((?:[-+\\w]+|\\*)/(?:[-+\\w]+|\\*))"+QualityPattern);
-	private static final Pattern LangPattern=
-			Pattern.compile("([a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*|\\*)"+QualityPattern);
-
-
-	/**
-	 * MIME types by file extension (including dot).
-	 *
-	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">
-	 * Common MIME types @ MDN</a>
-	 */
-	private static final Map<String, String> MIMETypes=unmodifiableMap(Stream
-
-			.of(input(Format.class, ".tsv"))
-
-			.flatMap(stream -> new BufferedReader(new InputStreamReader(stream, UTF_8)).lines())
-
-			.filter(line -> !line.isEmpty())
-
-			.map(line -> {
-
-				final int tab=line.indexOf('\t');
-
-				return Map.entry(line.substring(0, tab), line.substring(tab+1));
-
-			})
-
-			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
-
-	);
+    private static final Pattern MIMEPattern=Pattern.compile("((?:[-+\\w]+|\\*)/(?:[-+\\w]+|\\*))"+QualityPattern);
+    private static final Pattern LangPattern=Pattern.compile("([a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*|\\*)"+QualityPattern);
 
 
-	/**
+    /**
+     * MIME types by file extension (including dot).
+     *
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">
+     * Common MIME types @ MDN</a>
+     */
+    private static final Map<String, String> MIMETypes=unmodifiableMap(Stream
+
+            .of(input(Format.class, ".tsv"))
+
+            .flatMap(stream -> new BufferedReader(new InputStreamReader(stream, UTF_8)).lines())
+
+            .filter(line -> !line.isEmpty())
+
+            .map(line -> {
+
+                final int tab=line.indexOf('\t');
+
+                return Map.entry(line.substring(0, tab), line.substring(tab+1));
+
+            })
+
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+
+    );
+
+
+    /**
      * Guess the MIME type of resource path.
      *
      * @param path the path of the resource whose MIME type is to be guessed
@@ -98,169 +97,169 @@ public abstract class Format<V> {
      *
      * @throws NullPointerException if {@code path} is null
      */
-	public static String mime(final String path) {
+    public static String mime(final String path) {
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
+        if ( path == null ) {
+            throw new NullPointerException("null path");
+        }
 
-		final int slash=max(0, path.lastIndexOf('/'));
-		final int dot=(slash >= 0 ? path.substring(slash) : path).lastIndexOf('.');
+        final int slash=max(0, path.lastIndexOf('/'));
+        final int dot=(slash >= 0 ? path.substring(slash) : path).lastIndexOf('.');
 
-		final String extension=dot >= 0 ? path.substring(slash+dot).toLowerCase(ROOT) : "";
+        final String extension=dot >= 0 ? path.substring(slash+dot).toLowerCase(ROOT) : "";
 
-		return MIMETypes.getOrDefault(extension, MIMEDefault);
-	}
-
-
-	/**
-	 * Parses a MIME type list.
-	 *
-	 * @param types the MIME type list to be parsed
-	 *
-	 * @return a list of MIME types parsed from {@code types}, sorted by descending
-	 * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
-	 *
-	 * @throws NullPointerException if {@code types} is null
-	 */
-	public static List<String> mimes(final CharSequence types) {
-
-		if ( types == null ) {
-			throw new NullPointerException("null types");
-		}
-
-		return values(types, MIMEPattern);
-	}
-
-	/**
-	 * Parses a language tag list.
-	 *
-	 * @param langs the language tag list to be parsed
-	 *
-	 * @return a list of language tags parsed from {@code langs}, sorted by descending
-	 * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
-	 *
-	 * @throws NullPointerException if {@code langs} is null
-	 */
-	public static List<String> langs(final CharSequence langs) {
-
-		if ( langs == null ) {
-			throw new NullPointerException("null langs");
-		}
-
-		return values(langs, LangPattern);
-	}
+        return MIMETypes.getOrDefault(extension, MIMEDefault);
+    }
 
 
-	private static List<String> values(final CharSequence types, final Pattern pattern) {
+    /**
+     * Parses a MIME type list.
+     *
+     * @param types the MIME type list to be parsed
+     *
+     * @return a list of MIME types parsed from {@code types}, sorted by descending
+     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
+     *
+     * @throws NullPointerException if {@code types} is null
+     */
+    public static List<String> mimes(final CharSequence types) {
 
-		if ( types == null ) {
-			throw new NullPointerException("null mime types");
-		}
+        if ( types == null ) {
+            throw new NullPointerException("null types");
+        }
 
-		final List<Map.Entry<String, Float>> entries=new ArrayList<>();
+        return values(types, MIMEPattern);
+    }
 
-		final Matcher matcher=pattern.matcher(types);
+    /**
+     * Parses a language tag list.
+     *
+     * @param langs the language tag list to be parsed
+     *
+     * @return a list of language tags parsed from {@code langs}, sorted by descending
+     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
+     *
+     * @throws NullPointerException if {@code langs} is null
+     */
+    public static List<String> langs(final CharSequence langs) {
 
-		while ( matcher.find() ) {
+        if ( langs == null ) {
+            throw new NullPointerException("null langs");
+        }
 
-			final String media=matcher.group(1).toLowerCase(ROOT);
-			final String quality=matcher.group(2);
-
-			try {
-				entries.add(new SimpleImmutableEntry<>(media, quality == null ? 1 : parseFloat(quality)));
-			} catch ( final NumberFormatException ignored ) {
-				entries.add(new SimpleImmutableEntry<>(media, 0.0f));
-			}
-		}
-
-		entries.sort((x, y) -> -Float.compare(x.getValue(), y.getValue()));
-
-		return entries.stream().map(Map.Entry::getKey).collect(toList());
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Retrieves the default MIME type.
-	 *
-	 * <p>The default implementation returns the {@value MIMEDefault} type.</p>
-	 *
-	 * @return the default MIME type for this format
-	 */
-	public String mime() {
-		return MIMEDefault;
-	}
+        return values(langs, LangPattern);
+    }
 
 
-	/**
-	 * Decodes a message body.
-	 *
-	 * <p>The default implementation returns a {@linkplain MessageException#status() no-op message exception}.</p>
-	 *
-	 * <p>Concrete subclasses should report decoding issues using the following HTTP status codes:</p>
-	 *
-	 * <ul>
-	 * <li>{@link Response#UnsupportedMediaType} for missing bodies;</li>
-	 * <li>{@link Response#BadRequest} for malformed bodies, unless a more specific status code is available.</li>
-	 * </ul>
-	 *
-	 * @param message the message whose body is to be decoded
-	 *
-	 * @return either a message exception reporting a decoding issue or the decoded {@code message} body
-	 *
-	 * @throws NullPointerException if {@code message} is null
-	 */
-	public <M extends Message<M>> _Either<MessageException, V> decode(final M message) {
+    private static List<String> values(final CharSequence types, final Pattern pattern) {
 
-		if ( message == null ) {
-			throw new NullPointerException("null message");
-		}
+        if ( types == null ) {
+            throw new NullPointerException("null mime types");
+        }
 
-		return Left(status());
-	}
+        final List<Map.Entry<String, Float>> entries=new ArrayList<>();
 
-	/**
-	 * Encodes a message body.
-	 *
-	 * <p>The default implementation has no effects.</p>
-	 *
-	 * @param message the message whose body is to be encoded
-	 * @param value   the body being encoded into {@code message}
-	 * @param <M>     the type of {@code message}
-	 *
-	 * @return the target {@code message} with the encoded {@code value} as body
-	 *
-	 * @throws NullPointerException if either {@code message} or {@code value} is null
-	 */
-	public <M extends Message<M>> M encode(final M message, final V value) {
+        final Matcher matcher=pattern.matcher(types);
 
-		if ( message == null ) {
-			throw new NullPointerException("null message");
-		}
+        while ( matcher.find() ) {
 
-		if ( value == null ) {
-			throw new NullPointerException("null value");
-		}
+            final String media=matcher.group(1).toLowerCase(ROOT);
+            final String quality=matcher.group(2);
 
-		return message;
-	}
+            try {
+                entries.add(new SimpleImmutableEntry<>(media, quality == null ? 1 : parseFloat(quality)));
+            } catch ( final NumberFormatException ignored ) {
+                entries.add(new SimpleImmutableEntry<>(media, 0.0f));
+            }
+        }
+
+        entries.sort((x, y) -> -Float.compare(x.getValue(), y.getValue()));
+
+        return entries.stream().map(Map.Entry::getKey).collect(toList());
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>All format objects in the same class are equal to each other.</p>
-	 */
-	@Override public final boolean equals(final Object object) {
-		return this == object || object != null && getClass().equals(object.getClass());
-	}
+    /**
+     * Retrieves the default MIME type.
+     *
+     * <p>The default implementation returns the {@value MIMEDefault} type.</p>
+     *
+     * @return the default MIME type for this format
+     */
+    public String mime() {
+        return MIMEDefault;
+    }
 
-	@Override public final int hashCode() {
-		return getClass().hashCode();
-	}
+
+    /**
+     * Decodes a message body.
+     *
+     * <p>The default implementation returns a {@linkplain MessageException#status() no-op message exception}.</p>
+     *
+     * <p>Concrete subclasses should report decoding issues using the following HTTP status codes:</p>
+     *
+     * <ul>
+     * <li>{@link Response#UnsupportedMediaType} for missing bodies;</li>
+     * <li>{@link Response#BadRequest} for malformed bodies, unless a more specific status code is available.</li>
+     * </ul>
+     *
+     * @param message the message whose body is to be decoded
+     *
+     * @return either a message exception reporting a decoding issue or the decoded {@code message} body
+     *
+     * @throws NullPointerException if {@code message} is null
+     */
+    public <M extends Message<M>> Either<MessageException, V> decode(final M message) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        return Left(status());
+    }
+
+    /**
+     * Encodes a message body.
+     *
+     * <p>The default implementation has no effects.</p>
+     *
+     * @param message the message whose body is to be encoded
+     * @param value   the body being encoded into {@code message}
+     * @param <M>     the type of {@code message}
+     *
+     * @return the target {@code message} with the encoded {@code value} as body
+     *
+     * @throws NullPointerException if either {@code message} or {@code value} is null
+     */
+    public <M extends Message<M>> M encode(final M message, final V value) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        if ( value == null ) {
+            throw new NullPointerException("null value");
+        }
+
+        return message;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>All format objects in the same class are equal to each other.</p>
+     */
+    @Override public final boolean equals(final Object object) {
+        return this == object || object != null && getClass().equals(object.getClass());
+    }
+
+    @Override public final int hashCode() {
+        return getClass().hashCode();
+    }
 
 }

@@ -22,18 +22,18 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>, _Either<R, L>> {
+public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>, Either<R, L>> {
 
-	public static <L, R> EitherAssert<L, R> assertThat(final _Either<R, L> either) {
-		return new EitherAssert<>(either);
-	}
+    public static <L, R> EitherAssert<L, R> assertThat(final Either<R, L> either) {
+        return new EitherAssert<>(either);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private EitherAssert(final _Either<R, L> actual) {
-		super(actual, EitherAssert.class);
-	}
+    private EitherAssert(final Either<R, L> actual) {
+        super(actual, EitherAssert.class);
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

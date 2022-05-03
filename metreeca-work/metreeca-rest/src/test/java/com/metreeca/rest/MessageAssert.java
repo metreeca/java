@@ -240,24 +240,28 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
 		isNotNull();
 
-		actual.body(DataFormat.data()).accept(e -> { }, data -> {
+		actual.body(DataFormat.data()).fold(e -> this, data -> {
 
-			if ( data.length > 0 ) {
-				failWithMessage("expected empty body but had binary body of length <%d>", data.length);
-			}
+            if ( data.length > 0 ) {
+                failWithMessage("expected empty body but had binary body of length <%d>", data.length);
+            }
 
-		});
+            return this;
 
-		actual.body(TextFormat.text()).accept(e -> { }, text -> {
+        });
 
-			if ( !text.isEmpty() ) {
-				failWithMessage(
-						"expected empty body but had textual body of length <%d> (%s)",
-						text.length(), Strings.fold(Strings.excerpt(text))
-				);
-			}
+        actual.body(TextFormat.text()).fold(e -> this, text -> {
 
-		});
+            if ( !text.isEmpty() ) {
+                failWithMessage(
+                        "expected empty body but had textual body of length <%d> (%s)",
+                        text.length(), Strings.fold(Strings.excerpt(text))
+                );
+            }
+
+            return this;
+
+        });
 
 		return myself;
 	}

@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.link.Values.*;
@@ -72,11 +73,11 @@ final class MicrodataTest {
 	private Xtream<Statement> scan(final String document) {
 		return Xtream.of(document)
 
-				.optMap(html -> html(
+				.map(html -> html(
 						new ByteArrayInputStream(html.getBytes(UTF_8)), UTF_8, "http://example.net/"
-				).get())
+				))
 
-				.flatMap(new Microdata());
+				.flatMap(either -> either.fold(e -> Stream.empty(), new Microdata()));
 	}
 
 	private long test(final String document) {

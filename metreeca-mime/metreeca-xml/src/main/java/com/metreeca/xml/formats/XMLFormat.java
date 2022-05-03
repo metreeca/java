@@ -34,11 +34,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest.Either.Right;
 import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
-import static com.metreeca.rest._Either.Left;
-import static com.metreeca.rest._Either.Right;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -114,66 +114,66 @@ public final class XMLFormat extends Format<Document> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Parses a XML document.
-     *
-     * @param input the input stream the XML document is to be parsed from
-     *
-     * @return either a parsing exception or the XML document parsed from {@code input}
-     *
-     * @throws NullPointerException if {@code input} is null
-     */
-    public static _Either<TransformerException, Document> xml(final InputStream input) {
+	/**
+	 * Parses a XML document.
+	 *
+	 * @param input the input stream the XML document is to be parsed from
+	 *
+	 * @return either a parsing exception or the XML document parsed from {@code input}
+	 *
+	 * @throws NullPointerException if {@code input} is null
+	 */
+	public static Either<TransformerException, Document> xml(final InputStream input) {
 
-        if ( input == null ) {
-            throw new NullPointerException("null input");
-        }
+		if ( input == null ) {
+			throw new NullPointerException("null input");
+		}
 
-        return xml(input, null);
-    }
+		return xml(input, null);
+	}
 
-    /**
-     * Parses a XML document.
-     *
-     * @param input the input stream the XML document is to be parsed from
-     * @param base  the possibly null base URL for the XML document to be parsed
-     *
-     * @return either a parsing exception or the XML document parsed from {@code input}
-     *
-     * @throws NullPointerException if {@code input} is null
-     */
-    public static _Either<TransformerException, Document> xml(final InputStream input, final String base) {
+	/**
+	 * Parses a XML document.
+	 *
+	 * @param input the input stream the XML document is to be parsed from
+	 * @param base  the possibly null base URL for the XML document to be parsed
+	 *
+	 * @return either a parsing exception or the XML document parsed from {@code input}
+	 *
+	 * @throws NullPointerException if {@code input} is null
+	 */
+	public static Either<TransformerException, Document> xml(final InputStream input, final String base) {
 
-        if ( input == null ) {
-            throw new NullPointerException("null input");
-        }
+		if ( input == null ) {
+			throw new NullPointerException("null input");
+		}
 
-        final InputSource source=new InputSource();
+		final InputSource source=new InputSource();
 
-        source.setSystemId(base);
-        source.setByteStream(input);
+		source.setSystemId(base);
+		source.setByteStream(input);
 
         return xml(new SAXSource(source));
     }
 
-    /**
-     * Parses a XML document.
-     *
-     * @param source the source the XML document is to be parsed from
-     *
-     * @return either a parsing exception or the XML document parsed from {@code source}
-     *
-     * @throws NullPointerException if {@code source} is null
-     */
-    public static _Either<TransformerException, Document> xml(final Source source) {
+	/**
+	 * Parses a XML document.
+	 *
+	 * @param source the source the XML document is to be parsed from
+	 *
+	 * @return either a parsing exception or the XML document parsed from {@code source}
+	 *
+	 * @throws NullPointerException if {@code source} is null
+	 */
+	public static Either<TransformerException, Document> xml(final Source source) {
 
-        if ( source == null ) {
-            throw new NullPointerException("null source");
-        }
+		if ( source == null ) {
+			throw new NullPointerException("null source");
+		}
 
-        try {
+		try {
 
-            final Document document=builder().newDocument();
+			final Document document=builder().newDocument();
 
 			document.setDocumentURI(source.getSystemId());
 
@@ -209,22 +209,22 @@ public final class XMLFormat extends Format<Document> {
     }
 
 
-    /**
-     * Decodes the XML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
-     * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
-     * taking into account the {@code message} {@linkplain Message#charset() charset}
-     */
-    @Override public <M extends Message<M>> _Either<MessageException, Document> decode(final M message) {
-        return message.header("Content-Type").filter(MIMEPattern.asPredicate())
+	/**
+	 * Decodes the XML {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
+	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
+	 * taking into account the {@code message} {@linkplain Message#charset() charset}
+	 */
+	@Override public <M extends Message<M>> Either<MessageException, Document> decode(final M message) {
+		return message.header("Content-Type").filter(MIMEPattern.asPredicate())
 
-                .map(type -> message.body(input()).flatMap(source -> {
+				.map(type -> message.body(input()).flatMap(source -> {
 
-                    try ( final InputStream input=source.get() ) {
+					try ( final InputStream input=source.get() ) {
 
-                        final InputSource inputSource=new InputSource();
+						final InputSource inputSource=new InputSource();
 
-                        inputSource.setSystemId(message.item());
-                        inputSource.setByteStream(input);
+						inputSource.setSystemId(message.item());
+						inputSource.setByteStream(input);
 	                    inputSource.setEncoding(message.charset().name());
 
 						final SAXSource saxSource=(parser != null)
@@ -233,7 +233,7 @@ public final class XMLFormat extends Format<Document> {
 
                         saxSource.setSystemId(message.item());
 
-                        return xml(saxSource).fold(e -> Left(status(BadRequest, e)), _Either::Right);
+						return xml(saxSource).fold(e -> Left(status(BadRequest, e)), Either::Right);
 
 					} catch ( final UnsupportedEncodingException e ) {
 

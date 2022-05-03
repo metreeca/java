@@ -74,22 +74,21 @@ public final class TextFormat extends Format<String> {
 
 
 	/**
-     * Decodes the textual {@code message} body from the input stream supplied by the {@code message}
-     * {@link InputFormat}
+     * Decodes the textual {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
      * body, if one is available, taking into account the {@code message} {@linkplain Message#charset() charset}
      */
-    @Override public <M extends Message<M>> _Either<MessageException, String> decode(final M message) {
+    @Override public <M extends Message<M>> Either<MessageException, String> decode(final M message) {
         return message.body(input()).flatMap(source -> {
             try (
                     final InputStream input=source.get();
                     final Reader reader=new InputStreamReader(input, message.charset())
             ) {
 
-                return _Either.Right(Feeds.text(reader));
+                return Either.Right(Feeds.text(reader));
 
             } catch ( final UnsupportedEncodingException e ) {
 
-				return _Either.Left(status(BadRequest, e));
+				return Either.Left(status(BadRequest, e));
 
             } catch ( final IOException e ) {
 

@@ -16,7 +16,6 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.http.Either;
 import com.metreeca.rest.formats.MultipartFormat;
 
 import java.io.InputStream;
@@ -31,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Either.Left;
+import static com.metreeca.rest.Either.Left;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -52,6 +51,81 @@ import static java.util.stream.Collectors.joining;
  * @param <M> the self-bounded message type supporting fluent setters
  */
 public abstract class Message<M extends Message<M>> {
+
+    /**
+     * Creates a message part.
+     *
+     * @param item the (possibly relative)) IRI identifying the {@linkplain #item() focus item} of the new message part;
+     *             will be resolved against the message {@linkplain #item() item} IRI
+     *
+     * @return a new message part with a focus item identified by {@code item} and the same {@linkplain #request()
+     * originating request} as this message
+     *
+     * @throws NullPointerException     if {@code item} is null
+     * @throws IllegalArgumentException if {@code item} is not a legal (possibly relative) IRI
+     */
+    public Message<?> part(final String item) {
+
+        if ( item == null ) {
+            throw new NullPointerException("null item");
+        }
+
+        return new Part(URI.create(item()).resolve(item).toString(), this);
+    }
+
+    /**
+     * Lift a message part into this message.
+     *
+     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain MultipartFormat
+     * multipart} requests for further downstream processing, as for instance in:</p>
+     *
+     * <pre>{@code handler -> request -> request.body(multipart(1000, 10_000)).fold(
+     *
+     *     parts -> Optional.ofNullable(parts.get("main"))
+     *
+     *         .map(main -> {
+     *
+     *           ... // process ancillary body parts
+     *
+     *           return handler.handle(request.lift(main));
+     *
+     *         })
+     *
+     *         .orElseGet(() -> request.reply(new Failure()
+     *             .status(BadRequest)
+     *             .cause("missing main body part")
+     *         )),
+     *
+     *     request::reply
+     *
+     * )}</pre>
+     *
+     * @param message the message part to be lifted into this message
+     *
+     * @return this message modified as follows:
+     * <ul>
+     * <li>source {@code message} headers are copied to this message overriding existing matching values;</li>
+     * <li>source {@code message} body representations are copied to this message replacing all existing values.</li>
+     * </ul>
+     *
+     * @throws NullPointerException if {@code message} is null
+     */
+    public M lift(final Message<?> message) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        headers.putAll(message.headers); // value lists are read-only
+
+        bodies.clear();
+        bodies.putAll(message.bodies);
+
+        return self();
+    }
+
+
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static final Pattern SplitPattern=Pattern.compile("\\s*,\\s*");
     private static final Pattern ExpiresPattern=Pattern.compile("(?i)\\bExpires\\b");
@@ -126,7 +200,7 @@ public abstract class Message<M extends Message<M>> {
      * @throws UnsupportedCharsetException if the specified charset is not supported in this instance of the Java virtual
      *                                     machine
      */
-    public Charset charset() {
+    public Charset charset() throws UnsupportedCharsetException {
         return header("Content-Type")
 
                 .map(CharsetPattern::matcher)
@@ -548,87 +622,13 @@ public abstract class Message<M extends Message<M>> {
     }
 
 
-    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Creates a message part.
-     *
-     * @param item the (possibly relative)) IRI identifying the {@linkplain #item() focus item} of the new message part;
-     *             will be resolved against the message {@linkplain #item() item} IRI
-     *
-     * @return a new message part with a focus item identified by {@code item} and the same {@linkplain #request()
-     * originating request} as this message
-     *
-     * @throws NullPointerException     if {@code item} is null
-     * @throws IllegalArgumentException if {@code item} is not a legal (possibly relative) IRI
-     */
-    public Message<?> part(final String item) {
-
-        if ( item == null ) {
-            throw new NullPointerException("null item");
-        }
-
-        return new Part(URI.create(item()).resolve(item).toString(), this);
-    }
-
-    /**
-     * Lift a message part into this message.
-     *
-     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain MultipartFormat
-     * multipart} requests for further downstream processing, as for instance in:</p>
-     *
-     * <pre>{@code handler -> request -> request.body(multipart(1000, 10_000)).fold(
-     *
-     *     parts -> Optional.ofNullable(parts.get("main"))
-     *
-     *         .map(main -> {
-     *
-     *           ... // process ancillary body parts
-     *
-     *           return handler.handle(request.lift(main));
-     *
-     *         })
-     *
-     *         .orElseGet(() -> request.reply(new Failure()
-     *             .status(BadRequest)
-     *             .cause("missing main body part")
-     *         )),
-     *
-     *     request::reply
-     *
-     * )}</pre>
-     *
-     * @param message the message part to be lifted into this message
-     *
-     * @return this message modified as follows:
-     * <ul>
-     * <li>source {@code message} headers are copied to this message overriding existing matching values;</li>
-     * <li>source {@code message} body representations are copied to this message replacing all existing values.</li>
-     * </ul>
-     *
-     * @throws NullPointerException if {@code message} is null
-     */
-    public M lift(final Message<?> message) {
-
-        if ( message == null ) {
-            throw new NullPointerException("null message");
-        }
-
-        headers.putAll(message.headers); // value lists are read-only
-
-        bodies.clear();
-        bodies.putAll(message.bodies);
-
-        return self();
-    }
-
 
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final Map<Format<?>, _Either<MessageException, ?>> bodies=new HashMap<>();
+    private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
 
 
-    @SuppressWarnings("unchecked") public <V> _Either<MessageException, V> body(final Format<V> format) {
+    @SuppressWarnings("unchecked") public <V> Either<MessageException, V> body(final Format<V> format) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -636,13 +636,13 @@ public abstract class Message<M extends Message<M>> {
 
         // ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
 
-        _Either<MessageException, ?> body=bodies.get(format);
+        Either<MessageException, ?> body=bodies.get(format);
 
         if ( body == null ) {
             bodies.put(format, body=format.decode(self()));
         }
 
-        return (_Either<MessageException, V>)body;
+        return (Either<MessageException, V>)body;
     }
 
     public <V> M body(final Format<? super V> format, final V value) {
@@ -655,7 +655,7 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null value");
         }
 
-        bodies.put(format, _Either.Right(value));
+        bodies.put(format, Either.Right(value));
 
         return format.encode(self(), value);
     }
@@ -673,11 +673,11 @@ public abstract class Message<M extends Message<M>> {
 
         // ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
 
-        final _Either<MessageException, ?> value=bodies.get(format);
+        final Either<MessageException, ?> value=bodies.get(format);
 
         if ( value != null ) {
 
-            final _Either<MessageException, V> mapped=value.map(body -> requireNonNull(
+            final Either<MessageException, V> mapped=value.map(body -> requireNonNull(
 
                     mapper.apply((V)body), "null mapper return value"
 

@@ -18,7 +18,7 @@ package com.metreeca.rest.formats;
 
 import com.metreeca.link.Shape;
 import com.metreeca.link.Trace;
-import com.metreeca.rest._Either;
+import com.metreeca.rest.Either;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Shape.required;
@@ -79,9 +78,9 @@ final class JSONLDScannerTest {
 
 	@Nested final class Validation {
 
-		private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
-			return JSONLDScanner.scan(s, shape, asList(model));
-		}
+        private Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
+            return JSONLDScanner.scan(s, shape, asList(model));
+        }
 
 
 		@Test void testValidateShapeEnvelope() {
@@ -191,14 +190,14 @@ final class JSONLDScannerTest {
 
 	@Nested final class Constraints {
 
-		private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
+        private Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
 
-			return JSONLDScanner.scan(s, field(p, shape), Arrays
-					.stream(values)
-					.map(v -> statement(s, p, v))
-					.collect(toList())
-			);
-		}
+            return JSONLDScanner.scan(s, field(p, shape), Arrays
+                    .stream(values)
+                    .map(v -> statement(s, p, v))
+                    .collect(toList())
+            );
+        }
 
 
 		@Test void testValidateDatatype() {
@@ -464,8 +463,10 @@ final class JSONLDScannerTest {
 	@Nested final class Trimming {
 
 		private Collection<Statement> scan(final Shape shape, final Statement... model) {
-			return JSONLDScanner.scan(s, shape, asList(model)).get().orElse(emptySet());
-		}
+            return JSONLDScanner.scan(s, shape, asList(model))
+                    .fold(e -> Optional.<Collection<Statement>>empty(), Optional::of)
+                    .orElse(emptySet());
+        }
 
 
 		@Test void testPruneField() {

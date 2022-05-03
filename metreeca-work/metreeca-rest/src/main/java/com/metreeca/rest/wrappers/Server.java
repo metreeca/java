@@ -18,8 +18,8 @@ package com.metreeca.rest.wrappers;
 
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
+import com.metreeca.rest.codecs.Text;
 import com.metreeca.rest.formats.JSONFormat;
-import com.metreeca.rest.formats.TextFormat;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -49,7 +49,7 @@ public final class Server implements Wrapper {
     private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
     private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
 
-    private static final Pattern TextualPattern=Pattern.compile(TextFormat.MIMEPattern+"|"+JSONFormat.MIMEPattern);
+    private static final Pattern TextualPattern=Pattern.compile(Text.MIMEPattern+"|"+JSONFormat.MIMEPattern);
     private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
 
 

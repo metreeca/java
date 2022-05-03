@@ -20,10 +20,14 @@ import com.metreeca.rest.Codec;
 import com.metreeca.rest.Message;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Feeds.text;
+import static com.metreeca.rest.formats.OutputFormat.output;
+
+import static java.lang.String.valueOf;
 
 /**
  * Textual message codec.
@@ -79,23 +83,28 @@ public final class Text implements Codec<String> {
     }
 
     @Override public <M extends Message<M>> M encode(final M message, final String value) {
+
+        final Charset charset=message.charset();
+        final byte[] bytes=value.getBytes(charset);
+
         return message
 
                 .header("Content-Type", message.header("Content-Type").orElse(MIME))
+                .header("Content-Length", valueOf(bytes.length))
 
-                .output(output -> {
+                .body(output(), output -> {
+                    try {
 
-                    try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
-
-                        writer.write(value);
+                        output.write(bytes);
 
                     } catch ( final IOException e ) {
 
                         throw new UncheckedIOException(e);
 
                     }
-
                 });
+
+
     }
 
 }

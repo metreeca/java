@@ -35,24 +35,26 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 
 		if ( response != null ) {
 
-			response.body(output()).accept(e -> {}, target -> {
+			response.body(output()).fold(e -> null, target -> {
 
-				final byte[] data;
+                final byte[] data;
 
-				try ( final ByteArrayOutputStream out=new ByteArrayOutputStream(1000) ) {
+                try ( final ByteArrayOutputStream out=new ByteArrayOutputStream(1000) ) {
 
-					target.accept(out);
+                    target.accept(out);
 
-					data=out.toByteArray();
+                    data=out.toByteArray();
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
+                } catch ( final IOException e ) {
+                    throw new UncheckedIOException(e);
+                }
 
                 response.body(output(), output -> { Feeds.data(output, data); }); // cache output
                 response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
 
-			});
+                return null;
+
+            });
 
 			final StringBuilder builder=new StringBuilder(2500);
 

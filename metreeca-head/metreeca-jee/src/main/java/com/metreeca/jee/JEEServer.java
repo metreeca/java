@@ -238,15 +238,17 @@ public abstract class JEEServer implements Filter {
 
 			response.headers().forEach(http::addHeader);
 
-			response.body(output()).accept(e -> { }, target -> { // ignore missing response bodies
-				try {
+			response.body(output()).fold(e -> this, target -> { // ignore missing response bodies
+                try {
 
-					target.accept(http.getOutputStream());
+                    target.accept(http.getOutputStream());
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			});
+                    return this;
+
+                } catch ( final IOException e ) {
+                    throw new UncheckedIOException(e);
+                }
+            });
 
 			if ( !http.isCommitted() ) { // flush if not already committed by bodies
 				try {

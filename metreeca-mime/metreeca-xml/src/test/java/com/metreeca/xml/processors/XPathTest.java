@@ -17,13 +17,13 @@
 package com.metreeca.xml.processors;
 
 import com.metreeca.core.Xtream;
-import com.metreeca.rest._Either;
 import com.metreeca.xml.formats.XMLFormat;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.Optional;
 
 import static com.metreeca.xml.processors.XPath.decode;
 
@@ -44,7 +44,7 @@ final class XPathTest {
 
                 .map(x -> XMLFormat.xml(new ByteArrayInputStream(x.getBytes(UTF_8))))
 
-                .optMap(_Either::get)
+                .optMap(either -> either.fold(e -> Optional.empty(), Optional::of))
 
                 .map(XPath::new).flatMap(xpath -> xpath.nodes("//ns:y"))
                 .map(XPath::new).flatMap(xpath -> xpath.strings("//ns:z"))
