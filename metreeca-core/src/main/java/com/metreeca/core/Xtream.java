@@ -18,6 +18,7 @@ package com.metreeca.core;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -242,6 +243,34 @@ public final class Xtream<T> implements Stream<T> {
 
 
     /**
+     * Removes duplicate elements.
+     *
+     * @param key a function mapping from extended stream elements to element equality keys; must return a non-null
+     *            value
+     *
+     * @return an extended stream produced by removing from this extended stream all elements sharing the same {@code
+     * key} with previously processed elements
+     *
+     * @throws NullPointerException if {@code key} is null or returns null values
+     */
+    public Xtream<T> distinct(final Function<? super T, Object> key) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        return filter(new Predicate<>() {
+
+            private final Set<Object> processed=ConcurrentHashMap.newKeySet();
+
+            @Override public boolean test(final T value) {
+                return processed.add(Objects.requireNonNull(key.apply(value), "null key"));
+            }
+
+        });
+    }
+
+    /**
      * Removes incompatible elements.
      *
      * @param clash a binary predicate returning {@code true} if its arguments are mutually incompatible or {@code false}
@@ -258,7 +287,7 @@ public final class Xtream<T> implements Stream<T> {
             throw new NullPointerException("null clash");
         }
 
-        return filter(new Predicate<T>() {
+        return filter(new Predicate<>() {
 
             private final Collection<T> matches=new ArrayList<>();
 
