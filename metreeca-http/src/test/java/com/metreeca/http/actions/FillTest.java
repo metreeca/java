@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.metreeca.http.actions;
 
 
-import com.metreeca.core.Xtream;
 import com.metreeca.http.Locator;
+import com.metreeca.http.Xtream;
 
 import org.junit.jupiter.api.Test;
 

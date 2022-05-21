@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -303,7 +303,7 @@ import static java.lang.String.format;
 
 
         @Override public Response apply(final Request request) {
-            return request.safe() && request.remote() ? cache.retrieve(
+            return request.safe() ? cache.retrieve(
 
                     format("%s %s", request.method(), request.resource()),
 

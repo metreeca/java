@@ -56,10 +56,6 @@ public final class Request extends Message<Request> {
             GET, HEAD, OPTIONS, TRACE // https://tools.ietf.org/html/rfc7231#section-4.2.1
     ));
 
-    private static final Collection<String> Remote=new HashSet<>(asList(
-            "feed:", "ftp:", "http:", "https", "imap", "ldap:", "ldaps", "message:", "pop:", "s3:"
-    ));
-
 
     /**
      * URL-encode a string.
@@ -281,17 +277,6 @@ public final class Request extends Message<Request> {
      */
     public boolean safe() {
         return Safe.contains(method);
-    }
-
-    /**
-     * Checks if this request is remote.
-     *
-     * @return {@code true} if the {@link #item() focus IRI} of this request is based on a remote dereferenceable
-     * <a href="https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml#uri-schemes-1">URI scheme</a>; {@code
-     * false} otherwise
-     */
-    public boolean remote() {
-        return Remote.stream().anyMatch(item::startsWith);
     }
 
     /**

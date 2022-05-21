@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.metreeca.open.processors;
 
 import com.metreeca.core.Strings;
-import com.metreeca.core.Xtream;
+import com.metreeca.http.Xtream;
 import com.metreeca.http.actions.Fill;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Values;

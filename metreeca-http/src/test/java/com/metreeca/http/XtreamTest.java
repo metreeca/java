@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.metreeca.core;
+package com.metreeca.http;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 final class XtreamTest {
 
     @Nested final class Loop {
 
         @Test void testIncludeStartingPoint() {
-            assertThat(Xtream.of(0).loop(n -> n < 2 ? Xtream.of(n+1) : Xtream.empty()))
+            Assertions.assertThat(Xtream.of(0).loop(n -> n < 2 ? Xtream.of(n+1) : Xtream.empty()))
                     .containsExactly(0, 1, 2);
         }
 
@@ -38,10 +36,10 @@ final class XtreamTest {
     @Nested final class Scan {
 
         @Test void testIncludeStartingPoint() {
-            assertThat(Xtream.of(0).scan(n -> n < 3
-                    ? Xtream.of(entry(Stream.of(n+1), Stream.of(String.valueOf(n))))
-                    : Xtream.empty()
-            ))
+            Assertions.assertThat(Xtream.of(0).scan(n -> n < 3
+                            ? Xtream.of(Assertions.entry(Stream.of(n+1), Stream.of(String.valueOf(n))))
+                            : Xtream.empty()
+                    ))
                     .containsExactly("0", "1", "2");
         }
 
