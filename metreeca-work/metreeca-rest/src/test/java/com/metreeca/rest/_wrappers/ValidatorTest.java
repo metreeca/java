@@ -16,12 +16,12 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.http.Locator;
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
+import com.metreeca.rest.Handler;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.Response.OK;
+import static com.metreeca.http.Response.OK;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;

@@ -16,29 +16,31 @@
 
 package com.metreeca.rest.operators;
 
+import com.metreeca.http.*;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
 import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest.*;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
+import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.IRI;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.NotFound;
+import static com.metreeca.http.Response.OK;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Shape.Contains;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Guard.*;
-import static com.metreeca.rest.Response.NotFound;
-import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest._Wrapper.keeper;
 import static com.metreeca.rest._Wrapper.wrapper;
-import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
-import static com.metreeca.rest._formats.JSONLDFormat.query;
+import static com.metreeca.rest.codecs.JSONLD.query;
+import static com.metreeca.rest.codecs.JSONLD.shape;
 import static com.metreeca.rest.services.Engine.*;
 
 
@@ -50,7 +52,7 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
@@ -67,10 +69,10 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * <li>a shape describing the results;</li>
  *
- * <li>a {@link JSONLDFormat JSON-LD} body containing a description of member linked data resources
+ * <li>a {@link JSONLD JSON-LD} body containing a description of member linked data resources
  * retrieved with the assistance of the shared linked data {@linkplain Engine#relate(Frame, Query) engine} according to
  * the filtering constraints collected from the request shape and the
- * {@linkplain JSONLDFormat#query(IRI, Shape, String) query} component of the request IRI; the IRI of the target
+ * {@linkplain JSONLD#query(IRI, Shape, String) query} component of the request IRI; the IRI of the target
  * collection is connected to the IRIs of the member resources using the {@link Shape#Contains ldp:contains} property.
  * </li>
  *
@@ -87,7 +89,7 @@ import static com.metreeca.rest.services.Engine.*;
  *
  * <li>a shape describing the results;</li>
  *
- * <li>a {@link JSONLDFormat JSON-LD} body containing a description of the request item retrieved with the assistance
+ * <li>a {@link JSONLD JSON-LD} body containing a description of the request item retrieved with the assistance
  * of the shared linked data {@linkplain Engine#relate(Frame, Query) engine}. </li>
  *
  * </ul>
@@ -102,66 +104,68 @@ import static com.metreeca.rest.services.Engine.*;
  */
 public final class Relator extends Delegator {
 
-	private final Engine engine=service(engine());
+    private final Engine engine=service(engine());
 
 
-	/**
-	 * Creates a resource relator.
-	 */
-	private Relator() {
-		delegate(relate().with(wrapper(Request::collection,
-				keeper(Relate, Digest),
-				keeper(Relate, Detail)
-		)));
-	}
+    /**
+     * Creates a resource relator.
+     */
+    private Relator() {
+        delegate(relate().with(wrapper(Request::collection,
+                keeper(Relate, Digest),
+                keeper(Relate, Detail)
+        )));
+    }
 
 
-	private Handler relate() {
+    private Handler relate() {
         return (request, next) -> {
 
             final boolean collection=request.collection();
 
             final IRI item=iri(request.item());
-			final Shape shape=JSONLDFormat.shape(request);
+            final Shape shape=shape(request);
 
-			return query(item, shape, request.query()).fold(mapper -> request.reply().map(mapper),
-                    query -> engine.relate(frame(item), query)
+            final Query query=query(item, shape, request.query());
+            return engine.relate(frame(item), query)
 
-		                    .map(frame -> request.reply().map(response -> JSONLDFormat.shape(response.status(OK),
-                                            query.map(new ShapeProbe(collection)))
-				                    .body(jsonld(), frame)))
+                    .map(frame -> request.reply().map(response ->
+                            shape(response.status(OK), query.map(new ShapeProbe(collection)))
+                                    .body(new JSONLD(), frame)
+                    ))
 
-					.orElseGet(() -> request.reply().map(response -> collection
-							? JSONLDFormat.shape(response.status(OK), and()).body(jsonld(), frame(item)) // virtual container
-							: response.status(NotFound))));
-		};
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static final class ShapeProbe extends Query.Probe<Shape> {
-
-		private final boolean collection;
+                    .orElseGet(() -> request.reply().map(response -> collection
+                            ? shape(response.status(OK), and()).body(new JSONLD(), frame(item)) // virtual container
+                            : response.status(NotFound)
+                    ));
+        };
+    }
 
 
-		private ShapeProbe(final boolean collection) {
-			this.collection=collection;
-		}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static final class ShapeProbe extends Query.Probe<Shape> {
+
+        private final boolean collection;
 
 
-		@Override public Shape probe(final Items items) { // !!! add Shape.Contains if items.path is not empty
-			return (collection ? field(Contains, items.shape()) : items.shape()).redact(Mode, Convey); // remove filters
-		}
+        private ShapeProbe(final boolean collection) {
+            this.collection=collection;
+        }
 
-		@Override public Shape probe(final Stats stats) {
-			return StatsShape(stats);
-		}
 
-		@Override public Shape probe(final Terms terms) {
-			return TermsShape(terms);
-		}
+        @Override public Shape probe(final Items items) { // !!! add Shape.Contains if items.path is not empty
+            return (collection ? field(Contains, items.shape()) : items.shape()).redact(Mode, Convey); // remove filters
+        }
 
-	}
+        @Override public Shape probe(final Stats stats) {
+            return StatsShape(stats);
+        }
+
+        @Override public Shape probe(final Terms terms) {
+            return TermsShape(terms);
+        }
+
+    }
 
 }

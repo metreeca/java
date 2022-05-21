@@ -17,12 +17,11 @@
 package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.core.Identifiers;
+import com.metreeca.http.*;
+import com.metreeca.http.codecs.Data;
 import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
-import com.metreeca.rest._formats.JSONLDFormat;
-import com.metreeca.rest.codecs.Data;
+import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.*;
@@ -37,15 +36,14 @@ import java.io.*;
 import java.util.*;
 
 import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.http.Message.mimes;
+import static com.metreeca.http.Response.BadRequest;
+import static com.metreeca.http.Response.InternalServerError;
 import static com.metreeca.link.Shape.exactly;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.codecs.RDF.service;
-import static com.metreeca.rest.Message.mimes;
-import static com.metreeca.rest.Response.BadRequest;
-import static com.metreeca.rest.Response.InternalServerError;
-import static com.metreeca.rest._MessageException.status;
 
 import static java.lang.String.format;
 
@@ -104,7 +102,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null && !catalog ) {
 
-            return request.reply().map(status(BadRequest, "missing target graph parameter"));
+            throw new CodecException(BadRequest, "missing target graph parameter");
 
         } else if ( !queryable(request.roles()) ) {
 
@@ -128,7 +126,7 @@ public final class Graphs extends Endpoint<Graphs> {
                 }
             }));
 
-            return request.reply().map(response -> JSONLDFormat.shape(response.status(Response.OK), GraphsShape)
+            return request.reply().map(response -> JSONLD.shape(response.status(Response.OK), GraphsShape)
                     .body(new com.metreeca.rdf.codecs.RDF(), model));
 
         } else {
@@ -168,7 +166,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply().map(status(BadRequest, "missing target graph parameter"));
+            throw new CodecException(BadRequest, "missing target graph parameter");
 
         } else if ( !updatable(request.roles()) ) {
 
@@ -201,19 +199,19 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     logger().warning(this, "unable to read RDF payload", e);
 
-                    return request.reply().map(status(InternalServerError, e));
+                    throw new CodecException(InternalServerError, e.getMessage());
 
                 } catch ( final RDFParseException e ) {
 
                     logger().warning(this, "malformed RDF payload", e);
 
-                    return request.reply().map(status(BadRequest, e));
+                    throw new CodecException(BadRequest, e.getMessage());
 
                 } catch ( final RepositoryException e ) {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply().map(status(InternalServerError, e));
+                    throw new CodecException(InternalServerError, e.getMessage());
 
                 }
             });
@@ -230,7 +228,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply().map(status(BadRequest, "missing target graph parameter"));
+            throw new CodecException(BadRequest, "missing target graph parameter");
 
         } else if ( !updatable(request.roles()) ) {
 
@@ -254,7 +252,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply().map(status(InternalServerError, e));
+                    throw new CodecException(InternalServerError, e.getMessage());
 
                 }
             });
@@ -274,7 +272,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
         if ( target == null ) {
 
-            return request.reply().map(status(BadRequest, "missing target graph parameter"));
+            throw new CodecException(BadRequest, "missing target graph parameter");
 
         } else if ( !updatable(request.roles()) ) {
 
@@ -306,19 +304,19 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     logger().warning(this, "unable to read RDF payload", e);
 
-                    return request.reply().map(status(InternalServerError, e));
+                    throw new CodecException(InternalServerError, e.getMessage());
 
                 } catch ( final RDFParseException e ) {
 
                     logger().warning(this, "malformed RDF payload", e);
 
-                    return request.reply().map(status(BadRequest, e));
+                    throw new CodecException(BadRequest, e.getMessage());
 
                 } catch ( final RepositoryException e ) {
 
                     logger().warning(this, "unable to update graph "+context, e);
 
-                    return request.reply().map(status(InternalServerError, e));
+                    throw new CodecException(InternalServerError, e.getMessage());
 
                 }
             });

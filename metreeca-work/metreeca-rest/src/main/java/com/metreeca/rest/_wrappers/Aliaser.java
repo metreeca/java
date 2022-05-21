@@ -16,13 +16,16 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.rest.Response.SeeOther;
+import static com.metreeca.http.Response.SeeOther;
 import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Objects.requireNonNull;

@@ -16,21 +16,20 @@
 
 package com.metreeca.rest.operators;
 
+import com.metreeca.http.Request;
 import com.metreeca.link.Shape;
-import com.metreeca.rest.Request;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.codecs.JSONLD;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
+import static com.metreeca.http.Response.Created;
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.item;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Or.or;
-import static com.metreeca.rest.Response.Created;
-import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.operators.OperatorTest.exec;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,32 +53,38 @@ final class CreatorTest {
 
 				},
 
-                () -> new Creator()
+				() -> {
+					new Creator()
 
-		                .handle(JSONLDFormat.shape(new Request(), shape)
-										.body(jsonld(), frame(focus)
-												.value(RDF.VALUE, focus)
-										),
-								Request::reply
-		                )
+							.handle(JSONLD.shape(new Request(), shape)
+											.body(new JSONLD(), frame(focus)
+													.value(RDF.VALUE, focus)
+											),
+									Request::reply
+							)
 
-		                .map(response -> assertThat(response)
-				                .hasStatus(Created)
-				                .hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(or()))
-				                .doesNotHaveBody(jsonld())
-		                )
+							.map(response -> {
+										return assertThat(response)
+												.hasStatus(Created)
+												.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(or()))
+												.doesNotHaveBody(new JSONLD());
+									}
+							);
+				}
 
 		);
 	}
 
 	@Test void testReportClash() {
-		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> new Creator()
+		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> {
+					new Creator()
 
-				.handle(JSONLDFormat.shape(new Request()
-								, shape)
-								.body(jsonld(), frame(item("/"))),
-						Request::reply
-				)
+							.handle(JSONLD.shape(new Request()
+													, shape)
+											.body(new JSONLD(), frame(item("/"))),
+									Request::reply
+							);
+				}
 
 		));
 	}

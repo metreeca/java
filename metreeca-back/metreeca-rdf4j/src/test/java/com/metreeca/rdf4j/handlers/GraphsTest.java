@@ -16,8 +16,9 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.rdf4j.services.GraphTest;
-import com.metreeca.rest.Request;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
@@ -28,14 +29,14 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.Unauthorized;
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.ValuesTest.encode;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.export;
-import static com.metreeca.rest.Response.Unauthorized;
-import static com.metreeca.rest.ResponseAssert.assertThat;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -171,7 +172,7 @@ final class GraphsTest {
                 .handle(authenticated(catalog(request())), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(catalog())
                         )));
@@ -183,7 +184,7 @@ final class GraphsTest {
                 .handle(anonymous(catalog(request())), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(catalog())
                         )));
@@ -196,7 +197,7 @@ final class GraphsTest {
                 .handle(authenticated(catalog(request())), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(catalog())
                         )));
@@ -225,7 +226,7 @@ final class GraphsTest {
                 .handle(authenticated(dflt(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(First)
                         )
@@ -239,7 +240,7 @@ final class GraphsTest {
                 .handle(anonymous(dflt(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(First)
                         )));
@@ -251,7 +252,7 @@ final class GraphsTest {
                 .handle(authenticated(dflt(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(First)
                         )
@@ -276,7 +277,7 @@ final class GraphsTest {
                 .handle(authenticated(named(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(Rest)
                         )));
@@ -288,7 +289,7 @@ final class GraphsTest {
                 .handle(anonymous(named(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(Rest)
                         )));
@@ -300,7 +301,7 @@ final class GraphsTest {
                 .handle(authenticated(named(get(request()))), Request::reply)
 
                 .map(response -> assertThat(response)
-                        .hasStatus(com.metreeca.rest.Response.OK)
+                        .hasStatus(Response.OK)
                         .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
                                 .isIsomorphicTo(Rest)
                         )));

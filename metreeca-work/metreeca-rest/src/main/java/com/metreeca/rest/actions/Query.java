@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.actions;
 
+import com.metreeca.http.Request;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Request;
 
 import java.net.URI;
 import java.net.URISyntaxException;

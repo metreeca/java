@@ -16,9 +16,7 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.http.Locator;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
+import com.metreeca.http.*;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -28,10 +26,10 @@ import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.metreeca.rest.Request.POST;
-import static com.metreeca.rest.Response.InternalServerError;
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.Request.POST;
+import static com.metreeca.http.Response.InternalServerError;
+import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.ResponseAssert.assertThat;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;

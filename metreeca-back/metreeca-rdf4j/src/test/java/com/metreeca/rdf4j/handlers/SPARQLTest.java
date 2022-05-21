@@ -16,9 +16,9 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.http.*;
+import com.metreeca.http.codecs.JSON;
 import com.metreeca.link.Values;
-import com.metreeca.rest.*;
-import com.metreeca.rest.codecs.JSON;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -28,11 +28,11 @@ import java.util.function.Consumer;
 
 import javax.json.JsonValue;
 
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Values.statement;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.model;
-import static com.metreeca.rest.ResponseAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

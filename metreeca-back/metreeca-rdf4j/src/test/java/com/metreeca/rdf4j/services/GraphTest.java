@@ -19,10 +19,8 @@ package com.metreeca.rdf4j.services;
 
 
 import com.metreeca.core.Strings;
-import com.metreeca.http.Locator;
+import com.metreeca.http.*;
 import com.metreeca.link.Frame;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;

@@ -17,10 +17,12 @@
 package com.metreeca.rest.operators;
 
 
+import com.metreeca.http.*;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest.*;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
+import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
@@ -33,15 +35,14 @@ import java.util.function.Function;
 
 import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Request.encode;
+import static com.metreeca.http.Response.Created;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
-import static com.metreeca.rest.Request.encode;
-import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest._Wrapper.keeper;
-import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.services.Engine.engine;
 
 import static java.lang.String.format;
@@ -59,13 +60,13 @@ import static java.util.stream.Collectors.toMap;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
  *
- * <li>validates the {@link JSONLDFormat JSON-LD} request body against the request shape; malformed or invalid
+ * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid
  * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
  * status code;</li>
  *
@@ -131,7 +132,7 @@ public final class Creator extends Delegator {
     /**
      * Configures the slug generator.
      *
-     * @param slug a function mapping from the creation request and its {@linkplain JSONLDFormat JSON-LD} payload to the
+     * @param slug a function mapping from the creation request and its {@linkplain JSONLD JSON-LD} payload to the
      *             identifier to be assigned to the newly created resource; must return a non-null non-clashing value
      *
      * @return this creator handler
@@ -144,10 +145,7 @@ public final class Creator extends Delegator {
             throw new NullPointerException("null slug");
         }
 
-        this.slug=request -> slug.apply(request, request.body(jsonld()).fold(
-                error -> frame(iri(request.item())),
-                value -> value
-        ));
+        this.slug=request -> slug.apply(request, request.body(new JSONLD()));
 
         return this;
     }
@@ -167,7 +165,7 @@ public final class Creator extends Delegator {
 
             return handler.handle(request
                             .path(request.path()+name)
-                            .map(jsonld(), frame -> rewrite(target, source, frame)),
+                            .body(new JSONLD(), rewrite(target, source, request.body(new JSONLD()))),
                     next);
         };
     }
@@ -176,27 +174,25 @@ public final class Creator extends Delegator {
         return (request, next) -> {
 
             final IRI item=iri(request.item());
-            final Shape shape=JSONLDFormat.shape(request);
+            final Shape shape=JSONLD.shape(request);
 
-            return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.create(frame,
+            return engine.create(request.body(new JSONLD()),
                             shape)
 
                     .map(Frame::focus)
 
-					.map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
+                    .map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
                             .of(focus)
-							.filter(Value::isIRI)
-							.map(IRI.class::cast)
-							.map(Value::stringValue)
-							.map(Values::path) // root-relative to support relocation
-							.orElse(focus.stringValue())
-					)))
+                            .filter(Value::isIRI)
+                            .map(IRI.class::cast)
+                            .map(Value::stringValue)
+                            .map(Values::path) // root-relative to support relocation
+                            .orElse(focus.stringValue())
+                    )))
 
                     .orElseThrow(() ->
                             new IllegalStateException(format("existing resource identifier %s", format(item)))
-                    )
-
-            );
+                    );
 
         };
     }

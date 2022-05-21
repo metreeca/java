@@ -16,10 +16,10 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.http.codecs.Data;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
-import com.metreeca.rest.codecs.Data;
 import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -37,9 +37,9 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static com.metreeca.core.Lambdas.guarded;
+import static com.metreeca.http.Message.mimes;
+import static com.metreeca.http.Response.*;
 import static com.metreeca.rdf.codecs.RDF.service;
-import static com.metreeca.rest.Message.mimes;
-import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest._MessageException.status;
 
 

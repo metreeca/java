@@ -16,21 +16,22 @@
 
 package com.metreeca.rest.operators;
 
+import com.metreeca.http.*;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest.*;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
+import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.NoContent;
+import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.link.shapes.Guard.Update;
-import static com.metreeca.rest.Response.NoContent;
-import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest._Wrapper.keeper;
-import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.services.Engine.engine;
 
 
@@ -42,13 +43,13 @@ import static com.metreeca.rest.services.Engine.engine;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
+ * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
  * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Update} task and the {@linkplain Guard#Detail} view.</li>
  *
- * <li>validates the {@link JSONLDFormat JSON-LD} request body against the request shape; malformed or invalid
+ * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid
  * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
  * status code;</li>
  *
@@ -92,16 +93,13 @@ public final class Updater extends Delegator {
 	private Handler update() {
         return (request, next) -> {
 
-			final Shape shape=JSONLDFormat.shape(request);
+	        final Shape shape=JSONLD.shape(request);
 
-			return request.body(jsonld()).fold(mapper -> request.reply().map(mapper), frame -> engine.update(frame,
-							shape)
+	        return engine.update(request.body(new JSONLD()), shape)
 
-					.map(iri -> request.reply(NoContent))
+			        .map(iri -> request.reply(NoContent))
 
-					.orElseGet(() -> request.reply(NotFound)) // !!! 410 Gone if previously known
-
-            );
+			        .orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known;
 
 		};
 	}

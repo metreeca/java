@@ -16,7 +16,10 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.util.Objects;
 import java.util.Optional;

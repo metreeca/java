@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.codecs;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
 
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;

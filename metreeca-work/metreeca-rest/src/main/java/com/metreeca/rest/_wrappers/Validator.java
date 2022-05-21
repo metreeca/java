@@ -16,14 +16,17 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.util.*;
 import java.util.function.Function;
 
 import javax.json.Json;
 
-import static com.metreeca.rest.Response.UnprocessableEntity;
+import static com.metreeca.http.Response.UnprocessableEntity;
 import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Arrays.asList;

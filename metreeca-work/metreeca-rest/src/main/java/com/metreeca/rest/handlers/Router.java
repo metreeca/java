@@ -17,6 +17,8 @@
 package com.metreeca.rest.handlers;
 
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.rest.*;
 
 import java.net.URLDecoder;
@@ -27,9 +29,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Request.*;
-import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest.Response.OK;
+import static com.metreeca.http.Request.*;
+import static com.metreeca.http.Response.MethodNotAllowed;
+import static com.metreeca.http.Response.OK;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Map.entry;

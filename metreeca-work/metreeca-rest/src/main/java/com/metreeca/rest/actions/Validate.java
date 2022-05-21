@@ -28,7 +28,7 @@ import java.util.function.Function;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.link.Frame.frame;
-import static com.metreeca.rest._formats.JSONLDFormat.validate;
+import static com.metreeca.rest.codecs.JSONLD.validate;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;

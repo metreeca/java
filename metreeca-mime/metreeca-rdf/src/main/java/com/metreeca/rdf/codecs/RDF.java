@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf.codecs;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
 
 import org.eclipse.rdf4j.common.lang.FileFormat;
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
@@ -37,9 +37,9 @@ import java.util.function.Function;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
+import static com.metreeca.http.Message.mimes;
+import static com.metreeca.http.Response.BadRequest;
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.rest.Message.mimes;
-import static com.metreeca.rest.Response.BadRequest;
 
 
 /**

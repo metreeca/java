@@ -16,10 +16,12 @@
 
 package com.metreeca.rest._wrappers;
 
+import com.metreeca.http.*;
+import com.metreeca.http.codecs.JSON;
+import com.metreeca.http.codecs.Text;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.*;
-import com.metreeca.rest.codecs.JSON;
-import com.metreeca.rest.codecs.Text;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.io.*;
 import java.util.Optional;
@@ -28,10 +30,10 @@ import java.util.regex.Pattern;
 
 import static com.metreeca.core.Feeds.text;
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Request.*;
+import static com.metreeca.http.Response.InternalServerError;
 import static com.metreeca.http.services.Logger.Level.*;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Request.*;
-import static com.metreeca.rest.Response.InternalServerError;
 
 import static java.lang.String.format;
 

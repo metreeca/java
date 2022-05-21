@@ -90,7 +90,7 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rest</artifactId>
+			<artifactId>metreeca-http</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.codecs;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -34,7 +34,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import static com.metreeca.rest.Response.BadRequest;
+import static com.metreeca.http.Response.BadRequest;
 
 import static java.util.regex.Pattern.compile;
 

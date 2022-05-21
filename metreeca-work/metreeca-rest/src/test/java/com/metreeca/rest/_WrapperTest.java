@@ -17,13 +17,14 @@
 package com.metreeca.rest;
 
 import com.metreeca.http.Locator;
+import com.metreeca.http.Request;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Response.Unauthorized;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.Response.Unauthorized;
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.rest._Wrapper.roles;
 
 

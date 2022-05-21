@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import com.metreeca.http.codecs.Text;
 import com.metreeca.jse.JSEServer;
-import com.metreeca.rest.codecs.Text;
 
-import static com.metreeca.rest.Response.OK;
+import static com.metreeca.http.Response.OK;
 
 import static java.lang.String.format;
 

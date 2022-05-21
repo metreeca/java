@@ -16,10 +16,13 @@
 
 package com.metreeca.rest._wrappers;
 
+import com.metreeca.http.Message;
+import com.metreeca.http.Request;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Field;
-import com.metreeca.rest.*;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
+import com.metreeca.rest.codecs.JSONLD;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -36,17 +39,17 @@ import static java.util.Arrays.stream;
 /**
  * Shape-based content driver.
  *
- * <p>Drives the lifecycle of linked data resources managed by wrapped handlers {@linkplain JSONLDFormat#shape(Message)
+ * <p>Drives the lifecycle of linked data resources managed by wrapped handlers {@linkplain JSONLD#shape(Message)
  * associating} a {@linkplain #Driver(Shape...) shape} to incoming requests</p>
  *
  * <p>Wrapped handlers are responsible for:</p>
  *
  * <ul>
  *
- * <li>redacting the shape {@linkplain JSONLDFormat#shape(Message) associated} to incoming request according to the
+ * <li>redacting the shape {@linkplain JSONLD#shape(Message) associated} to incoming request according to the
  * task to be performed;</li>
  *
- * <li>{@linkplain JSONLDFormat#shape(Message) associating} a shape to outgoing responses in order to drive further
+ * <li>{@linkplain JSONLD#shape(Message) associating} a shape to outgoing responses in order to drive further
  * processing (e.g. JSON body mapping).</li>
  *
  * </ul>
@@ -69,7 +72,7 @@ public final class Driver implements _Wrapper {
      * @param shapes the field shapes
      *
      * @return a {@linkplain Field field} with a direct {@link OWL#SAMEAS owl:sameAs} IRI and the given {@code shapes};
-     * connected nodes in the {@linkplain JSONLDFormat JSON-LD} response model will be collapsed to the subject node and
+     * connected nodes in the {@linkplain JSONLD JSON-LD} response model will be collapsed to the subject node and
      * the link will be removed from the response shape
      *
      * @throws NullPointerException if {@code shapes} is null or contains null elements
@@ -84,7 +87,7 @@ public final class Driver implements _Wrapper {
      * @param shapes the field shapes
      *
      * @return a {@linkplain Field field} with an inverse {@link OWL#SAMEAS owl:sameAs} IRI and the given {@code shapes};
-     * connected nodes in the {@linkplain JSONLDFormat JSON-LD} response model will be collapsed to the subject node and
+     * connected nodes in the {@linkplain JSONLD JSON-LD} response model will be collapsed to the subject node and
      * the link will be removed from the response shape
      *
      * @throws NullPointerException if {@code shapes} is null or contains null elements
@@ -116,7 +119,7 @@ public final class Driver implements _Wrapper {
 
 
     @Override public Handler wrap(final Handler handler) {
-        return (request, next) -> handler.handle(JSONLDFormat.shape(request, shape), next);
+        return (request, next) -> handler.handle(JSONLD.shape(request, shape), next);
     }
 
 }

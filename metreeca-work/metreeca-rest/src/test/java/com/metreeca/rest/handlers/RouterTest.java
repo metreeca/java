@@ -16,7 +16,9 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.rest.Handler;
 
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Nested;
@@ -25,10 +27,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-import static com.metreeca.rest.RequestAssert.assertThat;
-import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.RequestAssert.assertThat;
+import static com.metreeca.http.Response.MethodNotAllowed;
+import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.rest._MessageException.status;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

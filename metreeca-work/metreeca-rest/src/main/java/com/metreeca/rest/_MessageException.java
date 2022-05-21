@@ -16,8 +16,10 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.rest.codecs.JSON;
-import com.metreeca.rest.codecs.Text;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.http.codecs.JSON;
+import com.metreeca.http.codecs.Text;
 
 import java.util.Optional;
 import java.util.function.Function;

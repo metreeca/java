@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.rest.codecs.Data;
+import com.metreeca.http.codecs.Data;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,9 +31,9 @@ import java.util.stream.Stream;
 import static com.metreeca.core.Lambdas.checked;
 import static com.metreeca.core.Resources.input;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.rest.Request.HEAD;
-import static com.metreeca.rest.Response.NotModified;
-import static com.metreeca.rest.Response.OK;
+import static com.metreeca.http.Request.HEAD;
+import static com.metreeca.http.Response.NotModified;
+import static com.metreeca.http.Response.OK;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;

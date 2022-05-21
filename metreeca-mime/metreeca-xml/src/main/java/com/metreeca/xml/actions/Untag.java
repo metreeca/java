@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.rest.CodecException;
+import com.metreeca.http.CodecException;
 
 import org.w3c.dom.*;
 

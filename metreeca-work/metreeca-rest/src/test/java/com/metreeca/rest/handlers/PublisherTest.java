@@ -17,13 +17,13 @@
 package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Locator;
-import com.metreeca.rest.Request;
+import com.metreeca.http.Request;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.Request.POST;
-import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.Request.POST;
+import static com.metreeca.http.Response.MethodNotAllowed;
+import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.rest.handlers.Publisher.mime;
 import static com.metreeca.rest.handlers.Publisher.variants;
 

@@ -16,17 +16,15 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.http.Locator;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
+import com.metreeca.http.*;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.ResponseAssert.assertThat;
 
 
 final class AliaserTest {

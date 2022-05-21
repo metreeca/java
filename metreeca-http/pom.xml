@@ -34,12 +34,17 @@
 
 	<dependencies>
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-core</artifactId>
+        </dependency>
 
-	</dependencies>
+        <dependency> <!-- !!! -->
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+        </dependency>
+
+    </dependencies>
 
 	<build>
 		<plugins>

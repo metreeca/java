@@ -16,8 +16,9 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.http.Locator;
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

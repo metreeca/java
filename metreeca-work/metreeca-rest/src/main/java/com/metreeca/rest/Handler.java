@@ -16,6 +16,9 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;

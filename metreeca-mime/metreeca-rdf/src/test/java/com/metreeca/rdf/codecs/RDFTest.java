@@ -16,11 +16,9 @@
 
 package com.metreeca.rdf.codecs;
 
-import com.metreeca.http.Locator;
+import com.metreeca.http.*;
 import com.metreeca.link.Values;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.codecs.JSONLD;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.model.vocabulary.LDP;
@@ -32,12 +30,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.metreeca.http.Message.mimes;
+import static com.metreeca.http.MessageAssert.assertThat;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
 import static com.metreeca.link.shapes.Datatype.datatype;
 import static com.metreeca.link.shapes.Field.field;
-import static com.metreeca.rest.Message.mimes;
-import static com.metreeca.rest.ResponseAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -130,7 +128,7 @@ final class RDFTest {
     @Nested final class Encoder {
 
         @Test void testConfigureWriterBaseIRI() {
-            exec(() -> JSONLDFormat
+            exec(() -> JSONLD
 
                     .shape(
 

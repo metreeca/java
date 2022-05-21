@@ -16,10 +16,8 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.http.Xtream;
+import com.metreeca.http.*;
 import com.metreeca.http.processors.Regex;
-import com.metreeca.rest.Message;
-import com.metreeca.rest.Request;
 import com.metreeca.rest.actions.*;
 import com.metreeca.xml.XPath;
 import com.metreeca.xml.codecs.HTML;
@@ -36,7 +34,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Request.HEAD;
+import static com.metreeca.http.Request.HEAD;
 
 import static java.lang.Runtime.getRuntime;
 

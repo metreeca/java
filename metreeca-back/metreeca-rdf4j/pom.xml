@@ -61,28 +61,35 @@
 		</dependency>
 
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-xml</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-xml</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-link</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-link</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rest</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-http</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-rest</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
 
-		<dependency>
+        <dependency>
 			<groupId>org.eclipse.rdf4j</groupId>
 			<artifactId>rdf4j-repository-sail</artifactId>
 			<scope>test</scope>

@@ -16,8 +16,8 @@
 
 package com.metreeca.jee;
 
-import com.metreeca.http.Locator;
-import com.metreeca.rest.*;
+import com.metreeca.http.*;
+import com.metreeca.rest.Handler;
 import com.metreeca.rest.services.Loader;
 
 import java.io.*;

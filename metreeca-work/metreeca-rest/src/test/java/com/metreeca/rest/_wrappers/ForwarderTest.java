@@ -16,14 +16,14 @@
 
 package com.metreeca.rest._wrappers;
 
+import com.metreeca.http.Request;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest.Request;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.Response.MovedPermanently;
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.http.Response.MovedPermanently;
+import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.ResponseAssert.assertThat;
 
 final class ForwarderTest {
 

@@ -16,10 +16,10 @@
 
 package com.metreeca.rest.services;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.http.codecs.Data;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
-import com.metreeca.rest.codecs.Data;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -32,10 +32,9 @@ import java.util.zip.GZIPInputStream;
 
 import static com.metreeca.core.Feeds.data;
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Request.GET;
+import static com.metreeca.http.Response.MethodNotAllowed;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Request.GET;
-import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest._formats.InputFormat.input;
 
 import static java.io.InputStream.nullInputStream;
 import static java.lang.Integer.max;
@@ -128,34 +127,18 @@ import static java.lang.String.format;
 
                 if ( connection.getDoOutput() ) {
 
-                    request.body(input()).fold(
+                    try (
+                            final InputStream input=request.input().get();
+                            final OutputStream output=connection.getOutputStream()
+                    ) {
 
-                            error -> {
+                        data(output, input);
 
-                                logger.error(this, format("unable to open input stream for <%s>", resource));
+                    } catch ( final IOException e ) {
 
-                                throw new RuntimeException(error.toString()); // !!!
+                        throw new UncheckedIOException(e);
 
-                            },
-
-                            target -> {
-
-                                try (
-                                        final InputStream input=target.get();
-                                        final OutputStream output=connection.getOutputStream()
-                                ) {
-
-                                    return data(output, input);
-
-                                } catch ( final IOException e ) {
-
-                                    throw new UncheckedIOException(e);
-
-                                }
-
-                            }
-
-                    );
+                    }
 
                 }
 
@@ -180,7 +163,7 @@ import static java.lang.String.format;
                             return response;
                         })
 
-                        .body(input(), () -> {
+                        .input(() -> {
                             try {
 
                                 return Optional
@@ -227,7 +210,7 @@ import static java.lang.String.format;
 
                         .status(Response.OK)
 
-                        .body(input(), () -> {
+                        .input(() -> {
                             try {
 
                                 final InputStream input=new URL(resource).openStream();
@@ -349,7 +332,7 @@ import static java.lang.String.format;
                 return new Response(request)
                         .status(status)
                         .headers(headers)
-                        .body(input(), () -> new ByteArrayInputStream(body));
+                        .input(() -> new ByteArrayInputStream(body));
 
             } catch ( final ClassNotFoundException unexpected ) {
 

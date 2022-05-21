@@ -17,9 +17,9 @@
 package com.metreeca.rest.actions;
 
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
 import com.metreeca.rest.services.Fetcher;
 
 import java.util.Optional;

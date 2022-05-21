@@ -16,7 +16,9 @@
 
 package com.metreeca.rest._wrappers;
 
-import com.metreeca.rest.*;
+import com.metreeca.http.Request;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.util.Optional;
 import java.util.function.Function;

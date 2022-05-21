@@ -17,8 +17,8 @@
 
 package com.metreeca.rest.actions;
 
-import com.metreeca.rest.Codec;
-import com.metreeca.rest.Request;
+import com.metreeca.http.Codec;
+import com.metreeca.http.Request;
 
 import java.util.Optional;
 import java.util.function.Function;

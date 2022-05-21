@@ -16,8 +16,8 @@
 
 package com.metreeca.rest.actions;
 
+import com.metreeca.http.*;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.*;
 
 import java.io.UncheckedIOException;
 import java.util.Optional;

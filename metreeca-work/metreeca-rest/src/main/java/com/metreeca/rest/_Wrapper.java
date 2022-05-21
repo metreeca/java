@@ -17,18 +17,19 @@
 package com.metreeca.rest;
 
 
+import com.metreeca.http.*;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.codecs.JSONLD;
 
 import java.util.*;
 import java.util.function.*;
 
+import static com.metreeca.http.Response.Forbidden;
+import static com.metreeca.http.Response.Unauthorized;
 import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Handler.handler;
-import static com.metreeca.rest.Response.Forbidden;
-import static com.metreeca.rest.Response.Unauthorized;
-import static com.metreeca.rest._formats.JSONLDFormat.shape;
+import static com.metreeca.rest.codecs.JSONLD.shape;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -142,51 +143,55 @@ import static java.util.Objects.requireNonNull;
                 ? requireNonNull(mapper.apply(response), "null mapper return value")
                 : response
         );
-	}
+    }
 
 
     /**
      * Creates a pre-processing body wrapper.
      *
      * @param <V>    the type of the request body to be pre-processed
-     * @param format the format of the request body to be pre-processed
-     * @param mapper the request body mapper; takes as argument a request and its {@code format} body and must return a
+     * @param codec  the codec of the request body to be pre-processed
+     * @param mapper the request body mapper; takes as argument a request and its {@code codec} body and must return a
      *               non-null updated value
      *
-     * @return a wrapper that pre-process request {@code format} bodies using {@code mapper}
+     * @return a wrapper that pre-process request {@code codec} bodies using {@code mapper}
      *
-     * @throws NullPointerException if either {@code format} or {@code mapper} is null
+     * @throws NullPointerException if either {@code codec} or {@code mapper} is null
      */
     public static <V> _Wrapper preprocessor(
-            final _Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
+            final Codec<V> codec, final BiFunction<? super Request, ? super V, V> mapper
     ) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
         }
 
-        return handler -> (request, next) ->
-                request.body(format).fold(mapper1 -> request.reply().map(mapper1), value -> handler.handle(
-                        request.body(format, requireNonNull(mapper.apply(request, value), "null mapper return "
-										+ "value")),
-                        next)
-                );
-	}
+        return handler -> (request, forward) -> handler.handle(
+
+                request.body(codec,
+                        requireNonNull(mapper.apply(request, request.body(codec)), "null mapper return value")
+                ),
+
+                forward
+
+        );
+
+    }
 
     /**
      * Creates a {@linkplain Response#success() successful} post-processing body wrapper.
      *
      * @param <V>    the type of the response body to be post-processed
-     * @param format the format of the response body to be post-processed
-     * @param mapper the response body mapper; takes as argument a response and its {@code format} body and must return a
+     * @param codec  the codec of the response body to be post-processed
+     * @param mapper the response body mapper; takes as argument a response and its {@code codec} body and must return a
      *               non-null updated value
      *
-     * @return a wrapper that post-process successful response {@code format} bodies using {@code mapper}
+     * @return a wrapper that post-process successful response {@code codec} bodies using {@code mapper}
      *
-     * @throws NullPointerException if either {@code format} or {@code mapper} is null
+     * @throws NullPointerException if either {@code codec} or {@code mapper} is null
      */
     public static <V> _Wrapper postprocessor(
-            final _Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
+            final Codec<V> codec, final BiFunction<? super Response, ? super V, V> mapper
     ) {
 
         if ( mapper == null ) {
@@ -194,12 +199,11 @@ import static java.util.Objects.requireNonNull;
         }
 
         return handler -> (request, next) -> handler.handle(request, next).map(response ->
-                response.success() ? response.body(format).fold(error -> { throw error; },
-                        value -> response.body(format,
-                                requireNonNull(mapper.apply(response, value), "null mapper return value")
-                        )) : response
+                response.success() ? response.body(codec,
+                        requireNonNull(mapper.apply(response, response.body(codec)), "null mapper return value")
+                ) : response
         );
-	}
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +263,7 @@ import static java.util.Objects.requireNonNull;
     public static _Wrapper keeper(final Object task, final Object view) {
         return handler -> (request, next) -> {
 
-            final Shape shape=JSONLDFormat.shape(request) // visible taking into account task/area
+            final Shape shape=JSONLD.shape(request) // visible taking into account task/area
 
                     .redact(Task, task)
                     .redact(View, view)
@@ -274,7 +278,7 @@ import static java.util.Objects.requireNonNull;
                     .redact(Role, request.roles());
 
 
-            final UnaryOperator<Request> incoming=message -> JSONLDFormat.shape(message, shape(message)
+            final UnaryOperator<Request> incoming=message -> JSONLD.shape(message, shape(message)
 
                     .redact(Role, message.roles())
                     .redact(Task, task)
@@ -283,7 +287,7 @@ import static java.util.Objects.requireNonNull;
                     .localize(message.request().langs())
             );
 
-            final UnaryOperator<Response> outgoing=message -> JSONLDFormat.shape(message, shape(message)
+            final UnaryOperator<Response> outgoing=message -> JSONLD.shape(message, shape(message)
 
                     .redact(Role, message.request().roles())
                     .redact(Task, task)

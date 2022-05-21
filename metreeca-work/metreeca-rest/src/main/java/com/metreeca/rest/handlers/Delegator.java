@@ -16,6 +16,8 @@
 
 package com.metreeca.rest.handlers;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.rest.*;
 
 import java.util.function.Function;

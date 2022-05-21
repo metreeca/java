@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.storage;
-import static com.metreeca.rest.Response.Forbidden;
+import static com.metreeca.http.Response.Forbidden;
 import static com.metreeca.rest.services.Store.store;
 import static com.metreeca.rest.services.Vault.vault;
 

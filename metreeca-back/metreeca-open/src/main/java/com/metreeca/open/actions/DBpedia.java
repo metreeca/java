@@ -18,9 +18,9 @@ package com.metreeca.open.actions;
 
 import com.metreeca.http.Xtream;
 import com.metreeca.http.actions.Fill;
+import com.metreeca.http.codecs.JSON;
 import com.metreeca.link.Frame;
 import com.metreeca.rest.actions.*;
-import com.metreeca.rest.codecs.JSON;
 
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
