@@ -16,6 +16,10 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.core.Strings;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -23,6 +27,7 @@ import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.core.Identifiers.IRIPattern;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 
@@ -143,6 +148,53 @@ public final class Request extends Message<Request> {
         }
 
         return new Response(this).status(status).header("Location", location);
+    }
+
+    /**
+     * Creates an error response for this request.
+     *
+     * @param status the error {@linkplain Response#status(int) status} code of the response
+     * @param cause  the (possibly null) throwable causing the selection of the status code
+     *
+     * @return a new response for this request initialized with {@code status} and {@code cause} and, if {@code status}
+     * is a {@code 4xx} client error, an "application/json" output body reporting {@code cause}
+     *
+     * @throws IllegalArgumentException if {@code status } is less than 400 or greater than 599
+     */
+    public Response reply(final int status, final Throwable cause) {
+
+        if ( status < 400 || status > 599 ) {
+            throw new IllegalArgumentException("illegal status code ["+status+"]");
+        }
+
+        return new Response(this).status(status).cause(cause).map(response -> Optional
+
+                .ofNullable(cause.getMessage())
+
+                .map(message -> response
+
+                        .header("Content-Type", "application/json")
+                        .header("Content-Length", "0")
+
+                        .output(output -> {
+
+                            try {
+
+                                output.write(Strings.quote(message, '"').getBytes(UTF_8));
+
+                            } catch ( final IOException e ) {
+
+                                throw new UncheckedIOException(e);
+
+                            }
+
+                        })
+
+                )
+
+                .orElse(response)
+
+        );
     }
 
 
