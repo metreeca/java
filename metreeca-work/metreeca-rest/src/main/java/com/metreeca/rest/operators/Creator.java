@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.metreeca.core.Identifiers.encode;
 import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.link.Frame.frame;
@@ -39,6 +38,7 @@ import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
+import static com.metreeca.rest.Request.encode;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest._Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;

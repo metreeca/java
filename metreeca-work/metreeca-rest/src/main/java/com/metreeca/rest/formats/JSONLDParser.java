@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.metreeca.link.*;
 import com.metreeca.link.queries.Stats;
 import com.metreeca.link.queries.Terms;
 import com.metreeca.link.shapes.*;
+import com.metreeca.rest.Request;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -32,8 +33,6 @@ import java.util.stream.Stream;
 
 import javax.json.*;
 
-import static com.metreeca.core.Identifiers.decode;
-import static com.metreeca.core.Identifiers.parameters;
 import static com.metreeca.link.Order.decreasing;
 import static com.metreeca.link.Order.increasing;
 import static com.metreeca.link.Values.format;
@@ -43,6 +42,7 @@ import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Field.labels;
 import static com.metreeca.link.shapes.Link.link;
+import static com.metreeca.rest.Request.decode;
 import static com.metreeca.rest.formats.JSONLDInspector.driver;
 
 import static java.lang.String.format;
@@ -126,7 +126,7 @@ final class JSONLDParser {
 
 
 	private Query form(final String query) {
-		return json(Json.createObjectBuilder(parameters(query).entrySet().stream()
+		return json(Json.createObjectBuilder(Request.params(query).entrySet().stream()
 
 				.collect(toMap(Map.Entry::getKey, this::value))
 

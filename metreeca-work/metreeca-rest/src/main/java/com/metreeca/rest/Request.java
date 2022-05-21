@@ -16,20 +16,21 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.core.Strings;
-
-import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.core.Identifiers.IRIPattern;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
+import static java.util.Map.entry;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -58,6 +59,125 @@ public final class Request extends Message<Request> {
     private static final Collection<String> Remote=new HashSet<>(asList(
             "feed:", "ftp:", "http:", "https", "imap", "ldap:", "ldaps", "message:", "pop:", "s3:"
     ));
+
+
+    /**
+     * URL-encode a string.
+     *
+     * @param string the string to be encoded
+     *
+     * @return the encoded version of {@code string}
+     *
+     * @throws NullPointerException if {@code string} is null
+     */
+    public static String encode(final String string) {
+
+        if ( string == null ) {
+            throw new NullPointerException("null string");
+        }
+
+        try {
+
+            return URLEncoder.encode(string, UTF_8.name());
+
+        } catch ( final UnsupportedEncodingException unexpected ) {
+            throw new UncheckedIOException(unexpected);
+        }
+    }
+
+    /**
+     * URL-decode a string.
+     *
+     * @param string the string to be decoded
+     *
+     * @return the decoded version of {@code string}
+     *
+     * @throws NullPointerException if {@code string} is null
+     */
+    public static String decode(final String string) {
+
+        if ( string == null ) {
+            throw new NullPointerException("null string");
+        }
+
+        try {
+
+            return URLDecoder.decode(string, UTF_8.name());
+
+        } catch ( final UnsupportedEncodingException unexpected ) {
+            throw new UncheckedIOException(unexpected);
+        }
+    }
+
+
+    /**
+     * Converts a parameter map into a query string.
+     *
+     * @param parameters the parameter map to be converted
+     *
+     * @return a query string built from {@code parameters}
+     *
+     * @throws NullPointerException if {@code parameters} is null or contains null values
+     */
+    public static String query(final Map<String, List<String>> parameters) {
+
+        if ( parameters == null || parameters.entrySet().stream().anyMatch(entry ->
+                entry.getKey() == null || entry.getValue() == null || entry.getValue().stream().anyMatch(Objects::isNull)
+        ) ) {
+            throw new NullPointerException("null parameters");
+        }
+
+        return parameters.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream().map(value -> entry(entry.getKey(), value)))
+                .map(p -> String.format("%s=%s", encode(p.getKey()), encode(p.getValue())))
+                .collect(joining("&"));
+    }
+
+    /**
+     * Converts a query string into a parameter map.
+     *
+     * @param query the query string to be converted
+     *
+     * @return a parameter map parsed from {@code query}
+     *
+     * @throws NullPointerException if {@code query} is null
+     */
+    public static Map<String, List<String>> params(final String query) {
+
+        if ( query == null ) {
+            throw new NullPointerException("null query");
+        }
+
+        final Map<String, List<String>> parameters=new LinkedHashMap<>();
+
+        final int length=query.length();
+
+        for (int head=0, tail; head < length; head=tail+1) {
+
+            final int equal=query.indexOf('=', head);
+            final int ampersand=query.indexOf('&', head);
+
+            tail=(ampersand >= 0) ? ampersand : length;
+
+            final boolean split=equal >= 0 && equal < tail;
+
+            final String label=URLDecoder.decode(query.substring(head, split ? equal : tail), UTF_8);
+            final String value=URLDecoder.decode(query.substring(split ? equal+1 : tail, tail), UTF_8);
+
+            parameters.compute(label, (name, values) -> {
+
+                final List<String> strings=(values != null) ? values : new ArrayList<>();
+
+                strings.add(value);
+
+                return strings;
+
+            });
+
+        }
+
+        return parameters;
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,57 +264,10 @@ public final class Request extends Message<Request> {
         }
 
         if ( !IRIPattern.matcher(location).matches() ) {
-            throw new IllegalArgumentException(format("malformed location IRI <%s>", location));
+            throw new IllegalArgumentException(String.format("malformed location IRI <%s>", location));
         }
 
         return new Response(this).status(status).header("Location", location);
-    }
-
-    /**
-     * Creates an error response for this request.
-     *
-     * @param status the error {@linkplain Response#status(int) status} code of the response
-     * @param cause  the (possibly null) throwable causing the selection of the status code
-     *
-     * @return a new response for this request initialized with {@code status} and {@code cause} and, if {@code status}
-     * is a {@code 4xx} client error, an "application/json" output body reporting {@code cause}
-     *
-     * @throws IllegalArgumentException if {@code status } is less than 400 or greater than 599
-     */
-    public Response reply(final int status, final Throwable cause) {
-
-        if ( status < 400 || status > 599 ) {
-            throw new IllegalArgumentException("illegal status code ["+status+"]");
-        }
-
-        return new Response(this).status(status).cause(cause).map(response -> Optional
-
-                .ofNullable(cause.getMessage())
-
-                .map(message -> response
-
-                        .header("Content-Type", "application/json")
-                        .header("Content-Length", "0")
-
-                        .output(output -> {
-
-                            try {
-
-                                output.write(Strings.quote(message, '"').getBytes(UTF_8));
-
-                            } catch ( final IOException e ) {
-
-                                throw new UncheckedIOException(e);
-
-                            }
-
-                        })
-
-                )
-
-                .orElse(response)
-
-        );
     }
 
 
@@ -599,8 +672,8 @@ public final class Request extends Message<Request> {
      *
      * @param name the name of the query parameter whose value is to be retrieved
      *
-     * @return an optional value containing the first value among those returned by {@link #parameters(String)}, if one
-     * is present; an empty optional otherwise
+     * @return an optional value containing the first value among those returned by {@link #params(String)}, if one is
+     * present; an empty optional otherwise
      *
      * @throws NullPointerException if {@code name} is null
      */

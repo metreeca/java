@@ -27,12 +27,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Feeds.text;
-import static com.metreeca.core.Identifiers.parameters;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.Level.*;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Request.GET;
-import static com.metreeca.rest.Request.POST;
+import static com.metreeca.rest.Request.*;
 import static com.metreeca.rest.Response.InternalServerError;
 
 import static java.lang.String.format;
@@ -135,7 +133,7 @@ public final class Server implements _Wrapper {
 
     private Request query(final Request request) { // parse parameters from query string, if not already set
         return request.parameters().isEmpty() && request.method().equals(GET)
-                ? request.parameters(parameters(request.query()))
+                ? request.parameters(params(request.query()))
                 : request;
     }
 
@@ -150,7 +148,7 @@ public final class Server implements _Wrapper {
                     final Reader reader=new InputStreamReader(input, request.charset());
             ) {
 
-                return request.parameters(parameters(text(reader)));
+                return request.parameters(params(text(reader)));
 
             } catch ( final IOException e ) {
 
