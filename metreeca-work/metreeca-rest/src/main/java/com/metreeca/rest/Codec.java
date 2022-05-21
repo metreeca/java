@@ -17,6 +17,7 @@
 package com.metreeca.rest;
 
 import java.io.UncheckedIOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -30,18 +31,18 @@ import java.util.function.Consumer;
 public interface Codec<V> {
 
     /**
-     * Retrieves the payload type.
-     *
-     * @return the type of the structured payload managed by this codec
-     */
-    public Class<V> type();
-
-    /**
      * Retrieves the payload MIME type.
      *
      * @return the MIME type of the structured payload managed by this codec
      */
     public String mime();
+
+    /**
+     * Retrieves the payload Java type.
+     *
+     * @return the type of the structured payload managed by this codec
+     */
+    public Class<V> type();
 
 
     /**
@@ -50,7 +51,8 @@ public interface Codec<V> {
      * @param message the source message
      * @param <M>     the {@code message} type
      *
-     * @return the structured payload decoded from the raw {@code message} {@linkplain Message#input()}
+     * @return the structured payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty
+     * optional if {@code message} doesn't contain the expected content
      *
      * @throws NullPointerException if {@code message} is null
      * @throws CodecException       if the raw {@code message} input is malformed
@@ -66,8 +68,8 @@ public interface Codec<V> {
      * @param value   the value to be encoded into {@code message}
      * @param <M>     the {@code message} type
      *
-     * @return the target {@code message} with its raw {@linkplain Message#output(Consumer) output} configured to
-     * generate the encoded version of {@code value}
+     * @return the target {@code message} with its {@linkplain Message#headers(Map) headers} and its raw {@linkplain
+     * Message#output(Consumer) output} configured to represent the encoded version of {@code value}
      *
      * @throws NullPointerException if {@code message} is null
      * @throws CodecException       if {@code value} cannot be legally encoded into {@code message} according to the

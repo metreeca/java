@@ -22,6 +22,7 @@ import com.metreeca.rest.Message;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Feeds.text;
@@ -47,17 +48,22 @@ public final class Text implements Codec<String> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public Class<String> type() {
-        return String.class;
-    }
-
     @Override public String mime() {
         return MIME;
+    }
+
+    @Override public Class<String> type() {
+        return String.class;
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return the textual payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account
+     * the {@code message} {@linkplain Message#charset() charset} or an empty optional if the {@code "Content-Type"}
+     * {@code message} header is not matched by {@link #MIMEPattern}
+     */
     @Override public <M extends Message<M>> Optional<String> decode(final M message) {
         return message
 
@@ -82,6 +88,11 @@ public final class Text implements Codec<String> {
                 });
     }
 
+    /**
+     * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless
+     * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the textual {@code
+     * value} taking into account the {@code message} {@linkplain Message#charset() charset}
+     */
     @Override public <M extends Message<M>> M encode(final M message, final String value) {
 
         final Charset charset=message.charset();
@@ -103,7 +114,6 @@ public final class Text implements Codec<String> {
 
                     }
                 });
-
 
     }
 
