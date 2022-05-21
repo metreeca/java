@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,26 +34,26 @@ import static com.metreeca.http.Locator.service;
  */
 public final class Parse<R> implements Function<Message<?>, Optional<R>> {
 
-	private final Format<R> format;
+	private final _Format<R> format;
 
 	private final Logger logger=service(Logger.logger());
 
 
-	/**
-	 * Creates a new message body parser.
-	 *
-	 * @param format the format of the message body to be extracted
-	 *
-	 * @throws NullPointerException if {@code format} is null
-	 */
-	public Parse(final Format<R> format) {
+    /**
+     * Creates a new message body parser.
+     *
+     * @param format the format of the message body to be extracted
+     *
+     * @throws NullPointerException if {@code format} is null
+     */
+    public Parse(final _Format<R> format) {
 
-		if ( format == null ) {
-			throw new NullPointerException("null format");
-		}
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
 
-		this.format=format;
-	}
+        this.format=format;
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

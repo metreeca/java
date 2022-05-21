@@ -31,15 +31,18 @@ import java.util.stream.Stream;
 
 import static com.metreeca.rest.Response.BadRequest;
 
+import static java.lang.Float.parseFloat;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Locale.ROOT;
 import static java.util.Map.entry;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -51,85 +54,80 @@ import static java.util.stream.Collectors.joining;
  */
 public abstract class Message<M extends Message<M>> {
 
-    /**
-     * Creates a message part.
-     *
-     * @param item the (possibly relative)) IRI identifying the {@linkplain #item() focus item} of the new message part;
-     *             will be resolved against the message {@linkplain #item() item} IRI
-     *
-     * @return a new message part with a focus item identified by {@code item} and the same {@linkplain #request()
-     * originating request} as this message
-     *
-     * @throws NullPointerException     if {@code item} is null
-     * @throws IllegalArgumentException if {@code item} is not a legal (possibly relative) IRI
-     */
-    public Message<?> part(final String item) {
-
-        if ( item == null ) {
-            throw new NullPointerException("null item");
-        }
-
-        return new Part(URI.create(item()).resolve(item).toString(), this);
-    }
-
-    /**
-     * Lift a message part into this message.
-     *
-     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain Multipart
-     * multipart} requests for further downstream processing, as for instance in:</p>
-     *
-     * <pre>{@code handler -> request -> request.body(multipart(1000, 10_000)).fold(
-     *
-     *     parts -> Optional.ofNullable(parts.get("main"))
-     *
-     *         .map(main -> {
-     *
-     *           ... // process ancillary body parts
-     *
-     *           return handler.handle(request.lift(main));
-     *
-     *         })
-     *
-     *         .orElseGet(() -> request.reply(new Failure()
-     *             .status(BadRequest)
-     *             .cause("missing main body part")
-     *         )),
-     *
-     *     request::reply
-     *
-     * )}</pre>
-     *
-     * @param message the message part to be lifted into this message
-     *
-     * @return this message modified as follows:
-     * <ul>
-     * <li>source {@code message} headers are copied to this message overriding existing matching values;</li>
-     * <li>source {@code message} body representations are copied to this message replacing all existing values.</li>
-     * </ul>
-     *
-     * @throws NullPointerException if {@code message} is null
-     */
-    public M lift(final Message<?> message) {
-
-        if ( message == null ) {
-            throw new NullPointerException("null message");
-        }
-
-        headers.putAll(message.headers); // value lists are read-only
-
-        bodies.clear();
-        bodies.putAll(message.bodies);
-
-        return self();
-    }
-
-
-    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     private static final Pattern SplitPattern=Pattern.compile("\\s*,\\s*");
     private static final Pattern ExpiresPattern=Pattern.compile("(?i)\\bExpires\\b");
     private static final Pattern CharsetPattern=Pattern.compile(";\\s*charset\\s*=\\s*(?<charset>[-\\w]+)\\b");
 
+    private static final Pattern QualityPattern=Pattern.compile("(?:\\s*;\\s*q\\s*=\\s*(\\d*(?:\\.\\d+)?))?");
+    private static final Pattern LangPattern=Pattern.compile("([a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*|\\*)"+QualityPattern);
+    private static final Pattern MIMEPattern=Pattern.compile("((?:[-+\\w]+|\\*)/(?:[-+\\w]+|\\*))"+QualityPattern);
+
+
+    /**
+     * Parses a MIME type list.
+     *
+     * @param types the MIME type list to be parsed
+     *
+     * @return a list of MIME types parsed from {@code types}, sorted by descending
+     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
+     *
+     * @throws NullPointerException if {@code types} is null
+     */
+    public static List<String> mimes(final CharSequence types) {
+
+        if ( types == null ) {
+            throw new NullPointerException("null types");
+        }
+
+        return values(types, MIMEPattern);
+    }
+
+    /**
+     * Parses a language tag list.
+     *
+     * @param langs the language tag list to be parsed
+     *
+     * @return a list of language tags parsed from {@code langs}, sorted by descending
+     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
+     *
+     * @throws NullPointerException if {@code langs} is null
+     */
+    public static List<String> langs(final CharSequence langs) {
+
+        if ( langs == null ) {
+            throw new NullPointerException("null langs");
+        }
+
+        return values(langs, LangPattern);
+    }
+
+
+    private static List<String> values(final CharSequence types, final Pattern pattern) {
+
+        if ( types == null ) {
+            throw new NullPointerException("null mime types");
+        }
+
+        final List<Entry<String, Float>> entries=new ArrayList<>();
+
+        final Matcher matcher=pattern.matcher(types);
+
+        while ( matcher.find() ) {
+
+            final String media=matcher.group(1).toLowerCase(ROOT);
+            final String quality=matcher.group(2);
+
+            try {
+                entries.add(new AbstractMap.SimpleImmutableEntry<>(media, quality == null ? 1 : parseFloat(quality)));
+            } catch ( final NumberFormatException ignored ) {
+                entries.add(new AbstractMap.SimpleImmutableEntry<>(media, 0.0f));
+            }
+        }
+
+        entries.sort((x, y) -> -Float.compare(x.getValue(), y.getValue()));
+
+        return entries.stream().map(Entry::getKey).collect(toList());
+    }
 
     private static String normalize(final String name) {
         return name.toLowerCase(Locale.ROOT);
@@ -207,6 +205,81 @@ public abstract class Message<M extends Message<M>> {
                 .map(matcher -> Charset.forName(matcher.group("charset")))
 
                 .orElse(UTF_8);
+    }
+
+
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Creates a message part.
+     *
+     * @param item the (possibly relative)) IRI identifying the {@linkplain #item() focus item} of the new message part;
+     *             will be resolved against the message {@linkplain #item() item} IRI
+     *
+     * @return a new message part with a focus item identified by {@code item} and the same {@linkplain #request()
+     * originating request} as this message
+     *
+     * @throws NullPointerException     if {@code item} is null
+     * @throws IllegalArgumentException if {@code item} is not a legal (possibly relative) IRI
+     */
+    public Message<?> part(final String item) {
+
+        if ( item == null ) {
+            throw new NullPointerException("null item");
+        }
+
+        return new Part(URI.create(item()).resolve(item).toString(), this);
+    }
+
+    /**
+     * Lift a message part into this message.
+     *
+     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain Multipart
+     * multipart} requests for further downstream processing, as for instance in:</p>
+     *
+     * <pre>{@code handler -> request -> request.body(multipart(1000, 10_000)).fold(
+     *
+     *     parts -> Optional.ofNullable(parts.get("main"))
+     *
+     *         .map(main -> {
+     *
+     *           ... // process ancillary body parts
+     *
+     *           return handler.handle(request.lift(main));
+     *
+     *         })
+     *
+     *         .orElseGet(() -> request.reply(new Failure()
+     *             .status(BadRequest)
+     *             .cause("missing main body part")
+     *         )),
+     *
+     *     request::reply
+     *
+     * )}</pre>
+     *
+     * @param message the message part to be lifted into this message
+     *
+     * @return this message modified as follows:
+     * <ul>
+     * <li>source {@code message} headers are copied to this message overriding existing matching values;</li>
+     * <li>source {@code message} body representations are copied to this message replacing all existing values.</li>
+     * </ul>
+     *
+     * @throws NullPointerException if {@code message} is null
+     */
+    public M lift(final Message<?> message) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        headers.putAll(message.headers); // value lists are read-only
+
+        bodies.clear();
+        bodies.putAll(message.bodies);
+
+        return self();
     }
 
 
@@ -623,10 +696,10 @@ public abstract class Message<M extends Message<M>> {
 
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final Map<Format<?>, _Either<_MessageException, ?>> bodies=new HashMap<>();
+    private final Map<_Format<?>, _Either<_MessageException, ?>> bodies=new HashMap<>();
 
 
-    @SuppressWarnings("unchecked") public <V> _Either<_MessageException, V> body(final Format<V> format) {
+    @SuppressWarnings("unchecked") public <V> _Either<_MessageException, V> body(final _Format<V> format) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -643,7 +716,7 @@ public abstract class Message<M extends Message<M>> {
         return (_Either<_MessageException, V>)body;
     }
 
-    public <V> M body(final Format<? super V> format, final V value) {
+    public <V> M body(final _Format<? super V> format, final V value) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -659,7 +732,7 @@ public abstract class Message<M extends Message<M>> {
     }
 
 
-    @SuppressWarnings("unchecked") public <V> M map(final Format<? super V> format, final UnaryOperator<V> mapper) {
+    @SuppressWarnings("unchecked") public <V> M map(final _Format<? super V> format, final UnaryOperator<V> mapper) {
 
         if ( format == null ) {
             throw new NullPointerException("null format");

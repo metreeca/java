@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ import static java.util.Objects.requireNonNull;
      * @throws NullPointerException if either {@code format} or {@code mapper} is null
      */
     public static <V> _Wrapper preprocessor(
-            final Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
+            final _Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
     ) {
 
         if ( mapper == null ) {
@@ -186,7 +186,7 @@ import static java.util.Objects.requireNonNull;
      * @throws NullPointerException if either {@code format} or {@code mapper} is null
      */
     public static <V> _Wrapper postprocessor(
-            final Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
+            final _Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
     ) {
 
         if ( mapper == null ) {

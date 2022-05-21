@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,17 +31,17 @@ import static java.lang.String.valueOf;
 /**
  * Binary message format.
  */
-public final class DataFormat extends Format<byte[]> {
+public final class DataFormat extends _Format<byte[]> {
 
-	/**
-	 * The default MIME type for binary messages ({@value}).
-	 */
-	public static final String MIME="application/octet-stream";
+    /**
+     * The default MIME type for binary messages ({@value}).
+     */
+    public static final String MIME="application/octet-stream";
 
-	/**
-	 * A pattern matching binary MIME types, for instance {@code application/zip or image/png}.
-	 */
-	public static final Pattern MIMEPattern=Pattern.compile("(?i)^(application|image)/.+$");
+    /**
+     * A pattern matching binary MIME types, for instance {@code application/zip or image/png}.
+     */
+    public static final Pattern MIMEPattern=Pattern.compile("(?i)^(application|image)/.+$");
 
 
 	/**

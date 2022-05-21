@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@ package com.metreeca.rest;
 
 import com.metreeca.rest.codecs.Text;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
+import static com.metreeca.rest.Message.mimes;
 import static com.metreeca.rest.MessageAssert.assertThat;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 
 
 final class MessageTest {
@@ -37,6 +41,66 @@ final class MessageTest {
         return new Request();
     }
 
+
+    @Nested final class MIMETest {
+
+        @Test void testParseStrings() {
+
+            Assertions.assertThat(mimes(""))
+                    .as("empty")
+                    .isEmpty();
+
+            Assertions.assertThat(mimes("text/turtle"))
+                    .as("single")
+                    .isEqualTo(singletonList("text/turtle"));
+
+            Assertions.assertThat(mimes("text/turtle, text/plain"))
+                    .as("multiple")
+                    .isEqualTo(asList("text/turtle", "text/plain"));
+
+            Assertions.assertThat(mimes("*/*"))
+                    .as("wildcard")
+                    .isEqualTo(singletonList("*/*"));
+
+            Assertions.assertThat(mimes("text/*"))
+                    .as("type wildcard")
+                    .isEqualTo(singletonList("text/*"));
+
+        }
+
+        @Test void testParseLeniently() {
+
+            Assertions.assertThat(mimes("text/Plain"))
+                    .as("normalize case")
+                    .isEqualTo(singletonList("text/plain"));
+
+            Assertions.assertThat(mimes(" text/plain ; q = 0.3"))
+                    .as("ignores spaces")
+                    .isEqualTo(singletonList("text/plain"));
+
+            Assertions.assertThat(mimes("text/turtle, text/plain\ttext/csv"))
+                    .as("lenient separators")
+                    .isEqualTo(asList("text/turtle", "text/plain", "text/csv"));
+
+        }
+
+        @Test void testSortOnQuality() {
+
+            Assertions.assertThat(mimes("text/turtle;q=0.1, text/plain;q=0.2"))
+                    .as("sorted")
+                    .isEqualTo(asList("text/plain", "text/turtle"));
+
+            Assertions.assertThat(mimes("text/turtle;q=0.1, text/plain"))
+                    .as("sorted with default values")
+                    .isEqualTo(asList("text/plain", "text/turtle"));
+
+            Assertions.assertThat(mimes("text/turtle;q=x, text/plain"))
+                    .as("sorted with corrupt values")
+                    .isEqualTo(asList("text/plain", "text/turtle"));
+
+        }
+
+    }
 
     @Nested final class HeadersTest {
 

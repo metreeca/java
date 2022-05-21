@@ -1,6 +1,6 @@
 
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 package com.metreeca.rest.actions;
 
-import com.metreeca.rest.Format;
 import com.metreeca.rest.Request;
+import com.metreeca.rest._Format;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -34,46 +34,46 @@ import static java.util.function.Function.identity;
  */
 public final class GET<T> implements Function<String, Optional<T>> {
 
-	private final Format<T> format;
-	private final Function<Request, Request> customizer;
+    private final _Format<T> format;
+    private final Function<Request, Request> customizer;
 
 
-	/**
-	 * Creates a resource retriever.
-	 *
-	 * @param format the format of the resource to be retrieved
-	 *
-	 * @throws NullPointerException if {@code format} is null
-	 */
-	public GET(final Format<T> format) {
+    /**
+     * Creates a resource retriever.
+     *
+     * @param format the format of the resource to be retrieved
+     *
+     * @throws NullPointerException if {@code format} is null
+     */
+    public GET(final _Format<T> format) {
 
-		if ( format == null ) {
-			throw new NullPointerException("null format");
-		}
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
 
-		this.format=format;
-		this.customizer=identity();
-	}
+        this.format=format;
+        this.customizer=identity();
+    }
 
-	/**
-	 * Creates a customized retriever.
-	 *
-	 * @param format     the format of the resource to be retrieved
-	 * @param customizer the request customizer
-	 *
-	 * @throws NullPointerException i feither {@code format} or {@code customizer} is null
-	 */
-	public GET(final Format<T> format, final Function<Request, Request> customizer) {
+    /**
+     * Creates a customized retriever.
+     *
+     * @param format     the format of the resource to be retrieved
+     * @param customizer the request customizer
+     *
+     * @throws NullPointerException i feither {@code format} or {@code customizer} is null
+     */
+    public GET(final _Format<T> format, final Function<Request, Request> customizer) {
 
-		if ( format == null ) {
-			throw new NullPointerException("null format");
-		}
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
 
-		if ( customizer == null ) {
-			throw new NullPointerException("null customizer");
-		}
+        if ( customizer == null ) {
+            throw new NullPointerException("null customizer");
+        }
 
-		this.format=format;
+        this.format=format;
 		this.customizer=customizer;
 	}
 

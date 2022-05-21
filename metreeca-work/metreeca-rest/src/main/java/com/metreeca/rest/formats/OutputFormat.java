@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.rest.Format;
+import com.metreeca.rest._Format;
 
 import java.io.OutputStream;
 import java.util.function.Consumer;
@@ -25,16 +25,16 @@ import java.util.function.Consumer;
 /**
  * Output message format.
  */
-public final class OutputFormat extends Format<Consumer<OutputStream>> {
+public final class OutputFormat extends _Format<Consumer<OutputStream>> {
 
-	/**
-	 * Creates an output message format.
-	 *
-	 * @return a new output message format
-	 */
-	public static OutputFormat output() {
-		return new OutputFormat();
-	}
+    /**
+     * Creates an output message format.
+     *
+     * @return a new output message format
+     */
+    public static OutputFormat output() {
+        return new OutputFormat();
+    }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static com.metreeca.core.Lambdas.guarded;
-import static com.metreeca.rest.Format.mimes;
+import static com.metreeca.rest.Message.mimes;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.DataFormat.data;

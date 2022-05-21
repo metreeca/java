@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -361,7 +361,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public A hasBody(final Format<?> format) {
+    public A hasBody(final _Format<?> format) {
 
         if ( format == null ) {
             throw new NullPointerException("null format");
@@ -370,7 +370,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
         return hasBody(format, body -> { });
     }
 
-    public <V> A hasBody(final Format<V> body, final Consumer<V> assertions) {
+    public <V> A hasBody(final _Format<V> body, final Consumer<V> assertions) {
 
         if ( body == null ) {
             throw new NullPointerException("null body");
@@ -400,7 +400,7 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
         );
     }
 
-    public A doesNotHaveBody(final Format<?> body) {
+    public A doesNotHaveBody(final _Format<?> body) {
 
         if ( body == null ) {
             throw new NullPointerException("null body");

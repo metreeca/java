@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,17 +53,17 @@ import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 /**
  * RDF message format.
  */
-public final class RDFFormat extends Format<Collection<Statement>> {
+public final class RDFFormat extends _Format<Collection<Statement>> {
 
-	/**
-	 * The default MIME type for RDF messages ({@value}).
-	 */
-	public static final String MIME="text/turtle";
+    /**
+     * The default MIME type for RDF messages ({@value}).
+     */
+    public static final String MIME="text/turtle";
 
 
-	/**
-	 * Locates a file format service in a registry.
-	 *
+    /**
+     * Locates a file format service in a registry.
+     *
 	 * @param registry the registry the file format service is to be located from
 	 * @param fallback the fallback file format to be used as key if no service in the registry is matched by one of
 	 *                 the suggested MIME {@code types}
@@ -274,7 +274,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
             final String base=focus.stringValue();
             final String type=message.header("Content-Type").orElse("");
 
-            final RDFParser parser=service(RDFParserRegistry.getInstance(), TURTLE, mimes(type)).getParser();
+            final RDFParser parser=service(RDFParserRegistry.getInstance(), TURTLE, Message.mimes(type)).getParser();
 
             customizer.accept(parser.getParserConfig());
 
@@ -299,7 +299,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
 	 */
 	@Override public <M extends Message<M>> M encode(final M message, final Collection<Statement> value) {
 
-		final List<String> types=mimes(message.request().header("Accept").orElse(""));
+		final List<String> types=Message.mimes(message.request().header("Accept").orElse(""));
 
 		final RDFWriterRegistry registry=RDFWriterRegistry.getInstance();
 		final RDFWriterFactory factory=service(registry, TURTLE, types);

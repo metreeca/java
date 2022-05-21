@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,17 +48,17 @@ import static java.util.regex.Pattern.compile;
 /**
  * XML message format.
  */
-public final class XMLFormat extends Format<Document> {
+public final class XMLFormat extends _Format<Document> {
 
-	/**
-	 * The default MIME type for XML message bodies ({@value}).
-	 */
-	public static final String MIME="application/xml";
+    /**
+     * The default MIME type for XML message bodies ({@value}).
+     */
+    public static final String MIME="application/xml";
 
-	/**
-	 * A pattern matching XML-based MIME types, for instance {@code application/rss+xml}.
-	 */
-	public static final Pattern MIMEPattern=compile("(?i)^.*/(?:.*\\+)?xml(?:\\s*;.*)?$");
+    /**
+     * A pattern matching XML-based MIME types, for instance {@code application/rss+xml}.
+     */
+    public static final Pattern MIMEPattern=compile("(?i)^.*/(?:.*\\+)?xml(?:\\s*;.*)?$");
 
 
 	private static DocumentBuilder builder() {

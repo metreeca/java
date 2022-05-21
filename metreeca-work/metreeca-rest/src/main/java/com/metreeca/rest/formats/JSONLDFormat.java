@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
 /**
  * Model-driven JSON-LD message format.
  */
-public final class JSONLDFormat extends Format<Frame> {
+public final class JSONLDFormat extends _Format<Frame> {
 
     /**
      * The default MIME type for JSON-LD messages ({@value}).
@@ -437,7 +437,7 @@ public final class JSONLDFormat extends Format<Frame> {
 
                 .header("Content-Type") // content-type explicitly defined by handler
 
-                .orElseGet(() -> mimes(message.request().header("Accept").orElse("")).stream()
+                .orElseGet(() -> Message.mimes(message.request().header("Accept").orElse("")).stream()
 
                         // application/ld+json or application/json accepted?
 

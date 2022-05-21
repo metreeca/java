@@ -16,17 +16,8 @@
 
 package com.metreeca.rest;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static com.metreeca.rest._Either.Left;
 import static com.metreeca.rest._MessageException.status;
-
-import static java.lang.Float.parseFloat;
-import static java.util.Locale.ROOT;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -38,79 +29,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @param <V> the type of the message body managed by the format
  */
-public abstract class Format<V> {
-
-    private static final Pattern QualityPattern=Pattern.compile("(?:\\s*;\\s*q\\s*=\\s*(\\d*(?:\\.\\d+)?))?");
-
-    private static final Pattern MIMEPattern=Pattern.compile("((?:[-+\\w]+|\\*)/(?:[-+\\w]+|\\*))"+QualityPattern);
-    private static final Pattern LangPattern=Pattern.compile("([a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*|\\*)"+QualityPattern);
-
-
-    /**
-     * Parses a MIME type list.
-     *
-     * @param types the MIME type list to be parsed
-     *
-     * @return a list of MIME types parsed from {@code types}, sorted by descending
-     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
-     *
-     * @throws NullPointerException if {@code types} is null
-     */
-    public static List<String> mimes(final CharSequence types) {
-
-        if ( types == null ) {
-            throw new NullPointerException("null types");
-        }
-
-        return values(types, MIMEPattern);
-    }
-
-    /**
-     * Parses a language tag list.
-     *
-     * @param langs the language tag list to be parsed
-     *
-     * @return a list of language tags parsed from {@code langs}, sorted by descending
-     * <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>
-     *
-     * @throws NullPointerException if {@code langs} is null
-     */
-    public static List<String> langs(final CharSequence langs) {
-
-        if ( langs == null ) {
-            throw new NullPointerException("null langs");
-        }
-
-        return values(langs, LangPattern);
-    }
-
-
-    private static List<String> values(final CharSequence types, final Pattern pattern) {
-
-        if ( types == null ) {
-            throw new NullPointerException("null mime types");
-        }
-
-        final List<Map.Entry<String, Float>> entries=new ArrayList<>();
-
-        final Matcher matcher=pattern.matcher(types);
-
-        while ( matcher.find() ) {
-
-            final String media=matcher.group(1).toLowerCase(ROOT);
-            final String quality=matcher.group(2);
-
-            try {
-                entries.add(new SimpleImmutableEntry<>(media, quality == null ? 1 : parseFloat(quality)));
-            } catch ( final NumberFormatException ignored ) {
-                entries.add(new SimpleImmutableEntry<>(media, 0.0f));
-            }
-        }
-
-        entries.sort((x, y) -> -Float.compare(x.getValue(), y.getValue()));
-
-        return entries.stream().map(Map.Entry::getKey).collect(toList());
-    }
+public abstract class _Format<V> {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

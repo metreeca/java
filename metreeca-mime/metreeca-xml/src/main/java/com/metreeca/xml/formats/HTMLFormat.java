@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,17 +47,17 @@ import static java.util.regex.Pattern.compile;
 /**
  * HTML message format.
  */
-public final class HTMLFormat extends Format<Document> {
+public final class HTMLFormat extends _Format<Document> {
 
-	/**
-	 * The default MIME type for HTML messages ({@value}).
-	 */
-	public static final String MIME="text/html";
+    /**
+     * The default MIME type for HTML messages ({@value}).
+     */
+    public static final String MIME="text/html";
 
-	/**
-	 * A pattern matching the HTML MIME type.
-	 */
-	public static final Pattern MIMEPattern=compile("(?i)^text/html(?:\\s*;.*)?$");
+    /**
+     * A pattern matching the HTML MIME type.
+     */
+    public static final Pattern MIMEPattern=compile("(?i)^text/html(?:\\s*;.*)?$");
 
 
 	/**

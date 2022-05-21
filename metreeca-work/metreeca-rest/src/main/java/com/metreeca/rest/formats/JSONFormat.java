@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,17 +40,17 @@ import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
  *
  * @see <a href="https://javaee.github.io/jsonp/">JSR 374 - Java API for JSON Processing</a>
  */
-public final class JSONFormat extends Format<JsonObject> {
+public final class JSONFormat extends _Format<JsonObject> {
 
-	/**
-	 * The default MIME type for JSON messages ({@value}).
-	 */
-	public static final String MIME="application/json";
+    /**
+     * The default MIME type for JSON messages ({@value}).
+     */
+    public static final String MIME="application/json";
 
-	/**
-	 * A pattern matching JSON-based MIME types, for instance {@code application/ld+json}.
-	 */
-	public static final Pattern MIMEPattern=Pattern.compile(
+    /**
+     * A pattern matching JSON-based MIME types, for instance {@code application/ld+json}.
+     */
+    public static final Pattern MIMEPattern=Pattern.compile(
 			"(?i:^(text/json|application/(?:.*\\+)?json)(?:\\s*;.*)?$)"
 	);
 
