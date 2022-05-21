@@ -21,8 +21,8 @@ import com.metreeca.http.processors.Regex;
 import com.metreeca.rest.Message;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.actions.*;
+import com.metreeca.xml.XPath;
 import com.metreeca.xml.formats.HTMLFormat;
-import com.metreeca.xml.processors.XPath;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

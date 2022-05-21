@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.xml.processors;
+package com.metreeca.xml;
 
 import com.metreeca.http.Xtream;
 import com.metreeca.xml.formats.XMLFormat;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
-import static com.metreeca.xml.processors.XPath.decode;
+import static com.metreeca.xml.XPath.decode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

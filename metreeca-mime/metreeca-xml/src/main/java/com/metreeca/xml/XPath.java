@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.xml.processors;
+package com.metreeca.xml;
 
 import com.metreeca.http.Xtream;
 
