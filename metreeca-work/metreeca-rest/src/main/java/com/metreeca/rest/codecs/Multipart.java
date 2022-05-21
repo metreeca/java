@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +192,6 @@ public final class Multipart implements Codec<Map<String, Message<?>>> {
                             );
 
                         }).parse();
-
 
                     } catch ( final IOException e ) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,9 +227,7 @@ final class MultipartParser {
     private State error(final int status, final String message) throws CodecException {
         try {
 
-            throw new CodecException(format("%s (%d)", message, body));
-
-            // !!! throw status(status, String.format("%s (%d)", message, body));
+            throw new CodecException(status, format("%s (%d)", message, body));
 
         } finally {
 

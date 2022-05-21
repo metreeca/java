@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public final class Server implements _Wrapper {
             throw new NullPointerException("null handler");
         }
 
-        return (request, next) -> {
+        return (request, forward) -> {
             try {
 
                 return request
@@ -75,10 +75,19 @@ public final class Server implements _Wrapper {
                         .map(this::query)
                         .map(this::form)
 
-                        .map(request1 -> handler.handle(request1, next))
+                        .map(_request -> handler.handle(_request, forward))
 
                         .map(this::logging)
                         .map(this::charset);
+
+            } catch ( final CodecException e ) {
+
+                final String method=request.method();
+                final String item=request.item();
+
+                logger.entry(warning, this, () -> format("%s %s > %d", method, item, e.getStatus()), e);
+
+                return request.reply(e.getStatus()).body(new Text(), e.getMessage());
 
             } catch ( final RuntimeException e ) { // try to send a new response
 
@@ -87,11 +96,8 @@ public final class Server implements _Wrapper {
 
                 logger.entry(error, this, () -> format("%s %s > %d", method, item, InternalServerError), e);
 
-                return request
+                return request.reply(InternalServerError);
 
-                        .reply(InternalServerError)
-
-                        .map(this::logging);
 
             }
         };

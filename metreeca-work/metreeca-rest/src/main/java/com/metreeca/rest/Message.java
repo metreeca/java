@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static com.metreeca.rest.Response.BadRequest;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -585,7 +587,7 @@ public abstract class Message<M extends Message<M>> {
 
                 }))
 
-                .orElseThrow(() -> new CodecException(format(
+                .orElseThrow(() -> new CodecException(BadRequest, format(
                         "missing <%s> message body", codec.getClass().getSimpleName()
                 )));
     }
