@@ -16,7 +16,7 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.rest.formats.MultipartFormat;
+import com.metreeca.rest.codecs.Multipart;
 
 import java.io.*;
 import java.net.URI;
@@ -73,7 +73,7 @@ public abstract class Message<M extends Message<M>> {
     /**
      * Lift a message part into this message.
      *
-     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain MultipartFormat
+     * <p>Mainly intended to be used inside wrappers to lift the main message part in {@linkplain Multipart
      * multipart} requests for further downstream processing, as for instance in:</p>
      *
      * <pre>{@code handler -> request -> request.body(multipart(1000, 10_000)).fold(
@@ -586,7 +586,7 @@ public abstract class Message<M extends Message<M>> {
                 }))
 
                 .orElseThrow(() -> new CodecException(format(
-                        "missing <%s> message body", codec.mime()
+                        "missing <%s> message body", codec.getClass().getSimpleName()
                 )));
     }
 

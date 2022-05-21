@@ -31,14 +31,7 @@ import java.util.function.Consumer;
 public interface Codec<V> {
 
     /**
-     * Retrieves the payload MIME type.
-     *
-     * @return the MIME type of the structured payload managed by this codec
-     */
-    public String mime();
-
-    /**
-     * Retrieves the payload Java type.
+     * Retrieves the payload type.
      *
      * @return the type of the structured payload managed by this codec
      */

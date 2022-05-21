@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest.formats;
+package com.metreeca.rest.codecs;
 
-import com.metreeca.rest.*;
+import com.metreeca.rest.Codec;
+import com.metreeca.rest.Message;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.rest.Response.UnsupportedMediaType;
-import static com.metreeca.rest._Either.Left;
-import static com.metreeca.rest._Either.Right;
-import static com.metreeca.rest._MessageException.status;
-import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -39,12 +32,12 @@ import static java.util.stream.Collectors.*;
 
 
 /**
- * Multipart message format.
+ * Multipart message codec.
  *
  * @see <a href="https://tools.ietf.org/html/rfc2046#section-5.1">RFC 2046 - Multipurpose Internet Mail Extensions
  * (MIME) Part Two: Media Types - § 5.1.  Multipart Media Type</a>
  */
-public final class MultipartFormat extends Format<Map<String, Message<?>>> {
+public final class Multipart implements Codec<Map<String, Message<?>>> {
 
     /**
      * The default MIME type for multipart messages ({@value}).
@@ -80,14 +73,17 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private final int part;
+    private final int body;
+
+
     /**
-     * Creates a write-only multipart message format.
+     * Creates a write-only multipart message format with no part/body size limits.
      *
-     * @return a new write-only multipart message format with part/body size limit set to 0, intended for configuring
-     * multipart response bodies
+     * <p>Mainly intended for configuring multipart response bodies.</p>
      */
-    public static MultipartFormat multipart() {
-        return new MultipartFormat(0, 0);
+    public Multipart() {
+        this(0, 0);
     }
 
     /**
@@ -97,12 +93,10 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
      *             preamble and epilogue
      * @param body the size limit for the complete message body
      *
-     * @return a new read/write multipart message format with the given {@code part}/{@code body} size limits
-     *
      * @throws IllegalArgumentException if either {@code part} or {@code body} is less than 0 or if {@code part} is
      *                                  greater than {@code body}
      */
-    public static MultipartFormat multipart(final int part, final int body) {
+    public Multipart(final int part, final int body) {
 
         if ( part < 0 ) {
             throw new IllegalArgumentException("negative part size limit");
@@ -116,17 +110,6 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
             throw new IllegalArgumentException("part size limit greater than body size limit");
         }
 
-        return new MultipartFormat(part, body);
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private final int part;
-    private final int body;
-
-
-    private MultipartFormat(final int part, final int body) {
         this.part=part;
         this.body=body;
     }
@@ -134,26 +117,24 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return the default MIME type for multipart messages ({@value MIME})
-     */
-    @Override public String mime() {
-        return MIME;
+    @SuppressWarnings("unchecked")
+    @Override public Class<Map<String, Message<?>>> type() {
+        return (Class<Map<String, Message<?>>>)(Class<?>)Map.class;
     }
 
     /**
-     * Decodes the multipart {@code message} body from the input stream supplied by the {@code message} {@link
-     * InputFormat} body, if one is available and the {@code message} {@code Content-Type} header is either missing or
-     * matched by {@link #MIMEPattern}
+     * @return the multipart payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty
+     * optional if the {@code "Content-Type"} {@code message} header is not matched by {@link #MIMEPattern}
      */
-    @Override public <M extends Message<M>> _Either<_MessageException, Map<String, Message<?>>> decode(final M message) {
+    @Override public <M extends Message<M>> Optional<Map<String, Message<?>>> decode(final M message) {
         return message
 
                 .header("Content-Type")
+                .filter(MIMEPattern.asPredicate())
 
-                .filter(MIMEPattern.asPredicate().or(String::isEmpty))
+                .map(type -> {
 
-                .map(type -> message.body(input()).flatMap(source -> {
+                    final Map<String, Message<?>> parts=new LinkedHashMap<>();
 
                     final String boundary=message
                             .header("Content-Type")
@@ -162,11 +143,9 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
                             .map(this::parameter)
                             .orElse("");
 
-                    final Map<String, Message<?>> parts=new LinkedHashMap<>();
+                    try ( final InputStream input=message.input().get() ) {
 
-                    try {
-
-                        new MultipartParser(part, body, source.get(), boundary, (headers, content) -> {
+                        new MultipartParser(part, body, input, boundary, (headers, content) -> {
 
                             final Optional<String> disposition=headers
                                     .stream()
@@ -208,15 +187,12 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
                                     })
 
-                                    .body(input(), () -> content)
+                                    .input(() -> content)
 
                             );
 
                         }).parse();
 
-                    } catch ( final _MessageException e ) {
-
-                        return Left(e);
 
                     } catch ( final IOException e ) {
 
@@ -224,17 +200,16 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
                     }
 
-                    return Right(parts);
+                    return parts;
 
-                }))
-
-                .orElseGet(() -> Left(status(UnsupportedMediaType, "no multipart body")));
+                });
     }
 
+
     /**
-     * Configures {@code message} {@code Content-Type} header to {@value #MIME}, unless already defined, defines the
-     * multipart message boundary, unless already defined and encodes the multipart {@code value} into the output stream
-     * accepted by the {@code message} {@link OutputFormat} body
+     * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless
+     * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the multipart
+     * {@code value}
      */
     @Override public <M extends Message<M>> M encode(final M message, final Map<String, Message<?>> value) {
 
@@ -262,7 +237,7 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
         }
 
-        return message.body(output(), output -> {
+        return message.output(output -> {
             try {
 
                 for (final Message<?> part : value.values()) {
@@ -282,10 +257,7 @@ public final class MultipartFormat extends Format<Map<String, Message<?>>> {
 
                     output.write(CRLF);
 
-                    part.body(output()).fold(
-                            unexpected -> { throw unexpected; },
-                            task(target -> target.accept(output))
-                    );
+                    part.output().accept(output);
 
                     output.write(CRLF);
                 }

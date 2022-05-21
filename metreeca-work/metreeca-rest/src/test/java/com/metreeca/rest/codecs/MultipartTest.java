@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest.formats;
+package com.metreeca.rest.codecs;
 
 import com.metreeca.rest.*;
-import com.metreeca.rest.codecs.Text;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.metreeca.rest.MessageAssert.assertThat;
-import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.formats.MultipartFormat.multipart;
-import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Map.entry;
-import static java.util.function.Function.identity;
 
 
-final class MultipartFormatTest {
+final class MultipartTest {
 
     @Nested final class Input {
 
@@ -78,100 +74,70 @@ final class MultipartFormatTest {
 
 
         @Test void testParseMultipartBodies() {
-            new Request()
+            assertThat(new Request()
 
                     .header("Content-Type", type)
 
                     .input(content())
 
-                    .body(multipart(250, 1000))
+                    .body(new Multipart(250, 1000))
 
-                    .fold(
+            ).satisfies(parts -> {
 
-                            error -> Assertions.fail("unexpected failure {"+error+"}"), parts -> {
+                assertThat(parts.size())
+                        .isEqualTo(2);
 
-                                assertThat(parts.size())
-                                        .isEqualTo(2);
+                assertThat(parts.keySet())
+                        .containsExactly("main", "file");
 
-                                assertThat(parts.keySet())
-                                        .containsExactly("main", "file");
+                assertThat(parts.get("file"))
+                        .as("part available by name")
+                        .hasItem("file:example.txt")
+                        .hasHeader("Content-Disposition")
+                        .hasBody(new Text(), text -> assertThat(text)
+                                .isEqualTo("text")
+                        );
 
-                                assertThat(parts.get("file"))
-                                        .as("part available by name")
-                                        .hasItem("file:example.txt")
-                                        .hasHeader("Content-Disposition")
-                                        .hasBody(new Text(), text -> assertThat(text)
-                                                .isEqualTo("text")
-                                        );
-
-                                return this;
-
-                            }
-
-                    );
+            });
         }
 
         @Test void testCacheIdempotentResults() {
 
             final Request request=new Request()
                     .header("Content-Type", type)
-                    .body(InputFormat.input(), content());
+                    .input(content());
 
             final Map<String, Message<?>> one=request
-                    .body(multipart(250, 1000))
-                    .fold(e -> Assertions.fail("missing multipart body"), identity());
+                    .body(new Multipart(250, 1000));
 
             final Map<String, Message<?>> two=request
-                    .body(multipart())
-                    .fold(e -> Assertions.fail("missing multipart body"), identity());
+                    .body(new Multipart());
 
-            Assertions.assertThat(one)
+            assertThat(one)
                     .as("idempotent")
                     .isSameAs(two);
         }
 
 
         @Test void testIgnoreUnrelatedContentTypes() {
-            new Request()
+
+            assertThat(new Request()
 
                     .header("Content-Type", "plain/test")
-                    .body(InputFormat.input(), content())
+                    .input(content())
 
-                    .body(multipart())
-
-                    .fold(
-                            Assertions::assertThat, parts -> Assertions.fail("unexpected multipart body")
-                    );
+            ).doesNotHaveBody(new Multipart());
         }
 
         @Test void testRejectMalformedPayloads() {
-            new Request()
+            assertThatExceptionOfType(CodecException.class).isThrownBy(() -> new Request()
 
                     .header("Content-Type", "multipart/data")
-                    .body(InputFormat.input(), content())
+                    .input(content())
 
-                    .body(multipart())
+                    .body(new Multipart())
 
-                    .fold(
-
-                            error -> {
-
-                                new Request().reply().map(error).map(response -> assertThat(response)
-                                        .as("missing boundary parameter")
-                                        .hasStatus(Response.BadRequest)
-                                );
-
-
-                                return this;
-                            }, parts -> {
-                                Assertions.fail("unexpected multipart body");
-
-
-                                return this;
-
-                            }
-
-                    );
+            );
         }
 
     }
@@ -183,7 +149,7 @@ final class MultipartFormatTest {
 
                     .map(response -> response.status(Response.OK)
 
-                            .body(multipart(), Map.ofEntries(
+                            .body(new Multipart(), Map.ofEntries(
 
                                     entry("one", response.part("one").body(new Text(), "one")),
                                     entry("two", response.part("two").body(new Text(), "two"))
@@ -203,28 +169,19 @@ final class MultipartFormatTest {
         }
 
         @Test void testPreserveCustomBoundary() {
-            new Request().reply().map(response1 -> response1
+            assertThat(new Request().reply()
 
-                            .status(Response.OK)
-                            .header("Content-Type", "multipart/form-data; boundary=1234567890")
-                            .body(multipart(), Map.of()))
+                    .header("Content-Type", "multipart/form-data; boundary=1234567890")
+                    .body(new Multipart(), Map.of())
 
-                    .map(response -> MessageAssert.assertThat(response)
+            )
 
-                            .hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
+                    .hasHeader("Content-Type", "multipart/form-data; boundary=1234567890")
 
-                            .hasBody(output(), target -> {
-
-                                final ByteArrayOutputStream output=new ByteArrayOutputStream();
-
-                                target.accept(output);
-
-                                assertThat(output.toString(UTF_8))
-                                        .contains("--1234567890--");
-
-                            })
-
+                    .hasTextOutput(text -> assertThat(text)
+                            .contains("--1234567890--")
                     );
+
         }
 
     }

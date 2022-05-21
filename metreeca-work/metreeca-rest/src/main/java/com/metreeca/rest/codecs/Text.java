@@ -48,10 +48,6 @@ public final class Text implements Codec<String> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public String mime() {
-        return MIME;
-    }
-
     @Override public Class<String> type() {
         return String.class;
     }

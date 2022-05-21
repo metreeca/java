@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest.formats;
+package com.metreeca.rest.codecs;
 
 import com.metreeca.core.Feeds;
 import com.metreeca.rest.*;
@@ -179,15 +179,15 @@ final class MultipartParserTest {
 
         @Test void testRejectMalformedHeaders() {
 
-            assertThatExceptionOfType(_MessageException.class)
+            assertThatExceptionOfType(CodecException.class)
                     .as("spaces before colon")
                     .isThrownBy(() -> parts("--boundary\nheader : value\n\ncontent"));
 
-            assertThatExceptionOfType(_MessageException.class)
+            assertThatExceptionOfType(CodecException.class)
                     .as("malformed name")
                     .isThrownBy(() -> parts("--boundary\nhea der: value\n\ncontent"));
 
-            assertThatExceptionOfType(_MessageException.class)
+            assertThatExceptionOfType(CodecException.class)
                     .as("malformed value")
                     .isThrownBy(() -> parts("--boundary\nhea der: val\rue\n\ncontent"));
 
@@ -204,7 +204,7 @@ final class MultipartParserTest {
 
         @Test void testEnforceBodySizeLimits() {
 
-            assertThatExceptionOfType(_MessageException.class)
+            assertThatExceptionOfType(CodecException.class)
                     .as("body size exceeded")
                     .isThrownBy(() -> parser(5, 25,
                             "--boundary\n\none\n--boundary\n\ntwo\n--boundary--"
@@ -214,7 +214,7 @@ final class MultipartParserTest {
 
         @Test void testEnforcePartSizeLimits() {
 
-            assertThatExceptionOfType(_MessageException.class)
+            assertThatExceptionOfType(CodecException.class)
                     .as("parts size exceeded")
                     .isThrownBy(() -> parser(10, 1000,
                             "--boundary\n\nshort\n--boundary\n\nlong content\n--boundary--"

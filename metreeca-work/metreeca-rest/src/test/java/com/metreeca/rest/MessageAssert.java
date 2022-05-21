@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.fail;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 
@@ -325,6 +326,41 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
     }
 
 
+    public A doesNotHaveBody() {
+
+        isNotNull();
+
+        final ByteArrayOutputStream output=new ByteArrayOutputStream();
+
+        actual.output().accept(output);
+
+        final byte[] data=output.toByteArray();
+
+        if ( data.length > 0 ) {
+            failWithMessage("expected empty body but had binary body of length <%d>", data.length);
+        }
+
+        return myself;
+    }
+
+    public A doesNotHaveBody(final Codec<?> codec) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        isNotNull();
+
+        codec.decode(actual).ifPresent(value ->
+                fail(format("expected message to have no <%s> body but has one", codec.getClass().getSimpleName()))
+        );
+
+        return myself;
+    }
+
+
+    //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public A hasBody(final Format<?> format) {
 
         if ( format == null ) {
@@ -362,24 +398,6 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
                 }
 
         );
-    }
-
-
-    public A doesNotHaveBody() {
-
-        isNotNull();
-
-        final ByteArrayOutputStream output=new ByteArrayOutputStream();
-
-        actual.output().accept(output);
-
-        final byte[] data=output.toByteArray();
-
-        if ( data.length > 0 ) {
-            failWithMessage("expected empty body but had binary body of length <%d>", data.length);
-        }
-
-        return myself;
     }
 
     public A doesNotHaveBody(final Format<?> body) {
