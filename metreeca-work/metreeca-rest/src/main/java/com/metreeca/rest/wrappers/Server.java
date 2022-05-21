@@ -82,9 +82,14 @@ public final class Server implements _Wrapper {
 
             } catch ( final RuntimeException e ) { // try to send a new response
 
+                final String method=request.method();
+                final String item=request.item();
+
+                logger.entry(error, this, () -> format("%s %s > %d", method, item, InternalServerError), e);
+
                 return request
 
-                        .reply(InternalServerError).cause(e)
+                        .reply(InternalServerError)
 
                         .map(this::logging);
 
@@ -146,13 +151,12 @@ public final class Server implements _Wrapper {
         final String item=request.item();
 
         final int status=response.status();
-        final Throwable cause=response.cause().orElse(null);
 
         final Logger.Level level=(status < 400) ? info
                 : (status < 500) ? warning
                 : error;
 
-        logger.entry(level, this, () -> format("%s %s > %d", method, item, status), cause);
+        logger.entry(level, this, () -> format("%s %s > %d", method, item, status), null);
 
         return response;
     }

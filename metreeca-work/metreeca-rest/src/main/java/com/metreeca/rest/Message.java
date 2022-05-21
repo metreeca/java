@@ -30,8 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest._Either.Left;
-
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -565,35 +563,23 @@ public abstract class Message<M extends Message<M>> {
      * @param codec the message codec
      * @param <V>   the expected message body type
      *
-     * @return either an exception reporting a decoding issue or the {@linkplain Codec#decode(Message) decoded} body of
-     * this message
+     * @return the {@linkplain Codec#decode(Message) decoded} body of this message
      *
      * @throws NullPointerException if {@code codec} is null
      */
-    public <V> _Either<IllegalArgumentException, V> body(final Codec<V> codec) {
+    public <V> V body(final Codec<V> codec) {
 
         if ( codec == null ) {
             throw new NullPointerException("null codec");
         }
 
-        try {
+        return attribute(codec.type())
 
-            return attribute(codec.type())
+                .or(() -> codec.decode(self()))
 
-                    .or(() -> codec.decode(self()))
-
-                    .map(_Either::<IllegalArgumentException, V>Right)
-
-                    .orElseGet(() -> Left(new IllegalArgumentException(format(
-                            "missing <%s> message body", codec.mime()
-                    ))));
-
-        } catch ( final IllegalArgumentException e ) {
-
-            return Left(e);
-
-        }
-
+                .orElseThrow(() -> new IllegalArgumentException(format(
+                        "missing <%s> message body", codec.mime()
+                )));
     }
 
     /**

@@ -26,11 +26,9 @@ public final class Test {
     public static void main(final String... args) {
         new JSEServer()
 
-                .delegate(locator -> locator.get(() ->
+                .delegate(locator -> locator.get(() -> (request, forward) -> request.reply(OK)
 
-                        (request, forward) -> request.body(new Text()).fold(request::reply, text ->
-                                request.reply(OK).body(new Text(), format("ciao %s!!!", text))
-                        )
+                        .body(new Text(), format("ciao %s!!!", request.body(new Text())))
 
                 ))
 

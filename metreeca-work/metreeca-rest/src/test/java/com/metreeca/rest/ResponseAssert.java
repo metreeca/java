@@ -49,8 +49,8 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
                     throw new UncheckedIOException(e);
                 }
 
-                response.body(output(), output -> { Feeds.data(output, data); }); // cache output
-                response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
+                response.body(output(), output -> Feeds.data(output, data)); // cache output
+				response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
 
                 return null;
 
@@ -79,8 +79,7 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 
 			Logger.getLogger(response.getClass().getName()).log(
 					response.status() < 400 ? Level.INFO : response.status() < 500 ? Level.WARNING : Level.SEVERE,
-					builder.toString(),
-					response.cause().orElse(null)
+					builder.toString()
 			);
 
 		}
@@ -115,17 +114,6 @@ public final class ResponseAssert extends MessageAssert<ResponseAssert, Response
 
 		if ( actual.status() != expected ) {
 			failWithMessage("expected response status to be <%d> was <%d>", expected, actual.status());
-		}
-
-		return this;
-	}
-
-	public ResponseAssert hasCause(final Class<? extends Throwable> expected) {
-
-		isNotNull();
-
-		if ( expected.isInstance(actual.cause()) ) {
-			failWithMessage("expected response to have cause of class <%s>", expected);
 		}
 
 		return this;

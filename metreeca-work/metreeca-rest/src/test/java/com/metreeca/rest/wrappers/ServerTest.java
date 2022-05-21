@@ -172,7 +172,6 @@ final class ServerTest {
 
 					.map(response -> assertThat(response)
                             .hasStatus(InternalServerError)
-                            .hasCause(UnsupportedOperationException.class)
                     )
 
             );

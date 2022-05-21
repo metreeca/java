@@ -16,6 +16,7 @@
 
 package com.metreeca.rest;
 
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -49,12 +50,13 @@ public interface Codec<V> {
      * @param message the message to be decoded
      * @param <M>     the {@code message} type
      *
-     * @return the structured payload decoded from the {@code message} {@linkplain Message#input()}
+     * @return the structured payload decoded from the raw {@code message} {@linkplain Message#input()}
      *
      * @throws NullPointerException     if {@code message} is null
-     * @throws IllegalArgumentException if the raw {@code message} body is not well-formed
+     * @throws UncheckedIOException     if an I/O error occurred while decoding the raw {@code message} input
+     * @throws IllegalArgumentException if the raw {@code message} input is malformed
      */
-    public <M extends Message<M>> Optional<V> decode(final M message) throws IllegalArgumentException;
+    public <M extends Message<M>> Optional<V> decode(final M message) throws UncheckedIOException;
 
     /**
      * Encoded a value into a message.
