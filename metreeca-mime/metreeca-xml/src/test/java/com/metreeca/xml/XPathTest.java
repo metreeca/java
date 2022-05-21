@@ -17,15 +17,15 @@
 package com.metreeca.xml;
 
 import com.metreeca.http.Xtream;
-import com.metreeca.xml.formats.XMLFormat;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.Optional;
 
 import static com.metreeca.xml.XPath.decode;
+import static com.metreeca.xml.codecs.XML.xml;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,18 +33,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 final class XPathTest {
 
     @Test void testDecodeNumericEntities() {
-        Assertions.assertThat(decode("Italy&#x2019;s &#8220;most powerful&#8221; car"))
+        assertThat(decode("Italy&#x2019;s &#8220;most powerful&#8221; car"))
                 .isEqualTo("Italy’s “most powerful” car");
     }
 
     @Test void testUseEnclosingNamespaces() {
-        Assertions.assertThat(Xtream
+        assertThat(Xtream
 
                 .of("<ns:x xmlns:ns='http://example.com/o'><ns:y><ns:z>text</ns:z></ns:y></ns:x>")
 
-                .map(x -> XMLFormat.xml(new ByteArrayInputStream(x.getBytes(UTF_8))))
-
-                .optMap(either -> either.fold(e -> Optional.empty(), Optional::of))
+                .map(xml -> xml(new ByteArrayInputStream(xml.getBytes(UTF_8))))
 
                 .map(XPath::new).flatMap(xpath -> xpath.nodes("//ns:y"))
                 .map(XPath::new).flatMap(xpath -> xpath.strings("//ns:z"))

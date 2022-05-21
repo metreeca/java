@@ -21,7 +21,8 @@ import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
-import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest._formats.JSONLDFormat;
+import com.metreeca.rest.codecs.Data;
 import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.*;
@@ -29,25 +30,23 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.VOID;
 import org.eclipse.rdf4j.repository.*;
 import org.eclipse.rdf4j.rio.*;
+import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
+import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Supplier;
 
 import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.link.Shape.exactly;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
 import static com.metreeca.link.shapes.Field.field;
-import static com.metreeca.rdf.formats.RDFFormat.rdf;
+import static com.metreeca.rdf.codecs.RDF.service;
 import static com.metreeca.rest.Message.mimes;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest._MessageException.status;
-import static com.metreeca.rest.formats.DataFormat.data;
-import static com.metreeca.rest.formats.InputFormat.input;
 
-import static java.io.InputStream.nullInputStream;
 import static java.lang.String.format;
 
 
@@ -130,17 +129,15 @@ public final class Graphs extends Endpoint<Graphs> {
             }));
 
             return request.reply().map(response -> JSONLDFormat.shape(response.status(Response.OK), GraphsShape)
-                    .body(rdf(), model));
+                    .body(new com.metreeca.rdf.codecs.RDF(), model));
 
         } else {
 
-            final RDFWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                    RDFWriterRegistry.getInstance(), RDFFormat.TURTLE, mimes(accept)
-            );
+            final RDFWriterFactory factory
+                    =service(RDFWriterRegistry.getInstance(), mimes(accept)).orElseGet(TurtleWriterFactory::new);
 
             final RDFFormat format=factory.getRDFFormat();
             final Resource context=target.isEmpty() ? null : iri(target);
-
 
             try ( final ByteArrayOutputStream data=new ByteArrayOutputStream() ) {
 
@@ -153,7 +150,7 @@ public final class Graphs extends Endpoint<Graphs> {
                                 target.isEmpty() ? "default" : target, format.getDefaultFileExtension()
                         ))
 
-                        .body(data(), data.toByteArray())));
+                        .body(new Data(), data.toByteArray())));
 
             } catch ( final IOException e ) {
                 throw new UncheckedIOException(e);
@@ -185,13 +182,11 @@ public final class Graphs extends Endpoint<Graphs> {
             // !!! If a clients issues a POST or PUT with a content type that is not understood by the
             // !!! graph store, the implementation MUST respond with 415 Unsupported Media Type.
 
-            final RDFParserFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                    RDFParserRegistry.getInstance(), RDFFormat.TURTLE, mimes(content) // !!! review fallback
-                    // handling
-            );
+            final RDFParserFactory factory=service(RDFParserRegistry.getInstance(), mimes(content))
+                    .orElseGet(TurtleParserFactory::new);// !!! review fallback handling
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> nullInputStream(), Supplier::get) ) {
+                try ( final InputStream input=request.input().get() ) {
 
                     final boolean exists=exists(connection, context);
 
@@ -293,13 +288,12 @@ public final class Graphs extends Endpoint<Graphs> {
             // !!! If a clients issues a POST or PUT with a content type that is not understood by the
             // !!! graph store, the implementation MUST respond with 415 Unsupported Media Type.
 
-            final RDFParserFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                    RDFParserRegistry.getInstance(), RDFFormat.TURTLE, mimes(content) // !!! review fallback
-            );
+            final RDFParserFactory factory=service(RDFParserRegistry.getInstance(), mimes(content))
+                    .orElseGet(TurtleParserFactory::new); // !!! review fallback
+
 
             return graph().update(connection -> { // binary format >> no rewriting
-                try ( final InputStream input=request.body(input()).fold(e -> nullInputStream(),
-                        Supplier::get) ) {
+                try ( final InputStream input=request.input().get() ) {
 
                     final boolean exists=exists(connection, context);
 

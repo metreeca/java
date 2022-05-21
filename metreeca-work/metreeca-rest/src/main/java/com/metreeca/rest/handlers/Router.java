@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import static com.metreeca.rest.Request.*;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Map.entry;
@@ -361,7 +360,7 @@ public final class Router implements Handler {
     private Response head(final Request request, final Function<Request, Response> forward) {
         return handle(request.method(GET), forward).map(response -> response
                 .header("Content-Length", "")
-                .body(output(), target -> { })
+                .output(target -> { })
         );
     }
 

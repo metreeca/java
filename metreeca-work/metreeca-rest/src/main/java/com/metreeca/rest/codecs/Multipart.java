@@ -117,16 +117,26 @@ public final class Multipart implements Codec<Map<String, Message<?>>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return {@value MIME}
+     */
+    @Override public String mime() {
+        return MIME;
+    }
+
     @SuppressWarnings("unchecked")
     @Override public Class<Map<String, Message<?>>> type() {
         return (Class<Map<String, Message<?>>>)(Class<?>)Map.class;
     }
 
+
     /**
+     * @param message
+     *
      * @return the multipart payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty
      * optional if the {@code "Content-Type"} {@code message} header is not matched by {@link #MIMEPattern}
      */
-    @Override public <M extends Message<M>> Optional<Map<String, Message<?>>> decode(final M message) {
+    @Override public Optional<Map<String, Message<?>>> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
@@ -203,7 +213,6 @@ public final class Multipart implements Codec<Map<String, Message<?>>> {
 
                 });
     }
-
 
     /**
      * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless

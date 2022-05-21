@@ -16,7 +16,7 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.rest.formats.DataFormat;
+import com.metreeca.rest.codecs.Data;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -34,7 +34,6 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.NotModified;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
@@ -129,7 +128,7 @@ public final class Publisher extends Delegator {
      * @param path the path of the resource whose MIME type is to be guessed
      *
      * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
-     * DataFormat#MIME}, if {@code path} doesn't include an extension or no well-known MIME type is defined
+     * Data#MIME}, if {@code path} doesn't include an extension or no well-known MIME type is defined
      *
      * @throws NullPointerException if {@code path} is null
      */
@@ -144,7 +143,7 @@ public final class Publisher extends Delegator {
 
         final String extension=dot >= 0 ? path.substring(slash+dot).toLowerCase(ROOT) : "";
 
-        return MIMETypes.getOrDefault(extension, DataFormat.MIME);
+        return MIMETypes.getOrDefault(extension, Data.MIME);
     }
 
 
@@ -257,7 +256,7 @@ public final class Publisher extends Delegator {
                                     .header("Content-Type", mime)
                                     .header("Content-Length", length)
                                     .header("ETag", etag)
-                                    .body(output(), checked(output -> { Files.copy(file, output); }));
+                                    .output(checked(output -> { Files.copy(file, output); }));
 
                         })))
 

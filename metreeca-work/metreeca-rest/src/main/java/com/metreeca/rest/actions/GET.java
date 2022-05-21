@@ -17,8 +17,8 @@
 
 package com.metreeca.rest.actions;
 
+import com.metreeca.rest.Codec;
 import com.metreeca.rest.Request;
-import com.metreeca.rest._Format;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -30,63 +30,63 @@ import static java.util.function.Function.identity;
  *
  * <p>Maps textual resource URIs to optional resource bodies.</p>
  *
- * @param <T> the type of the resource body
+ * @param <R> the type of the resource body
  */
-public final class GET<T> implements Function<String, Optional<T>> {
+public final class GET<R> implements Function<String, Optional<R>> {
 
-    private final _Format<T> format;
+    private final Codec<R> codec;
     private final Function<Request, Request> customizer;
 
 
     /**
      * Creates a resource retriever.
      *
-     * @param format the format of the resource to be retrieved
+     * @param codec the format of the resource to be retrieved
      *
      * @throws NullPointerException if {@code format} is null
      */
-    public GET(final _Format<T> format) {
+    public GET(final Codec<R> codec) {
 
-        if ( format == null ) {
-            throw new NullPointerException("null format");
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
         }
 
-        this.format=format;
+        this.codec=codec;
         this.customizer=identity();
     }
 
     /**
      * Creates a customized retriever.
      *
-     * @param format     the format of the resource to be retrieved
+     * @param codec      the format of the resource to be retrieved
      * @param customizer the request customizer
      *
-     * @throws NullPointerException i feither {@code format} or {@code customizer} is null
+     * @throws NullPointerException if either {@code format} or {@code customizer} is null
      */
-    public GET(final _Format<T> format, final Function<Request, Request> customizer) {
+    public GET(final Codec<R> codec, final Function<Request, Request> customizer) {
 
-        if ( format == null ) {
-            throw new NullPointerException("null format");
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
         }
 
         if ( customizer == null ) {
             throw new NullPointerException("null customizer");
         }
 
-        this.format=format;
-		this.customizer=customizer;
-	}
+        this.codec=codec;
+        this.customizer=customizer;
+    }
 
 
-	@Override public Optional<T> apply(final String url) {
-		return Optional.of(url)
+    @Override public Optional<R> apply(final String url) {
+        return Optional.of(url)
 
-				.flatMap(new Query(customizer.compose(request -> request
-						.header("Accept", format.mime())
-				)))
+                .flatMap(new Query(customizer.compose(request -> request
+                        .header("Accept", codec.mime())
+                )))
 
-				.flatMap(new Fetch())
-				.flatMap(new Parse<>(format));
-	}
+                .flatMap(new Fetch())
+                .flatMap(new Parse<>(codec));
+    }
 
 }

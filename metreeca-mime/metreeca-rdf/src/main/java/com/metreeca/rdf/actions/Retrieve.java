@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf.actions;
 
+import com.metreeca.rdf.codecs.RDF;
 import com.metreeca.rest.actions.*;
 
 import org.eclipse.rdf4j.model.Statement;
@@ -25,8 +26,6 @@ import org.eclipse.rdf4j.rio.RDFParserRegistry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import static com.metreeca.rdf.formats.RDFFormat.rdf;
 
 import static org.eclipse.rdf4j.rio.helpers.BasicParserSettings.*;
 
@@ -76,14 +75,12 @@ public final class Retrieve implements Function<String, Collection<Statement>> {
 
 				.flatMap(new Fetch())
 
-				.flatMap(new Parse<>(rdf(codec -> codec
+				.flatMap(new Parse<>(new RDF(codec -> codec
 
 						.set(VERIFY_URI_SYNTAX, false)
 						.set(FAIL_ON_UNKNOWN_DATATYPES, false)
 						.set(VERIFY_DATATYPE_VALUES, false)
-						.set(NORMALIZE_DATATYPE_VALUES, false)
-
-				)))
+						.set(NORMALIZE_DATATYPE_VALUES, false))))
 
 				.orElseGet(Collections::emptySet);
 	}

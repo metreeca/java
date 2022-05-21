@@ -32,11 +32,10 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.link.Values.*;
-import static com.metreeca.xml.formats.HTMLFormat.html;
+import static com.metreeca.xml.codecs.HTML.html;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,7 +76,7 @@ final class MicrodataTest {
 						new ByteArrayInputStream(html.getBytes(UTF_8)), UTF_8, "http://example.net/"
 				))
 
-				.flatMap(either -> either.fold(e -> Stream.empty(), new Microdata()));
+				.flatMap(new Microdata());
 	}
 
 	private long test(final String document) {

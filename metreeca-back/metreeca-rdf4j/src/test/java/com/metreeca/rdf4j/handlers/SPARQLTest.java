@@ -18,6 +18,7 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.link.Values;
 import com.metreeca.rest.*;
+import com.metreeca.rest.codecs.JSON;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -29,11 +30,9 @@ import javax.json.JsonValue;
 
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Values.statement;
-import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.model;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.formats.JSONFormat.json;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -168,7 +167,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json)
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
 								.satisfies(hasBooleanValue(true))
 						)
 				)
@@ -182,7 +181,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json ->
+						.hasBody(new JSON(), json ->
 								_JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))));
 	}
 
@@ -194,7 +193,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -205,7 +204,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -216,7 +215,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -227,7 +226,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -263,7 +262,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -275,7 +274,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -288,7 +287,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -300,7 +299,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -312,7 +311,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -324,7 +323,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -361,7 +360,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
 						)
 				));
@@ -374,7 +373,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
 				));
 	}
@@ -387,7 +386,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
 				));
 	}
@@ -399,7 +398,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST)))
 				));
 	}
@@ -411,7 +410,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
 						)
 				));
@@ -424,7 +423,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(rdf(), rdf -> assertThat(rdf)
+						.hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
 								.satisfies(hasObjects(RDF.FIRST, RDF.REST))
 						)
 				));
@@ -464,7 +463,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -483,7 +482,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -525,7 +524,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -544,7 +543,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(new JSON(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));

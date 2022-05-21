@@ -31,9 +31,16 @@ import java.util.function.Consumer;
 public interface Codec<V> {
 
     /**
-     * Retrieves the payload type.
+     * Retrieves the payload default MIME type.
      *
-     * @return the type of the structured payload managed by this codec
+     * @return the default MIME type of the structured payload managed by this codec
+     */
+    public String mime();
+
+    /**
+     * Retrieves the payload Java type.
+     *
+     * @return the Java type of the structured payload managed by this codec
      */
     public Class<V> type();
 
@@ -42,7 +49,6 @@ public interface Codec<V> {
      * Decodes a message.
      *
      * @param message the source message
-     * @param <M>     the {@code message} type
      *
      * @return the structured payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty
      * optional if {@code message} doesn't contain the expected content
@@ -52,7 +58,7 @@ public interface Codec<V> {
      * @throws UncheckedIOException if an I/O error occurred while decoding the raw {@code message} input
      * @see Message#body(Codec)
      */
-    public <M extends Message<M>> Optional<V> decode(final M message) throws CodecException, UncheckedIOException;
+    public Optional<V> decode(final Message<?> message) throws CodecException, UncheckedIOException;
 
     /**
      * Encoded a value into a message.

@@ -20,7 +20,7 @@ package com.metreeca.rest.operators;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
-import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest._formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 
@@ -41,7 +41,7 @@ import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Request.encode;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest._Wrapper.keeper;
-import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.services.Engine.engine;
 
 import static java.lang.String.format;

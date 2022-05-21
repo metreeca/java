@@ -19,7 +19,7 @@ package com.metreeca.rest.services;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
-import com.metreeca.rest.formats.DataFormat;
+import com.metreeca.rest.codecs.Data;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -35,7 +35,7 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rest.Request.GET;
 import static com.metreeca.rest.Response.MethodNotAllowed;
-import static com.metreeca.rest.formats.InputFormat.input;
+import static com.metreeca.rest._formats.InputFormat.input;
 
 import static java.io.InputStream.nullInputStream;
 import static java.lang.Integer.max;
@@ -315,34 +315,28 @@ import static java.lang.String.format;
 
 
         private Response encode(final Response response, final OutputStream output) {
-            return response.success() ? response.body(DataFormat.data()).fold(
+            if ( response.success() ) {
 
-                    error -> {
+                final byte[] value=response.body(new Data());
 
-                        throw new UncheckedIOException(new IOException(error.toString())); // !!! review
+                try ( final ObjectOutputStream serialized=new ObjectOutputStream(output); ) {
 
-                    }, value -> {
+                    serialized.writeInt(response.status());
+                    serialized.writeObject(response.headers());
+                    serialized.writeObject(value);
+                    serialized.flush();
 
-                        try (
-                                final ObjectOutputStream serialized=new ObjectOutputStream(output);
-                        ) {
+                    return response.input(() -> new ByteArrayInputStream(value));
 
-                            serialized.writeInt(response.status());
-                            serialized.writeObject(response.headers());
-                            serialized.writeObject(value);
-                            serialized.flush();
+                } catch ( final IOException e ) {
 
-                            return response.body(input(), () -> new ByteArrayInputStream(value));
+                    throw new UncheckedIOException(e);
 
-                        } catch ( final IOException e ) {
+                }
 
-                            throw new UncheckedIOException(e);
-
-                        }
-
-                    }
-
-            ) : response;
+            } else {
+                return response;
+            }
         }
 
         @SuppressWarnings("unchecked") private Response decode(final Request request, final InputStream input) {

@@ -17,14 +17,13 @@
 package com.metreeca.rest.handlers;
 
 import com.metreeca.rest.*;
-import com.metreeca.rest.formats.OutputFormat;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.MethodNotAllowed;
@@ -200,7 +199,7 @@ final class RouterTest {
     @Nested final class Methods {
 
         private Response handler(final Request request) {
-            return request.reply(OK).body(OutputFormat.output(), output -> {
+            return request.reply(OK).output(output -> {
                 try {
                     output.write("body".getBytes());
                 } catch ( final IOException e ) {
@@ -245,15 +244,7 @@ final class RouterTest {
 
                     .map(response -> assertThat(response)
                             .hasStatus(OK)
-                            .hasBody(OutputFormat.output(), target -> {
-
-                                final ByteArrayOutputStream output=new ByteArrayOutputStream();
-
-                                target.accept(output);
-
-                                Assertions.assertThat(output.toByteArray()).isEmpty();
-
-                            })
+                            .doesNotHaveBody()
                     );
         }
 

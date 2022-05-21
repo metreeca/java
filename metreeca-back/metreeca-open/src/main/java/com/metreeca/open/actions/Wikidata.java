@@ -21,7 +21,7 @@ import com.metreeca.http.actions.Fill;
 import com.metreeca.link.Frame;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.actions.*;
-import com.metreeca.rest.formats.JSONFormat;
+import com.metreeca.rest.codecs.JSON;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -39,7 +39,6 @@ import javax.json.*;
 
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.rest.formats.JSONFormat.json;
 
 import static java.lang.Double.parseDouble;
 import static java.util.Arrays.asList;
@@ -144,9 +143,9 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 
 				)
 
-				.optMap(new Query(request -> request.header("Accept", JSONFormat.MIME)))
+				.optMap(new Query(request -> request.header("Accept", JSON.MIME)))
 				.optMap(new Fetch())
-				.optMap(new Parse<>(json()))
+				.optMap(new Parse<>(new JSON()))
 
 				.flatMap(response -> response.getJsonArray("search").stream()
 						.map(JsonValue::asJsonObject)

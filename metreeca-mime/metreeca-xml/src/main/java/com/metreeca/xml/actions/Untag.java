@@ -16,6 +16,8 @@
 
 package com.metreeca.xml.actions;
 
+import com.metreeca.rest.CodecException;
+
 import org.w3c.dom.*;
 
 import java.io.ByteArrayInputStream;
@@ -23,7 +25,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import static com.metreeca.core.Strings.normalize;
-import static com.metreeca.xml.formats.HTMLFormat.html;
+import static com.metreeca.xml.codecs.HTML.html;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -51,11 +53,15 @@ public final class Untag implements Function<Node, String> {
             throw new NullPointerException("null cocument");
         }
 
-        return html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8, "").fold(
+        try {
 
-                error -> document, value -> new Untag().apply(value)
+            return new Untag().apply(html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8, ""));
 
-        );
+        } catch ( final CodecException e ) {
+
+            return document;
+
+        }
     }
 
 

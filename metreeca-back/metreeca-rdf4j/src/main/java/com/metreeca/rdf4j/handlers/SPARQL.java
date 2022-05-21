@@ -19,24 +19,28 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.Response;
+import com.metreeca.rest.codecs.Data;
 import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.query.impl.SimpleDataset;
 import org.eclipse.rdf4j.query.resultio.*;
+import org.eclipse.rdf4j.query.resultio.sparqljson.SPARQLBooleanJSONWriterFactory;
+import org.eclipse.rdf4j.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.rio.*;
+import org.eclipse.rdf4j.rio.ntriples.NTriplesWriterFactory;
 
 import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
 
 import static com.metreeca.core.Lambdas.guarded;
+import static com.metreeca.rdf.codecs.RDF.service;
 import static com.metreeca.rest.Message.mimes;
 import static com.metreeca.rest.Response.*;
 import static com.metreeca.rest._MessageException.status;
-import static com.metreeca.rest.formats.DataFormat.data;
 
 
 /**
@@ -218,8 +222,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
         final String accept=request.header("Accept").orElse("");
 
-        final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
+        final BooleanQueryResultWriterFactory factory
+                =service(BooleanQueryResultWriterRegistry.getInstance(), mimes(accept))
+                .orElseGet(SPARQLBooleanJSONWriterFactory::new);
 
         try ( final ByteArrayOutputStream output=new ByteArrayOutputStream() ) {
 
@@ -227,7 +232,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray()));
+                    .body(new Data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
             throw new UncheckedIOException(e);
@@ -239,8 +244,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
         final String accept=request.header("Accept").orElse("");
 
-        final TupleQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                TupleQueryResultWriterRegistry.getInstance(), TupleQueryResultFormat.SPARQL, mimes(accept));
+        final TupleQueryResultWriterFactory factory
+                =service(TupleQueryResultWriterRegistry.getInstance(), mimes(accept))
+                .orElseGet(SPARQLResultsJSONWriterFactory::new);
 
         try (
                 final TupleQueryResult result=query.evaluate();
@@ -258,7 +264,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getTupleQueryResultFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray()));
+                    .body(new Data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
 
@@ -272,8 +278,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
         final String accept=request.header("Accept").orElse("");
 
-        final RDFWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                RDFWriterRegistry.getInstance(), RDFFormat.NTRIPLES, mimes(accept));
+        final RDFWriterFactory factory
+                =service(RDFWriterRegistry.getInstance(), mimes(accept))
+                .orElseGet(NTriplesWriterFactory::new);
 
 
         try (
@@ -295,7 +302,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getRDFFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray()));
+                    .body(new Data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
 
@@ -309,8 +316,9 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
         final String accept=request.header("Accept").orElse("");
 
-        final BooleanQueryResultWriterFactory factory=com.metreeca.rdf.formats.RDFFormat.service(
-                BooleanQueryResultWriterRegistry.getInstance(), BooleanQueryResultFormat.SPARQL, mimes(accept));
+        final BooleanQueryResultWriterFactory factory
+                =service(BooleanQueryResultWriterRegistry.getInstance(), mimes(accept))
+                .orElseGet(SPARQLBooleanJSONWriterFactory::new);
 
         try ( final ByteArrayOutputStream output=new ByteArrayOutputStream() ) {
 
@@ -320,7 +328,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
             return request.reply().map(response -> response.status(OK)
                     .header("Content-Type", factory.getBooleanQueryResultFormat().getDefaultMIMEType())
-                    .body(data(), output.toByteArray()));
+                    .body(new Data(), output.toByteArray()));
 
         } catch ( final IOException e ) {
 

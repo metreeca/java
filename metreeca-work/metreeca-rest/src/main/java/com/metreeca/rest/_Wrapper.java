@@ -19,7 +19,7 @@ package com.metreeca.rest;
 
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest._formats.JSONLDFormat;
 
 import java.util.*;
 import java.util.function.*;
@@ -28,7 +28,7 @@ import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.Response.Forbidden;
 import static com.metreeca.rest.Response.Unauthorized;
-import static com.metreeca.rest.formats.JSONLDFormat.shape;
+import static com.metreeca.rest._formats.JSONLDFormat.shape;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;

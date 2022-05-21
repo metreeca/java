@@ -18,7 +18,7 @@ package com.metreeca.rest.operators;
 
 import com.metreeca.link.Shape;
 import com.metreeca.rest.Request;
-import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest._formats.JSONLDFormat;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -30,7 +30,7 @@ import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.rest.Response.Created;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.operators.OperatorTest.exec;
 
 import static org.assertj.core.api.Assertions.assertThat;

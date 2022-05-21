@@ -28,61 +28,61 @@ import static com.metreeca.rest.Context.asset;
 import static com.metreeca.rest.assets.Logger.logger;
 import static com.metreeca.rest.assets.Vault.vault;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.wrappers.Bearer.bearer;
-import static com.metreeca.rest.wrappers.CORS.cors;
-import static com.metreeca.rest.wrappers.Gateway.gateway;
+import static com.metreeca.rest._wrappers.Bearer.bearer;
+import static com.metreeca.rest._wrappers.CORS.cors;
+import static com.metreeca.rest._wrappers.Gateway.gateway;
 
 import static java.lang.String.format;
 
 public final class Sample {
 
-	private static final File StoragePath=new File("target/data");
+    private static final File StoragePath=new File("target/data");
 
-	private static final String UpdateRole="Update";
-	private static final String UpdateKey=uuid();
-
-
-	private static String key() {
-
-		final String key=asset(vault()).get("UpdateKey").orElse(UpdateKey);
-
-		asset(logger()).info(Sample.class, format("update key <%s>", UpdateKey));
-
-		return key;
-	}
+    private static final String UpdateRole="Update";
+    private static final String UpdateKey=uuid();
 
 
-	public static void main(final String... args) {
-		new JSEServer()
+    private static String key() {
 
-				.delegate(context -> context
+        final String key=asset(vault()).get("UpdateKey").orElse(UpdateKey);
 
-						.set(graph(), () -> new Graph(new SailRepository(new NativeStore(StoragePath))))
+        asset(logger()).info(Sample.class, format("update key <%s>", UpdateKey));
 
-						.get(() -> server()
+        return key;
+    }
 
-								.with(cors())
 
-								.with(bearer(key(), UpdateRole))
+    public static void main(final String... args) {
+        new JSEServer()
 
-								.wrap(router()
+                .delegate(context -> context
 
-										.path("/sparql", sparql()
-												.query()
-												.update(UpdateRole)
-										)
+                        .set(graph(), () -> new Graph(new SailRepository(new NativeStore(StoragePath))))
 
-										.path("/graphs", graphs()
-												.query()
-												.update(UpdateRole)
-										)
+                        .get(() -> server()
 
-								)
-						)
-				)
+                                .with(cors())
 
-				.start();
-	}
+                                .with(bearer(key(), UpdateRole))
+
+                                .wrap(router()
+
+                                        .path("/sparql", sparql()
+                                                .query()
+                                                .update(UpdateRole)
+                                        )
+
+                                        .path("/graphs", graphs()
+                                                .query()
+                                                .update(UpdateRole)
+                                        )
+
+                                )
+                        )
+                )
+
+                .start();
+    }
 
 }
 ```

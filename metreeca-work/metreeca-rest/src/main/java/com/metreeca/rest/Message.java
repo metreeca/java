@@ -650,11 +650,11 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null codec");
         }
 
-        return attribute(codec.type())
+        return attribute(key(codec))
 
                 .or(() -> codec.decode(self()).map(value -> {
 
-                    attribute(codec.type(), value);
+                    attribute(key(codec), value);
 
                     return value;
 
@@ -690,7 +690,12 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null value");
         }
 
-        return codec.encode(self().attribute(codec.type(), value), value);
+        return codec.encode(self().attribute(key(codec), value), value);
+    }
+
+
+    private <V> Entry<Class<V>, String> key(final Codec<V> codec) {
+        return entry(codec.type(), codec.getClass().getName());
     }
 
 

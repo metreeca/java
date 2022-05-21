@@ -19,7 +19,7 @@ package com.metreeca.jse;
 import com.metreeca.http.Locator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
-import com.metreeca.rest.wrappers.Server;
+import com.metreeca.rest._wrappers.Server;
 
 import com.sun.net.httpserver.*;
 

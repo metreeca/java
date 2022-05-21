@@ -22,7 +22,7 @@ import com.metreeca.rest.Message;
 import com.metreeca.rest.Request;
 import com.metreeca.rest.actions.*;
 import com.metreeca.xml.XPath;
-import com.metreeca.xml.formats.HTMLFormat;
+import com.metreeca.xml.codecs.HTML;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -37,7 +37,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.metreeca.rest.Request.HEAD;
-import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static java.lang.Runtime.getRuntime;
 
@@ -53,7 +52,7 @@ public final class Crawl implements Function<String, Stream<String>> {
     private final Function<String, Optional<Request>> head=new Query(request -> request.method(HEAD));
     private final Function<String, Optional<Request>> get=new Query();
 
-    private final Function<Message<?>, Optional<Document>> parse=new Parse<>(html()); // !!! support xhtml
+    private final Function<Message<?>, Optional<Document>> parse=new Parse<>(new HTML()); // !!! support xhtml
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +229,7 @@ public final class Crawl implements Function<String, Stream<String>> {
 
                                         .anyMatch(response -> response
                                                 .header("Content-Type")
-                                                .filter(HTMLFormat.MIMEPattern.asPredicate())
+                                                .filter(HTML.MIMEPattern.asPredicate())
                                                 .isPresent()
                                         )
 

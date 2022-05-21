@@ -111,23 +111,23 @@ Then, define in the `src/main/java` folder a minimal server stub like:
 import com.metreeca.jse.JSEServer;
 
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
 
-	public static void main(final String... args) {
-		new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-				.delegate(locator -> locator.get(() ->
+                .delegate(locator -> locator.get(() ->
 
-						server().wrap(request -> request.reply(response ->
-								response.status(OK)
-						))
+                        server().wrap(request -> request.reply(response ->
+                                response.status(OK)
+                        ))
 
-				))
+                ))
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -198,20 +198,20 @@ import com.metreeca.jee.JEEServer;
 import javax.servlet.annotation.WebFilter;
 
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 @WebFilter(urlPatterns="/*")
 public final class Server extends JEEServer {
 
-	public Server() {
-		delegate(locator -> locator.get(() ->
+    public Server() {
+        delegate(locator -> locator.get(() ->
 
-				server().wrap(request -> request.reply(response ->
-						response.status(OK)
-				))
+                server().wrap(request -> request.reply(response ->
+                        response.status(OK)
+                ))
 
-		));
-	}
+        ));
+    }
 
 }
 ```
@@ -260,41 +260,41 @@ import java.io.UncheckedIOException;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
 
-	public static void main(final String... args) {
-		new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-				.delegate(locator -> locator
+                .delegate(locator -> locator
 
-						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-						.exec(() -> service(graph()).update(connection -> {
-							try {
+                        .exec(() -> service(graph()).update(connection -> {
+                            try {
 
-								connection.add(
-										Toys.class.getResourceAsStream("toys.ttl"),
-										"https://example.com/", RDFFormat.TURTLE
-								);
+                                connection.add(
+                                        Toys.class.getResourceAsStream("toys.ttl"),
+                                        "https://example.com/", RDFFormat.TURTLE
+                                );
 
-								return null;
+                                return null;
 
-							} catch ( final IOException e ) {
-								throw new UncheckedIOException(e);
-							}
-						}))
+                            } catch ( final IOException e ) {
+                                throw new UncheckedIOException(e);
+                            }
+                        }))
 
-						.get(() ->
-								server().wrap(request -> request.reply(response ->
-										response.status(OK)
-								))
+                        .get(() ->
+                                server().wrap(request -> request.reply(response ->
+                                        response.status(OK)
+                                ))
 
-						))
+                        ))
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -318,28 +318,28 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
 
-	public static void main(final String... args) {
-		new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-				.delegate(locator -> locator
+                .delegate(locator -> locator
 
-						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-						.exec(new Toys())
+                        .exec(new Toys())
 
-						.get(() ->
-								server().wrap(request -> request.reply(response ->
-										response.status(OK)
-								))
+                        .get(() ->
+                                server().wrap(request -> request.reply(response ->
+                                        response.status(OK)
+                                ))
 
-						))
+                        ))
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -398,13 +398,13 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
-import static com.metreeca.rdf.formats.RDFFormat.rdf;
+import static com.metreeca.rdf.codecs.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
 import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
@@ -413,58 +413,58 @@ import static java.util.stream.Collectors.toList;
 
 public final class Server {
 
-	public static void main(final String... args) {
-      new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-              .delegate(locator -> locator
+                .delegate(locator -> locator
 
-                      .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-						.exec(new Toys())
+                        .exec(new Toys())
 
-						.get(() -> server()
+                        .get(() -> server()
 
-								.with(preprocessor(request -> request.base(Toys.Base)))
+                                .with(preprocessor(request -> request.base(Toys.Base)))
 
-								.wrap(router()
+                                .wrap(router()
 
-										.path("/products/*", router()
+                                        .path("/products/*", router()
 
-												.path("/", router().get(request -> request.reply(response -> response
-														.status(OK)
-														.body(rdf(), service(graph()).query(connection ->
-																stream(connection.getStatements(
-																		null, RDF.TYPE, iri(Toys.Namespace, "Product")
-																))
-																		.map(Statement::getSubject)
-																		.map(p -> statement(
-																				iri(request.item()), LDP.CONTAINS, p)
-																		)
-																		.collect(toList())
-														))
-												)))
+                                                .path("/", router().get(request -> request.reply(response -> response
+                                                        .status(OK)
+                                                        .body(rdf(), service(graph()).query(connection ->
+                                                                stream(connection.getStatements(
+                                                                        null, RDF.TYPE, iri(Toys.Namespace, "Product")
+                                                                ))
+                                                                        .map(Statement::getSubject)
+                                                                        .map(p -> statement(
+                                                                                iri(request.item()), LDP.CONTAINS, p)
+                                                                        )
+                                                                        .collect(toList())
+                                                        ))
+                                                )))
 
-												.path("/{code}",
-														router().get(request -> request.reply(response -> response
-																.status(OK)
-																.body(rdf(), service(graph()).query(connection ->
-																		asList(connection.getStatements(
-																						iri(request.item()), null, null
-																				)
-																		))
-																))
-														)
-												)
+                                                .path("/{code}",
+                                                        router().get(request -> request.reply(response -> response
+                                                                .status(OK)
+                                                                .body(rdf(), service(graph()).query(connection ->
+                                                                        asList(connection.getStatements(
+                                                                                        iri(request.item()), null, null
+                                                                                )
+                                                                        ))
+                                                                ))
+                                                        )
+                                                )
 
-										)
+                                        )
 
-								)
+                                )
 
-						)
-				)
+                        )
+                )
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -537,34 +537,34 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
 
-	public static void main(final String... args) {
-		new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-				.delegate(locator -> locator
+                .delegate(locator -> locator
 
-						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
 
-						.exec(new Toys())
+                        .exec(new Toys())
 
-						.get(() -> server()
+                        .get(() -> server()
 
-								.with(preprocessor(request -> request.base(Toys.Base)))
+                                .with(preprocessor(request -> request.base(Toys.Base)))
 
-								.wrap(router()
+                                .wrap(router()
 
-										.path("/products/*", new Products())
+                                        .path("/products/*", new Products())
 
-								)
+                                )
 
-						)
-				)
+                        )
+                )
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -579,7 +579,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
-import static com.metreeca.rdf.formats.RDFFormat.rdf;
+import static com.metreeca.rdf.codecs.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.http.Locator.service;
@@ -592,39 +592,39 @@ import static java.util.stream.Collectors.toList;
 
 public final class Products extends Delegator {
 
-	public static final IRI Product=iri(Toys.Namespace, "Product");
+    public static final IRI Product=iri(Toys.Namespace, "Product");
 
 
-	public Products() {
-		delegate(router()
+    public Products() {
+        delegate(router()
 
-				.path("/", router().get(request -> request.reply(response -> response
-						.status(OK)
-						.body(rdf(), service(graph()).query(connection ->
-								stream(connection.getStatements(
-										null, RDF.TYPE, Product
-								))
-										.map(Statement::getSubject)
-										.map(p -> statement(
-												iri(request.item()), LDP.CONTAINS, p)
-										)
-										.collect(toList())
-						))
-				)))
+                .path("/", router().get(request -> request.reply(response -> response
+                        .status(OK)
+                        .body(rdf(), service(graph()).query(connection ->
+                                stream(connection.getStatements(
+                                        null, RDF.TYPE, Product
+                                ))
+                                        .map(Statement::getSubject)
+                                        .map(p -> statement(
+                                                iri(request.item()), LDP.CONTAINS, p)
+                                        )
+                                        .collect(toList())
+                        ))
+                )))
 
-				.path("/{code}",
-						router().get(request -> request.reply(response -> response
-								.status(OK)
-								.body(rdf(), service(graph()).query(connection ->
-										asList(connection.getStatements(
-														iri(request.item()), null, null
-												)
-										))
-								))
-						)
-				)
-		);
-	}
+                .path("/{code}",
+                        router().get(request -> request.reply(response -> response
+                                .status(OK)
+                                .body(rdf(), service(graph()).query(connection ->
+                                        asList(connection.getStatements(
+                                                        iri(request.item()), null, null
+                                                )
+                                        ))
+                                ))
+                        )
+                )
+        );
+    }
 }
 ```
 
@@ -661,35 +661,35 @@ import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.services.Engine.engine;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
 
-	public static void main(final String... args) {
-		new JSEServer()
+    public static void main(final String... args) {
+        new JSEServer()
 
-				.delegate(locator -> locator
+                .delegate(locator -> locator
 
-						.set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
-						.set(engine(), GraphEngine::new) // <<< add this line <<<
+                        .set(graph(), () -> new Graph(new SailRepository(new MemoryStore())))
+                        .set(engine(), GraphEngine::new) // <<< add this line <<<
 
-						.exec(new Toys())
+                        .exec(new Toys())
 
-						.get(() -> server()
+                        .get(() -> server()
 
-								.with(preprocessor(request -> request.base(Toys.Base)))
+                                .with(preprocessor(request -> request.base(Toys.Base)))
 
-								.wrap(router()
+                                .wrap(router()
 
-										.path("/products/*", new Products())
+                                        .path("/products/*", new Products())
 
-								)
+                                )
 
-						)
-				)
+                        )
+                )
 
-				.start();
-	}
+                .start();
+    }
 
 }
 ```
@@ -718,32 +718,32 @@ import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.Deleter.deleter;
 import static com.metreeca.rest.operators.Relator.relator;
 import static com.metreeca.rest.operators.Updater.updater;
-import static com.metreeca.rest.wrappers.Driver.driver;
+import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-	public Products() {
-		delegate(driver(
+    public Products() {
+        delegate(driver(
 
-				field(RDF.TYPE),
-				field(RDFS.LABEL),
-				field(RDFS.COMMENT)
+                field(RDF.TYPE),
+                field(RDFS.LABEL),
+                field(RDFS.COMMENT)
 
-		).wrap(router()
+        ).wrap(router()
 
-				.path("/", router()
-						.get(relator())
-						.post(creator())
-				)
+                .path("/", router()
+                        .get(relator())
+                        .post(creator())
+                )
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+                .path("/*", router()
+                        .get(relator())
+                        .put(updater())
+                        .delete(deleter())
+                )
 
-		));
-	}
+        ));
+    }
 
 }
 ```
@@ -866,71 +866,71 @@ import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.Deleter.deleter;
 import static com.metreeca.rest.operators.Relator.relator;
 import static com.metreeca.rest.operators.Updater.updater;
-import static com.metreeca.rest.wrappers.Driver.driver;
+import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
     public Products() {
-		delegate(driver(or(relate(), role(Toys.staff)).then(
+        delegate(driver(or(relate(), role(Toys.staff)).then(
 
-				filter(clazz(Toys.Product)),
+                filter(clazz(Toys.Product)),
 
-				field(RDF.TYPE, exactly(Toys.Product)),
+                field(RDF.TYPE, exactly(Toys.Product)),
 
-				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-				field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+                field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+                field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-				server(field(Toys.code, required())),
+                server(field(Toys.code, required())),
 
-				field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+                field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-						relate(field(RDFS.LABEL, required()))
+                        relate(field(RDFS.LABEL, required()))
 
-				),
+                ),
 
-				field(Toys.scale, required(),
-						datatype(XSD.STRING),
-						pattern("1:[1-9][0-9]{1,2}")
-				),
+                field(Toys.scale, required(),
+                        datatype(XSD.STRING),
+                        pattern("1:[1-9][0-9]{1,2}")
+                ),
 
-				field(Toys.vendor, required(),
-						datatype(XSD.STRING),
-						maxLength(50)
-				),
+                field(Toys.vendor, required(),
+                        datatype(XSD.STRING),
+                        maxLength(50)
+                ),
 
-				field("price", Toys.sell, required(),
-						datatype(XSD.DECIMAL),
-						minExclusive(literal(0.0)),
-						maxExclusive(literal(1_000.0))
-				),
+                field("price", Toys.sell, required(),
+                        datatype(XSD.DECIMAL),
+                        minExclusive(literal(0.0)),
+                        maxExclusive(literal(1_000.0))
+                ),
 
-				role(Toys.staff).then(field(Toys.buy, required(),
-						datatype(XSD.DECIMAL),
-						minInclusive(literal(0.0)),
-						maxInclusive(literal(1_000.0))
-				)),
+                role(Toys.staff).then(field(Toys.buy, required(),
+                        datatype(XSD.DECIMAL),
+                        minInclusive(literal(0.0)),
+                        maxInclusive(literal(1_000.0))
+                )),
 
-				server().then(field(Toys.stock, required(),
-						datatype(XSD.INTEGER),
-						minInclusive(literal(0)),
-						maxExclusive(literal(10_000))
-				))
+                server().then(field(Toys.stock, required(),
+                        datatype(XSD.INTEGER),
+                        minInclusive(literal(0)),
+                        maxExclusive(literal(10_000))
+                ))
 
-		)).wrap(router()
+        )).wrap(router()
 
-				.path("/", router()
-						.get(relator())
-						.post(creator())
-				)
+                .path("/", router()
+                        .get(relator())
+                        .post(creator())
+                )
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+                .path("/*", router()
+                        .get(relator())
+                        .put(updater())
+                        .delete(deleter())
+                )
 
-		));
-	}
+        ));
+    }
 
 }
 ```
@@ -1145,73 +1145,73 @@ import static com.metreeca.rest.operators.Creator.creator;
 import static com.metreeca.rest.operators.Deleter.deleter;
 import static com.metreeca.rest.operators.Relator.relator;
 import static com.metreeca.rest.operators.Updater.updater;
-import static com.metreeca.rest.wrappers.Driver.driver;
+import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {
 
-	public Products() {
-		delegate(driver(or(relate(), role(Toys.staff)).then(
+    public Products() {
+        delegate(driver(or(relate(), role(Toys.staff)).then(
 
-				filter(clazz(Toys.Product)),
+                filter(clazz(Toys.Product)),
 
-				field(RDF.TYPE, exactly(Toys.Product)),
+                field(RDF.TYPE, exactly(Toys.Product)),
 
-				field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
-				field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
+                field(RDFS.LABEL, required(), datatype(XSD.STRING), maxLength(50)),
+                field(RDFS.COMMENT, required(), datatype(XSD.STRING), maxLength(500)),
 
-				server(field(Toys.code, required())),
+                server(field(Toys.code, required())),
 
-				field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
+                field(Toys.line, required(), convey(clazz(Toys.ProductLine)),
 
-						relate(field(RDFS.LABEL, required()))
+                        relate(field(RDFS.LABEL, required()))
 
-				),
+                ),
 
-				field(Toys.scale, required(),
-						datatype(XSD.STRING),
-						pattern("1:[1-9][0-9]{1,2}")
-				),
+                field(Toys.scale, required(),
+                        datatype(XSD.STRING),
+                        pattern("1:[1-9][0-9]{1,2}")
+                ),
 
-				field(Toys.vendor, required(),
-						datatype(XSD.STRING),
-						maxLength(50)
-				),
+                field(Toys.vendor, required(),
+                        datatype(XSD.STRING),
+                        maxLength(50)
+                ),
 
-				field("price", Toys.sell, required(),
-						datatype(XSD.DECIMAL),
-						minExclusive(literal(0.0)),
-						maxExclusive(literal(1_000.0))
-				),
+                field("price", Toys.sell, required(),
+                        datatype(XSD.DECIMAL),
+                        minExclusive(literal(0.0)),
+                        maxExclusive(literal(1_000.0))
+                ),
 
-				role(Toys.staff).then(field(Toys.buy, required(),
-						datatype(XSD.DECIMAL),
-						minInclusive(literal(0.0)),
-						maxInclusive(literal(1_000.0))
-				)),
+                role(Toys.staff).then(field(Toys.buy, required(),
+                        datatype(XSD.DECIMAL),
+                        minInclusive(literal(0.0)),
+                        maxInclusive(literal(1_000.0))
+                )),
 
-				server().then(field(Toys.stock, required(),
-						datatype(XSD.INTEGER),
-						minInclusive(literal(0)),
-						maxExclusive(literal(10_000))
-				))
+                server().then(field(Toys.stock, required(),
+                        datatype(XSD.INTEGER),
+                        minInclusive(literal(0)),
+                        maxExclusive(literal(10_000))
+                ))
 
-		)).wrap(router()
+        )).wrap(router()
 
-				.path("/", router()
-						.get(relator())
-						.post(creator()
-								.slug(new ProductsSlug())
-								.with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
-						))
+                .path("/", router()
+                        .get(relator())
+                        .post(creator()
+                                .slug(new ProductsSlug())
+                                .with(postprocessor(update(text(Products.class, "ProductsCreate.ql"))))
+                        ))
 
-				.path("/*", router()
-						.get(relator())
-						.put(updater())
-						.delete(deleter())
-				)
+                .path("/*", router()
+                        .get(relator())
+                        .put(updater())
+                        .delete(deleter())
+                )
 
-		));
-	}
+        ));
+    }
 
 }
 ```
@@ -1228,7 +1228,7 @@ import java.util.function.Function;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
+import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 
 import static org.eclipse.rdf4j.model.util.Values.literal;
 

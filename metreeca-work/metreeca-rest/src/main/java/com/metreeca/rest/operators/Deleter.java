@@ -20,7 +20,7 @@ import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.*;
-import com.metreeca.rest.formats.JSONLDFormat;
+import com.metreeca.rest._formats.JSONLDFormat;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
 

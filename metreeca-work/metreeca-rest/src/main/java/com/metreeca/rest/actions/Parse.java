@@ -19,10 +19,13 @@ package com.metreeca.rest.actions;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.*;
 
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
+
+import static java.lang.String.format;
 
 
 /**
@@ -34,67 +37,84 @@ import static com.metreeca.http.Locator.service;
  */
 public final class Parse<R> implements Function<Message<?>, Optional<R>> {
 
-	private final _Format<R> format;
+    private final Codec<R> codec;
 
-	private final Logger logger=service(Logger.logger());
+    private final Logger logger=service(Logger.logger());
 
 
     /**
      * Creates a new message body parser.
      *
-     * @param format the format of the message body to be extracted
+     * @param codec the codec for the message body to be extracted
      *
-     * @throws NullPointerException if {@code format} is null
+     * @throws NullPointerException if {@code codec} is null
      */
-    public Parse(final _Format<R> format) {
+    public Parse(final Codec<R> codec) {
 
-        if ( format == null ) {
-            throw new NullPointerException("null format");
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
         }
 
-        this.format=format;
+        this.codec=codec;
     }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Parses a message body representation.
-	 *
-	 * @param message the message whose body representation is to be parsed
-	 *
-	 * @return an optional body representation of the required format, if {@code message} was not null and its body
-	 * representation successfully pased; an empty optional, otherwise, logging an error to the
-	 * {@linkplain Logger#logger() shared event logger}
-	 */
-	@Override public Optional<R> apply(final Message<?> message) {
-		return message == null ? Optional.empty() : message.body(format).fold(error -> {
+    /**
+     * Parses a message body representation.
+     *
+     * @param message the message whose body representation is to be parsed
+     *
+     * @return an optional body representation of the required format, if {@code message} was not null and its body
+     * representation successfully pased; an empty optional, otherwise, logging an error to the {@linkplain
+     * Logger#logger() shared event logger}
+     */
+    @Override public Optional<R> apply(final Message<?> message) {
 
-			// !!! get cause directly from failure
+        if ( message == null ) { return Optional.empty(); } else {
 
-			final Response parse=new Response(message.request()).map(error);
-			final String media=format.getClass().getSimpleName();
+            try {
 
-			if ( parse.status() == Response.UnsupportedMediaType ) {
+                final Optional<R> value=codec.decode(message);
 
-				logger.warning(this,
-						String.format("no <%s> message body", media)
-				);
+                if ( value.isEmpty() ) {
 
-			} else {
+                    logger.warning(this,
+                            format("no <%s> message body", codec.getClass().getSimpleName())
+                    );
 
-				// !!! review formatting >> avoid newlines in log
+                }
 
-				logger.error(this,
-						String.format("unable to parse message body as <%s>", media),
-						new RuntimeException(error.toString(), error)
-				);
+                return value;
 
-			}
 
-			return Optional.empty();
+            } catch ( final CodecException error ) {
 
-		}, Optional::of);
-	}
+                // !!! review formatting >> avoid newlines in log
+
+                logger.error(this,
+                        format("unable to parse message body as <%s>", codec.getClass().getSimpleName()),
+                        new RuntimeException(error.toString(), error)
+                );
+
+                return Optional.empty();
+
+
+            } catch ( final UncheckedIOException e ) {
+
+                // !!! review formatting >> avoid newlines in log
+
+                logger.error(this,
+                        "unable to read message body",
+                        new RuntimeException(e.toString(), e)
+                );
+
+                return Optional.empty();
+
+            }
+        }
+
+    }
 
 }

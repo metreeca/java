@@ -73,7 +73,7 @@ may be easily plugged as a specialized component into your framework of choice.
 import com.metreeca.jse.JSEServer;
 
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.formats.TextFormat.text;
+import static com.metreeca.rest._formats.TextFormat.text;
 
 public final class Hello {
 

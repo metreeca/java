@@ -20,7 +20,7 @@ import com.metreeca.http.Xtream;
 import com.metreeca.http.actions.Fill;
 import com.metreeca.link.Frame;
 import com.metreeca.rest.actions.*;
-import com.metreeca.rest.formats.JSONFormat;
+import com.metreeca.rest.codecs.JSON;
 
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -31,7 +31,6 @@ import javax.json.*;
 
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.rest.formats.JSONFormat.json;
 
 
 /**
@@ -61,9 +60,9 @@ public final class DBpedia implements Function<String, Xtream<Frame>> {
 
 				)
 
-				.optMap(new Query(request -> request.header("Accept", JSONFormat.MIME)))
+				.optMap(new Query(request -> request.header("Accept", JSON.MIME)))
 				.optMap(new Fetch())
-				.optMap(new Parse<>(json()))
+				.optMap(new Parse<>(new JSON()))
 
 				.flatMap(response -> response.getJsonArray("results").stream()
 						.map(JsonValue::asJsonObject)

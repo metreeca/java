@@ -16,6 +16,7 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.rest.codecs.JSON;
 import com.metreeca.rest.codecs.Text;
 
 import java.util.Optional;
@@ -23,8 +24,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import javax.json.JsonObject;
-
-import static com.metreeca.rest.formats.JSONFormat.json;
 
 import static java.lang.String.format;
 
@@ -188,7 +187,7 @@ public final class _MessageException extends RuntimeException implements Handler
 
 		this.status=status;
 		this.report=response -> status < 500
-				? response.status(status).body(json(), details)
+				? response.status(status).body(new JSON(), details)
 				: response.status(status);
 	}
 

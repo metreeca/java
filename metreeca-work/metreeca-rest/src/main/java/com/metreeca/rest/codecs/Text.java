@@ -26,7 +26,6 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Feeds.text;
-import static com.metreeca.rest.formats.OutputFormat.output;
 
 import static java.lang.String.valueOf;
 
@@ -48,19 +47,24 @@ public final class Text implements Codec<String> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return {@value MIME}
+     */
+    @Override public String mime() {
+        return MIME;
+    }
+
     @Override public Class<String> type() {
         return String.class;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @return the textual payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account
      * the {@code message} {@linkplain Message#charset() charset} or an empty optional if the {@code "Content-Type"}
      * {@code message} header is not matched by {@link #MIMEPattern}
      */
-    @Override public <M extends Message<M>> Optional<String> decode(final M message) {
+    @Override public Optional<String> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
@@ -99,7 +103,7 @@ public final class Text implements Codec<String> {
                 .header("Content-Type", message.header("Content-Type").orElse(MIME))
                 .header("Content-Length", valueOf(bytes.length))
 
-                .body(output(), output -> {
+                .output(output -> {
                     try {
 
                         output.write(bytes);

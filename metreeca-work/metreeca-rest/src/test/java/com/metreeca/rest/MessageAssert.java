@@ -288,6 +288,23 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
     }
 
 
+    public A hasBody() {
+
+        isNotNull();
+
+        final ByteArrayOutputStream output=new ByteArrayOutputStream();
+
+        actual.output().accept(output);
+
+        final byte[] data=output.toByteArray();
+
+        if ( data.length == 0 ) {
+            failWithMessage("expected body but had none");
+        }
+
+        return myself;
+    }
+
     public A hasBody(final Codec<?> codec) {
 
         if ( codec == null ) {
