@@ -16,18 +16,16 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.rest.codecs.Text;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.function.Function;
 
 import static com.metreeca.rest.MessageAssert.assertThat;
-import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.TextFormat.text;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
@@ -35,50 +33,49 @@ import static java.util.Collections.emptySet;
 
 final class MessageTest {
 
-	private Message<?> message() {
-		return new Request();
-	}
+    private Message<?> message() {
+        return new Request();
+    }
 
 
-	@Nested final class HeadersTest {
+    @Nested final class HeadersTest {
 
-		@Test void testHeadersIgnoreHeaderCase() {
-			assertThat(message()
-					.header("TEST-header", "value")
-			)
-					.hasHeader("test-header", "value");
-		}
+        @Test void testHeadersIgnoreHeaderCase() {
+            assertThat(message()
+                    .header("TEST-header", "value")
+            )
+                    .hasHeader("test-header", "value");
+        }
 
-		@Test void testHeadersIgnoreEmptyHeaders() {
-			assertThat(message()
-					.headers("test-header", emptySet())
-			)
-					.doesNotHaveHeader("test-header");
-		}
+        @Test void testHeadersIgnoreEmptyHeaders() {
+            assertThat(message()
+                    .headers("test-header", emptySet())
+            )
+                    .doesNotHaveHeader("test-header");
+        }
 
-		@Test void testHeadersOverwritesValues() {
-			assertThat(message()
-					.header("test-header", "one")
-					.header("test-header", "two")
-			)
-					.hasHeader("test-header", "two");
-		}
+        @Test void testHeadersOverwritesValues() {
+            assertThat(message()
+                    .header("test-header", "one")
+                    .header("test-header", "two")
+            )
+                    .hasHeader("test-header", "two");
+        }
 
-	}
+    }
 
-	@Nested final class BodyTest {
+    @Nested final class BodyTest {
 
-		@Test void testBodyCaching() {
+        @Test void testBodyCaching() {
 
-			final Message<?> message=message()
-					.body(input(), () -> new ByteArrayInputStream("test".getBytes(UTF_8)));
+            final Message<?> message=message()
+                    .header("Content-Type", Text.MIME)
+                    .input(() -> new ByteArrayInputStream("test".getBytes(UTF_8)));
 
-			final Function<Message<?>, String> accessor=m -> m
-					.body(text()).fold(error -> fail("missing test body"), value -> value);
+            assertSame(message.body(new Text()), message.body(new Text()));
 
-			assertSame(accessor.apply(message), accessor.apply(message));
-		}
+        }
 
-	}
+    }
 
 }

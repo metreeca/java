@@ -16,13 +16,10 @@
 
 package com.metreeca.rest;
 
-import com.metreeca.core.Strings;
-import com.metreeca.rest.formats.DataFormat;
-import com.metreeca.rest.formats.TextFormat;
-
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
+import java.io.*;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -36,247 +33,366 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
     @SuppressWarnings("unchecked") public static <T extends Message<T>> MessageAssert<?, ?> assertThat(final Message<?> message) {
 
-	    final class WorkAssert extends MessageAssert<WorkAssert, T> {
+        final class WorkAssert extends MessageAssert<WorkAssert, T> {
 
-		    private WorkAssert(final T actual) { super(actual, WorkAssert.class); }
+            private WorkAssert(final T actual) { super(actual, WorkAssert.class); }
 
-	    }
+        }
 
-	    return new WorkAssert((T)message);
+        return new WorkAssert((T)message);
     }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected MessageAssert(final T actual, final Class<A> type) {
-		super(actual, type);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public A hasItem(final String item) {
-
-		isNotNull();
-
-		if ( !Objects.equals(actual.item(), item) ) {
-			failWithMessage("expected message to have <%s> item but has <%s>", item, actual.item());
-		}
-
-		return myself;
-	}
+    protected MessageAssert(final T actual, final Class<A> type) {
+        super(actual, type);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public <V> A hasAttribute(final Class<V> key, final Consumer<V> assertions) {
+    public A hasItem(final String item) {
 
-		if ( key == null ) {
-			throw new NullPointerException("null key");
-		}
+        isNotNull();
 
-		if ( assertions == null ) {
-			throw new NullPointerException("null assertions");
-		}
+        if ( !Objects.equals(actual.item(), item) ) {
+            failWithMessage("expected message to have <%s> item but has <%s>", item, actual.item());
+        }
 
-		isNotNull();
+        return myself;
+    }
 
-		actual.attribute(key).ifPresentOrElse(assertions, () ->
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public <V> A hasAttribute(final Class<V> key, final Consumer<V> assertions) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
+
+        isNotNull();
+
+        actual.attribute(key).ifPresentOrElse(assertions, () ->
                 failWithMessage("expected message to have <%s> attribute", key)
         );
 
 
-		return myself;
-	}
+        return myself;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public A hasHeader(final String name) {
+    public A hasHeader(final String name) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		final Collection<String> values=actual.headers(name).collect(toList());
+        final Collection<String> values=actual.headers(name).collect(toList());
 
-		if ( values.isEmpty() ) {
-			failWithMessage("expected message to have <%s> headers but has none", name);
-		}
+        if ( values.isEmpty() ) {
+            failWithMessage("expected message to have <%s> headers but has none", name);
+        }
 
-		return myself;
-	}
+        return myself;
+    }
 
-	public A hasHeader(final String name, final String value) {
+    public A hasHeader(final String name, final String value) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		if ( value == null ) {
-			throw new NullPointerException("null value");
-		}
+        if ( value == null ) {
+            throw new NullPointerException("null value");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		final String found=actual.header(name).orElse(null);
+        final String found=actual.header(name).orElse(null);
 
-		if ( !value.equals(found) ) {
-			failWithMessage(
-					"expected response to have <%s> header with value <%s> but found <%s>",
-					name, value, found
-			);
-		}
+        if ( !value.equals(found) ) {
+            failWithMessage(
+                    "expected response to have <%s> header with value <%s> but found <%s>",
+                    name, value, found
+            );
+        }
 
-		return myself;
-	}
+        return myself;
+    }
 
-	public A hasHeader(final String name, final Consumer<String> assertions) {
+    public A hasHeader(final String name, final Consumer<String> assertions) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		if ( assertions == null ) {
-			throw new NullPointerException("null assertions");
-		}
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		final String value=actual.header(name).orElse(null);
+        final String value=actual.header(name).orElse(null);
 
-		if ( value == null ) {
-			failWithMessage("expected message to have <%s> headers but has none", name);
-		}
+        if ( value == null ) {
+            failWithMessage("expected message to have <%s> headers but has none", name);
+        }
 
-		assertions.accept(value);
+        assertions.accept(value);
 
-		return myself;
-	}
+        return myself;
+    }
 
-	public A doesNotHaveHeader(final String name) {
+    public A doesNotHaveHeader(final String name) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		final Collection<String> values=actual.headers(name).collect(toList());
+        final Collection<String> values=actual.headers(name).collect(toList());
 
-		if ( !values.isEmpty() ) {
-			failWithMessage("expected response to have no <%s> headers but has <%s>", name, values);
-		}
+        if ( !values.isEmpty() ) {
+            failWithMessage("expected response to have no <%s> headers but has <%s>", name, values);
+        }
 
-		return myself;
-	}
+        return myself;
+    }
 
 
-	public A hasHeaders(final String name, final String... values) {
+    public A hasHeaders(final String name, final String... values) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		if ( values == null ) {
-			throw new NullPointerException("null values");
-		}
+        if ( values == null ) {
+            throw new NullPointerException("null values");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		Assertions.assertThat(actual.headers(name))
-				.as("<%s> message headers", name)
-				.containsExactly(values);
+        Assertions.assertThat(actual.headers(name))
+                .as("<%s> message headers", name)
+                .containsExactly(values);
 
-		return myself;
-	}
+        return myself;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public A hasBody(final Format<?> format) {
+    public <V> A hasDataInput(final Consumer<byte[]> assertions) {
 
-		if ( format == null ) {
-			throw new NullPointerException("null format");
-		}
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
 
-		return hasBody(format, body -> { });
-	}
+        isNotNull();
 
-	public <V> A hasBody(final Format<V> body, final Consumer<V> assertions) {
+        final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
 
-		if ( body == null ) {
-			throw new NullPointerException("null body");
-		}
+        try ( final InputStream input=actual.input().get() ) {
 
-		if ( assertions == null ) {
-			throw new NullPointerException("null assertions");
-		}
+            input.transferTo(buffer);
 
-		isNotNull();
+        } catch ( final IOException e ) {
 
-		return actual.body(body).fold(
+            throw new UncheckedIOException(e);
 
-				error -> fail(
-						"expected message to have a <%s> body but was unable to retrieve one (%s)",
-						body.getClass().getSimpleName(), error
-				),
+        }
 
-				value -> {
+        actual.input(() -> new ByteArrayInputStream(buffer.toByteArray()));
 
-					assertions.accept(value);
+        assertions.accept(buffer.toByteArray());
 
-					return myself;
+        return myself;
 
-				}
+    }
 
-		);
-	}
+    public <V> A hasTextInput(final Consumer<String> assertions) {
 
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
 
-	public A doesNotHaveBody() {
+        isNotNull();
 
-		isNotNull();
+        final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
 
-		actual.body(DataFormat.data()).fold(e -> this, data -> {
+        try ( final InputStream input=actual.input().get() ) {
 
-            if ( data.length > 0 ) {
-                failWithMessage("expected empty body but had binary body of length <%d>", data.length);
-            }
+            input.transferTo(buffer);
 
-            return this;
+        } catch ( final IOException e ) {
 
-        });
+            throw new UncheckedIOException(e);
 
-        actual.body(TextFormat.text()).fold(e -> this, text -> {
+        }
 
-            if ( !text.isEmpty() ) {
-                failWithMessage(
-                        "expected empty body but had textual body of length <%d> (%s)",
-                        text.length(), Strings.fold(Strings.excerpt(text))
-                );
-            }
+        actual.input(() -> new ByteArrayInputStream(buffer.toByteArray()));
 
-            return this;
+        assertions.accept(buffer.toString(actual.charset()));
 
-        });
+        return myself;
 
-		return myself;
-	}
+    }
 
-	public A doesNotHaveBody(final Format<?> body) {
 
-		if ( body == null ) {
-			throw new NullPointerException("null body");
-		}
+    public <V> A hasDataOutput(final Consumer<byte[]> assertions) {
 
-		isNotNull();
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
 
-		return actual.body(body).fold(
-				error -> myself, value -> fail("expected message to have no <%s> body but has one")
-		);
-	}
+        isNotNull();
+
+        final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
+
+        actual.output().accept(buffer);
+
+        assertions.accept(buffer.toByteArray());
+
+        return myself;
+
+    }
+
+    public <V> A hasTextOutput(final Consumer<String> assertions) {
+
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
+
+        isNotNull();
+
+        final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
+
+        actual.output().accept(buffer);
+
+        assertions.accept(buffer.toString(actual.charset()));
+
+        return myself;
+
+    }
+
+
+    public A hasBody(final Codec<?> codec) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        return hasBody(codec, body -> { });
+    }
+
+    public <V> A hasBody(final Codec<V> codec, final Consumer<V> assertions) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null body");
+        }
+
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
+
+        isNotNull();
+
+        try {
+
+            assertions.accept(actual.body(codec));
+
+        } catch ( final CodecException error ) {
+
+            fail(
+                    "expected message to have a <%s> body but was unable to retrieve one (%s)",
+                    codec.getClass().getSimpleName(), error
+            );
+
+        }
+
+        return myself;
+    }
+
+
+    public A hasBody(final Format<?> format) {
+
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
+
+        return hasBody(format, body -> { });
+    }
+
+    public <V> A hasBody(final Format<V> body, final Consumer<V> assertions) {
+
+        if ( body == null ) {
+            throw new NullPointerException("null body");
+        }
+
+        if ( assertions == null ) {
+            throw new NullPointerException("null assertions");
+        }
+
+        isNotNull();
+
+        return actual.body(body).fold(
+
+                error -> fail(
+                        "expected message to have a <%s> body but was unable to retrieve one (%s)",
+                        body.getClass().getSimpleName(), error
+                ),
+
+                value -> {
+
+                    assertions.accept(value);
+
+                    return myself;
+
+                }
+
+        );
+    }
+
+
+    public A doesNotHaveBody() {
+
+        isNotNull();
+
+        final ByteArrayOutputStream output=new ByteArrayOutputStream();
+
+        actual.output().accept(output);
+
+        final byte[] data=output.toByteArray();
+
+        if ( data.length > 0 ) {
+            failWithMessage("expected empty body but had binary body of length <%d>", data.length);
+        }
+
+        return myself;
+    }
+
+    public A doesNotHaveBody(final Format<?> body) {
+
+        if ( body == null ) {
+            throw new NullPointerException("null body");
+        }
+
+        isNotNull();
+
+        return actual.body(body).fold(
+                error -> myself, value -> fail("expected message to have no <%s> body but has one")
+        );
+    }
 
 }

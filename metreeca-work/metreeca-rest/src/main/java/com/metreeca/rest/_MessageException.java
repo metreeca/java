@@ -16,6 +16,8 @@
 
 package com.metreeca.rest;
 
+import com.metreeca.rest.codecs.Text;
+
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -23,7 +25,6 @@ import java.util.function.UnaryOperator;
 import javax.json.JsonObject;
 
 import static com.metreeca.rest.formats.JSONFormat.json;
-import static com.metreeca.rest.formats.TextFormat.text;
 
 import static java.lang.String.format;
 
@@ -177,7 +178,7 @@ public final class _MessageException extends RuntimeException implements Handler
 		this.status=status;
 		this.report=response
 				-> redirect(status) ? response.status(status).header("Location", fill(details, response))
-				: status < 500 ? response.status(status).body(text(), details)
+				: status < 500 ? response.status(status).body(new Text(), details)
 				: response.status(status);
 	}
 
@@ -199,7 +200,7 @@ public final class _MessageException extends RuntimeException implements Handler
 
 		this.status=status;
 		this.report=response -> status < 500
-				? response.status(status).body(text(), message)
+				? response.status(status).body(new Text(), message)
 				: response.status(status);
 	}
 

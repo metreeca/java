@@ -18,105 +18,91 @@ package com.metreeca.rest;
 
 import com.metreeca.core.Feeds;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.OutputFormat.output;
-import static com.metreeca.rest.formats.TextFormat.text;
-
-import static java.util.function.Function.identity;
 
 
 public final class ResponseAssert extends MessageAssert<ResponseAssert, Response> {
 
-	public static ResponseAssert assertThat(final Response response) {
+    public static ResponseAssert assertThat(final Response response) {
 
-		if ( response != null ) {
+        if ( response != null ) {
 
-			response.body(output()).fold(e -> null, target -> {
+            // cache output
 
-                final byte[] data;
+            final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
 
-                try ( final ByteArrayOutputStream out=new ByteArrayOutputStream(1000) ) {
+            response.output().accept(buffer);
 
-                    target.accept(out);
+            response.output(output -> Feeds.data(output, buffer.toByteArray())); // cache output
+            response.input(() -> new ByteArrayInputStream(buffer.toByteArray())); // expose output to testing
 
-                    data=out.toByteArray();
 
-                } catch ( final IOException e ) {
-                    throw new UncheckedIOException(e);
-                }
+            // log response
 
-                response.body(output(), output -> Feeds.data(output, data)); // cache output
-				response.body(input(), () -> new ByteArrayInputStream(data)); // expose output to testing
+            final StringBuilder builder=new StringBuilder(2500);
 
-                return null;
+            builder.append(response.status()).append('\n');
 
-            });
-
-			final StringBuilder builder=new StringBuilder(2500);
-
-			builder.append(response.status()).append('\n');
-
-			response.headers().forEach((name, value) ->
+            response.headers().forEach((name, value) ->
                     builder.append(name).append(": ").append(value).append('\n')
             );
 
-			builder.append('\n');
+            builder.append('\n');
 
-			final String text=response.body(text()).fold(e -> "", identity());
+            final String text=buffer.toString(response.charset());
 
-			if ( !text.isEmpty() ) {
+            if ( !text.isEmpty() ) {
 
-				final int limit=builder.capacity();
+                final int limit=builder.capacity();
 
-				builder
-						.append(text.length() <= limit ? text : text.substring(0, limit)+"\n⋮")
-						.append("\n\n");
-			}
+                builder
+                        .append(text.length() <= limit ? text : text.substring(0, limit)+"\n⋮")
+                        .append("\n\n");
+            }
 
-			Logger.getLogger(response.getClass().getName()).log(
-					response.status() < 400 ? Level.INFO : response.status() < 500 ? Level.WARNING : Level.SEVERE,
-					builder.toString()
-			);
+            Logger.getLogger(response.getClass().getName()).log(
+                    response.status() < 400 ? Level.INFO : response.status() < 500 ? Level.WARNING : Level.SEVERE,
+                    builder.toString()
+            );
 
-		}
+        }
 
-		return new ResponseAssert(response);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private ResponseAssert(final Response actual) {
-		super(actual, ResponseAssert.class);
-	}
+        return new ResponseAssert(response);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public ResponseAssert isSuccess() {
+    private ResponseAssert(final Response actual) {
+        super(actual, ResponseAssert.class);
+    }
 
-		isNotNull();
 
-		if ( !actual.success() ) {
-			failWithMessage("expected response to be success but was <%d>", actual.status());
-		}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		return this;
-	}
+    public ResponseAssert isSuccess() {
 
-	public ResponseAssert hasStatus(final int expected) {
+        isNotNull();
 
-		isNotNull();
+        if ( !actual.success() ) {
+            failWithMessage("expected response to be success but was <%d>", actual.status());
+        }
 
-		if ( actual.status() != expected ) {
-			failWithMessage("expected response status to be <%d> was <%d>", expected, actual.status());
-		}
+        return this;
+    }
 
-		return this;
-	}
+    public ResponseAssert hasStatus(final int expected) {
+
+        isNotNull();
+
+        if ( actual.status() != expected ) {
+            failWithMessage("expected response status to be <%d> was <%d>", expected, actual.status());
+        }
+
+        return this;
+    }
 
 }

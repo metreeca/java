@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.function.Function;
 
@@ -31,8 +32,8 @@ import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.InternalServerError;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.formats.TextFormat.text;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -48,7 +49,7 @@ final class ServerTest {
 
 
         @Test void testPreprocessQueryParameters() {
-			new Locator().get(Server::new)
+            new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -67,11 +68,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+                    .map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessBodyParameters() {
-			new Locator().get(Server::new)
+            new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -84,17 +85,22 @@ final class ServerTest {
 
                     })
 
-                    .handle(new Request()
-							.method(POST)
-                            .header("Content-Type", "application/x-www-form-urlencoded")
-                            .body(text(), "one=1&two=2&two=2")
-					, Request::reply)
+                    .handle(
 
-					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+                            new Request()
+                                    .method(POST)
+                                    .header("Content-Type", "application/x-www-form-urlencoded")
+                                    .input(() -> new ByteArrayInputStream("one=1&two=2&two=2".getBytes(UTF_8))),
+
+                            Request::reply
+
+                    )
+
+                    .map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessDontOverwriteExistingParameters() {
-			new Locator().get(Server::new)
+            new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -113,11 +119,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+                    .map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessQueryOnlyOnGET() {
-			new Locator().get(Server::new)
+            new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -133,11 +139,11 @@ final class ServerTest {
                             Request::reply
                     )
 
-					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+                    .map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
         @Test void testPreprocessBodyOnlyOnPOST() {
-			new Locator().get(Server::new)
+            new Locator().get(Server::new)
 
                     .wrap((request, next) -> {
 
@@ -147,14 +153,18 @@ final class ServerTest {
 
                     })
 
-                    .handle(new Request()
+                    .handle(
+
+                            new Request()
                                     .method(Request.PUT)
                                     .header("Content-Type", "application/x-www-form-urlencoded")
-                                    .body(text(), "one=1&two=2&two=2"),
+                                    .input(() -> new ByteArrayInputStream("one=1&two=2&two=2".getBytes(UTF_8))),
+
                             Request::reply
+
                     )
 
-					.map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
+                    .map(response -> Assertions.assertThat(response.status()).isEqualTo(OK));
         }
 
     }
@@ -162,7 +172,7 @@ final class ServerTest {
     @Nested final class ErrorHandling {
 
         @Test void testTrapStrayExceptions() {
-			new Locator().exec(() -> new Server()
+            new Locator().exec(() -> new Server()
 
                     .wrap((Request request, final Function<Request, Response> next) -> {
                         throw new UnsupportedOperationException("stray");
@@ -170,7 +180,7 @@ final class ServerTest {
 
                     .handle(new Request(), Request::reply)
 
-					.map(response -> assertThat(response)
+                    .map(response -> assertThat(response)
                             .hasStatus(InternalServerError)
                     )
 

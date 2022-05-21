@@ -40,7 +40,6 @@ import static com.metreeca.rest.Format.mimes;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
 import static com.metreeca.rest.ResponseAssert.assertThat;
 import static com.metreeca.rest.formats.InputFormat.input;
-import static com.metreeca.rest.formats.TextFormat.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -153,18 +152,26 @@ final class RDFFormatTest {
     @Nested final class Encoder {
 
         @Test void testConfigureWriterBaseIRI() {
-            exec(() -> JSONLDFormat.shape(new Request()
+            exec(() -> JSONLDFormat
 
-                            .base("http://example.com/base/")
-                            .path("/").reply()
-                            .status(Response.OK), field(LDP.CONTAINS, datatype(Values.IRIType)))
+                    .shape(
+
+                            new Request()
+
+                                    .base("http://example.com/base/")
+                                    .path("/").reply()
+                                    .status(Response.OK),
+
+                            field(LDP.CONTAINS, datatype(Values.IRIType))
+
+                    )
+
                     .body(rdf(), singletonList(statement(
-                            iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example"
-                                    +".com/base/x")
+                            iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example.com/base/x")
                     )))
 
                     .map(response -> assertThat(response)
-                            .hasBody(text(), text -> assertThat(text)
+                            .hasTextOutput(text -> assertThat(text)
                                     .contains("@base <"+"http://example.com/base/"+">")
                             )
                     )

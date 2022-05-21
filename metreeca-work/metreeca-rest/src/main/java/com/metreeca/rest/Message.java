@@ -577,9 +577,15 @@ public abstract class Message<M extends Message<M>> {
 
         return attribute(codec.type())
 
-                .or(() -> codec.decode(self()))
+                .or(() -> codec.decode(self()).map(value -> {
 
-                .orElseThrow(() -> new IllegalArgumentException(format(
+                    attribute(codec.type(), value);
+
+                    return value;
+
+                }))
+
+                .orElseThrow(() -> new CodecException(format(
                         "missing <%s> message body", codec.mime()
                 )));
     }

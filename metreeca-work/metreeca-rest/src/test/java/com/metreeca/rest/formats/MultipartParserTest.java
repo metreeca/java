@@ -16,6 +16,7 @@
 
 package com.metreeca.rest.formats;
 
+import com.metreeca.core.Feeds;
 import com.metreeca.rest.*;
 
 import org.junit.jupiter.api.Nested;
@@ -31,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 
 
@@ -59,9 +59,7 @@ final class MultipartParserTest {
 
                     .forEach(request::headers);
 
-            parts.put("part"+parts.size(), request
-                    .body(InputFormat.input(), () -> body)
-            );
+            parts.put("part"+parts.size(), request.input(() -> body));
 
         }).parse();
 
@@ -73,7 +71,22 @@ final class MultipartParserTest {
 
         private List<String> parts(final String content) throws IOException {
             return MultipartParserTest.this.parts(content).stream()
-                    .map(message -> message.body(TextFormat.text()).fold(e -> "", identity()))
+                    .map(message -> {
+
+                        try (
+                                final InputStream input=message.input().get();
+                                final Reader reader=new InputStreamReader(input, message.charset());
+                        ) {
+
+                            return Feeds.text(reader);
+
+                        } catch ( final IOException e ) {
+
+                            throw new UncheckedIOException(e);
+
+                        }
+
+                    })
                     .collect(toList());
         }
 
@@ -137,26 +150,29 @@ final class MultipartParserTest {
         @Test void testParseHeaders() throws IOException {
             assertThat(parts("--boundary\nsingle: value\nmultiple: one\nmultiple: two\n\ncontent"))
                     .isNotEmpty()
-                    .hasOnlyOneElementSatisfying(message -> assertThat(message)
+                    .singleElement()
+                    .satisfies(message -> assertThat(message)
                             .hasHeaders("single", "value")
                             .hasHeaders("multiple", "one", "two")
-                            .hasBody(TextFormat.text(), text -> assertThat(text).isEqualTo("content"))
+                            .hasTextInput(text -> assertThat(text).isEqualTo("content"))
                     );
         }
 
         @Test void testHandleEmptyHeaders() throws IOException {
             assertThat(parts("--boundary\nempty:\n\ncontent"))
                     .isNotEmpty()
-                    .hasOnlyOneElementSatisfying(message -> assertThat(message)
+                    .singleElement()
+                    .satisfies(message -> assertThat(message)
                             .hasHeaders("empty")
-                            .hasBody(TextFormat.text(), text -> assertThat(text).isEqualTo("content"))
+                            .hasTextInput(text -> assertThat(text).isEqualTo("content"))
                     );
         }
 
         @Test void testHandleEOFInHeaders() throws IOException {
             assertThat(parts("--boundary\nsingle: value"))
                     .isNotEmpty()
-                    .hasOnlyOneElementSatisfying(message -> assertThat(message)
+                    .singleElement()
+                    .satisfies(message -> assertThat(message)
                             .hasHeaders("single", "value")
                     );
         }

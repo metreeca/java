@@ -17,9 +17,6 @@
 package com.metreeca.rest;
 
 
-import com.metreeca.core.Feeds;
-import com.metreeca.rest.formats.TextFormat;
-
 import org.assertj.core.api.Assertions;
 
 import java.io.*;
@@ -27,151 +24,150 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.metreeca.rest.formats.InputFormat.input;
-
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
 
 public final class RequestAssert extends MessageAssert<RequestAssert, Request> {
 
-	public static RequestAssert assertThat(final Request request) {
+    public static RequestAssert assertThat(final Request request) {
 
-		if ( request != null ) {
+        if ( request != null ) {
 
-			request.map(input(), source -> { // cache input
+            // cache input
 
-				try ( final InputStream stream=source.get() ) {
+            final ByteArrayOutputStream buffer=new ByteArrayOutputStream();
 
-					final byte[] data=Feeds.data(stream);
+            try ( final InputStream input=request.input().get() ) {
 
-					return () -> new ByteArrayInputStream(data);
+                input.transferTo(buffer);
 
-				} catch ( final IOException e1 ) {
-					throw new UncheckedIOException(e1);
-				}
+            } catch ( final IOException e ) {
 
-					}
-			);
+                throw new UncheckedIOException(e);
 
-			final StringBuilder builder=new StringBuilder(2500);
+            }
 
-			builder.append(request.method()).append(' ').append(request.item()).append('\n');
+            request.input(() -> new ByteArrayInputStream(buffer.toByteArray()));
 
-			request.headers().forEach((name, value) ->
-					builder.append(name).append(": ").append(value).append('\n')
-			);
+            // log request
 
-			builder.append('\n');
+            final StringBuilder builder=new StringBuilder(2500);
 
+            builder.append(request.method()).append(' ').append(request.item()).append('\n');
 
-			final String text=request.body(TextFormat.text()).fold(e -> "", identity());
+            request.headers().forEach((name, value) ->
+                    builder.append(name).append(": ").append(value).append('\n')
+            );
 
-			if ( !text.isEmpty() ) {
+            builder.append('\n');
 
-				final int limit=builder.capacity();
+            final String text=buffer.toString(request.charset());
 
-				builder
-						.append(text.length() <= limit ? text : text.substring(0, limit)+"\n⋮")
-						.append("\n\n");
-			}
+            if ( !text.isEmpty() ) {
 
-			Logger.getLogger(request.getClass().getName()).log(
-					Level.INFO,
-					builder.toString()
-			);
+                final int limit=builder.capacity();
 
-		}
+                builder
+                        .append(text.length() <= limit ? text : text.substring(0, limit)+"\n⋮")
+                        .append("\n\n");
+            }
 
-		return new RequestAssert(request);
-	}
+            Logger.getLogger(request.getClass().getName()).log(
+                    Level.INFO,
+                    builder.toString()
+            );
 
+        }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private RequestAssert(final Request actual) {
-		super(actual, RequestAssert.class);
-	}
+        return new RequestAssert(request);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public RequestAssert hasParameter(final String name) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		isNotNull();
-
-		final Collection<String> values=actual.headers(name).collect(toList());
-
-		if ( values.isEmpty() ) {
-			failWithMessage("expected message to have <%s> parameters but has none", name);
-		}
-
-		return myself;
-	}
-
-	public RequestAssert hasParameter(final String name, final String expected) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		if ( expected == null ) {
-			throw new NullPointerException("null expected value");
-		}
-
-		isNotNull();
-
-		final String found=actual.parameter(name).orElse(null);
-
-		if ( !expected.equals(found) ) {
-			failWithMessage(
-					"expected response to have <%s> parameter with value <%s> but found <%s>",
-					name, expected, found
-			);
-		}
-
-		return myself;
-	}
-
-	public RequestAssert doesNotHaveParameter(final String name) {
-
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
-
-		isNotNull();
-
-		final Collection<String> values=actual.headers(name).collect(toList());
-
-		if ( !values.isEmpty() ) {
-			failWithMessage("expected response to have no <%s> parameters but has <%s>", name, values);
-		}
-
-		return myself;
-	}
+    private RequestAssert(final Request actual) {
+        super(actual, RequestAssert.class);
+    }
 
 
-	public RequestAssert hasParameters(final String name, final String... values) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+    public RequestAssert hasParameter(final String name) {
 
-		if ( values == null ) {
-			throw new NullPointerException("null values");
-		}
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		isNotNull();
+        isNotNull();
 
-		Assertions.assertThat(actual.headers(name))
-				.as("<%sh> message parameters", name)
-				.containsExactly(values);
+        final Collection<String> values=actual.headers(name).collect(toList());
 
-		return myself;
-	}
+        if ( values.isEmpty() ) {
+            failWithMessage("expected message to have <%s> parameters but has none", name);
+        }
+
+        return myself;
+    }
+
+    public RequestAssert hasParameter(final String name, final String expected) {
+
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
+
+        if ( expected == null ) {
+            throw new NullPointerException("null expected value");
+        }
+
+        isNotNull();
+
+        final String found=actual.parameter(name).orElse(null);
+
+        if ( !expected.equals(found) ) {
+            failWithMessage(
+                    "expected response to have <%s> parameter with value <%s> but found <%s>",
+                    name, expected, found
+            );
+        }
+
+        return myself;
+    }
+
+    public RequestAssert doesNotHaveParameter(final String name) {
+
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
+
+        isNotNull();
+
+        final Collection<String> values=actual.headers(name).collect(toList());
+
+        if ( !values.isEmpty() ) {
+            failWithMessage("expected response to have no <%s> parameters but has <%s>", name, values);
+        }
+
+        return myself;
+    }
+
+
+    public RequestAssert hasParameters(final String name, final String... values) {
+
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
+
+        if ( values == null ) {
+            throw new NullPointerException("null values");
+        }
+
+        isNotNull();
+
+        Assertions.assertThat(actual.headers(name))
+                .as("<%sh> message parameters", name)
+                .containsExactly(values);
+
+        return myself;
+    }
 
 }
