@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.rest.MessageException.status;
+import static com.metreeca.rest._MessageException.status;
 
 import static java.util.function.UnaryOperator.identity;
 
@@ -33,7 +33,7 @@ import static java.util.function.UnaryOperator.identity;
  * <p>Iteratively applies pattern-based {@linkplain #rewrite(String, String) rewrite} rules to incoming
  * {@linkplain Request#item() request items} and redirecting them if actually modified.</p>
  */
-public final class Forwarder implements Wrapper {
+public final class Forwarder implements _Wrapper {
 
 	private final int status;
 

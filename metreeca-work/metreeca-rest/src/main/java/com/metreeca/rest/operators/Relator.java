@@ -35,8 +35,8 @@ import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Guard.*;
 import static com.metreeca.rest.Response.NotFound;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Wrapper.keeper;
-import static com.metreeca.rest.Wrapper.wrapper;
+import static com.metreeca.rest._Wrapper.keeper;
+import static com.metreeca.rest._Wrapper.wrapper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.formats.JSONLDFormat.query;
 import static com.metreeca.rest.services.Engine.*;
@@ -53,7 +53,7 @@ import static com.metreeca.rest.services.Engine.*;
  * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Relate} task and the {@linkplain Guard#Digest} view, if the
  * focus item is a {@linkplain Request#collection() collection}, or the {@linkplain Guard#Detail} view, otherwise.</li>
  *

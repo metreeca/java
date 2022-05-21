@@ -46,7 +46,7 @@ final class BearerTest {
 
     @Test void testFallThroughToWrappedSchemes() {
 
-        final Wrapper authenticator=handler -> (request, next) ->
+        final _Wrapper authenticator=handler -> (request, next) ->
                 handler.handle(request, next).map(response -> response.header("WWW-Authenticate", "Custom"));
 
         exec(() -> bearer()

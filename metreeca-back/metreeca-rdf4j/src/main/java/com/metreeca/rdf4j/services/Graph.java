@@ -76,7 +76,7 @@ public final class Graph implements AutoCloseable {
 	 *
 	 * @return a wrapper ensuring that requests are handled within a single graph transaction
 	 */
-	public static Wrapper txn() {
+	public static _Wrapper txn() {
 
 		final Graph graph=service(graph());
 

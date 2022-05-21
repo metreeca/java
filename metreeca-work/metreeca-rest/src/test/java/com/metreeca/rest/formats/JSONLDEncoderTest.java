@@ -39,7 +39,7 @@ import static com.metreeca.link.shapes.Lang.lang;
 import static com.metreeca.link.shapes.Localized.localized;
 import static com.metreeca.link.shapes.MaxCount.maxCount;
 import static com.metreeca.link.shapes.Or.or;
-import static com.metreeca.rest.JSONAssert.assertThat;
+import static com.metreeca.rest._JSONAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

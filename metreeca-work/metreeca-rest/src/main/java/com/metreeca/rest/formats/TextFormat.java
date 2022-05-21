@@ -24,8 +24,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.regex.Pattern;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -77,18 +77,18 @@ public final class TextFormat extends Format<String> {
      * Decodes the textual {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
      * body, if one is available, taking into account the {@code message} {@linkplain Message#charset() charset}
      */
-    @Override public <M extends Message<M>> Either<MessageException, String> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<_MessageException, String> decode(final M message) {
         return message.body(input()).flatMap(source -> {
             try (
                     final InputStream input=source.get();
                     final Reader reader=new InputStreamReader(input, message.charset())
             ) {
 
-                return Either.Right(Feeds.text(reader));
+                return _Either.Right(Feeds.text(reader));
 
             } catch ( final UnsupportedEncodingException e ) {
 
-				return Either.Left(status(BadRequest, e));
+				return _Either.Left(status(BadRequest, e));
 
             } catch ( final IOException e ) {
 

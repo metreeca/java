@@ -18,8 +18,8 @@ package com.metreeca.rdf4j.services;
 
 import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
-import com.metreeca.rest.Setup;
 import com.metreeca.rest._Config;
+import com.metreeca.rest._Setup;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -36,7 +36,7 @@ import static com.metreeca.rdf4j.services.Graph.graph;
  *
  * <p>Handles model-driven CRUD operations on linked data resources stored in the shared {@linkplain Graph graph}.</p>
  */
-public final class GraphEngine extends Setup<GraphEngine> implements Engine {
+public final class GraphEngine extends _Setup<GraphEngine> implements Engine {
 
 	private final Graph graph=service(graph());
 

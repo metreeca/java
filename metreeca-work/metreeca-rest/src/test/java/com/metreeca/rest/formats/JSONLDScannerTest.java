@@ -18,7 +18,7 @@ package com.metreeca.rest.formats;
 
 import com.metreeca.link.Shape;
 import com.metreeca.link.Trace;
-import com.metreeca.rest.Either;
+import com.metreeca.rest._Either;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -54,7 +54,7 @@ import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.link.shapes.Range.range;
 import static com.metreeca.link.shapes.Stem.stem;
 import static com.metreeca.link.shapes.When.when;
-import static com.metreeca.rest.EitherAssert.assertThat;
+import static com.metreeca.rest._EitherAssert.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -78,7 +78,7 @@ final class JSONLDScannerTest {
 
 	@Nested final class Validation {
 
-        private Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
+        private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Statement... model) {
             return JSONLDScanner.scan(s, shape, asList(model));
         }
 
@@ -190,7 +190,7 @@ final class JSONLDScannerTest {
 
 	@Nested final class Constraints {
 
-        private Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
+        private _Either<Trace, Collection<Statement>> scan(final Shape shape, final Value... values) {
 
             return JSONLDScanner.scan(s, field(p, shape), Arrays
                     .stream(values)

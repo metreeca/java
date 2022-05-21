@@ -34,11 +34,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.Either.Right;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
+import static com.metreeca.rest._Either.Left;
+import static com.metreeca.rest._Either.Right;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -123,7 +123,7 @@ public final class XMLFormat extends Format<Document> {
 	 *
 	 * @throws NullPointerException if {@code input} is null
 	 */
-	public static Either<TransformerException, Document> xml(final InputStream input) {
+	public static _Either<TransformerException, Document> xml(final InputStream input) {
 
 		if ( input == null ) {
 			throw new NullPointerException("null input");
@@ -142,7 +142,7 @@ public final class XMLFormat extends Format<Document> {
 	 *
 	 * @throws NullPointerException if {@code input} is null
 	 */
-	public static Either<TransformerException, Document> xml(final InputStream input, final String base) {
+	public static _Either<TransformerException, Document> xml(final InputStream input, final String base) {
 
 		if ( input == null ) {
 			throw new NullPointerException("null input");
@@ -165,7 +165,7 @@ public final class XMLFormat extends Format<Document> {
 	 *
 	 * @throws NullPointerException if {@code source} is null
 	 */
-	public static Either<TransformerException, Document> xml(final Source source) {
+	public static _Either<TransformerException, Document> xml(final Source source) {
 
 		if ( source == null ) {
 			throw new NullPointerException("null source");
@@ -214,7 +214,7 @@ public final class XMLFormat extends Format<Document> {
 	 * body, if one is available and the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern},
 	 * taking into account the {@code message} {@linkplain Message#charset() charset}
 	 */
-	@Override public <M extends Message<M>> Either<MessageException, Document> decode(final M message) {
+	@Override public <M extends Message<M>> _Either<_MessageException, Document> decode(final M message) {
 		return message.header("Content-Type").filter(MIMEPattern.asPredicate())
 
 				.map(type -> message.body(input()).flatMap(source -> {
@@ -233,7 +233,7 @@ public final class XMLFormat extends Format<Document> {
 
                         saxSource.setSystemId(message.item());
 
-						return xml(saxSource).fold(e -> Left(status(BadRequest, e)), Either::Right);
+						return xml(saxSource).fold(e -> Left(status(BadRequest, e)), _Either::Right);
 
 					} catch ( final UnsupportedEncodingException e ) {
 

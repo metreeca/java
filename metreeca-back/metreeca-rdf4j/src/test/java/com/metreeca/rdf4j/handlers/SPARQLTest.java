@@ -115,7 +115,7 @@ final class SPARQLTest {
 
 
 	private Consumer<JsonValue> hasBooleanValue(final boolean value) {
-		return json -> JSONAssert.assertThat(json.asJsonObject()).hasField("boolean", value);
+		return json -> _JSONAssert.assertThat(json.asJsonObject()).hasField("boolean", value);
 	}
 
 	private Consumer<JsonValue> hasBindings(final IRI... iris) {
@@ -168,7 +168,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json)
+						.hasBody(json(), json -> _JSONAssert.assertThat(json)
 								.satisfies(hasBooleanValue(true))
 						)
 				)
@@ -183,7 +183,7 @@ final class SPARQLTest {
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
 						.hasBody(json(), json ->
-								JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))));
+								_JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))));
 	}
 
 
@@ -194,7 +194,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -205,7 +205,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -216,7 +216,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -227,7 +227,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)))
 				));
 	}
 
@@ -263,7 +263,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -275,7 +275,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -288,7 +288,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -300,7 +300,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -312,7 +312,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -324,7 +324,7 @@ final class SPARQLTest {
 
 				.map(response -> assertThat(response)
 						.hasStatus(Response.OK)
-						.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
+						.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBindings(RDF.FIRST,
 								RDF.REST)))
 				));
 	}
@@ -464,7 +464,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -483,7 +483,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -525,7 +525,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));
@@ -544,7 +544,7 @@ final class SPARQLTest {
 
 					assertThat(response)
 							.hasStatus(Response.OK)
-							.hasBody(json(), json -> JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
+							.hasBody(json(), json -> _JSONAssert.assertThat(json).satisfies(hasBooleanValue(true)));
 
 					assertThat(model())
 							.satisfies(hasObjects(RDF.FIRST, RDF.REST));

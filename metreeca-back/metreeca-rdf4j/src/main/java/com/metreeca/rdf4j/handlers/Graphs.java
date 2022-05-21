@@ -41,9 +41,9 @@ import static com.metreeca.link.Values.statement;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.formats.RDFFormat.rdf;
 import static com.metreeca.rest.Format.mimes;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.InternalServerError;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.InputFormat.input;
 

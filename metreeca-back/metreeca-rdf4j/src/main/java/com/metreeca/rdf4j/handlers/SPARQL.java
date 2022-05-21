@@ -34,8 +34,8 @@ import java.util.function.Consumer;
 
 import static com.metreeca.core.Lambdas.guarded;
 import static com.metreeca.rest.Format.mimes;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.*;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.DataFormat.data;
 
 

@@ -22,27 +22,27 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>, Either<R, L>> {
+public final class _EitherAssert<L, R> extends AbstractAssert<_EitherAssert<L, R>, _Either<R, L>> {
 
-    public static <L, R> EitherAssert<L, R> assertThat(final Either<R, L> either) {
-        return new EitherAssert<>(either);
+    public static <L, R> _EitherAssert<L, R> assertThat(final _Either<R, L> either) {
+        return new _EitherAssert<>(either);
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private EitherAssert(final Either<R, L> actual) {
-        super(actual, EitherAssert.class);
+    private _EitherAssert(final _Either<R, L> actual) {
+        super(actual, _EitherAssert.class);
     }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public EitherAssert<L, R> hasLeft() {
+	public _EitherAssert<L, R> hasLeft() {
 		return hasLeft(value -> {});
 	}
 
-	public EitherAssert<L, R> hasLeft(final R expected) {
+	public _EitherAssert<L, R> hasLeft(final R expected) {
 		return hasLeft(error -> {
 			if ( !Objects.equals(error, expected) ) {
 				failWithMessage("expected result <%s> to have left value <%s>", actual, expected);
@@ -50,7 +50,7 @@ public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>,
 		});
 	}
 
-	public EitherAssert<L, R> hasLeft(final Consumer<R> assertions) {
+	public _EitherAssert<L, R> hasLeft(final Consumer<R> assertions) {
 
 		if ( assertions == null ) {
 			throw new NullPointerException("null assertions");
@@ -79,11 +79,11 @@ public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>,
 	}
 
 
-	public EitherAssert<L, R> hasRight() {
+	public _EitherAssert<L, R> hasRight() {
 		return hasRight(value -> {});
 	}
 
-	public EitherAssert<L, R> hasRight(final L expected) {
+	public _EitherAssert<L, R> hasRight(final L expected) {
 		return hasRight(value -> {
 			if ( !Objects.equals(value, expected) ) {
 				failWithMessage("expected result <%s> to have right value <%s>", actual, expected);
@@ -91,7 +91,7 @@ public final class EitherAssert<L, R> extends AbstractAssert<EitherAssert<L, R>,
 		});
 	}
 
-	public EitherAssert<L, R> hasRight(final Consumer<L> assertions) {
+	public _EitherAssert<L, R> hasRight(final Consumer<L> assertions) {
 
 		if ( assertions == null ) {
 			throw new NullPointerException("null assertions");

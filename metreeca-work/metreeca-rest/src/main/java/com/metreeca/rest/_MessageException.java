@@ -32,7 +32,7 @@ import static java.lang.String.format;
  *
  * <p>Thrown to report message processing issues.</p>
  */
-public final class MessageException extends RuntimeException implements Handler, UnaryOperator<Response> {
+public final class _MessageException extends RuntimeException implements Handler, UnaryOperator<Response> {
 
 	private static final long serialVersionUID=6385340424276867964L;
 
@@ -42,8 +42,8 @@ public final class MessageException extends RuntimeException implements Handler,
 	 *
 	 * @return a no-op response generator
 	 */
-	public static MessageException status() {
-		return new MessageException();
+	public static _MessageException status() {
+		return new _MessageException();
 	}
 
 	/**
@@ -55,13 +55,13 @@ public final class MessageException extends RuntimeException implements Handler,
 	 *
 	 * @throws IllegalArgumentException if {@code response } is less than 100 or greater than 599
 	 */
-	public static MessageException status(final int status) {
+	public static _MessageException status(final int status) {
 
 		if ( status < 100 || status > 599 ) { // 0 used internally
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
 		}
 
-		return new MessageException(status);
+		return new _MessageException(status);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public final class MessageException extends RuntimeException implements Handler,
 	 * @throws IllegalArgumentException if {@code response } is less than 100 or greater than 599
 	 * @throws NullPointerException     if {@code details} is null
 	 */
-	public static MessageException status(final int status, final String details) {
+	public static _MessageException status(final int status, final String details) {
 
 		if ( status < 100 || status > 599 ) { // 0 used internally
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
@@ -86,7 +86,7 @@ public final class MessageException extends RuntimeException implements Handler,
 			throw new NullPointerException("null details");
 		}
 
-		return new MessageException(status, details);
+		return new _MessageException(status, details);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public final class MessageException extends RuntimeException implements Handler,
 	 * @throws IllegalArgumentException if {@code response } is less than 100 or greater than 599
 	 * @throws NullPointerException     if {@code details} is null
 	 */
-	public static MessageException status(final int status, final JsonObject details) {
+	public static _MessageException status(final int status, final JsonObject details) {
 
 		if ( status < 100 || status > 599 ) { // 0 used internally
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
@@ -110,7 +110,7 @@ public final class MessageException extends RuntimeException implements Handler,
 			throw new NullPointerException("null details");
 		}
 
-		return new MessageException(status, details);
+		return new _MessageException(status, details);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public final class MessageException extends RuntimeException implements Handler,
 	 * @throws IllegalArgumentException if {@code response } is less than 100 or greater than 599
 	 * @throws NullPointerException     if {@code cause} is null
 	 */
-	public static MessageException status(final int status, final Throwable cause) {
+	public static _MessageException status(final int status, final Throwable cause) {
 
 		if ( status < 100 || status > 599 ) { // 0 used internally
 			throw new IllegalArgumentException("illegal status code ["+status+"]");
@@ -134,7 +134,7 @@ public final class MessageException extends RuntimeException implements Handler,
 			throw new NullPointerException("null cause");
 		}
 
-		return new MessageException(status, cause);
+		return new _MessageException(status, cause);
 	}
 
 
@@ -154,7 +154,7 @@ public final class MessageException extends RuntimeException implements Handler,
 	private final UnaryOperator<Response> report;
 
 
-	private MessageException() {
+	private _MessageException() {
 
 		super(format("%3d", 0));
 
@@ -162,7 +162,7 @@ public final class MessageException extends RuntimeException implements Handler,
 		this.report=response -> response;
 	}
 
-	private MessageException(final int status) {
+	private _MessageException(final int status) {
 
 		super(format("%3d", status));
 
@@ -170,7 +170,7 @@ public final class MessageException extends RuntimeException implements Handler,
 		this.report=response -> response.status(status);
 	}
 
-	private MessageException(final int status, final String details) {
+	private _MessageException(final int status, final String details) {
 
 		super(format("%3d %s", status, details));
 
@@ -181,7 +181,7 @@ public final class MessageException extends RuntimeException implements Handler,
 				: response.status(status).cause(this);
 	}
 
-	private MessageException(final int status, final JsonObject details) {
+	private _MessageException(final int status, final JsonObject details) {
 
 		super(format("%3d %s", status, details));
 
@@ -191,7 +191,7 @@ public final class MessageException extends RuntimeException implements Handler,
 				: response.status(status).cause(this);
 	}
 
-	private MessageException(final int status, final Throwable cause) {
+	private _MessageException(final int status, final Throwable cause) {
 
 		super(format("%3d %s", status, cause), cause);
 

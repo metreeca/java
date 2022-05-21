@@ -16,16 +16,16 @@
 
 package com.metreeca.rest.formats;
 
-import com.metreeca.rest.MessageException;
+import com.metreeca.rest._MessageException;
 
 import java.io.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.PayloadTooLarge;
+import static com.metreeca.rest._MessageException.status;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.binarySearch;
@@ -43,7 +43,7 @@ final class MultipartParser {
 
 	@FunctionalInterface private static interface State {
 
-		public State next(final Type type) throws MessageException;
+		public State next(final Type type) throws _MessageException;
 
 	}
 
@@ -99,7 +99,7 @@ final class MultipartParser {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void parse() throws IOException, MessageException {
+	void parse() throws IOException, _MessageException {
 
 		if ( opening.length == 2 ) {
 			error(BadRequest, "empty boundary");
@@ -117,7 +117,7 @@ final class MultipartParser {
 	//// States
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private State preamble(final Type type) throws MessageException {
+	private State preamble(final Type type) throws _MessageException {
 		return type == Type.Empty ? skip(this::preamble)
 				: type == Type.Data ? skip(this::preamble)
 				: type == Type.Open ? skip(this::part)
@@ -126,7 +126,7 @@ final class MultipartParser {
 				: error(BadRequest, "unexpected chunk type {"+type+"}");
 	}
 
-	private State part(final Type type) throws MessageException {
+	private State part(final Type type) throws _MessageException {
 		return type == Type.Empty ? skip(this::body)
 				: type == Type.Data ? header(this::part)
 				: type == Type.Open ? report(this::part)
@@ -135,7 +135,7 @@ final class MultipartParser {
 				: error(BadRequest, "unexpected chunk type {"+type+"}");
 	}
 
-	private State body(final Type type) throws MessageException {
+	private State body(final Type type) throws _MessageException {
 		return type == Type.Empty ? this::body
 				: type == Type.Data ? this::body
 				: type == Type.Open ? report(this::part)
@@ -152,7 +152,7 @@ final class MultipartParser {
 	//// Actions
 	// /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private State header(final State next) throws MessageException {
+	private State header(final State next) throws _MessageException {
 		try {
 
 			final int eol=last > 2 && buffer[last-2] == '\r' && buffer[last-1] == '\n' ? last-2 : last;
@@ -226,7 +226,7 @@ final class MultipartParser {
 		}
 	}
 
-	private State error(final int status, final String message) throws MessageException {
+	private State error(final int status, final String message) throws _MessageException {
 		try {
 
 			throw status(status, String.format("%s (%d)", message, body));
@@ -249,7 +249,7 @@ final class MultipartParser {
 	/**
 	 * @return the next CRLF-terminated input chunk
 	 */
-	private Type read() throws IOException, MessageException {
+	private Type read() throws IOException, _MessageException {
 
 		final int head=last;
 

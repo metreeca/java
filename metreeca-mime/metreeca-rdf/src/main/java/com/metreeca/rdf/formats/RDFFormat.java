@@ -39,11 +39,11 @@ import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.Either.Right;
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
+import static com.metreeca.rest._Either.Left;
+import static com.metreeca.rest._Either.Right;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -175,7 +175,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
      *
      * @throws NullPointerException if either {@code input} or {@code parser} is null
      */
-    public static Either<MessageException, Collection<Statement>> rdf(
+    public static _Either<_MessageException, Collection<Statement>> rdf(
             final InputStream input, final String base, final RDFParser parser
     ) {
 
@@ -266,7 +266,7 @@ public final class RDFFormat extends Format<Collection<Statement>> {
      * body, if one is available, taking into account the RDF serialization format defined by the {@code message} {@code
      * Content-Type} header, defaulting to {@code text/turtle}
      */
-    @Override public <M extends Message<M>> Either<MessageException, Collection<Statement>> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<_MessageException, Collection<Statement>> decode(final M message) {
         return message.body(input()).fold(error -> Left(status(UnsupportedMediaType, "no RDF body")), source -> {
 
             final IRI focus=iri(message.item());

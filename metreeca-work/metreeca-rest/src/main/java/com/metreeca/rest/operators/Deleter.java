@@ -33,7 +33,7 @@ import static com.metreeca.link.shapes.Guard.Delete;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.NoContent;
 import static com.metreeca.rest.Response.NotFound;
-import static com.metreeca.rest.Wrapper.keeper;
+import static com.metreeca.rest._Wrapper.keeper;
 import static com.metreeca.rest.services.Engine.engine;
 
 
@@ -48,7 +48,7 @@ import static com.metreeca.rest.services.Engine.engine;
  * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Delete} task and the {@linkplain Guard#Detail} view.</li>
  *
  * <li>deletes the existing description of the resource matching the redacted request shape with the assistance of the

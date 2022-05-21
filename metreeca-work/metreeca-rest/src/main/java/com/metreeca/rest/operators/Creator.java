@@ -40,7 +40,7 @@ import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Response.Created;
-import static com.metreeca.rest.Wrapper.keeper;
+import static com.metreeca.rest._Wrapper.keeper;
 import static com.metreeca.rest.formats.JSONLDFormat.jsonld;
 import static com.metreeca.rest.services.Engine.engine;
 
@@ -62,7 +62,7 @@ import static java.util.stream.Collectors.toMap;
  * <li>redacts the {@linkplain JSONLDFormat#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
  *
  * <li>validates the {@link JSONLDFormat JSON-LD} request body against the request shape; malformed or invalid
@@ -155,7 +155,7 @@ public final class Creator extends Delegator {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Wrapper rewrite() {
+    private _Wrapper rewrite() {
         return handler -> (request, next) -> {
 
             final String name=encode( // encode slug as IRI path component

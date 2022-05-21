@@ -24,34 +24,34 @@ import java.util.function.Consumer;
 import javax.json.*;
 
 
-public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
+public final class _JSONAssert extends AbstractAssert<_JSONAssert, JsonValue> {
 
-	public static JSONAssert assertThat(final JsonValue json) {
-		return new JSONAssert(json);
+	public static _JSONAssert assertThat(final JsonValue json) {
+		return new _JSONAssert(json);
 	}
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private JSONAssert(final JsonValue actual) {
-		super(actual, JSONAssert.class);
+	private _JSONAssert(final JsonValue actual) {
+		super(actual, _JSONAssert.class);
 	}
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public JSONAssert isEqualTo(final JsonObjectBuilder expected) {
+	public _JSONAssert isEqualTo(final JsonObjectBuilder expected) {
 		return isEqualTo(expected.build());
 	}
 
-	public JSONAssert isEqualTo(final JsonArrayBuilder expected) {
+	public _JSONAssert isEqualTo(final JsonArrayBuilder expected) {
 		return isEqualTo(expected.build());
 	}
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public JSONAssert isObject() {
+	public _JSONAssert isObject() {
 
 		isNotNull();
 
@@ -65,7 +65,7 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 	}
 
 
-	public JSONAssert hasField(final String name) {
+	public _JSONAssert hasField(final String name) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -78,7 +78,7 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 		));
 	}
 
-	public JSONAssert hasField(final String name, final boolean value) {
+	public _JSONAssert hasField(final String name, final boolean value) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -91,7 +91,7 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 		));
 	}
 
-	public JSONAssert hasField(final String name, final String value) {
+	public _JSONAssert hasField(final String name, final String value) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -108,15 +108,15 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 		));
 	}
 
-	public JSONAssert hasField(final String name, final JsonObjectBuilder builder) {
+	public _JSONAssert hasField(final String name, final JsonObjectBuilder builder) {
 		return hasField(name, builder.build());
 	}
 
-	public JSONAssert hasField(final String name, final JsonArrayBuilder builder) {
+	public _JSONAssert hasField(final String name, final JsonArrayBuilder builder) {
 		return hasField(name, builder.build());
 	}
 
-	public JSONAssert hasField(final String name, final JsonValue value) {
+	public _JSONAssert hasField(final String name, final JsonValue value) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -133,7 +133,7 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 		));
 	}
 
-	public JSONAssert hasField(final String name, final Consumer<JsonValue> assertions) {
+	public _JSONAssert hasField(final String name, final Consumer<JsonValue> assertions) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -157,7 +157,7 @@ public final class JSONAssert extends AbstractAssert<JSONAssert, JsonValue> {
 	}
 
 
-	public JSONAssert doesNotHaveField(final String name) {
+	public _JSONAssert doesNotHaveField(final String name) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");

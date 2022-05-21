@@ -25,7 +25,7 @@ import java.io.*;
 import javax.json.Json;
 import javax.json.JsonObject;
 
-import static com.metreeca.rest.EitherAssert.assertThat;
+import static com.metreeca.rest._EitherAssert.assertThat;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.JSONFormat.json;
 import static com.metreeca.rest.formats.OutputFormat.output;

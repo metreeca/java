@@ -23,8 +23,8 @@ import java.util.function.Function;
 
 import javax.json.Json;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.UnprocessableEntity;
+import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
  *
  * <p>Applies custom validation {@linkplain #Validator(Function[]) rules} to incoming requests.</p>
  */
-public final class Validator implements Wrapper {
+public final class Validator implements _Wrapper {
 
 	private final Collection<Function<Request, Collection<String>>> rules;
 

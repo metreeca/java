@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.Either.Left;
+import static com.metreeca.rest._Either.Left;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -570,7 +570,7 @@ public abstract class Message<M extends Message<M>> {
      *
      * @throws NullPointerException if {@code codec} is null
      */
-    public <V> Either<IllegalArgumentException, V> body(final Codec<V> codec) {
+    public <V> _Either<IllegalArgumentException, V> body(final Codec<V> codec) {
 
         if ( codec == null ) {
             throw new NullPointerException("null codec");
@@ -582,7 +582,7 @@ public abstract class Message<M extends Message<M>> {
 
                     .or(() -> codec.decode(self()))
 
-                    .map(Either::<IllegalArgumentException, V>Right)
+                    .map(_Either::<IllegalArgumentException, V>Right)
 
                     .orElseGet(() -> Left(new IllegalArgumentException(format(
                             "missing <%s> message body", codec.mime()
@@ -625,10 +625,10 @@ public abstract class Message<M extends Message<M>> {
 
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final Map<Format<?>, Either<MessageException, ?>> bodies=new HashMap<>();
+    private final Map<Format<?>, _Either<_MessageException, ?>> bodies=new HashMap<>();
 
 
-    @SuppressWarnings("unchecked") public <V> Either<MessageException, V> body(final Format<V> format) {
+    @SuppressWarnings("unchecked") public <V> _Either<_MessageException, V> body(final Format<V> format) {
 
         if ( format == null ) {
             throw new NullPointerException("null body");
@@ -636,13 +636,13 @@ public abstract class Message<M extends Message<M>> {
 
         // ;( don't use bodies.computeIfAbsent() to prevent concurrent modification exceptions
 
-        Either<MessageException, ?> body=bodies.get(format);
+        _Either<_MessageException, ?> body=bodies.get(format);
 
         if ( body == null ) {
             bodies.put(format, body=format.decode(self()));
         }
 
-        return (Either<MessageException, V>)body;
+        return (_Either<_MessageException, V>)body;
     }
 
     public <V> M body(final Format<? super V> format, final V value) {
@@ -655,7 +655,7 @@ public abstract class Message<M extends Message<M>> {
             throw new NullPointerException("null value");
         }
 
-        bodies.put(format, Either.Right(value));
+        bodies.put(format, _Either.Right(value));
 
         return format.encode(self(), value);
     }
@@ -673,11 +673,11 @@ public abstract class Message<M extends Message<M>> {
 
         // ;( don't use bodies.computeIfPresent() to prevent concurrent modification exceptions
 
-        final Either<MessageException, ?> value=bodies.get(format);
+        final _Either<_MessageException, ?> value=bodies.get(format);
 
         if ( value != null ) {
 
-            final Either<MessageException, V> mapped=value.map(body -> requireNonNull(
+            final _Either<_MessageException, V> mapped=value.map(body -> requireNonNull(
 
                     mapper.apply((V)body), "null mapper return value"
 
@@ -779,6 +779,5 @@ public abstract class Message<M extends Message<M>> {
         }
 
     }
-
 
 }

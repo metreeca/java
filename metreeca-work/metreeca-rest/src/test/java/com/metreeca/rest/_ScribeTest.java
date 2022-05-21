@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.rest.Scribe.code;
-import static com.metreeca.rest.Scribe.text;
+import static com.metreeca.rest._Scribe.code;
+import static com.metreeca.rest._Scribe.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-final class ScribeTest {
+final class _ScribeTest {
 
 	@Nested final class Assembling {
 

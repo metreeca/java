@@ -55,7 +55,7 @@ import static java.util.Arrays.stream;
  * roles} of the current request {@linkplain Request#user() user}: no user-related shape redaction is performed by the
  * driver wrapper on behalf of nested handlers.</p>
  */
-public final class Driver implements Wrapper {
+public final class Driver implements _Wrapper {
 
     public static final IRI Direct=OWL.SAMEAS;
     public static final IRI Inverse=inverse(Direct);

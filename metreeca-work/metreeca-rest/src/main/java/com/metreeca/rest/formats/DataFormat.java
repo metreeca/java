@@ -73,7 +73,7 @@ public final class DataFormat extends Format<byte[]> {
      * Decodes the binary {@code message} body from the input stream supplied by the {@code message} {@link InputFormat}
      * body, if one is available
      */
-    @Override public <M extends Message<M>> Either<MessageException, byte[]> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<_MessageException, byte[]> decode(final M message) {
         return message.body(input()).map(source -> {
             try ( final InputStream input=source.get() ) {
 

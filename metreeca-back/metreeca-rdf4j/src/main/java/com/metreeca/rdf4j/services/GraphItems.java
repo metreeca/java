@@ -38,7 +38,7 @@ import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Scribe.*;
+import static com.metreeca.rest._Scribe.*;
 
 import static org.eclipse.rdf4j.model.util.Values.triple;
 

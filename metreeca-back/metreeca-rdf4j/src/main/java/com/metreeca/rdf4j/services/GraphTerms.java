@@ -38,8 +38,8 @@ import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest.Scribe.text;
-import static com.metreeca.rest.Scribe.*;
+import static com.metreeca.rest._Scribe.text;
+import static com.metreeca.rest._Scribe.*;
 
 final class GraphTerms extends GraphFacts {
 

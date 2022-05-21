@@ -35,16 +35,16 @@ import static java.util.stream.Collectors.toList;
 /**
  * Source code composer.
  */
-public abstract class Scribe {
+public abstract class _Scribe {
 
-	private static final Scribe Nothing=new Scribe() {
+	private static final _Scribe Nothing=new _Scribe() {
 
 		@Override protected Appendable scribe(final Appendable code) { return code; }
 
 	};
 
 
-	public static String code(final Scribe... scribes) {
+	public static String code(final _Scribe... scribes) {
 
 		if ( scribes == null || stream(scribes).anyMatch(Objects::isNull) ) {
 			throw new NullPointerException("null scribes");
@@ -56,29 +56,29 @@ public abstract class Scribe {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static Scribe block(final Scribe... scribes) {
+	public static _Scribe block(final _Scribe... scribes) {
 		return list(text("\r{ "), list(scribes), text(" }"));
 	}
 
-	public static Scribe parens(final Scribe... scribes) {
+	public static _Scribe parens(final _Scribe... scribes) {
 		return list(text("("), list(scribes), text(")"));
 	}
 
-	public static Scribe line(final Scribe... scribes) {
+	public static _Scribe line(final _Scribe... scribes) {
 		return list(text('\n'), list(scribes), text('\n'));
 	}
 
 
-	public static Scribe space(final Scribe... scribes) {
+	public static _Scribe space(final _Scribe... scribes) {
 		return list(text('\f'), list(scribes), text('\f'));
 	}
 
-	public static Scribe indent(final Scribe... scribes) {
+	public static _Scribe indent(final _Scribe... scribes) {
 		return list(text('\t'), list(scribes), text('\b'));
 	}
 
 
-	public static Scribe list(final Scribe... items) {
+	public static _Scribe list(final _Scribe... items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
@@ -87,7 +87,7 @@ public abstract class Scribe {
 		return list(stream(items));
 	}
 
-	public static Scribe list(final Stream<Scribe> items) {
+	public static _Scribe list(final Stream<_Scribe> items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
@@ -96,13 +96,13 @@ public abstract class Scribe {
 		return list(items.collect(toList())); // memoize to enable reuse
 	}
 
-	public static Scribe list(final Collection<Scribe> items) {
+	public static _Scribe list(final Collection<_Scribe> items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
 		}
 
-		return new Scribe() {
+		return new _Scribe() {
 
 			@Override protected Appendable scribe(final Appendable code) {
 				return items.stream()
@@ -114,7 +114,7 @@ public abstract class Scribe {
 	}
 
 
-	public static Scribe list(final CharSequence separator, final Scribe... items) {
+	public static _Scribe list(final CharSequence separator, final _Scribe... items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
@@ -127,7 +127,7 @@ public abstract class Scribe {
 		return list(separator, asList(items));
 	}
 
-	public static Scribe list(final CharSequence separator, final Stream<Scribe> items) {
+	public static _Scribe list(final CharSequence separator, final Stream<_Scribe> items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
@@ -140,7 +140,7 @@ public abstract class Scribe {
 		return list(separator, items.collect(toList())); // memoize to enable reuse
 	}
 
-	public static Scribe list(final CharSequence separator, final Collection<Scribe> items) {
+	public static _Scribe list(final CharSequence separator, final Collection<_Scribe> items) {
 
 		if ( items == null ) {
 			throw new NullPointerException("null items");
@@ -150,7 +150,7 @@ public abstract class Scribe {
 			throw new NullPointerException("null separator");
 		}
 
-		return new Scribe() {
+		return new _Scribe() {
 
 			@Override protected Appendable scribe(final Appendable code) {
 				return items.stream()
@@ -164,7 +164,7 @@ public abstract class Scribe {
 	}
 
 
-	public static Scribe text(final Object value) {
+	public static _Scribe text(final Object value) {
 
 		if ( value == null ) {
 			throw new NullPointerException("null value");
@@ -173,7 +173,7 @@ public abstract class Scribe {
 		return text(valueOf(value));
 	}
 
-	public static Scribe text(final Value value) {
+	public static _Scribe text(final Value value) {
 
 		if ( value == null ) {
 			throw new NullPointerException("null value");
@@ -182,8 +182,8 @@ public abstract class Scribe {
 		return text(format(value));
 	}
 
-	public static Scribe text(final char c) {
-		return new Scribe() {
+	public static _Scribe text(final char c) {
+		return new _Scribe() {
 			@Override protected Appendable scribe(final Appendable code) {
 				try {
 
@@ -198,13 +198,13 @@ public abstract class Scribe {
 		};
 	}
 
-	public static Scribe text(final CharSequence text) {
+	public static _Scribe text(final CharSequence text) {
 
 		if ( text == null ) {
 			throw new NullPointerException("null text");
 		}
 
-		return new Scribe() {
+		return new _Scribe() {
 			@Override protected Appendable scribe(final Appendable code) {
 				try {
 
@@ -219,7 +219,7 @@ public abstract class Scribe {
 		};
 	}
 
-	public static Scribe text(final String format, final Object... args) {
+	public static _Scribe text(final String format, final Object... args) {
 
 		if ( format == null ) {
 			throw new NullPointerException("null format");
@@ -229,20 +229,20 @@ public abstract class Scribe {
 	}
 
 
-	public static Scribe nothing() {
+	public static _Scribe nothing() {
 		return Nothing;
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Scribe() {}
+	private _Scribe() {}
 
 
 	abstract Appendable scribe(final Appendable code);
 
 
-	public Scribe map(final Function<Scribe, Scribe> mapper) {
+	public _Scribe map(final Function<_Scribe, _Scribe> mapper) {
 
 		if ( mapper == null ) {
 			throw new NullPointerException("null mapper");

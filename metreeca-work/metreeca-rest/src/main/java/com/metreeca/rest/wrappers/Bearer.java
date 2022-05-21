@@ -35,7 +35,7 @@ import static java.lang.String.format;
  *
  * @see <a href="https://tools.ietf.org/html/rfc6750">The OAuth 2.0 Authorization Framework: Bearer Token Usage</a>
  */
-public final class Bearer implements Wrapper {
+public final class Bearer implements _Wrapper {
 
     private static final Pattern BearerPattern=Pattern.compile("\\s*Bearer\\s*(?<token>\\S*)\\s*");
 
@@ -104,7 +104,7 @@ public final class Bearer implements Wrapper {
      * @return a wrapper adding authentication challenge to unauthorized responses, unless already provided by nested
      * authorization schemes
      */
-    private Wrapper challenger() {
+    private _Wrapper challenger() {
 		return handler -> (request, next) -> handler.handle(request, next).map(response ->
                 response.status() == Response.Unauthorized && response.header("WWW-Authenticate").isEmpty()
                         ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
@@ -115,7 +115,7 @@ public final class Bearer implements Wrapper {
     /**
      * @return a wrapper managing token-based authentication
      */
-    private Wrapper authenticator() {
+    private _Wrapper authenticator() {
         return handler -> (request, next) -> {
 
             // !!! handle token in form/query parameter (https://tools.ietf.org/html/rfc6750#section-2)

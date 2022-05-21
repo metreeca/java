@@ -54,7 +54,7 @@ public abstract class Delegator implements Handler {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public Handler with(final Wrapper wrapper) { return delegate.with(wrapper); }
+    @Override public Handler with(final _Wrapper wrapper) { return delegate.with(wrapper); }
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
         return delegate.handle(request, forward);

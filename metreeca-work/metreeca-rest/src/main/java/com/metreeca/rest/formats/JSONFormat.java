@@ -24,9 +24,9 @@ import java.util.regex.Pattern;
 import javax.json.*;
 import javax.json.stream.JsonParsingException;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.BadRequest;
 import static com.metreeca.rest.Response.UnsupportedMediaType;
+import static com.metreeca.rest._MessageException.status;
 import static com.metreeca.rest.formats.InputFormat.input;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
@@ -79,7 +79,7 @@ public final class JSONFormat extends Format<JsonObject> {
      *
      * @throws NullPointerException if {@code reader} is null
      */
-    public static Either<JsonParsingException, JsonObject> json(final Reader reader) {
+    public static _Either<JsonParsingException, JsonObject> json(final Reader reader) {
 
         if ( reader == null ) {
             throw new NullPointerException("null reader");
@@ -87,11 +87,11 @@ public final class JSONFormat extends Format<JsonObject> {
 
         try ( final JsonReader jsonReader=Json.createReader(reader) ) {
 
-            return Either.Right(jsonReader.readObject());
+            return _Either.Right(jsonReader.readObject());
 
         } catch ( final JsonParsingException e ) {
 
-            return Either.Left(e);
+            return _Either.Left(e);
 
 		}
 	}
@@ -147,7 +147,7 @@ public final class JSONFormat extends Format<JsonObject> {
      * body, if one is available and the {@code message} {@code Content-Type} header is either missing or  matched by
      * {@link #MIMEPattern}
      */
-    @Override public <M extends Message<M>> Either<MessageException, JsonObject> decode(final M message) {
+    @Override public <M extends Message<M>> _Either<_MessageException, JsonObject> decode(final M message) {
         return message
 
                 .header("Content-Type")
@@ -161,11 +161,11 @@ public final class JSONFormat extends Format<JsonObject> {
 							final Reader reader=new InputStreamReader(input, message.charset())
                     ) {
 
-                        return json(reader).fold(e -> Either.Left(status(BadRequest, e)), Either::Right);
+                        return json(reader).fold(e -> _Either.Left(status(BadRequest, e)), _Either::Right);
 
 					} catch ( final UnsupportedEncodingException e ) {
 
-                        return Either.Left(status(BadRequest, e));
+                        return _Either.Left(status(BadRequest, e));
 
                     } catch ( final IOException e ) {
 
@@ -175,7 +175,7 @@ public final class JSONFormat extends Format<JsonObject> {
 
                 }))
 
-                .orElseGet(() -> Either.Left(status(UnsupportedMediaType, "no JSON body")));
+                .orElseGet(() -> _Either.Left(status(UnsupportedMediaType, "no JSON body")));
 	}
 
 	/**

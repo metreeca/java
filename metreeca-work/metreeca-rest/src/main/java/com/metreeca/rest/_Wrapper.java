@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  *
  * <p><strong>Warning</strong> / Implementations must be thread-safe.</p>
  */
-@FunctionalInterface public interface Wrapper {
+@FunctionalInterface public interface _Wrapper {
 
     /**
      * Creates a conditional wrapper.
@@ -56,7 +56,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if either {@code test} or {@code pass} is null
      */
-    public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass) {
+    public static _Wrapper wrapper(final Predicate<Request> test, final _Wrapper pass) {
 
         if ( test == null ) {
             throw new NullPointerException("null test predicate");
@@ -83,7 +83,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if any of the arguments is null
      */
-    public static Wrapper wrapper(final Predicate<Request> test, final Wrapper pass, final Wrapper fail) {
+    public static _Wrapper wrapper(final Predicate<Request> test, final _Wrapper pass, final _Wrapper fail) {
 
         if ( test == null ) {
             throw new NullPointerException("null test predicate");
@@ -112,7 +112,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if {@code mapper} is null or returns a null value
      */
-    public static Wrapper preprocessor(final Function<Request, Request> mapper) {
+    public static _Wrapper preprocessor(final Function<Request, Request> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
@@ -132,7 +132,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if {@code mapper} is null or returns a null value
      */
-    public static Wrapper postprocessor(final Function<Response, Response> mapper) {
+    public static _Wrapper postprocessor(final Function<Response, Response> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
@@ -157,7 +157,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if either {@code format} or {@code mapper} is null
      */
-    public static <V> Wrapper preprocessor(
+    public static <V> _Wrapper preprocessor(
             final Format<V> format, final BiFunction<? super Request, ? super V, V> mapper
     ) {
 
@@ -185,7 +185,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if either {@code format} or {@code mapper} is null
      */
-    public static <V> Wrapper postprocessor(
+    public static <V> _Wrapper postprocessor(
             final Format<V> format, final BiFunction<? super Response, ? super V, V> mapper
     ) {
 
@@ -215,7 +215,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if {@code roles} is null or contains null values
      */
-    public static Wrapper roles(final Object... roles) {
+    public static _Wrapper roles(final Object... roles) {
 
         if ( roles == null || Arrays.stream(roles).anyMatch(Objects::isNull) ) {
             throw new NullPointerException("null roles");
@@ -235,7 +235,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if {@code roles} is null or contains null values
      */
-    public static Wrapper roles(final Collection<Object> roles) {
+    public static _Wrapper roles(final Collection<Object> roles) {
 
         if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
             throw new NullPointerException("null roles");
@@ -256,7 +256,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if either {@code task} or {@code view} is null
      */
-    public static Wrapper keeper(final Object task, final Object view) {
+    public static _Wrapper keeper(final Object task, final Object view) {
         return handler -> (request, next) -> {
 
             final Shape shape=JSONLDFormat.shape(request) // visible taking into account task/area
@@ -322,7 +322,7 @@ import static java.util.Objects.requireNonNull;
      *
      * @throws NullPointerException if {@code wrapper} is null
      */
-    public default Wrapper with(final Wrapper wrapper) {
+    public default _Wrapper with(final _Wrapper wrapper) {
 
         if ( wrapper == null ) {
             throw new NullPointerException("null wrapper");
@@ -336,12 +336,12 @@ import static java.util.Objects.requireNonNull;
     /**
      * Delegating wrapper.
      *
-     * <p>Delegates request processing to a {@linkplain #delegate(Wrapper) delegate} wrapper, possibly assembled as a
+     * <p>Delegates request processing to a {@linkplain #delegate(_Wrapper) delegate} wrapper, possibly assembled as a
      * combination of other wrappers.</p>
      */
-    public abstract class Base implements Wrapper {
+    public abstract class Base implements _Wrapper {
 
-        private Wrapper delegate=handler -> handler;
+        private _Wrapper delegate=handler -> handler;
 
 
         /**
@@ -353,7 +353,7 @@ import static java.util.Objects.requireNonNull;
          *
          * @throws NullPointerException if {@code delegate} is null
          */
-        protected Base delegate(final Wrapper delegate) {
+        protected Base delegate(final _Wrapper delegate) {
 
             if ( delegate == null ) {
                 throw new NullPointerException("null delegate");
@@ -367,7 +367,7 @@ import static java.util.Objects.requireNonNull;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        @Override public Wrapper with(final Wrapper wrapper) { return delegate.with(wrapper); }
+        @Override public _Wrapper with(final _Wrapper wrapper) { return delegate.with(wrapper); }
 
         @Override public Handler wrap(final Handler handler) { return delegate.wrap(handler); }
     }

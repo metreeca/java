@@ -29,8 +29,7 @@ import static java.util.Objects.requireNonNull;
  * @param <R> the type of the left alternative value
  * @param <L> the type of the right alternative value
  */
-
-public abstract class Either<L, R> {
+public abstract class _Either<L, R> {
 
     /**
      * Creates a left alternative value.
@@ -43,13 +42,13 @@ public abstract class Either<L, R> {
      *
      * @throws NullPointerException if {@code value} is null
      */
-    public static <L, R> Either<L, R> Left(final L value) {
+    public static <L, R> _Either<L, R> Left(final L value) {
 
         if ( value == null ) {
             throw new NullPointerException("null value");
         }
 
-        return new Either<>() {
+        return new _Either<>() {
 
             @Override public <V> V fold(
                     final Function<? super L, ? extends V> left,
@@ -85,13 +84,13 @@ public abstract class Either<L, R> {
      *
      * @throws NullPointerException if {@code value} is null
      */
-    public static <L, R> Either<L, R> Right(final R value) {
+    public static <L, R> _Either<L, R> Right(final R value) {
 
         if ( value == null ) {
             throw new NullPointerException("null value");
         }
 
-        return new Either<>() {
+        return new _Either<>() {
 
             @Override public <V> V fold(
                     final Function<? super L, ? extends V> left,
@@ -149,13 +148,13 @@ public abstract class Either<L, R> {
      *
      * @throws NullPointerException if {@code mapper} is null or returns a null value
      */
-    public <V> Either<L, V> map(final Function<R, V> mapper) {
+    public <V> _Either<L, V> map(final Function<R, V> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
         }
 
-        return fold(Either::Left, value ->
+        return fold(_Either::Left, value ->
                 Right(requireNonNull(mapper.apply(value), "null mapper return value"))
         );
     }
@@ -171,13 +170,13 @@ public abstract class Either<L, R> {
      *
      * @throws NullPointerException if {@code mapper} is null or returns a null value
      */
-    public <V> Either<L, V> flatMap(final Function<R, Either<L, V>> mapper) {
+    public <V> _Either<L, V> flatMap(final Function<R, _Either<L, V>> mapper) {
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
         }
 
-        return fold(Either::Left, value ->
+        return fold(_Either::Left, value ->
                 requireNonNull(mapper.apply(value), "null mapper return value")
         );
     }

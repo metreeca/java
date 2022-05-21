@@ -163,15 +163,15 @@ final class MultipartParserTest {
 
         @Test void testRejectMalformedHeaders() {
 
-            assertThatExceptionOfType(MessageException.class)
+            assertThatExceptionOfType(_MessageException.class)
                     .as("spaces before colon")
                     .isThrownBy(() -> parts("--boundary\nheader : value\n\ncontent"));
 
-            assertThatExceptionOfType(MessageException.class)
+            assertThatExceptionOfType(_MessageException.class)
                     .as("malformed name")
                     .isThrownBy(() -> parts("--boundary\nhea der: value\n\ncontent"));
 
-            assertThatExceptionOfType(MessageException.class)
+            assertThatExceptionOfType(_MessageException.class)
                     .as("malformed value")
                     .isThrownBy(() -> parts("--boundary\nhea der: val\rue\n\ncontent"));
 
@@ -188,7 +188,7 @@ final class MultipartParserTest {
 
         @Test void testEnforceBodySizeLimits() {
 
-            assertThatExceptionOfType(MessageException.class)
+            assertThatExceptionOfType(_MessageException.class)
                     .as("body size exceeded")
                     .isThrownBy(() -> parser(5, 25,
                             "--boundary\n\none\n--boundary\n\ntwo\n--boundary--"
@@ -198,7 +198,7 @@ final class MultipartParserTest {
 
         @Test void testEnforcePartSizeLimits() {
 
-            assertThatExceptionOfType(MessageException.class)
+            assertThatExceptionOfType(_MessageException.class)
                     .as("parts size exceeded")
                     .isThrownBy(() -> parser(10, 1000,
                             "--boundary\n\nshort\n--boundary\n\nlong content\n--boundary--"

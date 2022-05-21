@@ -44,7 +44,7 @@ import static java.util.function.Function.identity;
  * <p>Provides default resource pre/postprocessing and error handling; mainly intended as the outermost wrapper
  * returned by loaders.</p>
  */
-public final class Server implements Wrapper {
+public final class Server implements _Wrapper {
 
     private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
     private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");

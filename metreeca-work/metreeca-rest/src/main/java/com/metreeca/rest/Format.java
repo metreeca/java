@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Resources.input;
-import static com.metreeca.rest.Either.Left;
-import static com.metreeca.rest.MessageException.status;
+import static com.metreeca.rest._Either.Left;
+import static com.metreeca.rest._MessageException.status;
 
 import static java.lang.Float.parseFloat;
 import static java.lang.Math.max;
@@ -196,7 +196,7 @@ public abstract class Format<V> {
     /**
      * Decodes a message body.
      *
-     * <p>The default implementation returns a {@linkplain MessageException#status() no-op message exception}.</p>
+     * <p>The default implementation returns a {@linkplain _MessageException#status() no-op message exception}.</p>
      *
      * <p>Concrete subclasses should report decoding issues using the following HTTP status codes:</p>
      *
@@ -211,7 +211,7 @@ public abstract class Format<V> {
      *
      * @throws NullPointerException if {@code message} is null
      */
-    public <M extends Message<M>> Either<MessageException, V> decode(final M message) {
+    public <M extends Message<M>> _Either<_MessageException, V> decode(final M message) {
 
         if ( message == null ) {
             throw new NullPointerException("null message");

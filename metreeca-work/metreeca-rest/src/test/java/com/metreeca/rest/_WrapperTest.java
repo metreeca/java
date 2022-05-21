@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Response.Unauthorized;
 import static com.metreeca.rest.ResponseAssert.assertThat;
-import static com.metreeca.rest.Wrapper.roles;
+import static com.metreeca.rest._Wrapper.roles;
 
 
-final class WrapperTest {
+final class _WrapperTest {
 
 	private void exec(final Runnable... tasks) {
 		new Locator()

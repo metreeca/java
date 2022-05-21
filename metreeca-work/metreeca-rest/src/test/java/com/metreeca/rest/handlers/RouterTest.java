@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.RequestAssert.assertThat;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.rest._MessageException.status;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

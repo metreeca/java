@@ -22,8 +22,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.SeeOther;
+import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
  * <p>Empty or idempotent requests, that is requests whose {@link Request#item() focus item} is resolved to an empty
  * optional, to an empty string or to itself, are delegated to the wrapped handler.</p>
  */
-public final class Aliaser implements Wrapper {
+public final class Aliaser implements _Wrapper {
 
 	private final Function<Request, Optional<String>> resolver;
 
