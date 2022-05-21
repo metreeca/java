@@ -63,7 +63,7 @@ public abstract class _Either<L, R> {
                     throw new NullPointerException("null success mapper");
                 }
 
-                return requireNonNull(left.apply(value), "null left mapper return value");
+                return left.apply(value);
             }
 
             @Override public String toString() {
@@ -105,7 +105,7 @@ public abstract class _Either<L, R> {
                     throw new NullPointerException("null failure mapper");
                 }
 
-                return requireNonNull(right.apply(value), "null right mapper return value");
+                return right.apply(value);
             }
 
             @Override public String toString() {

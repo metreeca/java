@@ -47,16 +47,17 @@ public interface Codec<V> {
     /**
      * Decodes a message.
      *
-     * @param message the message to be decoded
+     * @param message the source message
      * @param <M>     the {@code message} type
      *
      * @return the structured payload decoded from the raw {@code message} {@linkplain Message#input()}
      *
-     * @throws NullPointerException     if {@code message} is null
-     * @throws UncheckedIOException     if an I/O error occurred while decoding the raw {@code message} input
-     * @throws IllegalArgumentException if the raw {@code message} input is malformed
+     * @throws NullPointerException if {@code message} is null
+     * @throws CodecException       if the raw {@code message} input is malformed
+     * @throws UncheckedIOException if an I/O error occurred while decoding the raw {@code message} input
+     * @see Message#body(Codec)
      */
-    public <M extends Message<M>> Optional<V> decode(final M message) throws UncheckedIOException;
+    public <M extends Message<M>> Optional<V> decode(final M message) throws CodecException, UncheckedIOException;
 
     /**
      * Encoded a value into a message.
@@ -65,12 +66,14 @@ public interface Codec<V> {
      * @param value   the value to be encoded into {@code message}
      * @param <M>     the {@code message} type
      *
-     * @return the input {@code message} with its raw {@linkplain Message#output(Consumer) output} configured to
-     * represent the encoded version of {@code value}
+     * @return the target {@code message} with its raw {@linkplain Message#output(Consumer) output} configured to
+     * generate the encoded version of {@code value}
      *
-     * @throws NullPointerException     if {@code message} is null
-     * @throws IllegalArgumentException if {@code value} cannot be legally encoded into {@code message}
+     * @throws NullPointerException if {@code message} is null
+     * @throws CodecException       if {@code value} cannot be legally encoded into {@code message} according to the
+     *                              specs included in the {@linkplain Message#request() originating request}
+     * @see Message#body(Codec, Object)
      */
-    public <M extends Message<M>> M encode(final M message, final V value) throws IllegalArgumentException;
+    public <M extends Message<M>> M encode(final M message, final V value) throws CodecException;
 
 }

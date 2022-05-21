@@ -18,8 +18,7 @@ package com.metreeca.rest;
 
 import com.metreeca.rest.formats.MultipartFormat;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -566,8 +565,11 @@ public abstract class Message<M extends Message<M>> {
      * @return the {@linkplain Codec#decode(Message) decoded} body of this message
      *
      * @throws NullPointerException if {@code codec} is null
+     * @throws CodecException       if the raw {@code message} input is malformed
+     * @throws UncheckedIOException if an I/O error occurred while decoding the raw {@code message} input
+     * @see Codec#decode(Message)
      */
-    public <V> V body(final Codec<V> codec) {
+    public <V> V body(final Codec<V> codec) throws CodecException, UncheckedIOException {
 
         if ( codec == null ) {
             throw new NullPointerException("null codec");
@@ -593,8 +595,11 @@ public abstract class Message<M extends Message<M>> {
      * body
      *
      * @throws NullPointerException if either {@code codec} or {@code value} is null
+     * @throws CodecException       if {@code value} cannot be legally encoded into {@code message} according to the
+     *                              specs included in the {@linkplain Message#request() originating request}
+     * @see Codec#encode(Message, Object)
      */
-    public <V> M body(final Codec<V> codec, final V value) {
+    public <V> M body(final Codec<V> codec, final V value) throws CodecException {
 
         if ( codec == null ) {
             throw new NullPointerException("null codec");
@@ -606,7 +611,6 @@ public abstract class Message<M extends Message<M>> {
 
         return codec.encode(self().attribute(codec.type(), value), value);
     }
-
 
 
     //// !!! ///////////////////////////////////////////////////////////////////////////////////////////////////////////
