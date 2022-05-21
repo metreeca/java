@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.metreeca.rest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.rest.Format.mime;
 import static com.metreeca.rest.Format.mimes;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,25 +27,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 final class FormatTest {
-
-	@Nested final class MIMEType {
-
-		@Test void testGuessKnownType() {
-			assertThat(mime("/static/index.html"))
-					.isEqualTo("text/html");
-		}
-
-		@Test void testHandleUknownType() {
-			assertThat(mime("/static/index.unknown"))
-					.isEqualTo("application/octet-stream");
-		}
-
-		@Test void testHandleMissingType() {
-			assertThat(mime("/static/index"))
-					.isEqualTo("application/octet-stream");
-		}
-
-	}
 
 	@Nested final class MIMETypes {
 

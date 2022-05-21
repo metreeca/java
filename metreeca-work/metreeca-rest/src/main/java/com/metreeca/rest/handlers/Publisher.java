@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,33 @@
 
 package com.metreeca.rest.handlers;
 
-import com.metreeca.rest.Format;
+import com.metreeca.rest.formats.DataFormat;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.file.*;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
+import static com.metreeca.core.Resources.input;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.rest.Request.HEAD;
 import static com.metreeca.rest.Response.NotModified;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.formats.OutputFormat.output;
 
+import static java.lang.Math.max;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Locale.ROOT;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Static content publisher.
@@ -41,6 +50,32 @@ import static java.util.Collections.emptyMap;
 public final class Publisher extends Delegator {
 
     private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
+
+    /**
+     * MIME types by file extension (including dot).
+     *
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">
+     * Common MIME types @ MDN</a>
+     */
+    private static final Map<String, String> MIMETypes=unmodifiableMap(Stream
+
+            .of(input(Publisher.class, ".tsv"))
+
+            .flatMap(stream -> new BufferedReader(new InputStreamReader(stream, UTF_8)).lines())
+
+            .filter(line -> !line.isEmpty())
+
+            .map(line -> {
+
+                final int tab=line.indexOf('\t');
+
+                return Map.entry(line.substring(0, tab), line.substring(tab+1));
+
+            })
+
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+
+    );
 
 
     /**
@@ -86,6 +121,30 @@ public final class Publisher extends Delegator {
             return Stream.of(url);
 
         }
+    }
+
+    /**
+     * Guess the MIME type of resource path.
+     *
+     * @param path the path of the resource whose MIME type is to be guessed
+     *
+     * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
+     * DataFormat#MIME}, if {@code path} doesn't include an extension or no well-known MIME type is defined
+     *
+     * @throws NullPointerException if {@code path} is null
+     */
+    public static String mime(final String path) {
+
+        if ( path == null ) {
+            throw new NullPointerException("null path");
+        }
+
+        final int slash=max(0, path.lastIndexOf('/'));
+        final int dot=path.substring(slash).lastIndexOf('.');
+
+        final String extension=dot >= 0 ? path.substring(slash+dot).toLowerCase(ROOT) : "";
+
+        return MIMETypes.getOrDefault(extension, DataFormat.MIME);
     }
 
 
@@ -180,7 +239,7 @@ public final class Publisher extends Delegator {
 
                         .map(file -> request.reply().map(checked(response -> {
 
-                            final String mime=Format.mime(file.getFileName().toString());
+                            final String mime=mime(file.getFileName().toString());
                             final String length=String.valueOf(Files.size(file));
                             final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 Metreeca srl
+ * Copyright © 2013-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import static com.metreeca.rest.Request.POST;
 import static com.metreeca.rest.Response.MethodNotAllowed;
 import static com.metreeca.rest.ResponseAssert.assertThat;
+import static com.metreeca.rest.handlers.Publisher.mime;
 import static com.metreeca.rest.handlers.Publisher.variants;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +56,23 @@ final class PublisherTest {
 		assertThat(variants("reindex")).containsExactly("reindex", "reindex.html");
 
 	}
+
+
+	@Test void testGuessKnownMIMEType() {
+		assertThat(mime("/static/index.html"))
+				.isEqualTo("text/html");
+	}
+
+	@Test void testHandleUnknownMIMEType() {
+		assertThat(mime("/static/index.unknown"))
+				.isEqualTo("application/octet-stream");
+	}
+
+	@Test void testHandleMissingMIMEType() {
+		assertThat(mime("/static/index"))
+				.isEqualTo("application/octet-stream");
+	}
+
 
 	@Test void testRejectUnsafeRequestsRequests() {
 		exec(() -> new Publisher(getClass().getResource("/"))
