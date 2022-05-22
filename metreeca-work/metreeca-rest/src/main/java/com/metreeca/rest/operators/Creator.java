@@ -21,7 +21,6 @@ import com.metreeca.http.*;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
@@ -43,7 +42,7 @@ import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.rest.Handler.handler;
-import static com.metreeca.rest._Wrapper.keeper;
+import static com.metreeca.rest.operators.Driver.keeper;
 import static com.metreeca.rest.services.Engine.engine;
 
 import static java.lang.String.format;
@@ -64,7 +63,7 @@ import static java.util.stream.Collectors.toMap;
  * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain Driver#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
  *
  * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid
@@ -101,9 +100,11 @@ public final class Creator extends Delegator {
      * Creates a resource creator with a UUID-based slug generator.
      */
     public Creator() {
-        delegate(handler(rewrite(), create().with( // rewrite immediately before handler, after custom wrappers
-                keeper(Create, Detail)
-        )));
+        delegate(handler(
+                rewrite(),
+                keeper(Create, Detail),
+                create()
+        ));
     }
 
 

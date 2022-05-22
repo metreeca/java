@@ -19,7 +19,6 @@ package com.metreeca.rest.handlers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.util.function.Function;
 
@@ -31,7 +30,7 @@ import java.util.function.Function;
  */
 public abstract class Delegator implements Handler {
 
-    private Handler delegate=(request, next) -> request.reply();
+    private Handler delegate=(request, forward) -> request.reply();
 
 
     /**
@@ -56,8 +55,6 @@ public abstract class Delegator implements Handler {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    @Override public Handler with(final _Wrapper wrapper) { return delegate.with(wrapper); }
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
         return delegate.handle(request, forward);

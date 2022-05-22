@@ -18,18 +18,12 @@ package com.metreeca.rest;
 
 
 import com.metreeca.http.*;
-import com.metreeca.link.Shape;
-import com.metreeca.link.shapes.Guard;
-import com.metreeca.rest.codecs.JSONLD;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import static com.metreeca.http.Response.Forbidden;
 import static com.metreeca.http.Response.Unauthorized;
-import static com.metreeca.link.shapes.Guard.*;
-import static com.metreeca.rest.Handler.handler;
-import static com.metreeca.rest.codecs.JSONLD.shape;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -44,65 +38,6 @@ import static java.util.Objects.requireNonNull;
  * <p><strong>Warning</strong> / Implementations must be thread-safe.</p>
  */
 @FunctionalInterface public interface _Wrapper {
-
-    /**
-     * Creates a conditional wrapper.
-     *
-     * @param test the request predicate used to decide if requests and responses are to be routed through the wrapper
-     * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-     *             true} on the request
-     *
-     * @return a conditional wrapper that routes requests and responses through the {@code pass} handler if the {@code
-     * test} predicate evaluates to {@code true} on the request or to a dummy wrapper otherwise
-     *
-     * @throws NullPointerException if either {@code test} or {@code pass} is null
-     */
-    public static _Wrapper wrapper(final Predicate<Request> test, final _Wrapper pass) {
-
-        if ( test == null ) {
-            throw new NullPointerException("null test predicate");
-        }
-
-        if ( pass == null ) {
-            throw new NullPointerException("null pass wrapper");
-        }
-
-        return wrapper(test, pass, handler -> handler);
-    }
-
-    /**
-     * Creates a conditional wrapper.
-     *
-     * @param test the request predicate used to select the wrapper requests and responses are to be routed through
-     * @param pass the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-     *             true} on the request
-     * @param fail the wrapper requests and responses are to be routed through when {@code test} evaluates to {@code
-     *             false} on the request
-     *
-     * @return a conditional wrapper that routes requests and responses either through the {@code pass} or the {@code
-     * fail} wrapper according to the results of the {@code test} predicate
-     *
-     * @throws NullPointerException if any of the arguments is null
-     */
-    public static _Wrapper wrapper(final Predicate<Request> test, final _Wrapper pass, final _Wrapper fail) {
-
-        if ( test == null ) {
-            throw new NullPointerException("null test predicate");
-        }
-
-        if ( pass == null ) {
-            throw new NullPointerException("null pass wrapper");
-        }
-
-        if ( fail == null ) {
-            throw new NullPointerException("null fail wrapper");
-        }
-
-        return handler -> handler(test, pass.wrap(handler), fail.wrap(handler));
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Creates a pre-processing wrapper.
@@ -247,61 +182,6 @@ import static java.util.Objects.requireNonNull;
 
         return handler -> (request, next) -> request.roles().stream().anyMatch(roles::contains)
                 ? handler.handle(request, next) : request.reply(Unauthorized); // !!! 404 under strict security
-    }
-
-
-    /**
-     * Creates a shape-based access controller.
-     *
-     * @param task the accepted value for the {@linkplain Guard#Task task} parametric axis
-     * @param view the accepted values for the {@linkplain Guard#View task} parametric axis
-     *
-     * @return a wrapper performing role-based shape redaction and shape-based authorization
-     *
-     * @throws NullPointerException if either {@code task} or {@code view} is null
-     */
-    public static _Wrapper keeper(final Object task, final Object view) {
-        return handler -> (request, next) -> {
-
-            final Shape shape=JSONLD.shape(request) // visible taking into account task/area
-
-                    .redact(Task, task)
-                    .redact(View, view)
-                    .redact(Mode, Convey);
-
-            final Shape baseline=shape // visible to anyone
-
-                    .redact(Role);
-
-            final Shape authorized=shape // visible to user
-
-                    .redact(Role, request.roles());
-
-
-            final UnaryOperator<Request> incoming=message -> JSONLD.shape(message, shape(message)
-
-                    .redact(Role, message.roles())
-                    .redact(Task, task)
-                    .redact(View, view)
-
-                    .localize(message.request().langs())
-            );
-
-            final UnaryOperator<Response> outgoing=message -> JSONLD.shape(message, shape(message)
-
-                    .redact(Role, message.request().roles())
-                    .redact(Task, task)
-                    .redact(View, view)
-                    .redact(Mode, Convey)
-
-                    .localize(message.request().langs())
-            );
-
-            return baseline.empty() ? request.reply(Forbidden)
-                    : authorized.empty() ? request.reply(Unauthorized)
-                    : handler.handle(request.map(incoming), next).map(outgoing);
-
-        };
     }
 
 

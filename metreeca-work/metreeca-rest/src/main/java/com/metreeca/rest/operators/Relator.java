@@ -21,7 +21,6 @@ import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
 import com.metreeca.link.shapes.Guard;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 import com.metreeca.rest.codecs.JSONLD;
 import com.metreeca.rest.handlers.Delegator;
 import com.metreeca.rest.services.Engine;
@@ -37,10 +36,10 @@ import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Guard.*;
-import static com.metreeca.rest._Wrapper.keeper;
-import static com.metreeca.rest._Wrapper.wrapper;
+import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest.codecs.JSONLD.query;
 import static com.metreeca.rest.codecs.JSONLD.shape;
+import static com.metreeca.rest.operators.Driver.keeper;
 import static com.metreeca.rest.services.Engine.*;
 
 
@@ -55,7 +54,7 @@ import static com.metreeca.rest.services.Engine.*;
  * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain _Wrapper#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain Driver#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Relate} task and the {@linkplain Guard#Digest} view, if the
  * focus item is a {@linkplain Request#collection() collection}, or the {@linkplain Guard#Detail} view, otherwise.</li>
  *
@@ -111,10 +110,13 @@ public final class Relator extends Delegator {
      * Creates a resource relator.
      */
     private Relator() {
-        delegate(relate().with(wrapper(Request::collection,
-                keeper(Relate, Digest),
-                keeper(Relate, Detail)
-        )));
+        delegate(handler(
+                handler(Request::collection,
+                        keeper(Relate, Digest),
+                        keeper(Relate, Detail)
+                ),
+                relate()
+        ));
     }
 
 
