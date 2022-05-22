@@ -26,13 +26,18 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>metreeca-test</artifactId>
+    <artifactId>metreeca-rdf4j-engine</artifactId>
 
     <dependencies>
 
         <dependency>
             <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-jse</artifactId>
+            <artifactId>metreeca-rest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-rdf4j</artifactId>
         </dependency>
 
     </dependencies>

@@ -20,7 +20,7 @@ import com.metreeca.http.*;
 import com.metreeca.json.codecs.JSON;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Or;
-import com.metreeca.rest._Either;
+import com.metreeca.rest.Either;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -295,7 +295,7 @@ public final class JSONLD implements Codec<Frame> {
      *
      * @throws NullPointerException if any parameter is null
      */
-    public static _Either<Trace, Collection<Statement>> validate(
+    public static Either<Trace, Collection<Statement>> validate(
             final Value focus, final Shape shape, final Collection<Statement> model
     ) {
 

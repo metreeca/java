@@ -149,6 +149,19 @@
 				<type>test-jar</type>
 			</dependency>
 
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-rdf4j-engine</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-rdf4j-engine</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
 
 			<!-- Core Modules -->
 

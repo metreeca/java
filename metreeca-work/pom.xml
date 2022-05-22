@@ -36,7 +36,7 @@
 
 		<module>metreeca-link</module>
 		<module>metreeca-rest</module>
-		<module>metreeca-test</module>
+		<module>metreeca-rdf4j-engine</module>
 
 	</modules>
 

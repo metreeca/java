@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.rdf4j;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the self-bounded setup type supporting fluent setters
  */
 @SuppressWarnings("unchecked")
-public abstract class _Setup<T extends _Setup<T>> implements _Config {
+public abstract class Setup<T extends Setup<T>> implements Config {
 
 	private final Map<Supplier<?>, Object> options=new LinkedHashMap<>();
 

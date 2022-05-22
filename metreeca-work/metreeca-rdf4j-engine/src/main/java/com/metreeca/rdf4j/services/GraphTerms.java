@@ -20,7 +20,7 @@ import com.metreeca.core.Identifiers;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.queries.Terms;
-import com.metreeca.rest._Config;
+import com.metreeca.rdf4j.Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -37,16 +37,16 @@ import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
+import static com.metreeca.rdf4j.Scribe.text;
+import static com.metreeca.rdf4j.Scribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest._Scribe.text;
-import static com.metreeca.rest._Scribe.*;
 
 final class GraphTerms extends GraphFacts {
 
 	private final Graph graph=service(graph());
 
 
-	GraphTerms(final _Config config) {
+	GraphTerms(final Config config) {
 		super(config);
 	}
 

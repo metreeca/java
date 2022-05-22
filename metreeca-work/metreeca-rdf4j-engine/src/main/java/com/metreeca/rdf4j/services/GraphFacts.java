@@ -21,8 +21,8 @@ import com.metreeca.http.services.Logger;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Values;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rest._Config;
-import com.metreeca.rest._Scribe;
+import com.metreeca.rdf4j.Config;
+import com.metreeca.rdf4j.Scribe;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -65,8 +65,8 @@ import static com.metreeca.rdf4j.SPARQLScribe.strstarts;
 import static com.metreeca.rdf4j.SPARQLScribe.union;
 import static com.metreeca.rdf4j.SPARQLScribe.values;
 import static com.metreeca.rdf4j.SPARQLScribe.var;
-import static com.metreeca.rest._Scribe.text;
-import static com.metreeca.rest._Scribe.*;
+import static com.metreeca.rdf4j.Scribe.text;
+import static com.metreeca.rdf4j.Scribe.*;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -102,19 +102,19 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final _Config config;
+	private final Config config;
 
 	private int label=1; // the next label available for tagging (0 reserved for the root node)
 
 	private final Logger logger=service(logger());
 
 
-	GraphFacts(final _Config config) {
+	GraphFacts(final Config config) {
 		this.config=config;
 	}
 
 
-	_Config config() {
+	Config config() {
 		return config;
 	}
 
@@ -146,12 +146,12 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	static _Scribe tree(final Shape shape, final boolean required) {
+	static Scribe tree(final Shape shape, final boolean required) {
 		return list(
 
 				all(shape) // root universal constraints
 						.map(values -> space(values(var(root), values)))
-						.map(_Scribe::space)
+						.map(Scribe::space)
 						.orElse(nothing()),
 
 				space(shape.map(new TreeProbe(root, required)))
@@ -193,7 +193,7 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final class TreeProbe extends Shape.Probe<_Scribe> {
+	private static final class TreeProbe extends Shape.Probe<Scribe> {
 
 		private final String anchor;
 
@@ -206,7 +206,7 @@ abstract class GraphFacts {
 		}
 
 
-		@Override public _Scribe probe(final Datatype datatype) {
+		@Override public Scribe probe(final Datatype datatype) {
 
 			final IRI iri=datatype.iri();
 
@@ -224,11 +224,11 @@ abstract class GraphFacts {
 			));
 		}
 
-		@Override public _Scribe probe(final Clazz clazz) {
+		@Override public Scribe probe(final Clazz clazz) {
 			return edge(var(anchor), text("a/rdfs:subClassOf*"), text(clazz.iri()));
 		}
 
-		@Override public _Scribe probe(final Range range) {
+		@Override public Scribe probe(final Range range) {
 			if ( required ) {
 
 				return probe((Shape)range); // !!! tbi (filter not exists w/ special root treatment)
@@ -236,13 +236,13 @@ abstract class GraphFacts {
 			} else {
 
 				return range.values().isEmpty() ? nothing() : line(filter(
-						in(var(anchor), range.values().stream().map(_Scribe::text))
+						in(var(anchor), range.values().stream().map(Scribe::text))
 				));
 
 			}
 		}
 
-		@Override public _Scribe probe(final Lang lang) {
+		@Override public Scribe probe(final Lang lang) {
 			if ( required ) {
 
 				return probe((Shape)lang); // !!! tbi (filter not exists w/ special root treatment)
@@ -250,84 +250,84 @@ abstract class GraphFacts {
 			} else {
 
 				return lang.tags().isEmpty() ? nothing() : filter(
-						in(lang(var(anchor)), lang.tags().stream().map(Strings::quote).map(_Scribe::text))
+						in(lang(var(anchor)), lang.tags().stream().map(Strings::quote).map(Scribe::text))
 				);
 
 			}
 		}
 
 
-		@Override public _Scribe probe(final MinExclusive minExclusive) {
+		@Override public Scribe probe(final MinExclusive minExclusive) {
 			return filter(gt(var(anchor), text(minExclusive.limit())));
 		}
 
-		@Override public _Scribe probe(final MaxExclusive maxExclusive) {
+		@Override public Scribe probe(final MaxExclusive maxExclusive) {
 			return filter(lt(var(anchor), text(maxExclusive.limit())));
 		}
 
-		@Override public _Scribe probe(final MinInclusive minInclusive) {
+		@Override public Scribe probe(final MinInclusive minInclusive) {
 			return filter(gte(var(anchor), text(minInclusive.limit())));
 		}
 
-		@Override public _Scribe probe(final MaxInclusive maxInclusive) {
+		@Override public Scribe probe(final MaxInclusive maxInclusive) {
 			return filter(lte(var(anchor), text(maxInclusive.limit())));
 		}
 
 
-		@Override public _Scribe probe(final MinLength minLength) {
+		@Override public Scribe probe(final MinLength minLength) {
 			return filter(gte(strlen(str(var(anchor))), text(minLength.limit())));
 		}
 
-		@Override public _Scribe probe(final MaxLength maxLength) {
+		@Override public Scribe probe(final MaxLength maxLength) {
 			return filter(lte(strlen(str(var(anchor))), text(maxLength.limit())));
 		}
 
 
-		@Override public _Scribe probe(final Pattern pattern) {
+		@Override public Scribe probe(final Pattern pattern) {
 			return filter(regex(
 					str(var(anchor)), text(Strings.quote(pattern.expression())), text(Strings.quote(pattern.flags()))
 			));
 		}
 
-		@Override public _Scribe probe(final Like like) {
+		@Override public Scribe probe(final Like like) {
 			return filter(regex(
 					str(var(anchor)), text(Strings.quote(like.toExpression()))
 			));
 		}
 
-		@Override public _Scribe probe(final Stem stem) {
+		@Override public Scribe probe(final Stem stem) {
 			return filter(strstarts(
 					str(var(anchor)), text(Strings.quote(stem.prefix()))
 			));
 		}
 
 
-		@Override public _Scribe probe(final MinCount minCount) {
+		@Override public Scribe probe(final MinCount minCount) {
 			return required ? probe((Shape)minCount) : nothing();
 		}
 
-		@Override public _Scribe probe(final MaxCount maxCount) {
+		@Override public Scribe probe(final MaxCount maxCount) {
 			return required ? probe((Shape)maxCount) : nothing();
 		}
 
 
-		@Override public _Scribe probe(final All all) {
+		@Override public Scribe probe(final All all) {
 			return nothing(); // universal constraints handled by skeleton()
 		}
 
-		@Override public _Scribe probe(final Any any) {
+		@Override public Scribe probe(final Any any) {
 			return space(anchor.equals(root)
 					? values(var(anchor), any.values())
-					: filter(in(var(anchor), any.values().stream().map(_Scribe::text)))
+					: filter(in(var(anchor), any.values().stream().map(Scribe::text)))
 			);
 		}
 
-		@Override public _Scribe probe(final Localized localized) {
+		@Override public Scribe probe(final Localized localized) {
 			return required ? probe((Shape)localized) : nothing();
 		}
 
 
-		@Override public _Scribe probe(final Field field) {
+		@Override public Scribe probe(final Field field) {
 
 			final String label=field.label();
 			final IRI iri=field.iri();
@@ -335,20 +335,20 @@ abstract class GraphFacts {
 
 			return shape.map(new Shape.Probe<>() {
 
-				@Override public _Scribe probe(final Or or) { // push field inside union
+				@Override public Scribe probe(final Or or) { // push field inside union
 					return space(union(or.shapes().stream().map(s ->
 							block(space(field(label, iri, s).map(TreeProbe.this)))
 					)));
 				}
 
-				@Override protected _Scribe probe(final Shape shape) {
+				@Override protected Scribe probe(final Shape shape) {
 					return list(
 
 							space(edge(var(anchor), text(iri), indent(list(", ", Stream.concat(
 
 									Stream.of(var(label)), // filtering/projection hook
 
-									all(shape).orElseGet(Collections::emptySet).stream().map(_Scribe::text)
+									all(shape).orElseGet(Collections::emptySet).stream().map(Scribe::text)
 
 							))))),
 
@@ -361,7 +361,7 @@ abstract class GraphFacts {
 
 		}
 
-		@Override public _Scribe probe(final Link link) {
+		@Override public Scribe probe(final Link link) {
 
 			final IRI iri=link.iri();
 			final Shape shape=link.shape();
@@ -378,16 +378,16 @@ abstract class GraphFacts {
 		}
 
 
-		@Override public _Scribe probe(final And and) {
+		@Override public Scribe probe(final And and) {
 			return list(and.shapes().stream().map(shape -> shape.map(this)));
 		}
 
-		@Override public _Scribe probe(final Or or) {
+		@Override public Scribe probe(final Or or) {
 			return space(union(or.shapes().stream().map(s -> block(space(s.map(this))))));
 		}
 
 
-		@Override public _Scribe probe(final Shape shape) {
+		@Override public Scribe probe(final Shape shape) {
 			throw new UnsupportedOperationException(shape.toString());
 		}
 

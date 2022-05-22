@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest;
+package com.metreeca.rdf4j;
 
 import java.util.function.Supplier;
 
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * <p>Provides access to customizable configuration parameters.</p>
  */
-@FunctionalInterface public interface _Config {
+@FunctionalInterface public interface Config {
 
 	/**
 	 * Retrieves an option.

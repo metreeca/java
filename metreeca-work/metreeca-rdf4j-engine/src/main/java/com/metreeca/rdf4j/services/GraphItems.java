@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.Items;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rest._Config;
+import com.metreeca.rdf4j.Config;
 import com.metreeca.rest.services.Engine;
 
 import org.eclipse.rdf4j.model.*;
@@ -37,8 +37,8 @@ import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.rdf4j.SPARQLScribe.*;
+import static com.metreeca.rdf4j.Scribe.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.rest._Scribe.*;
 
 import static org.eclipse.rdf4j.model.util.Values.triple;
 
@@ -47,12 +47,12 @@ import static java.util.stream.Collectors.toList;
 
 final class GraphItems extends GraphFacts {
 
-	private final _Config config=config();
+	private final Config config=config();
 
 	private final Graph graph=service(graph());
 
 
-	GraphItems(final _Config config) {
+	GraphItems(final Config config) {
 		super(config);
 	}
 
