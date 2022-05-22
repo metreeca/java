@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.codecs;
+package com.metreeca.json.codecs;
 
 import com.metreeca.http.CodecException;
 import com.metreeca.http.Request;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +67,7 @@ final class JSONTest {
 	@Test void testConfigureJSON() {
 		assertThat(new Request().body(new JSON(), TestJSON))
 
-				.hasTextOutput(json -> Assertions.assertThat(Json.createReader(new StringReader(json)).readObject())
+				.hasTextOutput(json -> assertThat(Json.createReader(new StringReader(json)).readObject())
 						.isEqualTo(TestJSON)
 				);
 

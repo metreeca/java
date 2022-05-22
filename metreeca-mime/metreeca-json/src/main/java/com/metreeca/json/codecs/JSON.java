@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.codecs;
+package com.metreeca.json.codecs;
 
 import com.metreeca.http.*;
 

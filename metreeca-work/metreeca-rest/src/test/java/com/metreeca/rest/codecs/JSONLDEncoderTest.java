@@ -29,7 +29,7 @@ import java.util.Map;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import static com.metreeca.http._JSONAssert.assertThat;
+import static com.metreeca.json.JSONAssert.assertThat;
 import static com.metreeca.link.Shape.optional;
 import static com.metreeca.link.Shape.required;
 import static com.metreeca.link.Values.*;

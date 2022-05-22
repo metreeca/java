@@ -39,11 +39,6 @@
             <artifactId>metreeca-core</artifactId>
         </dependency>
 
-        <dependency> <!-- !!! -->
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-        </dependency>
-
     </dependencies>
 
 	<build>

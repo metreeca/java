@@ -18,4 +18,4 @@
  * JSON data processors.
  */
 
-package com.metreeca.json.processors;
+package com.metreeca.json;

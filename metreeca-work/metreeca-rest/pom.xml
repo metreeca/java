@@ -34,16 +34,14 @@
 
 	<dependencies>
 
-
-		<dependency> <!-- !!! -->
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-
-
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-http</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-json</artifactId>
 		</dependency>
 
 		<dependency>
@@ -55,6 +53,13 @@
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-http</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-json</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

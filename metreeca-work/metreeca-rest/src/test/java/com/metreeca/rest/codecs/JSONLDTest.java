@@ -17,7 +17,8 @@
 package com.metreeca.rest.codecs;
 
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.JSON;
+import com.metreeca.json.JSONAssert;
+import com.metreeca.json.codecs.JSON;
 
 import org.assertj.core.api.Assertions;
 import org.eclipse.rdf4j.model.BNode;
@@ -164,7 +165,7 @@ final class JSONLDTest {
 
                     .map(response -> assertThat(response)
                             .hasHeader("Content-Type", JSON.MIME)
-                            .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                            .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
                                     .doesNotHaveField("@context")
                             )
                     )
@@ -179,7 +180,7 @@ final class JSONLDTest {
 
                     .map(response -> assertThat(response)
                             .hasHeader("Content-Type", JSON.MIME)
-                            .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                            .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
                                     .doesNotHaveField("@context")
                             )
                     )
@@ -194,7 +195,7 @@ final class JSONLDTest {
 
                     .map(response -> assertThat(response)
                             .hasHeader("Content-Type", MIME)
-                            .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                            .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
                                     .hasField("@context")
                             )
                     )
@@ -215,9 +216,9 @@ final class JSONLDTest {
 
                                     .hasHeader("Content-Type", MIME)
 
-                                    .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                                    .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
 
-                                            .hasField("@context", context -> _JSONAssert.assertThat(context)
+                                            .hasField("@context", context -> JSONAssert.assertThat(context)
 
                                                     .hasField("id", "@id") // keywords at top level
 
@@ -228,9 +229,9 @@ final class JSONLDTest {
 
                                             )
 
-                                            .hasField("direct", value -> _JSONAssert.assertThat(value)
+                                            .hasField("direct", value -> JSONAssert.assertThat(value)
 
-                                                    .hasField("@context", context -> _JSONAssert.assertThat(context)
+                                                    .hasField("@context", context -> JSONAssert.assertThat(context)
 
                                                             .doesNotHaveField("id") // keywords only at top level
 
@@ -252,7 +253,7 @@ final class JSONLDTest {
             exec(() -> request().reply().map(this::response)
 
                     .map(response -> assertThat(response)
-                            .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                            .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
                                     .doesNotHaveField("outlier")
                             )
                     )
@@ -280,7 +281,7 @@ final class JSONLDTest {
                     })
 
                     .map(response -> assertThat(response)
-                            .hasBody(new JSON(), json -> _JSONAssert.assertThat(json)
+                            .hasBody(new JSON(), json -> JSONAssert.assertThat(json)
                                     .hasField("direct", "one")
                             )
                     )

@@ -17,7 +17,6 @@
 package com.metreeca.http.handlers;
 
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.JSON;
 import com.metreeca.http.codecs.Text;
 import com.metreeca.http.services.Logger;
 
@@ -47,7 +46,7 @@ public final class Server extends Delegator {
     private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
     private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
 
-    private static final Pattern TextualPattern=Pattern.compile(Text.MIMEPattern+"|"+JSON.MIMEPattern);
+    private static final Pattern TextualPattern=Pattern.compile("(?i:^text/.+|.+/.*\bjson$)");
     private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
 
 

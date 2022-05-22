@@ -17,7 +17,7 @@
 package com.metreeca.rest.codecs;
 
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.JSON;
+import com.metreeca.json.codecs.JSON;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Or;
 import com.metreeca.rest._Either;
