@@ -714,10 +714,10 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.operators.Creator.creator;
-import static com.metreeca.rest.operators.Deleter.deleter;
-import static com.metreeca.rest.operators.Relator.relator;
-import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.handlers.Creator.creator;
+import static com.metreeca.rest.handlers.Deleter.deleter;
+import static com.metreeca.rest.handlers.Relator.relator;
+import static com.metreeca.rest.handlers.Updater.updater;
 import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {
@@ -862,10 +862,10 @@ import static com.metreeca.link.shapes.MinInclusive.minInclusive;
 import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.operators.Creator.creator;
-import static com.metreeca.rest.operators.Deleter.deleter;
-import static com.metreeca.rest.operators.Relator.relator;
-import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.handlers.Creator.creator;
+import static com.metreeca.rest.handlers.Deleter.deleter;
+import static com.metreeca.rest.handlers.Relator.relator;
+import static com.metreeca.rest.handlers.Updater.updater;
 import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {
@@ -1141,10 +1141,10 @@ import static com.metreeca.rdf4j.services.Graph.update;
 import static com.metreeca.http.Locator.text;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.operators.Creator.creator;
-import static com.metreeca.rest.operators.Deleter.deleter;
-import static com.metreeca.rest.operators.Relator.relator;
-import static com.metreeca.rest.operators.Updater.updater;
+import static com.metreeca.rest.handlers.Creator.creator;
+import static com.metreeca.rest.handlers.Deleter.deleter;
+import static com.metreeca.rest.handlers.Relator.relator;
+import static com.metreeca.rest.handlers.Updater.updater;
 import static com.metreeca.rest._wrappers.Driver.driver;
 
 public final class Products extends Delegator {

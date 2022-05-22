@@ -15,7 +15,7 @@
  */
 
 /**
- * Basic data processing actions.
+ * Model-driven data processing actions.
  */
 
 package com.metreeca.rest.actions;

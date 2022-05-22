@@ -18,9 +18,9 @@ package com.metreeca.gcp;
 
 import com.metreeca.gcp.services.GCPStore;
 import com.metreeca.gcp.services.GCPVault;
+import com.metreeca.http.Handler;
 import com.metreeca.http.Locator;
 import com.metreeca.jse.JSEServer;
-import com.metreeca.rest.Handler;
 
 import com.google.cloud.ServiceOptions;
 
@@ -31,8 +31,8 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.storage;
 import static com.metreeca.http.Response.Forbidden;
-import static com.metreeca.rest.services.Store.store;
-import static com.metreeca.rest.services.Vault.vault;
+import static com.metreeca.http.services.Store.store;
+import static com.metreeca.http.services.Vault.vault;
 
 import static java.lang.String.format;
 

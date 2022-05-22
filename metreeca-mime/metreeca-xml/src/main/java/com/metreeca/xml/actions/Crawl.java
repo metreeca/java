@@ -17,8 +17,8 @@
 package com.metreeca.xml.actions;
 
 import com.metreeca.http.*;
+import com.metreeca.http.actions.*;
 import com.metreeca.http.processors.Regex;
-import com.metreeca.rest.actions.*;
 import com.metreeca.xml.XPath;
 import com.metreeca.xml.codecs.HTML;
 

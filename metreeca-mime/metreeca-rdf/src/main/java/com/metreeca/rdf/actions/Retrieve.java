@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf.actions;
 
+import com.metreeca.http.actions.*;
 import com.metreeca.rdf.codecs.RDF;
-import com.metreeca.rest.actions.*;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.RDFFormat;

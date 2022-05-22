@@ -19,7 +19,7 @@ package com.metreeca.rest.services;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
 import com.metreeca.link.shapes.Field;
-import com.metreeca.rest.operators.Creator;
+import com.metreeca.rest.handlers.Creator;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;

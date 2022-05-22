@@ -19,7 +19,6 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.http.*;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
-import com.metreeca.rest.Handler;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;

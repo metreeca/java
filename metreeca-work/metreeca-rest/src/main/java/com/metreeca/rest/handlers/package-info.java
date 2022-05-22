@@ -15,7 +15,6 @@
  */
 
 /**
- * Basic handlers.
+ * Model-driven handlers.
  */
-
 package com.metreeca.rest.handlers;

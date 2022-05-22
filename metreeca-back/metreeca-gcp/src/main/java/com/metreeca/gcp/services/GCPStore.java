@@ -16,7 +16,7 @@
 
 package com.metreeca.gcp.services;
 
-import com.metreeca.rest.services.Store;
+import com.metreeca.http.services.Store;
 
 import com.google.cloud.storage.*;
 

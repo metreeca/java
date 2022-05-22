@@ -17,8 +17,7 @@
 package com.metreeca.jee;
 
 import com.metreeca.http.*;
-import com.metreeca.rest.Handler;
-import com.metreeca.rest.services.Loader;
+import com.metreeca.http.services.Loader;
 
 import java.io.*;
 import java.net.MalformedURLException;

@@ -19,10 +19,10 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.core.Identifiers;
 import com.metreeca.http.*;
 import com.metreeca.http.codecs.Data;
+import com.metreeca.http.handlers.Router;
 import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
 import com.metreeca.rest.codecs.JSONLD;
-import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;

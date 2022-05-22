@@ -17,9 +17,9 @@
 package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.http.Request;
+import com.metreeca.http.handlers.Delegator;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.handlers.Delegator;
 
 import java.util.*;
 

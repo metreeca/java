@@ -15,7 +15,7 @@
  */
 
 /**
- * Model-driven shared services.
+ * Basic handlers.
  */
 
-package com.metreeca.rest.services;
+package com.metreeca.http.handlers;

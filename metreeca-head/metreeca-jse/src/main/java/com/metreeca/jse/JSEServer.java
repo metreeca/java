@@ -17,9 +17,8 @@
 package com.metreeca.jse;
 
 import com.metreeca.http.*;
+import com.metreeca.http.handlers.Server;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Handler;
-import com.metreeca.rest.handlers.Server;
 
 import com.sun.net.httpserver.*;
 
@@ -33,9 +32,9 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.rest.Handler.handler;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;

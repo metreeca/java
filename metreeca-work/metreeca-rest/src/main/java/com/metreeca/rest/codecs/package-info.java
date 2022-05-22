@@ -15,7 +15,7 @@
  */
 
 /**
- * Basic message codecs.
+ * Model-driven message codecs.
  */
 
 package com.metreeca.rest.codecs;

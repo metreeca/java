@@ -15,7 +15,7 @@
  */
 
 /**
- * Web framework API.
+ * Model-driven REST framework
  */
 
 package com.metreeca.rest;

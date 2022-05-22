@@ -16,15 +16,12 @@
 
 package com.metreeca.http;
 
-import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
-import static com.metreeca.core.Identifiers.IRIPattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -250,20 +247,49 @@ public final class Request extends Message<Request> {
      * @return a new response for this request initialized with {@code status} and {@code location}
      *
      * @throws IllegalArgumentException if {@code status } is less than 100 or greater than 599
-     * @throws IllegalArgumentException if {@code location} is not a well-formed relative IRI
      * @throws NullPointerException     if {@code location} is null
      */
-    public Response reply(final int status, final String location) {
+    public Response reply(final int status, final URI location) {
 
         if ( location == null ) {
             throw new NullPointerException("null location");
         }
 
-        if ( !IRIPattern.matcher(location).matches() ) {
-            throw new IllegalArgumentException(String.format("malformed location IRI <%s>", location));
+        return new Response(this).status(status).header("Location", location.toASCIIString());
+    }
+
+    /**
+     * Creates an error response for this request.
+     *
+     * @param status  the {@linkplain Response#status(int) status} code of the response
+     * @param message the textual body of the response
+     *
+     * @return a new response for this request initialized with {@code status} and {@code message}
+     *
+     * @throws IllegalArgumentException if {@code status } is less than 100 or greater than 599
+     * @throws NullPointerException     if {@code message} is null
+     */
+    public Response reply(final int status, final String message) {
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
         }
 
-        return new Response(this).status(status).header("Location", location);
+        return new Response(this).status(status)
+                .header("Content-Type", "text/plain")
+                .output(stream -> {
+
+                    try {
+
+                        stream.write(message.getBytes(UTF_8));
+
+                    } catch ( final IOException e ) {
+
+                        throw new UncheckedIOException(e);
+
+                    }
+
+                });
     }
 
 

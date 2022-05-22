@@ -17,11 +17,10 @@
 package com.metreeca.open.actions;
 
 import com.metreeca.http.Xtream;
-import com.metreeca.http.actions.Fill;
+import com.metreeca.http.actions.*;
 import com.metreeca.http.codecs.JSON;
 import com.metreeca.link.Frame;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.actions.*;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;

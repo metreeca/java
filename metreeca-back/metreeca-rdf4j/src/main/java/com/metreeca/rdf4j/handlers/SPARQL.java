@@ -19,8 +19,8 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.codecs.Data;
+import com.metreeca.http.handlers.Router;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.handlers.Router;
 
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.query.*;
@@ -40,7 +40,6 @@ import static com.metreeca.core.Lambdas.guarded;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.rdf.codecs.RDF.service;
-import static com.metreeca.rest._MessageException.status;
 
 
 /**
@@ -110,7 +109,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
                 if ( operation == null ) { // !!! return void description for GET
 
-                    return request.reply().map(status(BadRequest, "missing query/update parameter"));
+                    return request.reply(BadRequest, "missing query/update parameter");
 
                 } else if ( operation instanceof Query && !queryable(request.roles())
                         || operation instanceof Update && !updatable(request.roles())
@@ -159,23 +158,23 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
                 } else {
 
-                    return request.reply().map(status(NotImplemented, operation.getClass().getName()));
+                    return request.reply(NotImplemented, operation.getClass().getName());
 
                 }
 
             } catch ( final MalformedQueryException|IllegalArgumentException e ) {
 
-                return request.reply().map(status(BadRequest, e));
+                return request.reply(BadRequest, e.getMessage());
 
             } catch ( final UnsupportedOperationException e ) {
 
-                return request.reply().map(status(NotImplemented, e));
+                return request.reply(NotImplemented, e.getMessage());
 
             } catch ( final RuntimeException e ) {
 
                 // !!! fails for QueryInterruptedException (timeout) ≫ response is already committed
 
-                return request.reply().map(status(InternalServerError, e));
+                return request.reply(InternalServerError, e.getMessage());
 
             }
         });
