@@ -52,9 +52,6 @@
 				<executions>
 					<execution>
 
-						<id>rest-test-jar</id>
-						<phase>package</phase>
-
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
