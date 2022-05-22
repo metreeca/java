@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Response.SeeOther;
-import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  * <p>Empty or idempotent requests, that is requests whose {@link Request#item() focus item} is resolved to an empty
  * optional, to an empty string or to itself, are delegated to the wrapped handler.</p>
  */
-public final class Aliaser implements _Wrapper {
+public final class Aliaser implements Handler {
 
 	private final Function<Request, Optional<String>> resolver;
 
@@ -67,20 +65,21 @@ public final class Aliaser implements _Wrapper {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Handler wrap(final Handler handler) {
-		return (request, next) -> alias(request).orElseGet(() -> handler.handle(request, next));
+
+	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
+		return alias(request).orElseGet(() -> forward.apply(request));
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Optional<Response> alias(final Request request) {
-        return requireNonNull(resolver.apply(request), "null resolver return value")
+		return requireNonNull(resolver.apply(request), "null resolver return value")
 
-		        .filter(resource -> !resource.isEmpty())
-		        .filter(resource -> !idempotent(request.item(), resource))
+				.filter(resource -> !resource.isEmpty())
+				.filter(resource -> !idempotent(request.item(), resource))
 
-		        .map(resource -> request.reply().map(status(SeeOther, resource)));
+				.map(resource -> request.reply(SeeOther, resource));
     }
 
 

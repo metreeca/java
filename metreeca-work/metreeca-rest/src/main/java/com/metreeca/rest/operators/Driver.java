@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.operators;
 
-import com.metreeca.http.Message;
-import com.metreeca.http.Request;
+import com.metreeca.http.*;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Field;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 import com.metreeca.rest.codecs.JSONLD;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import static com.metreeca.link.Values.inverse;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.rest.codecs.JSONLD.shape;
 
 import static java.util.Arrays.stream;
 
@@ -58,7 +58,7 @@ import static java.util.Arrays.stream;
  * roles} of the current request {@linkplain Request#user() user}: no user-related shape redaction is performed by the
  * driver wrapper on behalf of nested handlers.</p>
  */
-public final class Driver implements _Wrapper {
+public final class Driver implements Handler {
 
     public static final IRI Direct=OWL.SAMEAS;
     public static final IRI Inverse=inverse(Direct);
@@ -118,8 +118,8 @@ public final class Driver implements _Wrapper {
     }
 
 
-    @Override public Handler wrap(final Handler handler) {
-        return (request, next) -> handler.handle(JSONLD.shape(request, shape), next);
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+        return forward.apply(shape(request, shape));
     }
 
 }

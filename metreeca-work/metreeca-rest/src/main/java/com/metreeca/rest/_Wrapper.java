@@ -316,7 +316,6 @@ import static java.util.Objects.requireNonNull;
      */
     public Handler wrap(final Handler handler);
 
-
     /**
      * Chains a wrapper.
      *
@@ -333,47 +332,6 @@ import static java.util.Objects.requireNonNull;
         }
 
         return handler -> wrap(wrapper.wrap(handler));
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Delegating wrapper.
-     *
-     * <p>Delegates request processing to a {@linkplain #delegate(_Wrapper) delegate} wrapper, possibly assembled as a
-     * combination of other wrappers.</p>
-     */
-    public abstract class Base implements _Wrapper {
-
-        private _Wrapper delegate=handler -> handler;
-
-
-        /**
-         * Configures the delegate wrapper.
-         *
-         * @param delegate the wrapper request processing is delegated to
-         *
-         * @return this wrapper
-         *
-         * @throws NullPointerException if {@code delegate} is null
-         */
-        protected Base delegate(final _Wrapper delegate) {
-
-            if ( delegate == null ) {
-                throw new NullPointerException("null delegate");
-            }
-
-            this.delegate=delegate;
-
-            return this;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        @Override public _Wrapper with(final _Wrapper wrapper) { return delegate.with(wrapper); }
-
-        @Override public Handler wrap(final Handler handler) { return delegate.wrap(handler); }
     }
 
 }

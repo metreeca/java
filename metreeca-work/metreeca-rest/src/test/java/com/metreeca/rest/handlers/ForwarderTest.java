@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Request;
 import com.metreeca.rest.Handler;
@@ -24,15 +24,20 @@ import org.junit.jupiter.api.Test;
 import static com.metreeca.http.Response.MovedPermanently;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.rest.Handler.handler;
 
 final class ForwarderTest {
 
-	private final Handler relocator=new Forwarder(MovedPermanently)
+    private final Handler relocator=handler(
 
-			.rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
-			.rewrite("http:(.*)", "https:$1")
+            new Forwarder(MovedPermanently)
 
-			.wrap((request, next) -> request.reply(OK));
+                    .rewrite("(http://example)(?:\\.\\w+)/(.*)", "$1.com/$2")
+                    .rewrite("http:(.*)", "https:$1"),
+
+            (request, next) -> request.reply(OK)
+
+    );
 
 
     @Test void testRelocate() {
@@ -44,7 +49,7 @@ final class ForwarderTest {
                         Request::reply
                 )
 
-				.map(response -> assertThat(response)
+                .map(response -> assertThat(response)
                         .hasStatus(MovedPermanently)
                         .hasHeader("Location", "https://example.com/path")
                 );
@@ -59,7 +64,7 @@ final class ForwarderTest {
                         Request::reply
                 )
 
-				.map(response -> assertThat(response)
+                .map(response -> assertThat(response)
                         .hasStatus(OK)
                         .doesNotHaveHeader("Location")
                 );

@@ -19,6 +19,7 @@ package com.metreeca.rest.codecs;
 import com.metreeca.http.*;
 import com.metreeca.http.codecs.JSON;
 
+import org.assertj.core.api.Assertions;
 import org.eclipse.rdf4j.model.BNode;
 import org.eclipse.rdf4j.model.IRI;
 import org.junit.jupiter.api.Nested;
@@ -79,25 +80,48 @@ final class JSONLDTest {
 
 
         @Test void testReportMalformedPayload() {
-            exec(() -> request("{")
 
-                    .map(this::response)
+            exec(() -> assertThatExceptionOfType(CodecException.class)
 
-                    .map(response -> assertThat(response)
-                            .hasStatus(BadRequest)
+                    .isThrownBy(() ->
+                            request("{").map(this::response)
                     )
-            );
+
+                    .satisfies(e -> Assertions.assertThat(e.getStatus())
+                            .isEqualTo(BadRequest)
+                    ));
+
+            //exec(() -> request("{")
+            //
+            //        .map(this::response)
+            //
+            //        .map(response -> assertThat(response)
+            //                .hasStatus(BadRequest)
+            //        )
+            //);
+
         }
 
         @Test void testReportInvalidPayload() {
-            exec(() -> request("{}")
 
-                    .map(this::response)
+            exec(() -> assertThatExceptionOfType(CodecException.class)
 
-                    .map(response -> assertThat(response)
-                            .hasStatus(UnprocessableEntity)
+                    .isThrownBy(() ->
+                            request("{}").map(this::response)
                     )
-            );
+
+                    .satisfies(e -> Assertions.assertThat(e.getStatus())
+                            .isEqualTo(UnprocessableEntity)
+                    ));
+
+            //exec(() -> request("{}")
+            //
+            //        .map(this::response)
+            //
+            //        .map(response -> assertThat(response)
+            //                .hasStatus(UnprocessableEntity)
+            //        )
+            //);
         }
 
     }

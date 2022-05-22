@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.operators;
 
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
+import com.metreeca.http.codecs.Text;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.util.*;
 import java.util.function.Function;
@@ -27,7 +27,6 @@ import java.util.function.Function;
 import javax.json.Json;
 
 import static com.metreeca.http.Response.UnprocessableEntity;
-import static com.metreeca.rest._MessageException.status;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -39,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  *
  * <p>Applies custom validation {@linkplain #Validator(Function[]) rules} to incoming requests.</p>
  */
-public final class Validator implements _Wrapper {
+public final class Validator implements Handler {
 
 	private final Collection<Function<Request, Collection<String>>> rules;
 
@@ -85,26 +84,25 @@ public final class Validator implements _Wrapper {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
+		return Optional
 
-	@Override public Handler wrap(final Handler handler) {
-		return (request, next) -> Optional
+				.of(rules.stream()
+						.flatMap(rule -> rule.apply(request).stream())
+						.collect(toList())
+				)
 
-                .of(rules.stream()
-                        .flatMap(rule -> rule.apply(request).stream())
-                        .collect(toList())
-                )
+				.filter(issues -> !issues.isEmpty())
 
-                .filter(issues -> !issues.isEmpty())
+				.map(issues -> Json.createObjectBuilder()
+						.add("", Json.createArrayBuilder(issues)) // !!! align with JSON validator format
+						.build()
+				)
 
-                .map(issues -> Json.createObjectBuilder()
-                        .add("", Json.createArrayBuilder(issues)) // !!! align with JSON validator format
-                        .build()
-                )
+				.map(details -> request.reply(UnprocessableEntity).body(new Text(), details.toString())) // !!! JSON
+                // body
 
-				.map(details -> request.reply().map(status(UnprocessableEntity, details)))
-
-                .orElseGet(() -> handler.handle(request, next));
+				.orElseGet(() -> forward.apply(request));
 	}
 
 }

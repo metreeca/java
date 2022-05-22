@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Request;
-import com.metreeca.http.Response;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +25,9 @@ import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static com.metreeca.http.Response.Unauthorized;
+import static com.metreeca.rest.Handler.handler;
 
 import static java.lang.String.format;
 
@@ -38,7 +39,7 @@ import static java.lang.String.format;
  *
  * @see <a href="https://tools.ietf.org/html/rfc6750">The OAuth 2.0 Authorization Framework: Bearer Token Usage</a>
  */
-public final class Bearer implements _Wrapper {
+public final class Bearer extends Delegator {
 
     private static final Pattern BearerPattern=Pattern.compile("\\s*Bearer\\s*(?<token>\\S*)\\s*");
 
@@ -46,6 +47,14 @@ public final class Bearer implements _Wrapper {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private final BiFunction<? super String, ? super Request, Optional<Request>> authenticator;
+
+
+    {
+        delegate(handler(
+                authenticator(),
+                challenger()
+        ));
+    }
 
 
     /**
@@ -94,32 +103,11 @@ public final class Bearer implements _Wrapper {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public Handler wrap(final Handler handler) {
-        return handler
-                .with(challenger())
-                .with(authenticator());
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
-     * @return a wrapper adding authentication challenge to unauthorized responses, unless already provided by nested
-     * authorization schemes
+     * @return a handler managing token-based authentication
      */
-    private _Wrapper challenger() {
-		return handler -> (request, next) -> handler.handle(request, next).map(response ->
-                response.status() == Response.Unauthorized && response.header("WWW-Authenticate").isEmpty()
-                        ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
-                        : response
-        );
-	}
-
-    /**
-     * @return a wrapper managing token-based authentication
-     */
-    private _Wrapper authenticator() {
-        return handler -> (request, next) -> {
+    private Handler authenticator() {
+        return (request, forward) -> {
 
             // !!! handle token in form/query parameter (https://tools.ietf.org/html/rfc6750#section-2)
 
@@ -137,22 +125,34 @@ public final class Bearer implements _Wrapper {
 
                             // authenticated > handle request
 
-                            .map(request1 -> handler.handle(request1, next))
+                            .map(forward)
 
                             // not authenticated > report error
 
-							.orElseGet(() -> request.reply().map(response -> response
-                                    .status(Response.Unauthorized)
+                            .orElseGet(() -> request.reply(Unauthorized)
                                     .header("WWW-Authenticate", format(
-                                            "Bearer realm=\"%s\", error=\"invalid_token\"", response.request().base()
-									))))
+                                            "Bearer realm=\"%s\", error=\"invalid_token\"", request.base()
+                                    ))
+                            )
 
                     )
 
                     // no bearer token > fall-through to other authorization schemes
 
-                    .orElseGet(() -> handler.handle(request, next));
+                    .orElseGet(() -> forward.apply(request));
         };
+    }
+
+    /**
+     * @return a handler adding authentication challenge to unauthorized responses, unless already provided by other
+     * authorization schemes
+     */
+    private Handler challenger() {
+        return (request, forward) -> forward.apply(request).map(response ->
+                response.status() == Unauthorized && response.header("WWW-Authenticate").isEmpty()
+                        ? response.header("WWW-Authenticate", format("Bearer realm=\"%s\"", request.base()))
+                        : response
+        );
     }
 
 }

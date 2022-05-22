@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.http.*;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
-import com.metreeca.rest._Wrapper;
+import com.metreeca.rest.Handler;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -72,17 +72,17 @@ public final class Graph implements AutoCloseable {
 
 	//// Transactions //////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Creates a transaction wrapper.
-	 *
-	 * @return a wrapper ensuring that requests are handled within a single graph transaction
-	 */
-	public static _Wrapper txn() {
+    /**
+     * Creates a transaction wrapper.
+     *
+     * @return a wrapper ensuring that requests are handled within a single graph transaction
+     */
+    public static Handler txn() {
 
-		final Graph graph=service(graph());
+        final Graph graph=service(graph());
 
-		return handler -> (request, next) -> graph.update(connection -> handler.handle(request, next));
-	}
+        return (request, next) -> graph.update(connection -> next.apply(request));
+    }
 
 
 	//// SPARQL Processors /////////////////////////////////////////////////////////////////////////////////////////////

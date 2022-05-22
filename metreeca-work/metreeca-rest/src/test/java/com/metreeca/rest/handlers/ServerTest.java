@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.http.Locator;
+import com.metreeca.http.Request;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -24,12 +25,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.util.*;
-import java.util.function.Function;
 
 import static com.metreeca.http.Request.POST;
 import static com.metreeca.http.Response.InternalServerError;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.rest.Handler.handler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -47,18 +48,16 @@ final class ServerTest {
 
 
         @Test void testPreprocessQueryParameters() {
-            new Locator().get(Server::new)
+            handler(new Locator().get(Server::new), (request, next) -> {
 
-                    .wrap((request, next) -> {
+                Assertions.assertThat(request.parameters()).containsExactly(
+                        parameter("one", singletonList("1")),
+                        parameter("two", asList("2", "2"))
+                );
 
-                        Assertions.assertThat(request.parameters()).containsExactly(
-                                parameter("one", singletonList("1")),
-                                parameter("two", asList("2", "2"))
-                        );
+                return request.reply(OK);
 
-                        return request.reply(OK);
-
-                    })
+            })
 
                     .handle(new Request()
                                     .method(Request.GET)
@@ -70,18 +69,16 @@ final class ServerTest {
         }
 
         @Test void testPreprocessBodyParameters() {
-            new Locator().get(Server::new)
+            handler(new Locator().get(Server::new), (request, next) -> {
 
-                    .wrap((request, next) -> {
+                Assertions.assertThat(request.parameters()).containsExactly(
+                        parameter("one", singletonList("1")),
+                        parameter("two", asList("2", "2"))
+                );
 
-                        Assertions.assertThat(request.parameters()).containsExactly(
-                                parameter("one", singletonList("1")),
-                                parameter("two", asList("2", "2"))
-                        );
+                return request.reply(OK);
 
-                        return request.reply(OK);
-
-                    })
+            })
 
                     .handle(
 
@@ -98,17 +95,15 @@ final class ServerTest {
         }
 
         @Test void testPreprocessDontOverwriteExistingParameters() {
-            new Locator().get(Server::new)
+            handler(new Locator().get(Server::new), (request, next) -> {
 
-                    .wrap((request, next) -> {
+                Assertions.assertThat(request.parameters()).containsExactly(
+                        parameter("existing", singletonList("true"))
+                );
 
-                        Assertions.assertThat(request.parameters()).containsExactly(
-                                parameter("existing", singletonList("true"))
-                        );
+                return request.reply(OK);
 
-                        return request.reply(OK);
-
-                    })
+            })
 
                     .handle(new Request()
                                     .method(Request.GET)
@@ -121,15 +116,13 @@ final class ServerTest {
         }
 
         @Test void testPreprocessQueryOnlyOnGET() {
-            new Locator().get(Server::new)
+            handler(new Locator().get(Server::new), (request, next) -> {
 
-                    .wrap((request, next) -> {
+                Assertions.assertThat(request.parameters()).isEmpty();
 
-                        Assertions.assertThat(request.parameters()).isEmpty();
+                return request.reply(OK);
 
-                        return request.reply(OK);
-
-                    })
+            })
 
                     .handle(new Request()
                                     .method(Request.PUT)
@@ -141,15 +134,13 @@ final class ServerTest {
         }
 
         @Test void testPreprocessBodyOnlyOnPOST() {
-            new Locator().get(Server::new)
+            handler(new Locator().get(Server::new), (request, next) -> {
 
-                    .wrap((request, next) -> {
+                Assertions.assertThat(request.parameters()).isEmpty();
 
-                        Assertions.assertThat(request.parameters()).isEmpty();
+                return request.reply(OK);
 
-                        return request.reply(OK);
-
-                    })
+            })
 
                     .handle(
 
@@ -170,19 +161,16 @@ final class ServerTest {
     @Nested final class ErrorHandling {
 
         @Test void testTrapStrayExceptions() {
-            new Locator().exec(() -> new Server()
-
-                    .wrap((Request request, final Function<Request, Response> next) -> {
-                        throw new UnsupportedOperationException("stray");
-                    })
+            handler(new Locator().get(Server::new), (request, next) -> {
+                throw new UnsupportedOperationException("stray");
+            })
 
                     .handle(new Request(), Request::reply)
 
                     .map(response -> assertThat(response)
                             .hasStatus(InternalServerError)
-                    )
+                    );
 
-            );
         }
 
     }

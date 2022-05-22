@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.*;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.rest.Handler.handler;
 
 
 final class AliaserTest {
@@ -50,9 +50,7 @@ final class AliaserTest {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Test void testRedirectAliasedItem() {
-		exec(() -> aliaser("/canonical")
-
-				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
+		exec(() -> handler(aliaser("/canonical"), ((request, next) -> request.reply(OK)))
 
 				.handle(request("/alias"), Request::reply)
 
@@ -64,9 +62,7 @@ final class AliaserTest {
 	}
 
 	@Test void testForwardIdempotentItems() {
-		exec(() -> aliaser("/alias")
-
-				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
+		exec(() -> handler(aliaser("/alias"), ((request, next) -> request.reply(OK)))
 
 				.handle(request("/alias"), Request::reply)
 
@@ -77,9 +73,7 @@ final class AliaserTest {
 	}
 
 	@Test void testForwardOtherItems() {
-		exec(() -> aliaser("/canonical")
-
-				.wrap((Request request, final Function<Request, Response> next) -> request.reply(OK))
+		exec(() -> handler(aliaser("/canonical"), ((request, next) -> request.reply(OK)))
 
 				.handle(request("/other"), Request::reply)
 

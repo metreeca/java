@@ -19,7 +19,7 @@ package com.metreeca.jse;
 import com.metreeca.http.*;
 import com.metreeca.http.services.Logger;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._wrappers.Server;
+import com.metreeca.rest.handlers.Server;
 
 import com.sun.net.httpserver.*;
 
@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.rest.Handler.handler;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -151,9 +152,10 @@ public final class JSEServer {
             throw new NullPointerException("null handler factory");
         }
 
-        locator.set(delegate(), () ->
-                new Server().wrap(requireNonNull(factory.apply(locator), "null handler"))
-        );
+        locator.set(delegate(), () -> handler(
+                new Server(),
+                requireNonNull(factory.apply(locator), "null handler")
+        ));
 
         return this;
     }

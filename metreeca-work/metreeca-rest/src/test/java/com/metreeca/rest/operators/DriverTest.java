@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.operators;
 
 import com.metreeca.http.Request;
 import com.metreeca.link.Shape;
@@ -26,6 +26,7 @@ import static com.metreeca.http.RequestAssert.assertThat;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.link.shapes.Clazz.clazz;
+import static com.metreeca.rest.Handler.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,20 +37,18 @@ final class DriverTest {
 
         final Shape test=clazz(RDF.NIL);
 
-        new Driver(test)
+        handler(new Driver(test), (request, next) -> {
 
-                .wrap((request, next) -> {
+            assertThat(request)
+                    .hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(shape));
 
-                    assertThat(request)
-							.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(shape));
+            return request.reply(OK);
 
-                    return request.reply(OK);
-
-                })
+        })
 
                 .handle(new Request(), Request::reply)
 
-				.map(response -> assertThat(response)
+                .map(response -> assertThat(response)
                         .hasStatus(OK)
                 );
     }

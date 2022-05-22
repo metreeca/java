@@ -28,10 +28,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import static com.metreeca.http.RequestAssert.assertThat;
-import static com.metreeca.http.Response.MethodNotAllowed;
-import static com.metreeca.http.Response.OK;
+import static com.metreeca.http.Response.*;
 import static com.metreeca.http.ResponseAssert.assertThat;
-import static com.metreeca.rest._MessageException.status;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -253,7 +251,7 @@ final class RouterTest {
         @Test void testRejectHEADIfGetIsNotSupported() {
             new Router()
 
-                    .post(status(Response.Created))
+                    .post((request, forward) -> request.reply(Created))
 
                     .handle(new Request().method(Request.HEAD), Request::reply)
 

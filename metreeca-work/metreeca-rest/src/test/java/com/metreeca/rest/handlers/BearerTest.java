@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.http.Locator;
+import com.metreeca.http.Request;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
+
+import static com.metreeca.http.Request.GET;
+import static com.metreeca.http.Response.*;
+import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.rest.Handler.handler;
 
 
 final class BearerTest {
 
     private void exec(final Runnable... tasks) {
-		new Locator().exec(tasks).clear();
+        new Locator().exec(tasks).clear();
     }
 
 
     private Bearer bearer() {
-		return new Bearer((BiFunction<? super String, ? super Request, Optional<Request>>)(token, request) -> token.equals("token") ? Optional.of(request) : Optional.empty());
+        return new Bearer((token, request) -> token.equals("token") ? Optional.of(request) : Optional.empty());
     }
 
-    private Handler handler(final int status) {
-        return (request, next) -> request.reply(status);
+    private Handler status(final int status) {
+        return (request, forward) -> request.reply(status);
     }
 
 
@@ -47,24 +51,22 @@ final class BearerTest {
 
     @Test void testFallThroughToWrappedSchemes() {
 
-        final _Wrapper authenticator=handler -> (request, next) ->
-                handler.handle(request, next).map(response -> response.header("WWW-Authenticate", "Custom"));
+        final Handler authenticator=(request, forward) -> forward.apply(request).map(response ->
+                response.header("WWW-Authenticate", "Custom")
+        );
 
-        exec(() -> bearer()
-
-                .with(authenticator)
-                .wrap(handler(Response.Unauthorized))
+        exec(() -> handler(bearer(), authenticator, status(Unauthorized))
 
                 .handle(new Request()
-                                .method(Request.GET)
+                                .method(GET)
                                 .header("Authorization", "Custom secret"),
                         Request::reply
                 )
 
-				.map(response -> ResponseAssert.assertThat(response)
+                .map(response -> assertThat(response)
 
                         .as("access denied")
-                        .hasStatus(Response.Unauthorized)
+                        .hasStatus(Unauthorized)
 
                         .as("fall-through challenge")
                         .hasHeader("WWW-Authenticate", "Custom")
@@ -77,19 +79,17 @@ final class BearerTest {
     @Nested final class Anonymous {
 
         @Test void testGranted() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.OK))
+            exec(() -> handler(bearer(), status(OK))
 
                     .handle(new Request()
-                                    .method(Request.GET),
+                                    .method(GET),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access granted")
-                            .hasStatus(Response.OK)
+                            .hasStatus(OK)
 
                             .as("challenge not included")
                             .doesNotHaveHeader("WWW-Authenticate"))
@@ -97,19 +97,17 @@ final class BearerTest {
         }
 
         @Test void testForbidden() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.Forbidden))
+            exec(() -> handler(bearer(), status(Forbidden))
 
                     .handle(new Request()
-                                    .method(Request.GET),
+                                    .method(GET),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access denied")
-                            .hasStatus(Response.Forbidden)
+                            .hasStatus(Forbidden)
 
                             .as("challenge not included")
                             .doesNotHaveHeader("WWW-Authenticate"))
@@ -117,19 +115,17 @@ final class BearerTest {
         }
 
         @Test void testUnauthorized() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.Unauthorized))
+            exec(() -> handler(bearer(), status(Unauthorized))
 
                     .handle(new Request()
-                                    .method(Request.GET),
+                                    .method(GET),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access denied")
-                            .hasStatus(Response.Unauthorized)
+                            .hasStatus(Unauthorized)
 
                             .as("challenge included without error")
                             .matches(r -> r
@@ -146,20 +142,18 @@ final class BearerTest {
     @Nested final class TokenBearing {
 
         @Test void testGranted() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.OK))
+            exec(() -> handler(bearer(), status(OK))
 
                     .handle(new Request()
-                                    .method(Request.GET)
+                                    .method(GET)
                                     .header("Authorization", "Bearer token"),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access granted")
-                            .hasStatus(Response.OK)
+                            .hasStatus(OK)
 
                             .as("challenge not included")
                             .doesNotHaveHeader("WWW-Authenticate")
@@ -168,20 +162,18 @@ final class BearerTest {
         }
 
         @Test void testBadCredentials() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.OK))
+            exec(() -> handler(bearer(), status(OK))
 
                     .handle(new Request()
-                                    .method(Request.GET)
+                                    .method(GET)
                                     .header("Authorization", "Bearer qwertyuiop"),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access denied")
-                            .hasStatus(Response.Unauthorized)
+                            .hasStatus(Unauthorized)
 
                             .as("challenge included with error")
                             .matches(r -> r
@@ -193,20 +185,18 @@ final class BearerTest {
         }
 
         @Test void testForbidden() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.Forbidden))
+            exec(() -> handler(bearer(), status(Forbidden))
 
                     .handle(new Request()
-                                    .method(Request.GET)
+                                    .method(GET)
                                     .header("Authorization", "Bearer token"),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access denied")
-                            .hasStatus(Response.Forbidden)
+                            .hasStatus(Forbidden)
 
                             .as("challenge not included")
                             .doesNotHaveHeader("WWW-Authenticate")
@@ -215,20 +205,18 @@ final class BearerTest {
         }
 
         @Test void testUnauthorized() {
-            exec(() -> bearer()
-
-                    .wrap(handler(Response.Unauthorized))
+            exec(() -> handler(bearer(), status(Unauthorized))
 
                     .handle(new Request()
-                                    .method(Request.GET)
+                                    .method(GET)
                                     .header("Authorization", "Bearer token"),
                             Request::reply
                     )
 
-					.map(response -> ResponseAssert.assertThat(response)
+                    .map(response -> assertThat(response)
 
                             .as("access denied")
-                            .hasStatus(Response.Unauthorized)
+                            .hasStatus(Unauthorized)
 
                             .as("challenge included without error")
                             .matches(r -> r

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.metreeca.rest._MessageException.status;
 
 import static java.util.function.UnaryOperator.identity;
 
@@ -35,7 +33,7 @@ import static java.util.function.UnaryOperator.identity;
  * <p>Iteratively applies pattern-based {@linkplain #rewrite(String, String) rewrite} rules to incoming
  * {@linkplain Request#item() request items} and redirecting them if actually modified.</p>
  */
-public final class Forwarder implements _Wrapper {
+public final class Forwarder implements Handler {
 
 	private final int status;
 
@@ -115,17 +113,16 @@ public final class Forwarder implements _Wrapper {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Handler wrap(final Handler handler) {
-		return (request, next) -> {
 
-            final String original=request.item();
-            final String location=rewriter.apply(original);
+	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-            return location.equals(original)
-                    ? handler.handle(request, next)
-                    : request.reply().map(status(status, location));
+		final String original=request.item();
+		final String location=rewriter.apply(original);
 
-        };
+		return location.equals(original)
+				? forward.apply(request)
+				: request.reply(status, location);
+
 	}
 
 }

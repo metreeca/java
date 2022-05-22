@@ -18,7 +18,8 @@ package com.metreeca.rest.handlers;
 
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Handler;
+import com.metreeca.rest._Wrapper;
 
 import java.util.function.Function;
 
@@ -42,7 +43,7 @@ public abstract class Delegator implements Handler {
      *
      * @throws NullPointerException if {@code delegate} is null
      */
-    protected com.metreeca.rest.handlers.Delegator delegate(final Handler delegate) {
+    protected Delegator delegate(final Handler delegate) {
 
         if ( delegate == null ) {
             throw new NullPointerException("null delegate");

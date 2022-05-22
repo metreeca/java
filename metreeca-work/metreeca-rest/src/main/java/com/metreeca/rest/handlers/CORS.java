@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 
 import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
+
+import java.util.function.Function;
 
 import static java.lang.String.join;
 
@@ -34,12 +36,13 @@ import static java.lang.String.join;
  * @see <a href="https://fetch.spec.whatwg.org/#cors-protocol">Fetch - § 3.2 CORS protocol</a>
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross-Origin Resource Sharing (CORS) @ MDN</a>
  */
-public final class CORS implements _Wrapper {
+public final class CORS implements Handler {
 
-	// !!! https://www.html5rocks.com/static/images/cors_server_flowchart.png
+    // !!! https://www.html5rocks.com/static/images/cors_server_flowchart.png
 
-	@Override public Handler wrap(final Handler handler) {
-		return (request, next) -> handler.handle(request, next).map(response -> response
+
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+        return forward.apply(request).map(response -> response
 
                 .header("Access-Control-Allow-Origin", request.header("Origin").orElse("*"))
                 .header("Access-Control-Allow-Credentials", "true")
@@ -50,21 +53,21 @@ public final class CORS implements _Wrapper {
                         Request.HEAD,
                         Request.POST,
                         Request.PUT,
-						Request.DELETE
-				))
+                        Request.DELETE
+                ))
 
-				.header("Access-Control-Allow-Headers", join(", ",
-						"Origin",
-						"Accept",
-						"Content-Type",
-						"Authorization",
-						"X-Requested-With",
-						"Access-Control-Allow-Header",
-						"Access-Control-Request-Method",
-						"Access-Control-Request-Header"
-				))
+                .header("Access-Control-Allow-Headers", join(", ",
+                        "Origin",
+                        "Accept",
+                        "Content-Type",
+                        "Authorization",
+                        "X-Requested-With",
+                        "Access-Control-Allow-Header",
+                        "Access-Control-Request-Method",
+                        "Access-Control-Request-Header"
+                ))
 
-		);
-	}
+        );
+    }
 
 }

@@ -42,6 +42,7 @@ import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
+import static com.metreeca.rest.Handler.handler;
 import static com.metreeca.rest._Wrapper.keeper;
 import static com.metreeca.rest.services.Engine.engine;
 
@@ -100,9 +101,9 @@ public final class Creator extends Delegator {
      * Creates a resource creator with a UUID-based slug generator.
      */
     public Creator() {
-        delegate(rewrite().wrap(create()).with( // rewrite immediately before handler, after custom wrappers
+        delegate(handler(rewrite(), create().with( // rewrite immediately before handler, after custom wrappers
                 keeper(Create, Detail)
-        ));
+        )));
     }
 
 
@@ -153,8 +154,8 @@ public final class Creator extends Delegator {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private _Wrapper rewrite() {
-        return handler -> (request, next) -> {
+    private Handler rewrite() {
+        return (request, next) -> {
 
             final String name=encode( // encode slug as IRI path component
                     requireNonNull(slug.apply(request), "null resource name")
@@ -163,10 +164,10 @@ public final class Creator extends Delegator {
             final IRI source=iri(request.item());
             final IRI target=iri(source, name);
 
-            return handler.handle(request
-                            .path(request.path()+name)
-                            .body(new JSONLD(), rewrite(target, source, request.body(new JSONLD()))),
-                    next);
+            return next.apply(request
+                    .path(request.path()+name)
+                    .body(new JSONLD(), rewrite(target, source, request.body(new JSONLD())))
+            );
         };
     }
 

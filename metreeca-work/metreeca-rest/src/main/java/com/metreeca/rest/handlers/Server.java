@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.metreeca.rest._wrappers;
+package com.metreeca.rest.handlers;
 
 import com.metreeca.http.*;
 import com.metreeca.http.codecs.JSON;
 import com.metreeca.http.codecs.Text;
 import com.metreeca.http.services.Logger;
-import com.metreeca.rest.Handler;
-import com.metreeca.rest._Wrapper;
 
 import java.io.*;
 import java.util.Optional;
@@ -41,10 +39,10 @@ import static java.lang.String.format;
 /**
  * API server.
  *
- * <p>Provides default resource pre/postprocessing and error handling; mainly intended as the outermost wrapper
+ * <p>Provides default resource pre/postprocessing and error handling; mainly intended as the outermost handler
  * returned by loaders.</p>
  */
-public final class Server implements _Wrapper {
+public final class Server extends Delegator {
 
     private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
     private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
@@ -60,13 +58,9 @@ public final class Server implements _Wrapper {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public Handler wrap(final Handler handler) {
 
-        if ( handler == null ) {
-            throw new NullPointerException("null handler");
-        }
-
-        return (request, forward) -> {
+    public Server() {
+        delegate((request, forward) -> {
             try {
 
                 return request
@@ -75,7 +69,7 @@ public final class Server implements _Wrapper {
                         .map(this::query)
                         .map(this::form)
 
-                        .map(_request -> handler.handle(_request, forward))
+                        .map(forward)
 
                         .map(this::logging)
                         .map(this::charset);
@@ -100,7 +94,7 @@ public final class Server implements _Wrapper {
 
 
             }
-        };
+        });
     }
 
 
