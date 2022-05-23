@@ -16,11 +16,11 @@
 
 package com.metreeca.rest.codecs;
 
+import com.metreeca.http.Request;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.Stats;
 import com.metreeca.link.queries.Terms;
 import com.metreeca.link.shapes.*;
-import com.metreeca.http.Request;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.json.*;
 
+import static com.metreeca.http.Request.decode;
 import static com.metreeca.link.Order.decreasing;
 import static com.metreeca.link.Order.increasing;
 import static com.metreeca.link.Values.format;
@@ -42,7 +43,6 @@ import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Field.labels;
 import static com.metreeca.link.shapes.Link.link;
-import static com.metreeca.http.Request.decode;
 import static com.metreeca.rest.codecs.JSONLDInspector.driver;
 
 import static java.lang.String.format;

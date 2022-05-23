@@ -23,13 +23,13 @@
 
 	<parent>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-work</artifactId>
+		<artifactId>metreeca-java</artifactId>
 		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-rest</artifactId>
 
-	<name>Metreeca REST Publishing</name>
+	<name>Metreeca model-driven REST Framework</name>
 	<description>A model-driven REST publishing framework.</description>
 
 	<dependencies>
