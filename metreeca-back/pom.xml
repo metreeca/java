@@ -39,6 +39,7 @@
 
 		<module>metreeca-rdf4j</module>
 		<module>metreeca-rdf4j-text</module>
+		<module>metreeca-rdf4j-jsonld</module>
 
 		<module>metreeca-gcp</module>
 		<module>metreeca-gcp-rdf4j</module>

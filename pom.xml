@@ -74,14 +74,11 @@
 		<module>metreeca-core</module>
 		<module>metreeca-http</module>
 		<module>metreeca-link</module>
-		<module>metreeca-rest</module>
 		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
 		<module>metreeca-back</module>
-
-		<module>metreeca-work</module>
 
 	</modules>
 
@@ -125,45 +122,6 @@
 				<version>1.1.4</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-link</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-link</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rest</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rest</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf4j-engine</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf4j-engine</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
 
 			<!-- Core Modules -->
 
@@ -173,6 +131,13 @@
 				<version>${project.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-core</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
@@ -183,6 +148,20 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-http</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-link</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-link</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -216,6 +195,21 @@
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-jsonld</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-jsonld</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
@@ -262,6 +256,12 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf4j-text</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-rdf4j-jsonld</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

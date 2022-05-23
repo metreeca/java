@@ -16,7 +16,8 @@
   limitations under the License.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
@@ -27,70 +28,26 @@
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>metreeca-rdf</artifactId>
+	<artifactId>metreeca-jsonld</artifactId>
 
-	<name>Metreeca RDF Data Connector</name>
-	<description>Connector kit for RDF data.</description>
+	<name>Metreeca JSON-LD Data Connector</name>
+	<description>Connector kit for JSON-LD data.</description>
 
 	<dependencies>
 
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-http</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-link</artifactId>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.eclipse.rdf4j</groupId>
-            <artifactId>rdf4j-rio-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-turtle</artifactId>
-		</dependency>
-
 		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-jsonld</artifactId>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-http</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-rdfxml</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-nquads</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-trig</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-trix</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-rio-binary</artifactId>
-		</dependency>
-
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-link</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-json</artifactId>
 		</dependency>
 
 		<dependency>
@@ -100,6 +57,49 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-link</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency> <!-- !!! required by ModelAssert -->
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-model</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-json</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin> <!-- https://maven.apache.org/plugins/maven-jar-plugin/ -->
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+
+				<executions>
+					<execution>
+
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+
+					</execution>
+				</executions>
+
+			</plugin>
+
+		</plugins>
+	</build>
 
 </project>

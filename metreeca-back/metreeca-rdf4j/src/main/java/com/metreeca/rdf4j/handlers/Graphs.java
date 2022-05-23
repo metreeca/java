@@ -23,7 +23,6 @@ import com.metreeca.http.codecs.Data;
 import com.metreeca.http.handlers.Router;
 import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
-import com.metreeca.rest.codecs.JSONLD;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -38,8 +37,7 @@ import java.util.*;
 
 import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.http.Message.mimes;
-import static com.metreeca.http.Response.BadRequest;
-import static com.metreeca.http.Response.InternalServerError;
+import static com.metreeca.http.Response.*;
 import static com.metreeca.link.Shape.exactly;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
@@ -127,8 +125,8 @@ public final class Graphs extends Endpoint<Graphs> {
                 }
             }));
 
-            return request.reply().map(response -> JSONLD.shape(response.status(Response.OK), GraphsShape)
-                    .body(new com.metreeca.rdf.codecs.RDF(), model));
+            return request.reply(OK)
+                    .body(new com.metreeca.rdf.codecs.RDF(), model);
 
         } else {
 
@@ -142,7 +140,7 @@ public final class Graphs extends Endpoint<Graphs> {
 
                 graph().query(task(connection -> connection.export(factory.getWriter(data), context)));
 
-                return graph().query(connection -> request.reply().map(response -> response.status(Response.OK)
+                return graph().query(connection -> request.reply().map(response -> response.status(OK)
 
                         .header("Content-Type", format.getDefaultMIMEType())
                         .header("Content-Disposition", format("attachment; filename=\"%s.%s\"",

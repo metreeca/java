@@ -33,13 +33,14 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import java.util.stream.Stream;
 
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
 import static com.metreeca.link.Values.iri;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -177,19 +178,18 @@ public final class RDF implements Codec<Collection<Statement>> {
 
         } else { // !!! log warnings/error/fatals?
 
-            final JsonObjectBuilder trace=Json.createObjectBuilder()
+            throw new CodecException(BadRequest, Stream
 
-                    .add("format", parser.getRDFFormat().getDefaultMIMEType());
+                    .of(
+                            fatals.stream().map(fatal -> format("!!! %s", fatal)),
+                            errors.stream().map(error -> format(" !! %s", error)),
+                            warnings.stream().map(warning -> format("  ! %s", warning))
+                    )
+                    .flatMap(stream -> stream)
 
-            if ( !fatals.isEmpty() ) { trace.add("fatals", Json.createArrayBuilder(fatals)); }
-            if ( !errors.isEmpty() ) { trace.add("errors", Json.createArrayBuilder(errors)); }
-            if ( !warnings.isEmpty() ) { trace.add("warnings", Json.createArrayBuilder(warnings)); }
+                    .collect(joining("/b"))
 
-            final StringWriter writer=new StringWriter();
-
-            Json.createWriter(writer).write(trace.build());
-
-            throw new CodecException(BadRequest, writer.toString()); // !!! JSON MIME
+            );
 
         }
     }

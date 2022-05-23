@@ -16,12 +16,9 @@
 
 package com.metreeca.rdf.codecs;
 
-import com.metreeca.http.*;
-import com.metreeca.link.Values;
-import com.metreeca.rest.codecs.JSONLD;
+import com.metreeca.http.Locator;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
-import org.eclipse.rdf4j.model.vocabulary.LDP;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,17 +28,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.metreeca.http.Message.mimes;
-import static com.metreeca.http.MessageAssert.assertThat;
-import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.Values.statement;
-import static com.metreeca.link.shapes.Datatype.datatype;
-import static com.metreeca.link.shapes.Field.field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 
 final class RDFTest {
@@ -121,37 +112,6 @@ final class RDFTest {
                 return service.getFormat();
             }
 
-        }
-
-    }
-
-    @Nested final class Encoder {
-
-        @Test void testConfigureWriterBaseIRI() {
-            exec(() -> JSONLD
-
-                    .shape(
-
-                            new Request()
-
-                                    .base("http://example.com/base/")
-                                    .path("/").reply()
-                                    .status(Response.OK),
-
-                            field(LDP.CONTAINS, datatype(Values.IRIType))
-
-                    )
-
-                    .body(new RDF(), singletonList(statement(
-                            iri("http://example.com/base/"), LDP.CONTAINS, iri("http://example.com/base/x")
-                    )))
-
-                    .map(response -> assertThat(response)
-                            .hasTextOutput(text -> assertThat(text)
-                                    .contains("@base <"+"http://example.com/base/"+">")
-                            )
-                    )
-            );
         }
 
     }

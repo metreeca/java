@@ -80,6 +80,51 @@ public abstract class Shape {
 
 
     /**
+     * Identifies statements implied by this shape.
+     *
+     * @param focus the initial focus values for shape traversal
+     *
+     * @return a set of statements implied by this shape when recursively traversed starting from {@code focus} values
+     *
+     * @throws NullPointerException if {@code focus} is null or contains null elements
+     */
+    public Set<Statement> outline(final Value... focus) {
+
+        if ( focus == null || stream(focus).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null focus");
+        }
+
+        return redact(Mode).map(new ShapeOutliner(focus)).collect(toSet());
+    }
+
+
+    /**
+     * Validate an RDF model against this shape.
+     *
+     * @param focus the target IRI for the validation process
+     * @param model the RDF model to be validated
+     *
+     * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
+     * from the target {@code focus} according to this shape
+     *
+     * @throws NullPointerException if either {@code focus} or {@code model} is null or if {@code model} contains null
+     *                              elements
+     */
+    public Either<Trace, Collection<Statement>> validate(final Value focus, final Collection<Statement> model) {
+
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
+
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
+
+        return ShapeValidator.validate(focus, this, model);
+    }
+
+
+    /**
      * Traverses this shape.
      *
      * @param path the property path to be traversed
@@ -103,25 +148,6 @@ public abstract class Shape {
 
         return shape;
     }
-
-    /**
-     * Identifies statements implied by this shape.
-     *
-     * @param focus the initial focus values for shape traversal
-     *
-     * @return a set of statements implied by this shape when recursively traversed starting from {@code focus} values
-     *
-     * @throws NullPointerException if {@code focus} is null or contains null elements
-     */
-    public Set<Statement> outline(final Value... focus) {
-
-        if ( focus == null || stream(focus).anyMatch(Objects::isNull) ) {
-            throw new NullPointerException("null focus");
-        }
-
-        return redact(Mode).map(new ShapeOutliner(focus)).collect(toSet());
-    }
-
 
     /**
      * Extends this shape with inferred constraints.
