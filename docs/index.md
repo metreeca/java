@@ -19,15 +19,15 @@ may be easily plugged as a specialized component into your framework of choice.
 
 # Modules
 
-|    area | javadocs                                                     | description                             |
-| ------: | :----------------------------------------------------------- | :-------------------------------------- |
-|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-link) | shape-based JSON modelling framework    |
-|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework  |
-|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities           |
-|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                |
-|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/metreeca-jse) | Java SE HTTP server connector          |
-|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/metreeca-jee) | Servlet 3.1 containers connector        |
-| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j) | RDF4J-based SPARQL repository connector |
+|    area | javadocs                                                     | description                              |
+| ------: | :----------------------------------------------------------- |:-----------------------------------------|
+|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-link) | shape-based JSON modelling framework     |
+|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework   |
+|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities            |
+|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                 |
+|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/metreeca-jse) | Java SE HTTP server connector            |
+|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/metreeca-jee) | Java EE Servlet 3.1 containers connector |
+| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j) | RDF4J-based SPARQL repository connector  |
 
 # Getting Started
 

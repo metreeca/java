@@ -23,14 +23,14 @@
 
 	<parent>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-work</artifactId>
+		<artifactId>metreeca-java</artifactId>
 		<version>${revision}</version>
 	</parent>
 
 	<artifactId>metreeca-link</artifactId>
 
-	<name>Metreeca JSON/LD Modelling</name>
-	<description>A shape-based JSON/LD modelling framework.</description>
+	<name>Metreeca Linked Data Modelling</name>
+	<description>A shape-based linked data modelling framework.</description>
 
 	<dependencies>
 
@@ -39,10 +39,6 @@
 			<artifactId>metreeca-core</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>
@@ -53,6 +49,7 @@
 			<groupId>org.eclipse.rdf4j</groupId>
 			<artifactId>rdf4j-model-vocabulary</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>
@@ -78,9 +75,6 @@
 
 				<executions>
 					<execution>
-
-						<id>json-test-jar</id>
-						<phase>package</phase>
 
 						<goals>
 							<goal>test-jar</goal>

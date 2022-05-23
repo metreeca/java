@@ -34,11 +34,9 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Trace.trace;
-import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.lang;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
@@ -359,7 +357,7 @@ public final class JSONLD implements Codec<Frame> {
 
                         return validate(focus, shape, model).fold(
 
-                                trace -> { throw new CodecException(UnprocessableEntity, trace.toJSON().toString()); },
+                                trace -> { throw new CodecException(UnprocessableEntity, format(trace)); },
 
                                 value -> frame(focus, model) // use model to include inferred statements
 
@@ -404,8 +402,8 @@ public final class JSONLD implements Codec<Frame> {
         final Value focus=value.focus();
 
         if ( !focus.isIRI() || !focus.stringValue().equals(item) ) {
-            throw new IllegalArgumentException(format(
-                    "message item <%s> and frame focus %s don't match", item, format(focus)
+            throw new IllegalArgumentException(String.format(
+                    "message item <%s> and frame focus %s don't match", item, Values.format(focus)
             ));
         }
 
@@ -448,7 +446,8 @@ public final class JSONLD implements Codec<Frame> {
                 trace -> {
 
                     throw new CodecException(InternalServerError,
-                            trace(trace("invalid JSON-LD payload"), trace).toJSON().toString());
+                            format(trace(trace("invalid JSON-LD payload"), trace))
+                    );
 
                 },
 
@@ -484,5 +483,42 @@ public final class JSONLD implements Codec<Frame> {
 
                 });
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private String format(final Trace trace) {
+
+        final JsonObjectBuilder builder=Json.createObjectBuilder();
+
+        if ( !trace.issues().isEmpty() ) {
+            builder.add("@errors", Json.createArrayBuilder(trace.issues()));
+        }
+
+        trace.fields().forEach((label, nested) -> {
+
+            if ( !nested.empty() ) {
+                builder.add(label, format(nested));
+            }
+
+        });
+
+        try ( final StringWriter writer=new StringWriter() ) {
+
+            Json
+                    .createWriterFactory(singletonMap(PRETTY_PRINTING, true))
+                    .createWriter(writer)
+                    .write(builder.build());
+
+            return writer.toString();
+
+        } catch ( final IOException e ) {
+
+            throw new UncheckedIOException(e);
+
+        }
+
+    }
+
 
 }

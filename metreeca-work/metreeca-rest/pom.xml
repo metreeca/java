@@ -41,12 +41,12 @@
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-json</artifactId>
+			<artifactId>metreeca-link</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-link</artifactId>
+			<artifactId>metreeca-json</artifactId>
 		</dependency>
 
 

@@ -73,6 +73,7 @@
 
 		<module>metreeca-core</module>
 		<module>metreeca-http</module>
+		<module>metreeca-link</module>
 		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
