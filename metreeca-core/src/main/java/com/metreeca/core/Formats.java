@@ -43,7 +43,9 @@ public final class Formats {
 
             .toFormatter(Locale.ROOT);
 
-
+    /**
+     * A compact ISO local date formatter ({@code yyyyMMddThhmmss}).
+     */
     public static final DateTimeFormatter ISO_LOCAL_DATE_TIME_COMPACT=new DateTimeFormatterBuilder()
 
             .parseStrict()

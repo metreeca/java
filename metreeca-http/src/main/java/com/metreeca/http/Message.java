@@ -616,7 +616,7 @@ public abstract class Message<M extends Message<M>> {
      *
      * @return this message
      *
-     * @throws NullPointerException if {@code output is null
+     * @throws NullPointerException if {@code output} is null
      */
     public M output(final Consumer<OutputStream> output) {
 
