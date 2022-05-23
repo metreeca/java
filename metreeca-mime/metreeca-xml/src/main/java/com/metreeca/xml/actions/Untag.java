@@ -50,7 +50,7 @@ public final class Untag implements Function<Node, String> {
     public static String untag(final String document) {
 
         if ( document == null ) {
-            throw new NullPointerException("null cocument");
+            throw new NullPointerException("null document");
         }
 
         try {
