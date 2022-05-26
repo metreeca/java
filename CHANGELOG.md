@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSON / Extend JSONPath.Processor API with getters for JSON objects, arrays and nested processors
 - REST / Add Xtream.distinct(key) custom duplicate removal method
 - XML / Add Untag.untag(String) utility method
+- XML / Normalize block text in Untag
 - RDF / Factor RDFFormat static parsing method
 
 ### Fixed
