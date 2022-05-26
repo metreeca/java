@@ -74,6 +74,8 @@ public final class Untag implements Function<Node, String> {
 
     private static final class Builder {
 
+        private int indent;
+
         private final StringBuilder builder=new StringBuilder(100);
 
 
@@ -118,18 +120,19 @@ public final class Untag implements Function<Node, String> {
                     return feed().append("### ").append(normalize(element.getTextContent()));
 
                 case "p":
-
-                case "ul":
-                case "ol":
-
                 case "div":
                 case "section":
 
                     return feed().format(element.getChildNodes());
 
+                case "ul":
+                case "ol":
+
+                    return indent().format(element.getChildNodes()).outdent();
+
                 case "li":
 
-                    return wrap().append("- ").format(element.getChildNodes());
+                    return wrap().append("- ").format(element.getChildNodes()).append("\n");
 
                 case "br":
 
@@ -154,10 +157,10 @@ public final class Untag implements Function<Node, String> {
 
         private Builder format(final Text text) {
 
-            final String value=text.getNodeValue();
+            final String value=normalize(text.getNodeValue());
             final boolean border=text.getPreviousSibling() == null || text.getNextSibling() == null;
 
-            if ( !(border && normalize(value).isEmpty()) ) {
+            if ( !value.isEmpty() ) {
                 builder.append(value);
             }
 
@@ -168,6 +171,21 @@ public final class Untag implements Function<Node, String> {
         private Builder append(final String string) {
 
             builder.append(string);
+
+            return this;
+        }
+
+
+        private Builder indent() {
+
+            if ( indent++ == 0 ) { feed(); }
+
+            return this;
+        }
+
+        private Builder outdent() {
+
+            indent--;
 
             return this;
         }
