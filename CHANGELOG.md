@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - REST / Add Xtream.distinct(key) custom duplicate removal method
 - XML / Add Untag.untag(String) utility method
 - XML / Normalize block text in Untag
+- XML / Add XPath.path()/paths() utility methods
 - RDF / Factor RDFFormat static parsing method
 
 ### Fixed
