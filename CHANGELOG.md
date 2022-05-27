@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Core / Fix Strings.indent(): now newlines are preserved
 - JSON / Frame formatting: now recursively formats nested frames
 
 

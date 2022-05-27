@@ -322,7 +322,7 @@ public final class Strings {
         }
 
         return string.isEmpty() ? string
-                : NewlinePattern.matcher(string).replaceAll("\0"+Matcher.quoteReplacement(prefix));
+                : NewlinePattern.matcher(string).replaceAll("$0"+Matcher.quoteReplacement(prefix));
     }
 
 
