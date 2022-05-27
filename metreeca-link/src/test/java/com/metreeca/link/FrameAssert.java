@@ -19,14 +19,13 @@ package com.metreeca.link;
 import org.assertj.core.api.*;
 import org.eclipse.rdf4j.model.Statement;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.metreeca.core.Strings.indent;
+import static com.metreeca.link.Values.format;
 
 import static org.eclipse.rdf4j.model.util.Models.isomorphic;
-
-import static java.util.stream.Collectors.toList;
 
 
 public final class FrameAssert extends AbstractAssert<FrameAssert, Frame> {
@@ -56,7 +55,7 @@ public final class FrameAssert extends AbstractAssert<FrameAssert, Frame> {
         isNotNull();
 
         if ( !actual.empty() ) {
-            failWithMessage("expected frame to be empty but was <\n%s\n>", actual.format());
+            failWithMessage("expected frame to be empty but was <\n%s\n>", format(actual));
         }
 
         return this;
@@ -82,13 +81,13 @@ public final class FrameAssert extends AbstractAssert<FrameAssert, Frame> {
 
         isNotNull();
 
-        final List<Statement> a=actual.model().collect(toList());
-        final List<Statement> f=frame.model().collect(toList());
+        final Set<Statement> a=actual.model();
+        final Set<Statement> f=frame.model();
 
         if ( !isomorphic(a, f) ) {
             failWithMessage(
                     "expected frame <\n%s\n> to be isomorphic to <\n%s\n>",
-                    indent(actual.format()), indent(frame.format())
+                    indent(format(actual)), indent(format(frame))
             );
         }
 

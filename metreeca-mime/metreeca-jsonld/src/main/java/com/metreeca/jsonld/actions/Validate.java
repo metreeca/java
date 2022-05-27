@@ -30,7 +30,6 @@ import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.link.Frame.frame;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Shape-based validation.
@@ -63,7 +62,7 @@ public final class Validate implements Function<Frame, Optional<Frame>> {
 
 	@Override public Optional<Frame> apply(final Frame frame) {
 
-		return shape.validate(frame.focus(), frame.model().collect(toList())).fold(
+		return shape.validate(frame.focus(), frame.model()).fold(
 
 				trace -> {
 

@@ -37,8 +37,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
+import static com.metreeca.core.Strings.indent;
+
 import static java.util.Locale.ROOT;
-import static java.util.stream.Collectors.joining;
+import static java.util.Map.Entry.comparingByKey;
+import static java.util.stream.Collectors.*;
 
 
 /**
@@ -510,10 +513,6 @@ public final class Values {
                 : format((Literal)value);
     }
 
-    public static String format(final Frame frame) {
-        return frame == null ? null : frame.toString();
-    }
-
     public static String format(final Focus focus) {
         return focus == null ? null : "{"+focus.stringValue()+"}";
     }
@@ -553,6 +552,61 @@ public final class Values {
                 return Strings.quote(literal.getLabel())+"^^"+format(type);
 
             }
+        }
+    }
+
+
+    public static String format(final Frame frame) {
+        if ( frame == null ) { return null; } else {
+
+            final StringBuilder builder=new StringBuilder(1000);
+
+            final Queue<Value> pending=new ArrayDeque<>(Set.of(frame.focus()));
+            final Collection<Value> visited=new HashSet<>();
+
+            for (Value next; (next=pending.poll()) != null; ) {
+
+                final Value subject=next;
+
+                if ( visited.add(subject) ) {
+
+                    final List<Statement> traits=frame.model().stream()
+                            .filter(statement -> statement.getSubject().equals(subject))
+                            .collect(toList());
+
+                    if ( !traits.isEmpty() ) {
+
+                        traits.stream()
+                                .map(Statement::getObject)
+                                .forEach(pending::add);
+
+                        builder.append("\n\n").append(format(subject)).append(' ').append(indent(traits.stream()
+
+                                .collect(groupingBy(Statement::getPredicate, mapping(Statement::getObject, toList())))
+                                .entrySet()
+                                .stream()
+
+                                .sorted(comparingByKey((x, y) ->
+                                        x.equals(RDF.TYPE) ? y.equals(RDF.TYPE) ? 0 : -1 : y.equals(RDF.TYPE) ? +1 : 0
+                                ))
+
+                                .map(entry -> format(entry.getKey())+" "+entry.getValue().stream()
+                                        .map(Values::format)
+                                        .collect(joining(", "))
+                                )
+
+                                .collect(joining(";\n"))
+
+                        ));
+
+                    }
+
+                }
+
+            }
+
+            return builder.length() == 0 ? format(frame.focus())
+                    : String.format("%s {%s\n\n}", format(frame.focus()), indent(builder.toString()));
         }
     }
 

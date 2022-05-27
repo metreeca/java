@@ -24,12 +24,13 @@ import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
 import com.metreeca.link.shapes.Guard;
 
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.http.Handler.handler;
@@ -44,10 +45,7 @@ import static com.metreeca.link.shapes.Guard.Create;
 import static com.metreeca.link.shapes.Guard.Detail;
 
 import static java.lang.String.format;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -201,22 +199,21 @@ public final class Creator extends Delegator {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Frame rewrite(final IRI target, final IRI source, final Frame frame) {
-        return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.traits()));
+        return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.model()));
     }
 
-    private Value rewrite(final Value target, final Value source, final Value focus) {
+    private Collection<Statement> rewrite(final IRI target, final IRI source, final Collection<Statement> model) {
+        return model.stream()
+                .map(statement -> Values.statement(
+                        (Resource)rewrite(target, source, statement.getSubject()),
+                        (IRI)rewrite(target, source, statement.getPredicate()),
+                        rewrite(target, source, statement.getObject())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private Value rewrite(final IRI target, final IRI source, final Value focus) {
         return source.equals(focus) ? target : focus;
-    }
-
-    private Map<IRI, Collection<Frame>> rewrite(
-            final IRI target, final IRI source, final Map<IRI, Collection<Frame>> traits
-    ) {
-        return traits.entrySet().stream().collect(toMap(Map.Entry::getKey, entry ->
-                unmodifiableSet((Set<Frame>)entry.getValue().stream()
-                        .map(frame -> rewrite(target, source, frame))
-                        .collect(toCollection(LinkedHashSet::new))
-                )
-        ));
     }
 
 }

@@ -253,7 +253,7 @@ public final class GraphLinker implements Function<Chunk, Stream<Match<Chunk, Fr
 		final Collection<Statement> connections=matches.stream()
 
 				.map(Match::target)
-				.flatMap(Frame::model)
+				.flatMap(frame -> frame.model().stream())
 
 				// consider only links to other candidates
 

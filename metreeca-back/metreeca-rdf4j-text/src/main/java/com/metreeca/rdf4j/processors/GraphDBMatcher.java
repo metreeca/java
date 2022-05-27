@@ -364,7 +364,7 @@ public final class GraphDBMatcher implements Function<Stream<String>, Stream<Mat
                             .orElse(BigDecimal.ZERO)
                             .doubleValue();
 
-                    return frame.model()
+                    return frame.model().stream()
 
                             .filter(s -> labels.contains(s.getPredicate()))
 

@@ -289,11 +289,12 @@ public abstract class EngineTest {
 		@Test void testSortingDefault() {
 			exec(dataset(), () -> Assertions.assertThat(relate(frame(employees), items(EmployeeShape)).map(frame ->
 
-					frame.frames(Contains).collect(toList())
+					frame.frames(Contains).map(Frame::focus).collect(toList())
 
 			)).hasValue(resources.stream()
 					.filter(frame -> frame.value(RDF.TYPE).filter(Employee::equals).isPresent())
 					.sorted(comparing(Frame::focus, Values::compare))
+					.map(Frame::focus)
 					.collect(toList())
 			));
 		}
@@ -305,11 +306,12 @@ public abstract class EngineTest {
 
 			)).map(frame ->
 
-					frame.frames(Contains).collect(toList())
+					frame.frames(Contains).map(Frame::focus).collect(toList())
 
 			)).hasValue(resources.stream()
 					.filter(frame -> frame.value(RDF.TYPE).filter(Employee::equals).isPresent())
 					.sorted(comparing(Frame::focus, Values::compare).reversed())
+					.map(Frame::focus)
 					.collect(toList())
 			));
 		}
@@ -321,11 +323,12 @@ public abstract class EngineTest {
 
 			)).map(frame ->
 
-					frame.frames(Contains).collect(toList())
+					frame.frames(Contains).map(Frame::focus).collect(toList())
 
 			)).hasValue(resources.stream()
 					.filter(frame -> frame.value(RDF.TYPE).filter(Employee::equals).isPresent())
 					.sorted(comparing(frame -> frame.string(RDFS.LABEL).orElse("")))
+					.map(Frame::focus)
 					.collect(toList())
 			));
 		}
@@ -337,11 +340,12 @@ public abstract class EngineTest {
 
 			)).map(frame ->
 
-					frame.frames(Contains).collect(toList())
+					frame.frames(Contains).map(Frame::focus).collect(toList())
 
 			)).hasValue(resources.stream()
 					.filter(frame -> frame.value(RDF.TYPE).filter(Employee::equals).isPresent())
 					.sorted(Comparator.<Frame, String>comparing(frame -> frame.string(RDFS.LABEL).orElse("")).reversed())
+					.map(Frame::focus)
 					.collect(toList())
 			));
 		}
@@ -353,7 +357,7 @@ public abstract class EngineTest {
 
 			)).map(frame ->
 
-					frame.frames(Contains).collect(toList())
+					frame.frames(Contains).map(Frame::focus).collect(toList())
 
 			)).hasValue(resources.stream()
 					.filter(frame -> frame.value(RDF.TYPE).filter(Employee::equals).isPresent())
@@ -361,6 +365,7 @@ public abstract class EngineTest {
 							.<Frame, Value>comparing(frame -> frame.value(office).orElse(null), Values::compare)
 							.thenComparing(frame -> frame.string(RDFS.LABEL).orElse(""))
 					)
+					.map(Frame::focus)
 					.collect(toList())
 			));
 		}

@@ -394,7 +394,7 @@ public final class JSONLD implements Codec<Frame> {
                 );
 
 
-        final Collection<Statement> localized=value.model().filter(statement -> {
+        final Collection<Statement> localized=value.model().stream().filter(statement -> {
 
             if ( global ) { return true; } else { // retain only tagged literals with an accepted language
 

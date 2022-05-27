@@ -111,7 +111,7 @@ public final class GraphTest {
 								frame(iri(Base, "/test/request"))
 										.value(RDF.VALUE, RDF.NIL)
 
-						).model().collect(toList())
+						).model()
 
 		)
 
@@ -179,7 +179,7 @@ public final class GraphTest {
 						frame(iri(Base, "/test/request"))
 								.value(RDF.VALUE, RDF.NIL)
 
-				).model().collect(toList())
+				).model()
 		)
 
 				.as("bindings configured")

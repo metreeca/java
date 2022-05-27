@@ -43,7 +43,6 @@ import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 import static java.lang.String.format;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.MILLIS;
-import static java.util.stream.Collectors.toCollection;
 
 
 /**
@@ -119,7 +118,7 @@ public final class Graph implements AutoCloseable {
 
 			logger.debug(Graph.class, () -> format("evaluating query %s", query));
 
-			final ArrayList<Statement> model=frame.model().collect(toCollection(ArrayList::new));
+			final ArrayList<Statement> model=new ArrayList<>(frame.model());
 
 			time(() -> configure(
 

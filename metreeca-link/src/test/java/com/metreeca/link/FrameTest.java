@@ -29,7 +29,6 @@ import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shifts.Seq.seq;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -72,16 +71,20 @@ final class FrameTest {
             )));
         }
 
-        @Test void testReportLiteralSubjectsForDirectTraits() {
-            assertThatIllegalArgumentException().isThrownBy(() ->
-                    frame(x).value(inverse(RDF.VALUE), literal(1))
-            );
+        @Test void tesIgnoreLiteralSubjectsForDirectTraits() {
+
+            final Frame frame=frame(literal(1));
+
+            assertThat(frame.value(RDF.VALUE, x))
+                    .isEqualTo(frame);
         }
 
-        @Test void testReportLiteralObjectsForInverseTraits() {
-            assertThatIllegalArgumentException().isThrownBy(() ->
-                    frame(x).value(inverse(RDF.VALUE), literal(1))
-            );
+        @Test void testIgnoreLiteralObjectsForInverseTraits() {
+
+            final Frame frame=frame(x);
+
+            assertThat(frame.value(inverse(RDF.VALUE), literal(1)))
+                    .isEqualTo(frame);
         }
 
     }
@@ -121,19 +124,6 @@ final class FrameTest {
             ))).isIsomorphicTo(frame(x, singletonList(
 
                     statement(x, RDF.VALUE, y)
-
-            )));
-        }
-
-        @Test void testIgnoreInverseTypeLinks() {
-            assertThat(frame(x, asList(
-
-                    statement(x, RDF.TYPE, z),
-                    statement(y, RDF.TYPE, z)
-
-            ))).isIsomorphicTo(frame(x, singletonList(
-
-                    statement(x, RDF.TYPE, z)
 
             )));
         }
@@ -223,8 +213,22 @@ final class FrameTest {
 
     }
 
-
     @Nested final class Shifting {
+
+        @Test void testShiftStep() {
+            assertThat(
+
+                    frame(w, List.of(
+                            statement(w, RDF.FIRST, x),
+                            statement(x, RDF.REST, y),
+                            statement(x, RDF.REST, z)
+                    ))
+
+                            .values(RDF.FIRST)
+                            .collect(toSet())
+
+            ).containsExactlyInAnyOrder(x);
+        }
 
         @Test void testShiftSeq() {
             assertThat(

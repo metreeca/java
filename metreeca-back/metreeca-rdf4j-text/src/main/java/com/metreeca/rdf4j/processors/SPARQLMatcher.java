@@ -170,7 +170,7 @@ public final class SPARQLMatcher implements Function<Stream<String>, Stream<Matc
 							.orElse(BigDecimal.ZERO)
 							.doubleValue();
 
-					return frame.model()
+					return frame.model().stream()
 
 							.filter(s -> labels.contains(s.getPredicate()))
 
