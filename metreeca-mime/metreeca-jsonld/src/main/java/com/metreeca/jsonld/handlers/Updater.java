@@ -17,7 +17,6 @@
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.http.*;
-import com.metreeca.http.handlers.Delegator;
 import com.metreeca.jsonld.codecs.JSONLD;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Frame;
@@ -29,6 +28,7 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.jsonld.handlers.Driver.keeper;
+import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.link.shapes.Guard.Update;
 
@@ -73,9 +73,9 @@ import static com.metreeca.link.shapes.Guard.Update;
  *
  * </ul>
  */
-public final class Updater extends Delegator {
+public final class Updater extends Operator {
 
-	private final Engine engine=service(Engine.engine());
+	private final Engine engine=service(engine());
 
 
 	/**
@@ -84,6 +84,7 @@ public final class Updater extends Delegator {
 	public Updater() {
 		delegate(handler(
 				keeper(Update, Detail),
+				wrapper(),
 				update()
 		));
 	}

@@ -17,7 +17,6 @@
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.http.*;
-import com.metreeca.http.handlers.Delegator;
 import com.metreeca.jsonld.codecs.JSONLD;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
@@ -33,6 +32,7 @@ import static com.metreeca.http.Response.OK;
 import static com.metreeca.jsonld.codecs.JSONLD.query;
 import static com.metreeca.jsonld.codecs.JSONLD.shape;
 import static com.metreeca.jsonld.handlers.Driver.keeper;
+import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Shape.Contains;
 import static com.metreeca.link.Values.iri;
@@ -99,9 +99,9 @@ import static com.metreeca.link.shapes.Guard.*;
  *
  * </ul>
  */
-public final class Relator extends Delegator {
+public final class Relator extends Operator {
 
-    private final Engine engine=service(Engine.engine());
+    private final Engine engine=service(engine());
 
 
     /**
@@ -113,13 +113,14 @@ public final class Relator extends Delegator {
                         keeper(Relate, Digest),
                         keeper(Relate, Detail)
                 ),
+                wrapper(),
                 relate()
         ));
     }
 
 
     private Handler relate() {
-        return (request, next) -> {
+        return (request, forward) -> {
 
             final boolean collection=request.collection();
 

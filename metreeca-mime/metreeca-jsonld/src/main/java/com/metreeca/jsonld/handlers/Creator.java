@@ -18,7 +18,6 @@ package com.metreeca.jsonld.handlers;
 
 
 import com.metreeca.http.*;
-import com.metreeca.http.handlers.Delegator;
 import com.metreeca.jsonld.codecs.JSONLD;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
@@ -38,6 +37,7 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Request.encode;
 import static com.metreeca.http.Response.Created;
 import static com.metreeca.jsonld.handlers.Driver.keeper;
+import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.iri;
@@ -85,11 +85,11 @@ import static java.util.Objects.requireNonNull;
  *
  * </ul>
  */
-public final class Creator extends Delegator {
+public final class Creator extends Operator {
 
     private Function<Request, String> slug=request -> md5();
 
-    private final Engine engine=service(Engine.engine());
+    private final Engine engine=service(engine());
 
 
     /**
@@ -99,6 +99,7 @@ public final class Creator extends Delegator {
         delegate(handler(
                 rewrite(),
                 keeper(Create, Detail),
+                wrapper(),
                 create()
         ));
     }
