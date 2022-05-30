@@ -36,7 +36,6 @@ import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Request.encode;
 import static com.metreeca.http.Response.Created;
-import static com.metreeca.jsonld.handlers.Driver.keeper;
 import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.format;
@@ -59,7 +58,7 @@ import static java.util.Objects.requireNonNull;
  * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Driver#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
  *
  * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid

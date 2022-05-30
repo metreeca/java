@@ -29,7 +29,6 @@ import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.jsonld.handlers.Driver.keeper;
 import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.iri;
@@ -48,7 +47,7 @@ import static com.metreeca.link.shapes.Guard.Detail;
  * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Driver#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Delete} task and the {@linkplain Guard#Detail} view.</li>
  *
  * <li>deletes the existing description of the resource matching the redacted request shape with the assistance of the
@@ -75,33 +74,33 @@ import static com.metreeca.link.shapes.Guard.Detail;
  */
 public final class Deleter extends Operator {
 
-	private final Engine engine=service(engine());
+    private final Engine engine=service(engine());
 
 
-	/**
-	 * Creates a resource deleter.
-	 */
-	public Deleter() {
-		delegate(handler(
-				keeper(Delete, Detail),
-				wrapper(),
-				delete()
-		));
-	}
+    /**
+     * Creates a resource deleter.
+     */
+    public Deleter() {
+        delegate(handler(
+                keeper(Delete, Detail),
+                wrapper(),
+                delete()
+        ));
+    }
 
 
-	private Handler delete() {
+    private Handler delete() {
         return (request, next) -> {
 
-	        final IRI item=iri(request.item());
-	        final Shape shape=JSONLD.shape(request);
+            final IRI item=iri(request.item());
+            final Shape shape=JSONLD.shape(request);
 
             return engine.delete(frame(item), shape)
 
-					.map(frame -> request.reply(NoContent))
+                    .map(frame -> request.reply(NoContent))
 
-					.orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known
+                    .orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known
 
-		};
-	}
+        };
+    }
 }

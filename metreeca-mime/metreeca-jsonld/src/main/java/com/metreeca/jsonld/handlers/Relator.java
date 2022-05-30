@@ -31,7 +31,6 @@ import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.jsonld.codecs.JSONLD.query;
 import static com.metreeca.jsonld.codecs.JSONLD.shape;
-import static com.metreeca.jsonld.handlers.Driver.keeper;
 import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Shape.Contains;
@@ -52,7 +51,7 @@ import static com.metreeca.link.shapes.Guard.*;
  * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
  * user {@linkplain Request#roles() roles};</li>
  *
- * <li>performs shape-based {@linkplain Driver#keeper(Object, Object) authorization}, considering the subset of
+ * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Relate} task and the {@linkplain Guard#Digest} view, if the
  * focus item is a {@linkplain Request#collection() collection}, or the {@linkplain Guard#Detail} view, otherwise.</li>
  *
@@ -107,7 +106,7 @@ public final class Relator extends Operator {
     /**
      * Creates a resource relator.
      */
-    private Relator() {
+    public Relator() {
         delegate(handler(
                 handler(Request::collection,
                         keeper(Relate, Digest),

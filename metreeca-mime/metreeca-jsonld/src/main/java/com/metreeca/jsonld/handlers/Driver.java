@@ -20,22 +20,17 @@ import com.metreeca.http.*;
 import com.metreeca.jsonld.codecs.JSONLD;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Field;
-import com.metreeca.link.shapes.Guard;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
-import static com.metreeca.http.Response.Forbidden;
-import static com.metreeca.http.Response.Unauthorized;
 import static com.metreeca.jsonld.codecs.JSONLD.shape;
 import static com.metreeca.link.Values.inverse;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
-import static com.metreeca.link.shapes.Guard.*;
 
 import static java.util.Arrays.stream;
 
@@ -98,61 +93,6 @@ public final class Driver implements Handler {
      */
     public static Shape back(final Shape... shapes) {
         return field(Tag, Inverse, shapes);
-    }
-
-
-    /**
-     * Creates a shape-based access controller.
-     *
-     * @param task the accepted value for the {@linkplain Guard#Task task} parametric axis
-     * @param view the accepted values for the {@linkplain Guard#View task} parametric axis
-     *
-     * @return a wrapper performing role-based shape redaction and shape-based authorization
-     *
-     * @throws NullPointerException if either {@code task} or {@code view} is null
-     */
-    public static Handler keeper(final Object task, final Object view) {
-        return (request, forward) -> {
-
-            final Shape shape=shape(request) // visible taking into account task/area
-
-                    .redact(Task, task)
-                    .redact(View, view)
-                    .redact(Mode, Convey);
-
-            final Shape baseline=shape // visible to anyone
-
-                    .redact(Role);
-
-            final Shape authorized=shape // visible to user
-
-                    .redact(Role, request.roles());
-
-
-            final UnaryOperator<Request> incoming=message -> shape(message, shape(message)
-
-                    .redact(Role, message.roles())
-                    .redact(Task, task)
-                    .redact(View, view)
-
-                    .localize(message.request().langs())
-            );
-
-            final UnaryOperator<Response> outgoing=message -> shape(message, shape(message)
-
-                    .redact(Role, message.request().roles())
-                    .redact(Task, task)
-                    .redact(View, view)
-                    .redact(Mode, Convey)
-
-                    .localize(message.request().langs())
-            );
-
-            return baseline.empty() ? request.reply(Forbidden)
-                    : authorized.empty() ? request.reply(Unauthorized)
-                    : forward.apply(request.map(incoming)).map(outgoing);
-
-        };
     }
 
 
