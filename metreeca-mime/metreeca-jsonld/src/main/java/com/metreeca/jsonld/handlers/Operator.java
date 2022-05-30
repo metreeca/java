@@ -23,7 +23,6 @@ import com.metreeca.link.shapes.Guard;
 
 import java.util.function.UnaryOperator;
 
-import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.Forbidden;
 import static com.metreeca.http.Response.Unauthorized;
 import static com.metreeca.jsonld.codecs.JSONLD.shape;
@@ -104,21 +103,21 @@ public abstract class Operator extends Delegator {
     }
 
     /**
-     * Configures the custom wrapper handlers.
+     * Configures the custom wrapper handler.
      *
-     * @param wrappers the wrapper handlers used to customize requests and responses
+     * @param wrapper the wrapper handler used to customize requests and responses
      *
      * @return this operator
      *
      * @throws NullPointerException if {@code wrappers} is null or contains null elements
      */
-    public Operator wrapper(final Handler... wrappers) {
+    public Operator wrapper(final Handler wrapper) {
 
         if ( wrapper == null ) {
             throw new NullPointerException("null wrappers");
         }
 
-        this.wrapper=handler(wrapper);
+        this.wrapper=wrapper;
 
         return this;
     }
