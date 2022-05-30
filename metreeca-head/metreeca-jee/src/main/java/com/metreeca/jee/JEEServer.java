@@ -17,6 +17,7 @@
 package com.metreeca.jee;
 
 import com.metreeca.http.*;
+import com.metreeca.http.handlers.Server;
 import com.metreeca.http.services.Loader;
 
 import java.io.*;
@@ -30,6 +31,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.services.Logger.logger;
 
 import static java.util.Arrays.asList;
@@ -84,7 +86,10 @@ public abstract class JEEServer implements Filter {
             throw new NullPointerException("null factory");
         }
 
-        locator.set(delegate(), () -> requireNonNull(factory.apply(locator), "null handler"));
+        locator.set(delegate(), () -> handler(
+                new Server(),
+                requireNonNull(factory.apply(locator), "null handler")
+        ));
 
         return this;
     }

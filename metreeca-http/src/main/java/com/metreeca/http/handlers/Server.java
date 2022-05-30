@@ -38,8 +38,8 @@ import static java.lang.String.format;
 /**
  * API server.
  *
- * <p>Provides default resource pre/postprocessing and error handling; mainly intended as the outermost handler
- * returned by loaders.</p>
+ * <p>Provides default resource pre/postprocessing and error handling; mainly intended to factor default server
+ * connector functionalities.</p>
  */
 public final class Server extends Delegator {
 
