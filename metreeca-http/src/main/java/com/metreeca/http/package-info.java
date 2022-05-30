@@ -15,6 +15,7 @@
  */
 
 /**
- * HTTP framework components.
+ * HTTP API framework.
  */
+
 package com.metreeca.http;
