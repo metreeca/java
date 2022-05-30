@@ -175,9 +175,10 @@ public final class JSEServer {
             server.createContext(path, exchange -> {
                 try {
 
-                    response(exchange, handler.handle(request(exchange), Request::reply).map(response ->
-                            response.status() > 0 ? response : response.status(NotFound)
+                    locator.exec(() -> response(exchange, handler.handle(request(exchange), Request::reply)
+                            .map(response -> response.status() > 0 ? response : response.status(NotFound))
                     ));
+
 
                 } catch ( final RuntimeException e ) {
 
