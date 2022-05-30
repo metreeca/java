@@ -37,15 +37,21 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
             final Value focus, final Shape shape, final Collection<Statement> model
     ) {
         return shape
+
+                .redact(Guard.Role)
+                .redact(Guard.Task)
+                .redact(Guard.View)
+                .redact(Guard.Mode, Guard.Convey) // remove internal filtering shapes
+
                 .map(new ShapeValidator(focus, singleton(focus), model))
                 .fold(Either::Left, stream -> Right(stream.collect(toList())));
     }
 
 
-	private final Value focus;
+    private final Value focus;
 
-	private final Collection<Value> group;
-	private final Collection<Statement> model;
+    private final Collection<Value> group;
+    private final Collection<Statement> model;
 
 
     private ShapeValidator(final Value focus, final Collection<Value> group, final Collection<Statement> model) {
@@ -77,11 +83,11 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
     private Value resolve(final Value value) {
         return value instanceof Focus ? ((Focus)value).resolve(focus) : value;
-	}
+    }
 
-	private Set<Value> resolve(final Collection<Value> values) {
-		return values.stream().map(this::resolve).collect(toSet());
-	}
+    private Set<Value> resolve(final Collection<Value> values) {
+        return values.stream().map(this::resolve).collect(toSet());
+    }
 
 
     @Override public Either<Trace, Stream<Statement>> probe(final Guard guard) {
@@ -106,7 +112,8 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
         return report(Trace.trace(group.stream()
                 .filter(value -> !values.contains(value))
-                .map(value -> format("%s is not in the expected value range {%s}", Values.format(value), Values.format(values)))
+                .map(value -> format("%s is not in the expected value range {%s}", Values.format(value),
+                        Values.format(values)))
         ));
     }
 
@@ -125,7 +132,7 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
                         "%s is not in the expected language set {%s}", Values.format(value), join(", ", tags)
                 ))
         ));
-	}
+    }
 
 
     @Override public Either<Trace, Stream<Statement>> probe(final MinExclusive minExclusive) {
@@ -154,7 +161,8 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
         return report(Trace.trace(group.stream()
                 .filter(negate(value -> Values.compare(value, limit) >= 0))
-                .map(value -> format("%s is not greater than or equal to %s", Values.format(value), Values.format(limit)))
+                .map(value -> format("%s is not greater than or equal to %s", Values.format(value),
+                        Values.format(limit)))
         ));
     }
 
@@ -201,7 +209,8 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
         return report(Trace.trace(group.stream()
                 .filter(negate(value -> compiled.matcher(Values.text(value)).matches()))
-                .map(value -> format("%s textual value doesn't match <%s> pattern", Values.format(value), compiled.pattern()))
+                .map(value -> format("%s textual value doesn't match <%s> pattern", Values.format(value),
+                        compiled.pattern()))
         ));
     }
 
@@ -213,7 +222,8 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
         return report(Trace.trace(group.stream()
                 .filter(negate(value -> predicate.test(Values.text(value))))
-                .map(value -> String.format("%s textual value doesn't match <%s> keywords", Values.format(value), like.keywords()))
+                .map(value -> String.format("%s textual value doesn't match <%s> keywords", Values.format(value),
+                        like.keywords()))
         ));
     }
 
@@ -279,7 +289,7 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
                 .map(entry -> String.format("multiple values for <%s> language tag", entry.getKey()))
         ));
-	}
+    }
 
 
     @Override public Either<Trace, Stream<Statement>> probe(final Link link) {
@@ -297,13 +307,13 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
                             recto -> s -> s.getPredicate().equals(recto) && s.getSubject().equals(value),
                             verso -> s -> s.getPredicate().equals(verso) && s.getObject().equals(value)
                     ))
-					.collect(toList());
+                    .collect(toList());
 
-			final Set<Value> values=statements.stream()
+            final Set<Value> values=statements.stream()
                     .map(Values.direct(iri) ? Statement::getObject : Statement::getSubject)
-					.collect(toSet());
+                    .collect(toSet());
 
-			return merge(
+            return merge(
 
                     shape.map(new ShapeValidator(focus, values, model)).fold(
                             trace -> Either.Left(Trace.trace(iri.toString(), trace)),
@@ -313,8 +323,8 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
                     Right(statements.stream())
             );
 
-		}).reduce(Right(Stream.empty()), this::merge);
-	}
+        }).reduce(Right(Stream.empty()), this::merge);
+    }
 
 
     @Override public Either<Trace, Stream<Statement>> probe(final When when) {
@@ -340,10 +350,10 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
                 .collect(toList());
 
-		return reports.isEmpty()
+        return reports.isEmpty()
                 ? Either.Left(Trace.trace("values don't match any alternative"))
                 : reports.stream().reduce(Right(Stream.empty()), this::merge);
-	}
+    }
 
 
     @Override public Either<Trace, Stream<Statement>> probe(final Shape shape) {
