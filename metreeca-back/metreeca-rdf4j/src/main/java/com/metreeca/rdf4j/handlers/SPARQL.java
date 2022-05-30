@@ -35,6 +35,7 @@ import org.eclipse.rdf4j.rio.ntriples.NTriplesWriterFactory;
 import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.metreeca.core.Lambdas.guarded;
 import static com.metreeca.http.Message.mimes;
@@ -55,25 +56,13 @@ import static com.metreeca.rdf.codecs.RDF.service;
  */
 public final class SPARQL extends Endpoint<SPARQL> {
 
-    /**
-     * Creates a SPARQL endpoint
-     *
-     * @return a new SPARQL endpoint
-     */
-    public static SPARQL sparql() {
-        return new SPARQL();
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     private Consumer<Operation> options=operation -> { };
 
 
-    private SPARQL() {
+    public SPARQL() {
         delegate(new Router()
-                .get((request, next) -> process(request))
-                .post((request1, next) -> process(request1))
+                .get(this::process)
+                .post(this::process)
         );
     }
 
@@ -101,7 +90,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Response process(final Request request) {
+    private Response process(final Request request, final Function<Request, Response> forward) {
         return graph().query(connection -> {
             try {
 

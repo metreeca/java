@@ -21,7 +21,6 @@ import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.codecs.Data;
 import com.metreeca.http.handlers.Router;
-import com.metreeca.link.Shape;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.model.*;
@@ -34,14 +33,13 @@ import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 import static com.metreeca.core.Lambdas.task;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.link.Shape.exactly;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.statement;
-import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.rdf.codecs.RDF.service;
 
 import static java.lang.String.format;
@@ -60,29 +58,12 @@ import static java.lang.String.format;
  */
 public final class Graphs extends Endpoint<Graphs> {
 
-    private static final Shape GraphsShape=field(RDF.VALUE,
-            field(RDF.TYPE), exactly(VOID.DATASET)
-    );
-
-
-    /**
-     * Creates a graph store endpoint
-     *
-     * @return a new graph store endpoint
-     */
-    public static Graphs graphs() {
-        return new Graphs();
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private Graphs() {
+    public Graphs() {
         delegate(new Router()
-                .get((request, next) -> get(request))
-                .put((request1, next) -> put(request1))
-                .delete((request2, next) -> delete(request2))
-                .post((request3, next) -> post(request3))
+                .get(this::get)
+                .put(this::put)
+                .delete(this::delete)
+                .post(this::post)
         );
     }
 
@@ -92,7 +73,7 @@ public final class Graphs extends Endpoint<Graphs> {
     /*
      * https://www.w3.org/TR/sparql11-http-rdf-update/#http-get
      */
-    private Response get(final Request request) {
+    private Response get(final Request request, final Function<Request, Response> forward) {
 
         final boolean catalog=request.parameters().isEmpty();
 
@@ -159,7 +140,7 @@ public final class Graphs extends Endpoint<Graphs> {
     /*
      * https://www.w3.org/TR/sparql11-http-rdf-update/#http-put
      */
-    private Response put(final Request request) {
+    private Response put(final Request request, final Function<Request, Response> forward) {
 
         final String target=graph(request);
 
@@ -221,7 +202,7 @@ public final class Graphs extends Endpoint<Graphs> {
     /*
      * https://www.w3.org/TR/sparql11-http-rdf-update/#http-delete
      */
-    private Response delete(final Request request) {
+    private Response delete(final Request request, final Function<Request, Response> forward) {
 
         final String target=graph(request);
 
@@ -262,7 +243,7 @@ public final class Graphs extends Endpoint<Graphs> {
     /*
      * https://www.w3.org/TR/sparql11-http-rdf-update/#http-post
      */
-    private Response post(final Request request) {
+    private Response post(final Request request, final Function<Request, Response> forward) {
 
         // !!! support  "multipart/form-data"
         // !!! support graph creation with IRI identifying the underlying Graph Store
