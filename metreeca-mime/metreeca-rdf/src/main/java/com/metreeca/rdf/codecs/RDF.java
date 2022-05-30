@@ -242,10 +242,14 @@ public final class RDF implements Codec<Collection<Statement>> {
     /**
      * @return the RDF payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account the
      * RDF serialization format defined by the  {@code "Content-Type"} {@code message} header or an empty optional if the
-     * {@code "Content-Type"} {@code message} is not associated with an RDF format in the {@link RDFParserRegistry}
+     * {@code "Content-Type"} {@code message} is not empty and is not associated with an RDF format in the {@link
+     * RDFParserRegistry}
      */
     @Override public Optional<Collection<Statement>> decode(final Message<?> message) {
-        return message.header("Content-Type")
+        return message
+
+                .header("Content-Type")
+                .or(() -> Optional.of(MIME))
 
                 .flatMap(type -> service(RDFParserRegistry.getInstance(), mimes(type)))
 

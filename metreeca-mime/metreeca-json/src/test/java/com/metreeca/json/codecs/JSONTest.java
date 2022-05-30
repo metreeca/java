@@ -58,6 +58,7 @@ final class JSONTest {
 	@Test void testRetrieveJSONChecksContentType() {
 
 		final Request request=new Request()
+				.header("Content-Type", "text/plain")
 				.input(() -> new ByteArrayInputStream(TestJSON.toString().getBytes(UTF_8)));
 
 		assertThatExceptionOfType(CodecException.class)

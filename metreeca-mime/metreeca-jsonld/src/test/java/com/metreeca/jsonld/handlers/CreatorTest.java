@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.metreeca.http.Response.Created;
 import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.jsonld.codecs.JSONLD.shape;
 import static com.metreeca.jsonld.handlers.OperatorTest.exec;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.item;
@@ -53,38 +54,31 @@ final class CreatorTest {
 
 				},
 
-				() -> {
-					new Creator()
+				() -> new Creator()
 
-							.handle(JSONLD.shape(new Request(), shape)
-											.body(new JSONLD(), frame(focus)
-													.value(RDF.VALUE, focus)
-											),
-									Request::reply
-							)
+						.handle(shape(new Request(), shape)
+										.body(new JSONLD(), frame(focus)
+												.value(RDF.VALUE, focus)
+										),
+								Request::reply
+						)
 
-							.map(response -> {
-										return assertThat(response)
-												.hasStatus(Created)
-												.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(or()))
-												.doesNotHaveBody(new JSONLD());
-									}
-							);
-				}
+						.map(response -> assertThat(response)
+								.hasStatus(Created)
+								.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(or()))
+								.doesNotHaveBody()
+						)
 
 		);
 	}
 
 	@Test void testReportClash() {
-		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> {
-					new Creator()
+		assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> new Creator()
 
-							.handle(JSONLD.shape(new Request()
-													, shape)
-											.body(new JSONLD(), frame(item("/"))),
-									Request::reply
-							);
-				}
+				.handle(shape(new Request(), shape)
+								.body(new JSONLD(), frame(item("/"))),
+						Request::reply
+				)
 
 		));
 	}

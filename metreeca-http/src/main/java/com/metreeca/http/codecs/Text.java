@@ -62,12 +62,13 @@ public final class Text implements Codec<String> {
     /**
      * @return the textual payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account
      * the {@code message} {@linkplain Message#charset() charset} or an empty optional if the {@code "Content-Type"}
-     * {@code message} header is not matched by {@link #MIMEPattern}
+     * {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
     @Override public Optional<String> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
+                .or(() -> Optional.of(MIME))
                 .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {

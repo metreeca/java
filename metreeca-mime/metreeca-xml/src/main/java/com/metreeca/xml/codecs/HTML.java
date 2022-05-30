@@ -185,15 +185,16 @@ public final class HTML implements Codec<Document> {
      * @param message
      *
      * @return the HTML payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account
-     * the
-     * {@code message} {@linkplain Message#charset() charset} or an empty optional if the {@code "Content-Type"} {@code
-     * message} header is not matched by {@link #MIMEPattern}
+     * the {@code message} {@linkplain Message#charset() charset} or an empty optional if the {@code "Content-Type"}
+     * {@code
+     * message} header is not empty and is not matched by {@link #MIMEPattern}
      */
     @Override public Optional<Document> decode(final Message<?> message) {
         return message
 
-                .header("Content-Type")
-                .filter(MIMEPattern.asPredicate())
+		        .header("Content-Type")
+		        .or(() -> Optional.of(MIME))
+		        .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {
 

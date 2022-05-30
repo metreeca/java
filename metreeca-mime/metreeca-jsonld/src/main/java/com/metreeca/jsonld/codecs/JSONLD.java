@@ -24,6 +24,7 @@ import org.eclipse.rdf4j.model.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -296,19 +297,18 @@ public final class JSONLD implements Codec<Frame> {
         return Frame.class;
     }
 
-
     /**
-     * Decodes the JSON-LD {@code message} body from the input stream supplied by the {@code message} {@link
-     * Message#input()}, if the {@code message} {@code Content-Type} header is matched by {@link #MIMEPattern}
-     *
      * <p><strong>Warning</strong> / Decoding is completely driven by the {@code message}
      * {@linkplain JSONLD#shape(Message) shape attribute}: embedded {@code @context} objects are ignored.</p>
+     *
+     * @return the JSON-LD payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty optional
+     * if the {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
-
     @Override public Optional<Frame> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
+                .or(() -> Optional.of(MIME))
                 .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {
@@ -355,9 +355,6 @@ public final class JSONLD implements Codec<Frame> {
     }
 
     /**
-     * Configures {@code message} {@code Content-Type} header to {@value #MIME}, unless already defined, and encodes the
-     * JSON-LD model {@code value} into the output stream accepted by the {@code message} {@link Message#output()}.
-     *
      * <p>If the originating {@code message} {@linkplain Message#request() request} includes an {@code Accept-Language}
      * header, a suitably {@linkplain Shape#localize localized} version of the message shape is used in the conversion
      * process and only matching tagged literals from {@code value} are included in the response body.</p>
@@ -365,6 +362,10 @@ public final class JSONLD implements Codec<Frame> {
      * <p><strong>Warning</strong> / {@code @context} objects generated from the {@code message}
      * {@linkplain JSONLD#shape(Message) shape attribute} are embedded only if {@code Content-Type} is {@value
      * MIME}.</p>
+     *
+     * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless
+     * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the JSON-LD {@code
+     * value}
      */
     @Override public <M extends Message<M>> M encode(final M message, final Frame value) {
 

@@ -35,7 +35,6 @@ import static com.metreeca.http.Request.GET;
 import static com.metreeca.http.Response.MethodNotAllowed;
 import static com.metreeca.http.services.Logger.logger;
 
-import static java.io.InputStream.nullInputStream;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 import static java.lang.String.format;
@@ -104,11 +103,11 @@ import static java.lang.String.format;
                 // !!! connection.setReadTimeout();
                 // !!! connection.setIfModifiedSince();
 
-                if ( !request.header("User-Agent").isPresent() ) {
+                if ( request.header("User-Agent").isEmpty() ) {
                     connection.addRequestProperty("User-Agent", "metreeca/java (https://github.com/metreeca/java)");
                 }
 
-                if ( !request.header("Accept-Encoding").isPresent() ) {
+                if ( request.header("Accept-Encoding").isEmpty() ) {
                     connection.addRequestProperty("Accept-Encoding", "gzip");
                 }
 
@@ -184,7 +183,7 @@ import static java.lang.String.format;
                                             }
                                         })
 
-                                        .orElseGet(() -> nullInputStream());
+                                        .orElseGet(InputStream::nullInputStream);
 
                             } catch ( final IOException e ) {
                                 throw new UncheckedIOException(e);

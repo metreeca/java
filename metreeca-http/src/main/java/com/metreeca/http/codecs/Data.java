@@ -60,12 +60,13 @@ public final class Data implements Codec<byte[]> {
 
     /**
      * @return the binary payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty optional
-     * if the {@code "Content-Type"} {@code message} header is not matched by {@link #MIMEPattern}
+     * if the {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
     @Override public Optional<byte[]> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
+                .or(() -> Optional.of(MIME))
                 .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {

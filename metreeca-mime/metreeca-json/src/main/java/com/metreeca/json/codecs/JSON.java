@@ -132,12 +132,13 @@ public final class JSON implements Codec<JsonObject> {
 
     /**
      * @return the JSON payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty optional if
-     * the {@code "Content-Type"} {@code message} header is not matched by {@link #MIMEPattern}
+     * the {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
     @Override public Optional<JsonObject> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
+                .or(() -> Optional.of(MIME))
                 .filter(MIMEPattern.asPredicate())
 
                 .map(type -> {
