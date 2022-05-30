@@ -18,7 +18,6 @@ package com.metreeca.http.services;
 
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.codecs.Data;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -298,16 +297,19 @@ import static java.lang.String.format;
         private Response encode(final Response response, final OutputStream output) {
             if ( response.success() ) {
 
-                final byte[] value=response.body(new Data());
+                try (
+                        final InputStream input=response.input().get();
+                        final ObjectOutputStream serialized=new ObjectOutputStream(output)
+                ) {
 
-                try ( final ObjectOutputStream serialized=new ObjectOutputStream(output); ) {
+                    final byte[] data=data(input);
 
                     serialized.writeInt(response.status());
                     serialized.writeObject(response.headers());
-                    serialized.writeObject(value);
+                    serialized.writeObject(data);
                     serialized.flush();
 
-                    return response.input(() -> new ByteArrayInputStream(value));
+                    return response.input(() -> new ByteArrayInputStream(data));
 
                 } catch ( final IOException e ) {
 
