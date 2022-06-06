@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.core.Scribe;
+import com.metreeca.core.Snippets;
 import com.metreeca.core.Strings;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Shape;
@@ -29,11 +29,12 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Scribe.text;
-import static com.metreeca.core.Scribe.*;
+import static com.metreeca.core.Snippets.text;
+import static com.metreeca.core.Snippets.*;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
@@ -147,12 +148,12 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	static Scribe tree(final Shape shape, final boolean required) {
+	static Consumer<Appendable> tree(final Shape shape, final boolean required) {
 		return list(
 
 				all(shape) // root universal constraints
 						.map(values -> space(values(var(root), values)))
-						.map(Scribe::space)
+						.map(Snippets::space)
 						.orElse(nothing()),
 
 				space(shape.map(new TreeProbe(root, required)))
@@ -194,7 +195,7 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final class TreeProbe extends Shape.Probe<Scribe> {
+	private static final class TreeProbe extends Shape.Probe<Consumer<Appendable>> {
 
 		private final String anchor;
 
@@ -207,7 +208,7 @@ abstract class GraphFacts {
 		}
 
 
-		@Override public Scribe probe(final Datatype datatype) {
+		@Override public Consumer<Appendable> probe(final Datatype datatype) {
 
 			final IRI iri=datatype.iri();
 
@@ -225,11 +226,11 @@ abstract class GraphFacts {
 			));
 		}
 
-		@Override public Scribe probe(final Clazz clazz) {
+		@Override public Consumer<Appendable> probe(final Clazz clazz) {
 			return edge(var(anchor), text("a/rdfs:subClassOf*"), SPARQL.value(clazz.iri()));
 		}
 
-		@Override public Scribe probe(final Range range) {
+		@Override public Consumer<Appendable> probe(final Range range) {
 			if ( required ) {
 
 				return probe((Shape)range); // !!! tbi (filter not exists w/ special root treatment)
@@ -243,7 +244,7 @@ abstract class GraphFacts {
 			}
 		}
 
-		@Override public Scribe probe(final Lang lang) {
+		@Override public Consumer<Appendable> probe(final Lang lang) {
 			if ( required ) {
 
 				return probe((Shape)lang); // !!! tbi (filter not exists w/ special root treatment)
@@ -251,84 +252,85 @@ abstract class GraphFacts {
 			} else {
 
 				return lang.tags().isEmpty() ? nothing() : filter(
-						in(lang(var(anchor)), lang.tags().stream().map(Strings::quote).map(Scribe::text))
+						in(lang(var(anchor)),
+								lang.tags().stream().map(Strings::quote).map(Snippets::text))
 				);
 
 			}
 		}
 
 
-		@Override public Scribe probe(final MinExclusive minExclusive) {
+		@Override public Consumer<Appendable> probe(final MinExclusive minExclusive) {
 			return filter(gt(var(anchor), SPARQL.value(minExclusive.limit())));
 		}
 
-		@Override public Scribe probe(final MaxExclusive maxExclusive) {
+		@Override public Consumer<Appendable> probe(final MaxExclusive maxExclusive) {
 			return filter(lt(var(anchor), SPARQL.value(maxExclusive.limit())));
 		}
 
-		@Override public Scribe probe(final MinInclusive minInclusive) {
+		@Override public Consumer<Appendable> probe(final MinInclusive minInclusive) {
 			return filter(gte(var(anchor), SPARQL.value(minInclusive.limit())));
 		}
 
-		@Override public Scribe probe(final MaxInclusive maxInclusive) {
+		@Override public Consumer<Appendable> probe(final MaxInclusive maxInclusive) {
 			return filter(lte(var(anchor), SPARQL.value(maxInclusive.limit())));
 		}
 
 
-		@Override public Scribe probe(final MinLength minLength) {
+		@Override public Consumer<Appendable> probe(final MinLength minLength) {
 			return filter(gte(strlen(str(var(anchor))), text(minLength.limit())));
 		}
 
-		@Override public Scribe probe(final MaxLength maxLength) {
+		@Override public Consumer<Appendable> probe(final MaxLength maxLength) {
 			return filter(lte(strlen(str(var(anchor))), text(maxLength.limit())));
 		}
 
 
-		@Override public Scribe probe(final Pattern pattern) {
+		@Override public Consumer<Appendable> probe(final Pattern pattern) {
 			return filter(regex(
 					str(var(anchor)), text(Strings.quote(pattern.expression())), text(Strings.quote(pattern.flags()))
 			));
 		}
 
-		@Override public Scribe probe(final Like like) {
+		@Override public Consumer<Appendable> probe(final Like like) {
 			return filter(regex(
 					str(var(anchor)), text(Strings.quote(like.toExpression()))
 			));
 		}
 
-		@Override public Scribe probe(final Stem stem) {
+		@Override public Consumer<Appendable> probe(final Stem stem) {
 			return filter(strstarts(
 					str(var(anchor)), text(Strings.quote(stem.prefix()))
 			));
 		}
 
 
-		@Override public Scribe probe(final MinCount minCount) {
+		@Override public Consumer<Appendable> probe(final MinCount minCount) {
 			return required ? probe((Shape)minCount) : nothing();
 		}
 
-		@Override public Scribe probe(final MaxCount maxCount) {
+		@Override public Consumer<Appendable> probe(final MaxCount maxCount) {
 			return required ? probe((Shape)maxCount) : nothing();
 		}
 
 
-		@Override public Scribe probe(final All all) {
+		@Override public Consumer<Appendable> probe(final All all) {
 			return nothing(); // universal constraints handled by skeleton()
 		}
 
-		@Override public Scribe probe(final Any any) {
+		@Override public Consumer<Appendable> probe(final Any any) {
 			return space(anchor.equals(root)
 					? values(var(anchor), any.values())
 					: filter(in(var(anchor), any.values().stream().map(SPARQL::value)))
 			);
 		}
 
-		@Override public Scribe probe(final Localized localized) {
+		@Override public Consumer<Appendable> probe(final Localized localized) {
 			return required ? probe((Shape)localized) : nothing();
 		}
 
 
-		@Override public Scribe probe(final Field field) {
+		@Override public Consumer<Appendable> probe(final Field field) {
 
 			final String label=field.label();
 			final IRI iri=field.iri();
@@ -336,14 +338,15 @@ abstract class GraphFacts {
 
 			return shape.map(new Shape.Probe<>() {
 
-				@Override public Scribe probe(final Or or) { // push field inside union
+				@Override public Consumer<Appendable> probe(final Or or) { // push field inside union
 					return space(union(or.shapes().stream().map(s ->
 							block(space(field(label, iri, s).map(TreeProbe.this)))
 					)));
 				}
 
-				@Override protected Scribe probe(final Shape shape) {
-					return list(
+				@Override protected Consumer<Appendable> probe(final Shape shape) {
+
+					final Consumer<Appendable> list=list(
 
 							space(edge(var(anchor), SPARQL.value(iri), indent(list(", ", Stream.concat(
 
@@ -355,14 +358,16 @@ abstract class GraphFacts {
 
 							space(shape.map(new TreeProbe(label, required)))
 
-					).map(scribe -> required ? scribe : space(optional(scribe)));
+					);
+
+					return required ? list : space(optional(list));
 				}
 
 			});
 
 		}
 
-		@Override public Scribe probe(final Link link) {
+		@Override public Consumer<Appendable> probe(final Link link) {
 
 			final IRI iri=link.iri();
 			final Shape shape=link.shape();
@@ -379,16 +384,16 @@ abstract class GraphFacts {
 		}
 
 
-		@Override public Scribe probe(final And and) {
+		@Override public Consumer<Appendable> probe(final And and) {
 			return list(and.shapes().stream().map(shape -> shape.map(this)));
 		}
 
-		@Override public Scribe probe(final Or or) {
+		@Override public Consumer<Appendable> probe(final Or or) {
 			return space(union(or.shapes().stream().map(s -> block(space(s.map(this))))));
 		}
 
 
-		@Override public Scribe probe(final Shape shape) {
+		@Override public Consumer<Appendable> probe(final Shape shape) {
 			throw new UnsupportedOperationException(shape.toString());
 		}
 

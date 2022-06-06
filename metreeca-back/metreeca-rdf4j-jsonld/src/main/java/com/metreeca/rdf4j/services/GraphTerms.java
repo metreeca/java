@@ -32,8 +32,8 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.core.Scribe.text;
-import static com.metreeca.core.Scribe.*;
+import static com.metreeca.core.Snippets.text;
+import static com.metreeca.core.Snippets.*;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;

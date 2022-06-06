@@ -19,12 +19,12 @@ package com.metreeca.core;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.core.Scribe.code;
-import static com.metreeca.core.Scribe.text;
+import static com.metreeca.core.Snippets.code;
+import static com.metreeca.core.Snippets.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-final class ScribeTest {
+final class SnippetsTest {
 
     @Nested final class Assembling {
 

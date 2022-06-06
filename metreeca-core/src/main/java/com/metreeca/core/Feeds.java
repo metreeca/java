@@ -19,7 +19,7 @@ package com.metreeca.core;
 import java.io.*;
 
 /**
- * I/O Utilities.
+ * I/O utilities.
  */
 public final class Feeds {
 

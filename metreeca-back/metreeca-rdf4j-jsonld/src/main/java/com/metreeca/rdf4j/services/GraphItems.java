@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.core.Scribe.*;
+import static com.metreeca.core.Snippets.*;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;
