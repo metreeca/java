@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf4j;
 
+import com.metreeca.core.Scribe;
 import com.metreeca.link.Values;
 
 import org.eclipse.rdf4j.model.*;
@@ -23,16 +24,17 @@ import org.eclipse.rdf4j.model.*;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Scribe.*;
 import static com.metreeca.core.Strings.quote;
+import static com.metreeca.link.Values.format;
 import static com.metreeca.link.Values.traverse;
-import static com.metreeca.rdf4j.Scribe.*;
 
 import static java.util.Arrays.stream;
 
 /**
  * SPARQL query composer.
  */
-public final class SPARQLScribe {
+public final class SPARQL {
 
 	public static Scribe comment(final String text) {
 		return space(text("# %s", text));
@@ -166,8 +168,8 @@ public final class SPARQLScribe {
 
 	public static Scribe edge(final Scribe source, final IRI path, final Scribe target) {
 		return traverse(path,
-				iri -> edge(source, text(iri), target),
-				iri -> edge(target, text(iri), source)
+				iri -> edge(source, value(iri), target),
+				iri -> edge(target, value(iri), source)
 		);
 	}
 
@@ -296,9 +298,18 @@ public final class SPARQLScribe {
 		return list(x, text(' '), text(name), text(' '), y);
 	}
 
+	public static Scribe value(final Value value) {
+
+		if ( value == null ) {
+			throw new NullPointerException("null value");
+		}
+
+		return text(format(value));
+	}
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private SPARQLScribe() {}
+	private SPARQL() { }
 
 }

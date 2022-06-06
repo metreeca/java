@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rdf4j;
-
-import org.eclipse.rdf4j.model.Value;
+package com.metreeca.core;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -24,8 +22,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import static com.metreeca.link.Values.format;
 
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
@@ -171,15 +167,6 @@ public abstract class Scribe {
 		}
 
 		return text(valueOf(value));
-	}
-
-	public static Scribe text(final Value value) {
-
-		if ( value == null ) {
-			throw new NullPointerException("null value");
-		}
-
-		return text(format(value));
 	}
 
 	public static Scribe text(final char c) {

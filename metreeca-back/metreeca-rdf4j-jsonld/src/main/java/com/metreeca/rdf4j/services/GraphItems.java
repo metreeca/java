@@ -32,12 +32,12 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.core.Scribe.*;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;
-import static com.metreeca.rdf4j.SPARQLScribe.*;
-import static com.metreeca.rdf4j.Scribe.*;
+import static com.metreeca.rdf4j.SPARQL.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
 
 import static org.eclipse.rdf4j.model.util.Values.triple;

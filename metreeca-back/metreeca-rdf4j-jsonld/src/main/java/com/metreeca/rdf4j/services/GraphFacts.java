@@ -16,13 +16,14 @@
 
 package com.metreeca.rdf4j.services;
 
+import com.metreeca.core.Scribe;
 import com.metreeca.core.Strings;
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Values;
 import com.metreeca.link.shapes.*;
 import com.metreeca.rdf4j.Config;
-import com.metreeca.rdf4j.Scribe;
+import com.metreeca.rdf4j.SPARQL;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -31,6 +32,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Scribe.text;
+import static com.metreeca.core.Scribe.*;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
@@ -41,32 +44,30 @@ import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Link.link;
 import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.link.shapes.When.when;
-import static com.metreeca.rdf4j.SPARQLScribe.datatype;
-import static com.metreeca.rdf4j.SPARQLScribe.edge;
-import static com.metreeca.rdf4j.SPARQLScribe.eq;
-import static com.metreeca.rdf4j.SPARQLScribe.filter;
-import static com.metreeca.rdf4j.SPARQLScribe.gt;
-import static com.metreeca.rdf4j.SPARQLScribe.gte;
-import static com.metreeca.rdf4j.SPARQLScribe.in;
-import static com.metreeca.rdf4j.SPARQLScribe.isBlank;
-import static com.metreeca.rdf4j.SPARQLScribe.isIRI;
-import static com.metreeca.rdf4j.SPARQLScribe.isLiteral;
-import static com.metreeca.rdf4j.SPARQLScribe.lang;
-import static com.metreeca.rdf4j.SPARQLScribe.lt;
-import static com.metreeca.rdf4j.SPARQLScribe.lte;
-import static com.metreeca.rdf4j.SPARQLScribe.neq;
-import static com.metreeca.rdf4j.SPARQLScribe.optional;
-import static com.metreeca.rdf4j.SPARQLScribe.or;
-import static com.metreeca.rdf4j.SPARQLScribe.regex;
-import static com.metreeca.rdf4j.SPARQLScribe.str;
-import static com.metreeca.rdf4j.SPARQLScribe.string;
-import static com.metreeca.rdf4j.SPARQLScribe.strlen;
-import static com.metreeca.rdf4j.SPARQLScribe.strstarts;
-import static com.metreeca.rdf4j.SPARQLScribe.union;
-import static com.metreeca.rdf4j.SPARQLScribe.values;
-import static com.metreeca.rdf4j.SPARQLScribe.var;
-import static com.metreeca.rdf4j.Scribe.text;
-import static com.metreeca.rdf4j.Scribe.*;
+import static com.metreeca.rdf4j.SPARQL.datatype;
+import static com.metreeca.rdf4j.SPARQL.edge;
+import static com.metreeca.rdf4j.SPARQL.eq;
+import static com.metreeca.rdf4j.SPARQL.filter;
+import static com.metreeca.rdf4j.SPARQL.gt;
+import static com.metreeca.rdf4j.SPARQL.gte;
+import static com.metreeca.rdf4j.SPARQL.in;
+import static com.metreeca.rdf4j.SPARQL.isBlank;
+import static com.metreeca.rdf4j.SPARQL.isIRI;
+import static com.metreeca.rdf4j.SPARQL.isLiteral;
+import static com.metreeca.rdf4j.SPARQL.lang;
+import static com.metreeca.rdf4j.SPARQL.lt;
+import static com.metreeca.rdf4j.SPARQL.lte;
+import static com.metreeca.rdf4j.SPARQL.neq;
+import static com.metreeca.rdf4j.SPARQL.optional;
+import static com.metreeca.rdf4j.SPARQL.or;
+import static com.metreeca.rdf4j.SPARQL.regex;
+import static com.metreeca.rdf4j.SPARQL.str;
+import static com.metreeca.rdf4j.SPARQL.string;
+import static com.metreeca.rdf4j.SPARQL.strlen;
+import static com.metreeca.rdf4j.SPARQL.strstarts;
+import static com.metreeca.rdf4j.SPARQL.union;
+import static com.metreeca.rdf4j.SPARQL.values;
+import static com.metreeca.rdf4j.SPARQL.var;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -219,13 +220,13 @@ abstract class GraphFacts {
 							: iri.equals(LiteralType) ? isLiteral(var(anchor))
 							: iri.equals(RDF.LANGSTRING) ? neq(lang(var(anchor)), string(""))
 
-							: eq(datatype(var(anchor)), text(iri))
+							: eq(datatype(var(anchor)), SPARQL.value(iri))
 
 			));
 		}
 
 		@Override public Scribe probe(final Clazz clazz) {
-			return edge(var(anchor), text("a/rdfs:subClassOf*"), text(clazz.iri()));
+			return edge(var(anchor), text("a/rdfs:subClassOf*"), SPARQL.value(clazz.iri()));
 		}
 
 		@Override public Scribe probe(final Range range) {
@@ -236,7 +237,7 @@ abstract class GraphFacts {
 			} else {
 
 				return range.values().isEmpty() ? nothing() : line(filter(
-						in(var(anchor), range.values().stream().map(Scribe::text))
+						in(var(anchor), range.values().stream().map(SPARQL::value))
 				));
 
 			}
@@ -258,19 +259,19 @@ abstract class GraphFacts {
 
 
 		@Override public Scribe probe(final MinExclusive minExclusive) {
-			return filter(gt(var(anchor), text(minExclusive.limit())));
+			return filter(gt(var(anchor), SPARQL.value(minExclusive.limit())));
 		}
 
 		@Override public Scribe probe(final MaxExclusive maxExclusive) {
-			return filter(lt(var(anchor), text(maxExclusive.limit())));
+			return filter(lt(var(anchor), SPARQL.value(maxExclusive.limit())));
 		}
 
 		@Override public Scribe probe(final MinInclusive minInclusive) {
-			return filter(gte(var(anchor), text(minInclusive.limit())));
+			return filter(gte(var(anchor), SPARQL.value(minInclusive.limit())));
 		}
 
 		@Override public Scribe probe(final MaxInclusive maxInclusive) {
-			return filter(lte(var(anchor), text(maxInclusive.limit())));
+			return filter(lte(var(anchor), SPARQL.value(maxInclusive.limit())));
 		}
 
 
@@ -318,7 +319,7 @@ abstract class GraphFacts {
 		@Override public Scribe probe(final Any any) {
 			return space(anchor.equals(root)
 					? values(var(anchor), any.values())
-					: filter(in(var(anchor), any.values().stream().map(Scribe::text)))
+					: filter(in(var(anchor), any.values().stream().map(SPARQL::value)))
 			);
 		}
 
@@ -344,11 +345,11 @@ abstract class GraphFacts {
 				@Override protected Scribe probe(final Shape shape) {
 					return list(
 
-							space(edge(var(anchor), text(iri), indent(list(", ", Stream.concat(
+							space(edge(var(anchor), SPARQL.value(iri), indent(list(", ", Stream.concat(
 
 									Stream.of(var(label)), // filtering/projection hook
 
-									all(shape).orElseGet(Collections::emptySet).stream().map(Scribe::text)
+									all(shape).orElseGet(Collections::emptySet).stream().map(SPARQL::value)
 
 							))))),
 
@@ -370,7 +371,7 @@ abstract class GraphFacts {
 
 			return list(
 
-					space(edge(var(anchor), text(iri), var(id))),
+					space(edge(var(anchor), SPARQL.value(iri), var(id))),
 
 					space(shape.map(new TreeProbe(id, required)))
 
