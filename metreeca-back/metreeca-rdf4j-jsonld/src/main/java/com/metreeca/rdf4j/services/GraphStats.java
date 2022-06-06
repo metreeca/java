@@ -20,7 +20,6 @@ import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.queries.Stats;
-import com.metreeca.rdf4j.Config;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -47,8 +46,8 @@ final class GraphStats extends GraphFacts {
 	private final Graph graph=service(graph());
 
 
-	GraphStats(final Config config) {
-		super(config);
+	GraphStats(final Engine engine) {
+		super(engine);
 	}
 
 

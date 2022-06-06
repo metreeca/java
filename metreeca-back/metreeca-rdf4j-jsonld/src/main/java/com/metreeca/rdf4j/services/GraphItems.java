@@ -20,7 +20,6 @@ import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.Items;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rdf4j.Config;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -47,13 +46,11 @@ import static java.util.stream.Collectors.toList;
 
 final class GraphItems extends GraphFacts {
 
-	private final Config config=config();
-
 	private final Graph graph=service(graph());
 
 
-	GraphItems(final Config config) {
-		super(config);
+	GraphItems(final Engine engine) {
+		super(engine);
 	}
 
 
@@ -113,7 +110,7 @@ final class GraphItems extends GraphFacts {
 									))),
 
 									offset(offset),
-									limit(limit, config.get(Engine::ItemsLimit))
+									limit(limit, Engine.ItemsLimit)
 
 							)),
 

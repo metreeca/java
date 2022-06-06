@@ -17,7 +17,8 @@
 package com.metreeca.jsonld.services;
 
 import com.metreeca.link.*;
-import com.metreeca.link.queries.*;
+import com.metreeca.link.queries.Stats;
+import com.metreeca.link.queries.Terms;
 import com.metreeca.link.shapes.Field;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -49,15 +50,6 @@ public interface Engine {
      * The default items fetch limit.
      */
     public int ItemsLimit=100;
-
-    /**
-     * Retrieves the items fetch limit ({@value #ItemsLimit}).
-     *
-     * @return the maximum number of resources returned by {@linkplain Items items queries}
-     */
-    public static int ItemsLimit() {
-        return ItemsLimit;
-    }
 
 
     /**

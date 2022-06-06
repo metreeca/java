@@ -19,8 +19,6 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.*;
-import com.metreeca.rdf4j.Config;
-import com.metreeca.rdf4j.Setup;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -36,7 +34,7 @@ import static com.metreeca.rdf4j.services.Graph.graph;
  *
  * <p>Handles model-driven CRUD operations on linked data resources stored in the shared {@linkplain Graph graph}.</p>
  */
-public final class GraphEngine extends Setup<GraphEngine> implements Engine {
+public final class GraphEngine implements Engine {
 
 	private final Graph graph=service(graph());
 
@@ -113,26 +111,26 @@ public final class GraphEngine extends Setup<GraphEngine> implements Engine {
 
 	private static final class QueryProbe extends Query.Probe<Frame> {
 
-		private final Config config;
+		private final Engine engine;
 		private final Value focus;
 
 
-		QueryProbe(final Config config, final Value focus) {
-			this.config=config;
+		QueryProbe(final Engine engine, final Value focus) {
+			this.engine=engine;
 			this.focus=focus;
 		}
 
 
 		@Override public Frame probe(final Items items) {
-			return new GraphItems(config).process(focus, items);
+			return new GraphItems(engine).process(focus, items);
 		}
 
 		@Override public Frame probe(final Terms terms) {
-			return new GraphTerms(config).process(focus, terms);
+			return new GraphTerms(engine).process(focus, terms);
 		}
 
 		@Override public Frame probe(final Stats stats) {
-			return new GraphStats(config).process(focus, stats);
+			return new GraphStats(engine).process(focus, stats);
 		}
 
 	}

@@ -19,10 +19,10 @@ package com.metreeca.rdf4j.services;
 import com.metreeca.core.Snippets;
 import com.metreeca.core.Strings;
 import com.metreeca.http.services.Logger;
+import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Values;
 import com.metreeca.link.shapes.*;
-import com.metreeca.rdf4j.Config;
 import com.metreeca.rdf4j.SPARQL;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -104,20 +104,20 @@ abstract class GraphFacts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Config config;
+	private final Engine engine;
 
 	private int label=1; // the next label available for tagging (0 reserved for the root node)
 
 	private final Logger logger=service(logger());
 
 
-	GraphFacts(final Config config) {
-		this.config=config;
+	GraphFacts(final Engine engine) {
+		this.engine=engine;
 	}
 
 
-	Config config() {
-		return config;
+	Engine engine() {
+		return engine;
 	}
 
 

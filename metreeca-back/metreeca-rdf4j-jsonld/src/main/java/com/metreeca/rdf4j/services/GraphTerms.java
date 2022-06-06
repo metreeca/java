@@ -21,7 +21,6 @@ import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.queries.Terms;
-import com.metreeca.rdf4j.Config;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -46,8 +45,8 @@ final class GraphTerms extends GraphFacts {
 	private final Graph graph=service(graph());
 
 
-	GraphTerms(final Config config) {
-		super(config);
+	GraphTerms(final Engine engine) {
+		super(engine);
 	}
 
 
