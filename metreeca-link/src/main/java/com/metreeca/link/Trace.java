@@ -25,6 +25,7 @@ import static com.metreeca.core.Strings.indent;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 
 
@@ -97,14 +98,23 @@ public final class Trace {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override public String toString() {
+        return Stream
 
-        return format("{\n%s%s\n}}",
-                indent(String.join("\n", issues)),
-                indent(fields.entrySet().stream()
-                        .map(entry -> format("%s: %s", entry.getKey(), entry.getValue()))
-                        .collect(joining("\n"))
+                .of(
+
+                        issues.stream()
+                                .map(issue -> format("\t%s", issue))
+                                .collect(joining("\n")),
+
+                        fields.entrySet().stream()
+                                .map(entry -> format("\t%s: %s", entry.getKey(), indent(entry.getValue().toString())))
+                                .collect(joining("\n"))
+
                 )
-        );
+
+                .filter(not(String::isEmpty))
+
+                .collect(joining("\n", "{\n", "\n}"));
 
     }
 
