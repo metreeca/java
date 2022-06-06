@@ -72,7 +72,13 @@ public final class Validate implements Function<Frame, Optional<Frame>> {
 
 				},
 
-				model -> Optional.of(frame(frame.focus(), model))
+				model -> {
+
+					logger.debug(this, () -> format("%s {}", frame.focus()));
+
+					return Optional.of(frame(frame.focus(), model));
+
+				}
 
 		);
 	}
