@@ -104,13 +104,13 @@ public abstract class Shape {
      * @param focus the target IRI for the validation process
      * @param model the RDF model to be validated
      *
-     * @return either a shape validation trace detailing model issues or the subset of the input {@code model} reachable
-     * from the target {@code focus} according to this shape
+     * @return an empty optional, if {@code model} is valid  starting from {@code focus} according to this shape or an
+     * optional containing a validation trace, otherwise
      *
      * @throws NullPointerException if either {@code focus} or {@code model} is null or if {@code model} contains null
      *                              elements
      */
-    public Either<Trace, Collection<Statement>> validate(final Value focus, final Collection<Statement> model) {
+    public Optional<Trace> validate(final Value focus, final Collection<Statement> model) {
 
         if ( focus == null ) {
             throw new NullPointerException("null focus");
@@ -120,7 +120,7 @@ public abstract class Shape {
             throw new NullPointerException("null model");
         }
 
-        return ShapeValidator.validate(focus, this, model);
+        return ShapeValidator.validate(this, focus, model);
     }
 
 

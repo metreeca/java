@@ -34,9 +34,11 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.codecs.JSONLDInspector.driver;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Trace.trace;
+import static com.metreeca.link.Values.iri;
 
 import static java.util.Collections.singletonMap;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
 import static javax.json.stream.JsonGenerator.PRETTY_PRINTING;
@@ -319,19 +321,17 @@ public final class JSONLD implements Codec<Frame> {
                             final JsonReader jsonReader=Json.createReader(reader)
                     ) {
 
-                        final IRI focus=Values.iri(message.item());
+                        final IRI focus=iri(message.item());
                         final Shape shape=shape(message);
                         final Map<String, String> keywords=service(keywords());
 
                         final Collection<Statement> model=decode(focus, shape, keywords, jsonReader.readObject());
 
-                        return driver(shape).validate(focus, model).fold(
+                        return driver(shape).validate(focus, model)
 
-                                trace -> { throw new CodecException(UnprocessableEntity, format(trace)); },
+                                .<Frame>map(trace -> { throw new CodecException(UnprocessableEntity, format(trace)); })
 
-                                value -> Frame.frame(focus, model) // use model to include inferred statements
-
-                        );
+                                .orElseGet(() -> frame(focus, model));
 
                     } catch ( final JsonException e ) {
 
@@ -407,47 +407,45 @@ public final class JSONLD implements Codec<Frame> {
 
         }).collect(toList());
 
-        final Collection<Statement> validated=driver(shape).validate(value.focus(), localized).fold(
 
-                trace -> {
+        return driver(shape).validate(value.focus(), localized)
+
+                .<M>map(trace -> {
 
                     throw new CodecException(InternalServerError,
-                            format(Trace.trace(Trace.trace("invalid JSON-LD payload"), trace))
+                            format(trace(trace("invalid JSON-LD payload"), trace))
                     );
 
-                },
+                })
 
-                identity()
+                .orElseGet(() -> message
 
-        );
+                        .header("Content-Type", mime)
 
-        return message
+                        .output(output -> {
 
-                .header("Content-Type", mime)
-
-                .output(output -> {
-
-                    try (
-                            final Writer writer=new OutputStreamWriter(output, message.charset());
-                            final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
-                    ) {
+                            try (
+                                    final Writer writer=new OutputStreamWriter(output, message.charset());
+                                    final JsonWriter jsonWriter=JsonWriters.createWriter(writer)
+                            ) {
 
 
-                        jsonWriter.writeObject(encode(
-                                Values.iri(item),
-                                shape.localize(langs),
-                                service(keywords()), validated,
-                                mime.equals(MIME) // include context objects for application/ld+json
-                        ));
+                                jsonWriter.writeObject(encode(
+                                        iri(item),
+                                        shape.localize(langs),
+                                        service(keywords()), localized,
+                                        mime.equals(MIME) // include context objects for application/ld+json
+                                ));
 
 
-                    } catch ( final IOException e ) {
+                            } catch ( final IOException e ) {
 
-                        throw new UncheckedIOException(e);
+                                throw new UncheckedIOException(e);
 
-                    }
+                            }
 
-                });
+                        }));
+
     }
 
 

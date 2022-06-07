@@ -22,39 +22,46 @@ import org.eclipse.rdf4j.model.*;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import static com.metreeca.link.Either.Right;
+import static com.metreeca.link.Trace.trace;
+import static com.metreeca.link.Values.format;
+import static com.metreeca.link.Values.is;
+import static com.metreeca.link.Values.lang;
+import static com.metreeca.link.Values.traverse;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
-import static java.util.Collections.singleton;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 
-final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>> {
 
-    static Either<Trace, Collection<Statement>> validate(
-            final Value focus, final Shape shape, final Collection<Statement> model
-    ) {
-        return shape
+final class ShapeValidator extends Shape.Probe<Trace> {
+
+    static Optional<Trace> validate(final Shape shape, final Value focus, final Collection<Statement> model) {
+        return Optional.of(shape
 
                 .redact(Guard.Role)
                 .redact(Guard.Task)
                 .redact(Guard.View)
                 .redact(Guard.Mode, Guard.Convey) // remove internal filtering shapes
 
-                .map(new ShapeValidator(focus, singleton(focus), model))
-                .fold(Either::Left, stream -> Right(stream.collect(toList())));
+                .map(new ShapeValidator(focus, Set.of(focus),
+                        model.stream().collect(groupingBy(Statement::getPredicate)) // optimize lookup by predicate
+                ))
+
+        ).filter(not(Trace::empty));
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private final Value focus;
 
-    private final Collection<Value> group;
-    private final Collection<Statement> model;
+    private final Set<Value> group;
+    private final Map<IRI, List<Statement>> model;
 
 
-    private ShapeValidator(final Value focus, final Collection<Value> group, final Collection<Statement> model) {
+    private ShapeValidator(final Value focus, final Set<Value> group, final Map<IRI, List<Statement>> model) {
 
         this.focus=focus;
 
@@ -63,141 +70,130 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
     }
 
 
-    private <T> Predicate<T> negate(final Predicate<T> predicate) {
-        return predicate.negate();
+    private Trace merge(final Trace x, final Trace y) {
+        return x.empty() ? y : y.empty() ? x : trace(x, y);
     }
 
-    private Either<Trace, Stream<Statement>> report(final Trace trace) {
-        return trace.empty() ? Right(Stream.empty()) : Either.Left(trace);
-    }
-
-    private Either<Trace, Stream<Statement>> merge(
-            final Either<Trace, Stream<Statement>> x, final Either<Trace, Stream<Statement>> y
-    ) {
-        return x.fold(
-                xtrace -> y.fold(ytrace -> Either.Left(Trace.trace(xtrace, ytrace)), ystream -> Either.Left(xtrace)),
-                xstream -> y.fold(Either::Left, ystream -> Right(Stream.concat(xstream, ystream)))
-        );
-    }
-
-
-    private Value resolve(final Value value) {
-        return value instanceof Focus ? ((Focus)value).resolve(focus) : value;
-    }
 
     private Set<Value> resolve(final Collection<Value> values) {
         return values.stream().map(this::resolve).collect(toSet());
     }
 
+    private Value resolve(final Value value) {
+        return value instanceof Focus ? ((Focus)value).resolve(focus) : value;
+    }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Guard guard) {
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public Trace probe(final Guard guard) {
         throw new UnsupportedOperationException(guard.toString());
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Datatype datatype) {
+    @Override public Trace probe(final Datatype datatype) {
 
         final IRI iri=datatype.iri();
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.is(value, iri)))
-                .map(value -> format("%s is not of datatype %s", Values.format(value), Values.format(iri)))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> is(value, iri)))
+                .map(value -> format("%s is not of datatype %s", format(value), format(iri)))
+        );
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Range range) {
+    @Override public Trace probe(final Range range) {
 
         final Set<Value> values=resolve(range.values());
 
-        return report(Trace.trace(group.stream()
+        return trace(group.stream()
                 .filter(value -> !values.contains(value))
-                .map(value -> format("%s is not in the expected value range {%s}", Values.format(value),
-                        Values.format(values)))
-        ));
+                .map(value -> format("%s is not in the expected value range {%s}", format(value), format(values)))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Lang lang) {
+    @Override public Trace probe(final Lang lang) {
 
         final Set<String> tags=lang.tags();
 
-        return report(Trace.trace(group.stream()
+        final Predicate<Value> predicate=tags.isEmpty()
+                ? value -> !lang(value).isEmpty()
+                : value -> tags.contains(lang(value));
 
-                .filter(negate(tags.isEmpty()
-                        ? value -> !Values.lang(value).isEmpty()
-                        : value -> tags.contains(Values.lang(value))
-                ))
+        return trace(group.stream()
+
+                .filter(not(predicate))
 
                 .map(value -> format(
-                        "%s is not in the expected language set {%s}", Values.format(value), join(", ", tags)
+                        "%s is not in the expected language set {%s}", format(value), join(", ", tags)
                 ))
-        ));
+        );
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MinExclusive minExclusive) {
+    @Override public Trace probe(final MinExclusive minExclusive) {
 
         final Value limit=resolve(minExclusive.limit());
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.compare(value, limit) > 0))
-                .map(value -> format("%s is not strictly greater than %s", Values.format(value), Values.format(limit)))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.compare(value, limit) > 0))
+                .map(value -> format("%s is not strictly greater than %s", format(value), format(limit)))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MaxExclusive maxExclusive) {
+    @Override public Trace probe(final MaxExclusive maxExclusive) {
 
         final Value limit=resolve(maxExclusive.limit());
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.compare(value, limit) < 0))
-                .map(value -> format("%s is not strictly less than %s", Values.format(value), Values.format(limit)))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.compare(value, limit) < 0))
+                .map(value -> format("%s is not strictly less than %s", format(value), format(limit)))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MinInclusive minInclusive) {
+    @Override public Trace probe(final MinInclusive minInclusive) {
 
         final Value limit=resolve(minInclusive.limit());
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.compare(value, limit) >= 0))
-                .map(value -> format("%s is not greater than or equal to %s", Values.format(value),
-                        Values.format(limit)))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.compare(value, limit) >= 0))
+                .map(value -> format("%s is not greater than or equal to %s", format(value),
+                        format(limit)))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MaxInclusive maxInclusive) {
+    @Override public Trace probe(final MaxInclusive maxInclusive) {
 
         final Value limit=resolve(maxInclusive.limit());
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.compare(value, limit) <= 0))
-                .map(value -> format("%s is not less than or equal to %s", Values.format(value), Values.format(limit)))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.compare(value, limit) <= 0))
+                .map(value -> format("%s is not less than or equal to %s", format(value), format(limit)))
+        );
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MinLength minLength) {
+    @Override public Trace probe(final MinLength minLength) {
 
         final int limit=minLength.limit();
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.text(value).length() >= limit))
-                .map(value -> format("%s length is not greater than or equal to %s", Values.format(value), limit))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.text(value).length() >= limit))
+                .map(value -> format("%s length is not greater than or equal to %s", format(value), limit))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MaxLength maxLength) {
+    @Override public Trace probe(final MaxLength maxLength) {
 
         final int limit=maxLength.limit();
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> Values.text(value).length() <= limit))
-                .map(value -> format("%s length is not less than or equal to %s", Values.format(value), limit))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> Values.text(value).length() <= limit))
+                .map(value -> format("%s length is not less than or equal to %s", format(value), limit))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Pattern pattern) {
+    @Override public Trace probe(final Pattern pattern) {
 
         final String expression=pattern.expression();
         final String flags=pattern.flags();
@@ -207,157 +203,142 @@ final class ShapeValidator extends Shape.Probe<Either<Trace, Stream<Statement>>>
 
         // match the whole string: don't use compiled.asPredicate() (implemented using .find())
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> compiled.matcher(Values.text(value)).matches()))
-                .map(value -> format("%s textual value doesn't match <%s> pattern", Values.format(value),
-                        compiled.pattern()))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> compiled.matcher(Values.text(value)).matches()))
+                .map(value -> format("%s textual value doesn't match <%s> pattern", format(value), compiled.pattern()))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Like like) {
+    @Override public Trace probe(final Like like) {
 
         final String expression=like.toExpression();
 
         final Predicate<String> predicate=java.util.regex.Pattern.compile(expression).asPredicate();
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> predicate.test(Values.text(value))))
-                .map(value -> String.format("%s textual value doesn't match <%s> keywords", Values.format(value),
-                        like.keywords()))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> predicate.test(Values.text(value))))
+                .map(value -> format("%s textual value doesn't match <%s> keywords", format(value), like.keywords()))
+        );
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Stem stem) {
+    @Override public Trace probe(final Stem stem) {
 
         final String prefix=stem.prefix();
 
         final Predicate<String> predicate=lexical -> lexical.startsWith(prefix);
 
-        return report(Trace.trace(group.stream()
-                .filter(negate(value -> predicate.test(Values.text(value))))
-                .map(value -> format("%s textual value has not stem <%s>", Values.format(value), prefix))
-        ));
+        return trace(group.stream()
+                .filter(not(value -> predicate.test(Values.text(value))))
+                .map(value -> format("%s textual value has not stem <%s>", format(value), prefix))
+        );
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MinCount minCount) {
+    @Override public Trace probe(final MinCount minCount) {
 
         final int count=group.size();
         final int limit=minCount.limit();
 
-        return count >= limit ? Right(Stream.empty()) : report(Trace.trace(format(
+        return count >= limit ? trace() : trace(format(
                 "value count is not greater than or equal to %s", limit
-        )));
+        ));
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final MaxCount maxCount) {
+    @Override public Trace probe(final MaxCount maxCount) {
 
         final int count=group.size();
         final int limit=maxCount.limit();
 
-        return count <= limit ? Right(Stream.empty()) : report(Trace.trace(format(
+        return count <= limit ? trace() : trace(format(
                 "value count is not less than or equal to %s", limit
-        )));
+        ));
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final All all) {
+    @Override public Trace probe(final All all) {
 
         final Set<Value> values=resolve(all.values());
 
-        return group.containsAll(values) ? Right(Stream.empty()) : report(Trace.trace(format(
-                "values don't include all the expected set {%s}", Values.format(values)
-        )));
+        return group.containsAll(values) ? trace() : trace(format(
+                "values don't include all the expected set {%s}", format(values)
+        ));
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Any any) {
+    @Override public Trace probe(final Any any) {
 
         final Set<Value> values=resolve(any.values());
 
-        return values.stream().anyMatch(group::contains) ? Right(Stream.empty()) : report(Trace.trace(format(
-                "values don't include at least one of the expected set {%s}", Values.format(values)
-        )));
+        return values.stream().anyMatch(group::contains) ? trace() : trace(format(
+                "values don't include at least one of the expected set {%s}", format(values)
+        ));
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Localized localized) {
-        return report(Trace.trace(group.stream()
+    @Override public Trace probe(final Localized localized) {
+        return trace(group.stream()
 
                 .collect(groupingBy(Values::lang, toList()))
 
                 .entrySet().stream()
 
-                .filter(negate(entry -> entry.getValue().size() <= 1))
+                .filter(not(entry -> entry.getValue().size() <= 1))
 
-                .map(entry -> String.format("multiple values for <%s> language tag", entry.getKey()))
-        ));
+                .map(entry -> format("multiple values for <%s> language tag", entry.getKey()))
+        );
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Link link) {
+    @Override public Trace probe(final Link link) {
         return link.shape().map(this);
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Field field) {
+    @Override public Trace probe(final Field field) {
         return group.stream().map(value -> {
 
             final IRI iri=field.iri();
             final Shape shape=field.shape();
 
-            final List<Statement> statements=model.stream()
-                    .filter(Values.traverse(iri,
-                            recto -> s -> s.getPredicate().equals(recto) && s.getSubject().equals(value),
-                            verso -> s -> s.getPredicate().equals(verso) && s.getObject().equals(value)
-                    ))
-                    .collect(toList());
+            final Set<Value> values=traverse(iri,
 
-            final Set<Value> values=statements.stream()
-                    .map(Values.direct(iri) ? Statement::getObject : Statement::getSubject)
-                    .collect(toSet());
+                    recto -> model.getOrDefault(recto, List.of()).stream()
+                            .filter(s -> s.getSubject().equals(value))
+                            .map(Statement::getObject),
 
-            return merge(
+                    verso -> model.getOrDefault(verso, List.of()).stream()
+                            .filter(s -> s.getObject().equals(value))
+                            .map(Statement::getSubject)
 
-                    shape.map(new ShapeValidator(focus, values, model)).fold(
-                            trace -> Either.Left(Trace.trace(iri.toString(), trace)),
-                            Either::Right
-                    ),
+            ).collect(toSet());
 
-                    Right(statements.stream())
-            );
+            final Trace trace=shape.map(new ShapeValidator(focus, values, model));
 
-        }).reduce(Right(Stream.empty()), this::merge);
+            return trace.empty() ? trace : trace(iri.toString(), trace);
+
+        }).reduce(trace(), this::merge);
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final When when) {
-        return when.test().map(this).fold(trace -> when.fail(), stream -> when.pass()).map(this);
+    @Override public Trace probe(final When when) {
+        return when.test().map(this).empty()
+                ? when.pass().map(this)
+                : when.fail().map(this);
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final And and) {
+    @Override public Trace probe(final And and) {
         return and.shapes().stream()
 
                 .map(s -> s.map(this))
 
-                .reduce(Right(Stream.empty()), this::merge);
+                .reduce(trace(), this::merge);
     }
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Or or) {
-
-        final List<Either<Trace, Stream<Statement>>> reports=or.shapes().stream()
-
-                .map(s -> s.map(this))
-
-
-                .filter(entry -> entry.fold(trace -> false, stream -> true))
-
-                .collect(toList());
-
-        return reports.isEmpty()
-                ? Either.Left(Trace.trace("values don't match any alternative"))
-                : reports.stream().reduce(Right(Stream.empty()), this::merge);
+    @Override public Trace probe(final Or or) {
+        return or.shapes().stream().map(s -> s.map(this)).noneMatch(Trace::empty)
+                ? trace("values don't match any alternative")
+                : trace();
     }
 
 
-    @Override public Either<Trace, Stream<Statement>> probe(final Shape shape) {
-        return Right(Stream.empty());
+    @Override public Trace probe(final Shape shape) {
+        return trace();
     }
 
 }

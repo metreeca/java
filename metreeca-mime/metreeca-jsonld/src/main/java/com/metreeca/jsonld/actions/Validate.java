@@ -27,7 +27,6 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.link.Frame.frame;
 
 import static java.lang.String.format;
 
@@ -38,49 +37,46 @@ import static java.lang.String.format;
  */
 public final class Validate implements Function<Frame, Optional<Frame>> {
 
-	private final Shape shape;
+    private final Shape shape;
 
-	private final Logger logger=service(logger());
-
-
-	/**
-	 * Creates a shape-based validation action.
-	 *
-	 * @param shape the shape frames are to be validated against
-	 *
-	 * @throws NullPointerException if {@code shape} is null
-	 */
-	public Validate(final Shape shape) {
-
-		if ( shape == null ) {
-			throw new NullPointerException("null shape");
-		}
-
-		this.shape=shape;
-	}
+    private final Logger logger=service(logger());
 
 
-	@Override public Optional<Frame> apply(final Frame frame) {
+    /**
+     * Creates a shape-based validation action.
+     *
+     * @param shape the shape frames are to be validated against
+     *
+     * @throws NullPointerException if {@code shape} is null
+     */
+    public Validate(final Shape shape) {
 
-		return shape.validate(frame.focus(), frame.model()).fold(
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
 
-				trace -> {
+        this.shape=shape;
+    }
 
-					logger.warning(this, () -> format("%s %s", frame.focus(), trace));
 
-					return Optional.empty();
+    @Override public Optional<Frame> apply(final Frame frame) {
+        return shape.validate(frame.focus(), frame.model())
 
-				},
+                .map(trace -> {
 
-				model -> {
+                    logger.warning(this, () -> format("%s %s", frame.focus(), trace));
 
-					logger.debug(this, () -> format("%s {}", frame.focus()));
+                    return Optional.<Frame>empty();
 
-					return Optional.of(frame(frame.focus(), model));
+                })
 
-				}
+                .orElseGet(() -> {
 
-		);
-	}
+                    logger.info(this, () -> format("%s {}", frame.focus()));
+
+                    return Optional.of(frame);
+
+                });
+    }
 
 }
