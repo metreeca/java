@@ -199,6 +199,25 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-xml</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-ical</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-rdf</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-jsonld</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -208,19 +227,6 @@
 				<artifactId>metreeca-jsonld</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-xml</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf</artifactId>
-				<version>${project.version}</version>
 			</dependency>
 
 
@@ -284,6 +290,12 @@
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
 				<version>2.9.0</version>
+			</dependency>
+
+			<dependency> <!-- https://search.maven.org/artifact/org.mnode.ical4j/ical4j -->
+				<groupId>org.mnode.ical4j</groupId>
+				<artifactId>ical4j</artifactId>
+				<version>3.2.2</version>
 			</dependency>
 
 			<dependency> <!-- https://search.maven.org/artifact/org.eclipse.rdf4j/rdf4j-bom -->
