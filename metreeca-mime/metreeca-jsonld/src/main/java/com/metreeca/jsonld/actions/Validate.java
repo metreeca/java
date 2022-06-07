@@ -72,7 +72,7 @@ public final class Validate implements Function<Frame, Optional<Frame>> {
 
                 .orElseGet(() -> {
 
-                    logger.info(this, () -> format("%s {}", frame.focus()));
+                    logger.debug(this, () -> format("%s {}", frame.focus()));
 
                     return Optional.of(frame);
 

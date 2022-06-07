@@ -41,6 +41,13 @@ public final class Trace {
         return EmptyTrace;
     }
 
+    public static Trace trace(final Trace x, final Trace y) {
+        return x.isEmpty() ? y : y.isEmpty() ? x : new Trace(
+                Stream.of(x, y).flatMap(trace -> trace.issues().stream()),
+                Stream.of(x, y).flatMap(trace -> trace.fields().entrySet().stream())
+        );
+    }
+
     public static Trace trace(final Trace... traces) {
         return new Trace(
                 Arrays.stream(traces).flatMap(trace -> trace.issues().stream()),
@@ -74,14 +81,14 @@ public final class Trace {
                 .collect(toCollection(LinkedHashSet::new));
 
         this.fields=fields
-                .filter(field -> !field.getValue().empty())
+                .filter(field -> !field.getValue().isEmpty())
                 .collect(toMap(Entry::getKey, Entry::getValue, Trace::trace, LinkedHashMap::new));
     }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean empty() {
+    public boolean isEmpty() {
         return issues.isEmpty() && fields.isEmpty();
     }
 

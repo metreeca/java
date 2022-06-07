@@ -49,7 +49,7 @@ final class ShapeValidator extends Shape.Probe<Trace> {
                         model.stream().collect(groupingBy(Statement::getPredicate)) // optimize lookup by predicate
                 ))
 
-        ).filter(not(Trace::empty));
+        ).filter(not(Trace::isEmpty));
     }
 
 
@@ -67,11 +67,6 @@ final class ShapeValidator extends Shape.Probe<Trace> {
 
         this.group=group;
         this.model=model;
-    }
-
-
-    private Trace merge(final Trace x, final Trace y) {
-        return x.empty() ? y : y.empty() ? x : trace(x, y);
     }
 
 
@@ -310,14 +305,14 @@ final class ShapeValidator extends Shape.Probe<Trace> {
 
             final Trace trace=shape.map(new ShapeValidator(focus, values, model));
 
-            return trace.empty() ? trace : trace(iri.toString(), trace);
+            return trace.isEmpty() ? trace : trace(iri.toString(), trace);
 
-        }).reduce(trace(), this::merge);
+        }).reduce(trace(), Trace::trace);
     }
 
 
     @Override public Trace probe(final When when) {
-        return when.test().map(this).empty()
+        return when.test().map(this).isEmpty()
                 ? when.pass().map(this)
                 : when.fail().map(this);
     }
@@ -327,11 +322,11 @@ final class ShapeValidator extends Shape.Probe<Trace> {
 
                 .map(s -> s.map(this))
 
-                .reduce(trace(), this::merge);
+                .reduce(trace(), Trace::trace);
     }
 
     @Override public Trace probe(final Or or) {
-        return or.shapes().stream().map(s -> s.map(this)).noneMatch(Trace::empty)
+        return or.shapes().stream().map(s -> s.map(this)).noneMatch(Trace::isEmpty)
                 ? trace("values don't match any alternative")
                 : trace();
     }

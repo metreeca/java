@@ -461,7 +461,7 @@ public final class JSONLD implements Codec<Frame> {
 
         trace.fields().forEach((label, nested) -> {
 
-            if ( !nested.empty() ) {
+            if ( !nested.isEmpty() ) {
                 builder.add(label, format(nested));
             }
 
