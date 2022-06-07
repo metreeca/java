@@ -18,7 +18,8 @@ package com.metreeca.jsonld.codecs;
 
 import com.metreeca.http.Request;
 import com.metreeca.link.*;
-import com.metreeca.link.queries.*;
+import com.metreeca.link.queries.Stats;
+import com.metreeca.link.queries.Terms;
 import com.metreeca.link.shapes.*;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -35,6 +36,7 @@ import javax.json.*;
 import static com.metreeca.http.Request.decode;
 import static com.metreeca.jsonld.codecs.JSONLDInspector.driver;
 import static com.metreeca.link.Values.iri;
+import static com.metreeca.link.queries.Items.items;
 import static com.metreeca.link.shapes.And.and;
 
 import static java.lang.String.format;
@@ -78,7 +80,7 @@ final class JSONLDParser {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Query parse(final String query) throws JsonException, NoSuchElementException {
-		return query.isEmpty() ? Items.items(baseline)
+		return query.isEmpty() ? items(baseline)
 				: query.startsWith("%7B") ? json(decode(query))
 				: query.startsWith("{") ? json(query)
 				: form(query);
@@ -109,11 +111,11 @@ final class JSONLDParser {
 		final int offset=offset(json);
 		final int limit=limit(json);
 
-		final Shape filtered=And.and(baseline, Guard.filter(filter)); // filtering only >> don't include in results
+		final Shape filtered=and(baseline, Guard.filter(filter)); // filtering only >> don't include in results
 
 		return terms != null ? Terms.terms(filtered, terms, offset, limit)
 				: stats != null ? Stats.stats(filtered, stats, offset, limit)
-				: Items.items(filtered, order, offset, limit);
+				: items(filtered, order, offset, limit);
 	}
 
 
@@ -188,23 +190,14 @@ final class JSONLDParser {
 					final String key=entry.getKey();
 					final JsonValue value=entry.getValue();
 
-					return key.startsWith("^") ? filter(value, shape, key.substring(1), this::datatype)
-							: key.startsWith("@") ? filter(value, shape, key.substring(1), this::clazz)
-							: key.startsWith("%") ? filter(value, shape, key.substring(1), this::range)
-
-							: key.startsWith(">=") ? filter(value, shape, key.substring(2), this::minInclusive)
+					return key.startsWith(">=") ? filter(value, shape, key.substring(2), this::minInclusive)
 							: key.startsWith("<=") ? filter(value, shape, key.substring(2), this::maxInclusive)
 							: key.startsWith(">") ? filter(value, shape, key.substring(1), this::minExclusive)
 							: key.startsWith("<") ? filter(value, shape, key.substring(1), this::maxExclusive)
 
-							: key.startsWith("$>") ? filter(value, shape, key.substring(2), this::minLength)
-							: key.startsWith("$<") ? filter(value, shape, key.substring(2), this::maxLength)
-							: key.startsWith("*") ? filter(value, shape, key.substring(1), this::pattern)
 							: key.startsWith("~") ? filter(value, shape, key.substring(1), this::like)
-							: key.startsWith("'") ? filter(value, shape, key.substring(1), this::stem)
+							: key.startsWith("^") ? filter(value, shape, key.substring(1), this::stem)
 
-							: key.startsWith("#>") ? filter(value, shape, key.substring(2), this::minCount)
-							: key.startsWith("#<") ? filter(value, shape, key.substring(2), this::maxCount)
 							: key.startsWith("!") ? filter(value, shape, key.substring(1), this::all)
 							: key.startsWith("?") ? filter(value, shape, key.substring(1), this::any)
 
@@ -492,50 +485,19 @@ final class JSONLDParser {
 	}
 
 
-	private Shape minLength(final JsonValue value, final Shape shape) {
-		return value instanceof JsonNumber
-				? MinLength.minLength(((JsonNumber)value).intValue())
-				: error("length is not a number");
-	}
-
-	private Shape maxLength(final JsonValue value, final Shape shape) {
-		return value instanceof JsonNumber
-				? MaxLength.maxLength(((JsonNumber)value).intValue())
-				: error("length is not a number");
-	}
-
-	private Shape pattern(final JsonValue value, final Shape shape) {
-		return value instanceof JsonString
-				? ((JsonString)value).getString().isEmpty() ? And.and() :
-				Pattern.pattern(((JsonString)value).getString())
-				: error("pattern is not a string");
-	}
-
 	private Shape like(final JsonValue value, final Shape shape) {
 		return value instanceof JsonString
-				? ((JsonString)value).getString().isEmpty() ? And.and() : Like.like(((JsonString)value).getString(),
-                true)
+				? ((JsonString)value).getString().isEmpty() ? and() : Like.like(((JsonString)value).getString(),
+				true)
 				: error("pattern is not a string");
 	}
 
 	private Shape stem(final JsonValue value, final Shape shape) {
 		return value instanceof JsonString
-				? ((JsonString)value).getString().isEmpty() ? And.and() : Stem.stem(((JsonString)value).getString())
+				? ((JsonString)value).getString().isEmpty() ? and() : Stem.stem(((JsonString)value).getString())
 				: error("pattern is not a string");
 	}
 
-
-	private Shape minCount(final JsonValue value, final Shape shape) {
-		return value instanceof JsonNumber
-				? MinCount.minCount(((JsonNumber)value).intValue())
-				: error("length is not a number");
-	}
-
-	private Shape maxCount(final JsonValue value, final Shape shape) {
-		return value instanceof JsonNumber
-				? MaxCount.maxCount(((JsonNumber)value).intValue())
-				: error("length is not a number");
-	}
 
 	private Shape all(final JsonValue value, final Shape shape) {
 		return value.getValueType() == JsonValue.ValueType.NULL

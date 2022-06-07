@@ -1,9 +1,8 @@
 ---
 title: "REST Faceted Search"
 trail: "Reference"
+excerpt:   " REST faceted search queries and serialization"
 ---
-
-[comment]: <> (excerpt:    REST faceted search queries and serialization)
 
 REST/JSON-LD APIs published with the Metreeca/Java framework support engine-managed faceted search capabilities, driven
 by structural and typing constraints specified in the underlying linked data model.
@@ -138,25 +137,13 @@ stats for a facet specified by a target property path, taking into account appli
 ```
 <filter> ::= {
 
-    "^ <path>": "<datatype>", // datatype
-    "@ <path>": "<class>", // class
-    "% <path>": <value> | [<value>(, <value>)*], // range
-
-
     "> <path>": <value>, // minExclusive
     "< <path>: <value>, // maxExclusive
     ">= <path>": <value>, // minInclusive
     "<= <path>": <value>, // maxInclusive
     
-    "$> <path>": <value>, // minLength
-    "$< <path>": <value>, // maxLength
-    
-    "* <path>": "pattern", // pattern (regular expression matching)
     "~ <path>": "keywords", // like (stemmed word search)
-    "' <path>": "stem", // stem (prefix search)
-    
-    "#> <path>": <integer>, // minCount
-    "#< <path>": <integer>, // maxCount
+    "^ <path>": "stem", // stem (prefix search)
     
     "! <path>": <value> | [<value>(, <value>)*], // all
     "? <path>": <value> | [<value>(, <value>)*], // any
