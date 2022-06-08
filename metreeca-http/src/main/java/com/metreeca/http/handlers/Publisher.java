@@ -16,20 +16,24 @@
 
 package com.metreeca.http.handlers;
 
+import com.metreeca.http.*;
 import com.metreeca.http.codecs.Data;
+import com.metreeca.http.services.Fetcher.URLFetcher;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.*;
+import java.nio.file.FileSystem;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Lambdas.checked;
 import static com.metreeca.core.Resources.input;
+import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Request.HEAD;
 import static com.metreeca.http.Response.NotModified;
@@ -127,8 +131,8 @@ public final class Publisher extends Delegator {
      *
      * @param path the path of the resource whose MIME type is to be guessed
      *
-     * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value
-     * Data#MIME}, if {@code path} doesn't include an extension or no well-known MIME type is defined
+     * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value Data#MIME},
+     * if {@code path} doesn't include an extension or no well-known MIME type is defined
      *
      * @throws NullPointerException if {@code path} is null
      */
@@ -149,17 +153,58 @@ public final class Publisher extends Delegator {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private Path assets;
+    private String fallback;
+
+    private final Function<Request, Response> fetcher=new URLFetcher();
+
+
+    public Publisher() {
+        delegate(new Router()
+
+                .get(handler(
+                        (Handler)this::assets,
+                        (Handler)this::fallback
+                ))
+
+        );
+    }
+
+
     /**
-     * Creates a static content publisher.
+     * Configures the static content root.
+     *
+     * @param root the root path of the content to be published
+     *
+     * @return this publisher
+     *
+     * @throws NullPointerException if {@code root} is null
+     */
+    public Publisher assets(final Path root) {
+
+        if ( root == null ) {
+            throw new NullPointerException("null root");
+        }
+
+        this.assets=root;
+
+        return this;
+    }
+
+    /**
+     * Configures the static content root.
      *
      * <p><strong>Warning</strong> / Only {@code file:} and {@code jar:} URLs are currently supported.</p>
      *
-     * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)}) *
+     * @param root the root URL of the content to be published (e.g. as returned by {@link Class#getResource(String)})
      *
-     * @throws NullPointerException     if {@code root} is null
-     * @throws IllegalArgumentException if {@code root} is malformed
+     * @return this publisher
+     *
+     * @throws NullPointerException          if {@code root} is null
+     * @throws IllegalArgumentException      if {@code root} is malformed
+     * @throws UnsupportedOperationException if the {@code root} scheme is not supported
      */
-    public Publisher(final URL root) {
+    public Publisher assets(final URL root) {
 
         if ( root == null ) {
             throw new NullPointerException("null root");
@@ -171,7 +216,7 @@ public final class Publisher extends Delegator {
 
             try {
 
-                publish(Paths.get(root.toURI()));
+                this.assets=Paths.get(root.toURI());
 
             } catch ( final URISyntaxException e ) {
 
@@ -194,77 +239,141 @@ public final class Publisher extends Delegator {
                     FileSystems.newFileSystem(URI.create(jar), emptyMap())
             ));
 
-            publish(filesystem.getPath(entry));
+            this.assets=filesystem.getPath(entry);
 
         } else {
 
             throw new UnsupportedOperationException(format("unsupported URL scheme <%s>", root));
 
         }
+
+        return this;
     }
 
-    /**
-     * Creates a static content publisher.
-     *
-     * @param root the root path of the content to be published
-     *
-     * @throws NullPointerException if {@code root} is null
-     */
-    public Publisher(final Path root) {
 
-        if ( root == null ) {
-            throw new NullPointerException("null root");
+    /**
+     * Configures the fallback content.
+     *
+     * @param fallback the absolute path of the fallback content
+     *
+     * @return this publisher
+     *
+     * @throws NullPointerException     if {@code fallback} is null
+     * @throws IllegalArgumentException if {@code fallback} is not an absolute path
+     */
+    public Publisher fallback(final String fallback) {
+
+        if ( fallback == null ) {
+            throw new NullPointerException("null fallback path");
         }
 
-        publish(root);
+        if ( !fallback.startsWith("/") ) {
+            throw new NullPointerException("relative fallback path");
+        }
+
+        this.fallback=fallback;
+
+        return this;
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void publish(final Path root) {
-        delegate(new Router()
+    private Response assets(final Request request, final Function<Request, Response> forward) {
+        if ( assets != null && request.asset() ) {
 
-                .get((request, forward) -> variants(request.path())
+            return variants(request.path())
 
-                        .map(variant -> root.getRoot().relativize(root.getFileSystem().getPath(variant)))
-                        .map(root::resolve)
-                        .map(Path::normalize) // prevent tree walking attacks
+                    .map(variant -> assets.getRoot().relativize(assets.getFileSystem().getPath(variant)))
+                    .map(assets::resolve)
+                    .map(Path::normalize) // prevent tree walking attacks
 
-                        .filter(Files::exists)
-                        .filter(Files::isRegularFile)
+                    .filter(Files::exists)
+                    .filter(Files::isRegularFile)
 
-                        .findFirst()
+                    .findFirst()
 
-                        .map(file -> request.reply().map(checked(response -> {
+                    .map(file -> request.reply().map(checked(response -> {
 
-                            final String mime=mime(file.getFileName().toString());
-                            final String length=String.valueOf(Files.size(file));
-                            final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
+                        final String mime=mime(file.getFileName().toString());
+                        final String length=String.valueOf(Files.size(file));
+                        final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
 
-                            return request.headers("If-None-Match").anyMatch(etag::equals)
+                        return request.headers("If-None-Match").anyMatch(etag::equals)
 
-                                    ? response.status(NotModified)
+                                ? response.status(NotModified)
 
-                                    : request.method().equals(HEAD)
+                                : request.method().equals(HEAD)
 
-                                    ? response.status(OK)
-                                    .header("Content-Type", mime)
-                                    .header("ETag", etag)
+                                ? response.status(OK)
+                                .header("Content-Type", mime)
+                                .header("ETag", etag)
 
-                                    : response.status(OK)
-                                    .header("Content-Type", mime)
-                                    .header("Content-Length", length)
-                                    .header("ETag", etag)
-                                    .output(checked(output -> { Files.copy(file, output); }));
+                                : response.status(OK)
+                                .header("Content-Type", mime)
+                                .header("Content-Length", length)
+                                .header("ETag", etag)
+                                .output(checked(output -> { Files.copy(file, output); }));
 
-                        })))
+                    })))
 
-                        .orElseGet(() -> forward.apply(request))
+                    .orElseGet(() -> forward.apply(request));
 
-                )
+        } else {
 
-        );
+            return forward.apply(request);
+
+        }
+    }
+
+    private Response fallback(final Request request, final Function<Request, Response> forward) {
+        if ( fallback != null && request.route() && !request.path().equals(fallback) ) {
+
+            // retrieve fallback with a new request to support static content delivery on dedicated server
+
+            return new Request()
+
+                    .method(request.method())
+                    .base(request.base())
+                    .path(fallback)
+
+                    .headers(request.headers())
+
+                    // disable conditional requests
+
+                    .header("If-None-Match", "")
+                    .header("If-Modified-Since", "")
+
+                    .map(fetcher)
+
+                    // convert incoming into outgoing response
+
+                    .map(response -> request.reply(response.status())
+
+                            .header("Content-Type", response.header("Content-Type").orElse(""))
+                            .header("Cache-Control", "no-store") // don't shadow future API responses
+
+                            .output(output -> {
+
+                                try ( final InputStream input=response.input().get() ) {
+
+                                    input.transferTo(output);
+
+                                } catch ( final IOException e ) {
+
+                                    throw new UncheckedIOException(e);
+
+                                }
+
+                            })
+
+                    );
+
+        } else {
+
+            return forward.apply(request);
+
+        }
     }
 
 }

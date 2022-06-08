@@ -74,8 +74,8 @@ final class PublisherTest {
 	}
 
 
-	@Test void testRejectUnsafeRequestsRequests() {
-		exec(() -> new Publisher(getClass().getResource("/"))
+	@Test void testRejectUnsafeRequests() {
+		exec(() -> new Publisher().assets(getClass().getResource("/"))
 
 				.handle(new Request().method(POST), Request::reply)
 
