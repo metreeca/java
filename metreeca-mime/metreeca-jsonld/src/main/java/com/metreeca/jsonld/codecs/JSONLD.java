@@ -381,8 +381,6 @@ public final class JSONLD implements Codec<Frame> {
         final Shape shape=shape(message);
         final List<String> langs=message.request().langs();
 
-        final boolean global=langs.isEmpty() || langs.contains("*");
-
         final String mime=message
 
                 .header("Content-Type") // content-type explicitly defined by handler
@@ -395,17 +393,19 @@ public final class JSONLD implements Codec<Frame> {
                 );
 
 
-        final Collection<Statement> localized=value.model().stream().filter(statement -> {
+        final boolean global=langs.isEmpty() || langs.contains("*");
 
-            if ( global ) { return true; } else { // retain only tagged literals with an accepted language
+        final Collection<Statement> localized=global ? value.model() : value.model().stream()
 
-                final String lang=Values.lang(statement.getObject());
+                .filter(statement -> {  // retain only tagged literals with an accepted language
 
-                return lang.isEmpty() || langs.contains(lang);
+                    final String lang=Values.lang(statement.getObject());
 
-            }
+                    return lang.isEmpty() || langs.contains(lang);
 
-        }).collect(toList());
+                })
+
+                .collect(toList());
 
 
         return driver(shape).validate(value.focus(), localized)
