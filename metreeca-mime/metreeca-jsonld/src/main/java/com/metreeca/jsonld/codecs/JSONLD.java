@@ -453,26 +453,12 @@ public final class JSONLD implements Codec<Frame> {
 
     private String format(final Trace trace) {
 
-        final JsonObjectBuilder builder=Json.createObjectBuilder();
-
-        if ( !trace.issues().isEmpty() ) {
-            builder.add("@errors", Json.createArrayBuilder(trace.issues()));
-        }
-
-        trace.fields().forEach((label, nested) -> {
-
-            if ( !nested.isEmpty() ) {
-                builder.add(label, format(nested));
-            }
-
-        });
-
         try ( final StringWriter writer=new StringWriter() ) {
 
             Json
                     .createWriterFactory(singletonMap(PRETTY_PRINTING, true))
                     .createWriter(writer)
-                    .write(builder.build());
+                    .write(json(trace));
 
             return writer.toString();
 
@@ -484,5 +470,23 @@ public final class JSONLD implements Codec<Frame> {
 
     }
 
+    private JsonObject json(final Trace trace) {
+
+        final JsonObjectBuilder builder=Json.createObjectBuilder();
+
+        if ( !trace.issues().isEmpty() ) {
+            builder.add("@errors", Json.createArrayBuilder(trace.issues()));
+        }
+
+        trace.fields().forEach((label, nested) -> {
+
+            if ( !nested.isEmpty() ) {
+                builder.add(label, json(nested));
+            }
+
+        });
+
+        return builder.build();
+    }
 
 }
