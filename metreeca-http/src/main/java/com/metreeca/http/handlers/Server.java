@@ -80,7 +80,9 @@ public final class Server extends Delegator {
 
                 logger.entry(warning, this, () -> format("%s %s > %d", method, item, e.getStatus()), e);
 
-                return request.reply(e.getStatus()).body(new Text(), e.getMessage());
+                return e.getStatus() < 500
+                        ? request.reply(e.getStatus()).body(new Text(), e.getMessage())
+                        : request.reply(e.getStatus());
 
             } catch ( final RuntimeException e ) { // try to send a new response
 

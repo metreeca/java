@@ -25,6 +25,7 @@ import java.util.logging.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Strings.indent;
 import static com.metreeca.http.services.Logger.Level.*;
 
 import static java.util.Arrays.stream;
@@ -398,7 +399,7 @@ public abstract class Logger {
 
                     cause.printStackTrace(printer);
 
-                    return writer.toString();
+                    return indent(writer.toString());
 
                 } catch ( final IOException unexpected ) {
                     throw new UncheckedIOException(unexpected);

@@ -46,7 +46,7 @@ public final class CodecException extends RuntimeException {
             throw new NullPointerException("null message");
         }
 
-        if ( status/100 != 4 ) {
+        if ( status < 400 ) {
             throw new IllegalArgumentException("status outside client error range");
         }
 
