@@ -19,6 +19,7 @@ package com.metreeca.http;
 import org.junit.jupiter.api.Test;
 
 import static com.metreeca.http.Request.GET;
+import static com.metreeca.http.Request.POST;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +60,13 @@ final class RequestTest {
 		).isTrue();
 
 		assertThat(new Request()
+				.method(POST)
+				.path("/path/route")
+				.header("Accept", "text/xhtml,charset=utf8")
+				.route()
+		).isFalse();
+
+		assertThat(new Request()
 				.method(GET)
 				.path("/path/route.ext")
 				.header("Accept", "text/xhtml,charset=utf8")
@@ -76,29 +84,18 @@ final class RequestTest {
 
 	@Test void testAsset() {
 
-		assertThat(new Request().method(GET).path("/path/file.ext").asset()).isTrue();
-
 		assertThat(new Request().method(GET).path("/path/route/").asset()).isFalse();
 		assertThat(new Request().method(GET).path("/path/route").asset()).isFalse();
 
-		assertThat(new Request()
-				.method(GET)
-				.path("/path/route")
-				.header("Accept", "text/xhtml,charset=utf8")
+		assertThat(new Request().method(GET)
+				.header("Referer", "http://example.org")
+				.path("/path/file.ext")
 				.asset()
 		).isTrue();
 
-		assertThat(new Request()
-				.method(GET)
-				.path("/path/route.ext")
-				.header("Accept", "text/xhtml,charset=utf8")
-				.asset()
-		).isTrue();
-
-		assertThat(new Request()
-				.method(GET)
-				.path("/path/route")
-				.header("Accept", "application/xml,charset=utf8")
+		assertThat(new Request().method(POST)
+				.header("Referer", "http://example.org")
+				.path("/path/file.ext")
 				.asset()
 		).isFalse();
 

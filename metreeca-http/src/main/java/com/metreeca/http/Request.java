@@ -320,29 +320,28 @@ public final class Request extends Message<Request> {
     /**
      * Checks if this request targets a browser route.
      *
-     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe} and its {@code
-     * Accept} header includes a MIME type usually associated with an interactive browser-managed HTTP request (e.g.
-     * {@code text/html} and its {@link #path() path} doesn't contain a filename extension (e.g. {@code .html}); {@code
+     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe}, its {@link
+     * #path() path} doesn't contain a filename extension (e.g. {@code .html}) and its {@code Accept} header includes a
+     * MIME type usually associated with an interactive browser-managed HTTP request (e.g. {@code text/html}; {@code
      * false}, otherwise
      */
     public boolean route() {
-        return safe() && (!FilePattern.matcher(path).find()
-                && headers("Accept").anyMatch(value -> HTMLPattern.matcher(value).find())
-        );
+        return safe()
+                && !FilePattern.matcher(path).find()
+                && headers("Accept").anyMatch(value -> HTMLPattern.matcher(value).find());
     }
 
     /**
      * Checks if this request targets a browser asset.
      *
-     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe} and its {@code
-     * Accept} header includes a MIME type usually associated with an interactive browser-managed HTTP request (e.g.
-     * {@code text/html} or its {@link #path() path} contains a filename extension (e.g. {@code .html}); {@code false},
-     * otherwise
+     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe}, its {@link
+     * #path() path} contains a filename extension (e.g. {@code .html}) and a {@code Referer} header is set; {@code
+     * false}, otherwise
      */
     public boolean asset() {
-        return safe() && (FilePattern.matcher(path).find()
-                || headers("Accept").anyMatch(value -> HTMLPattern.matcher(value).find())
-        );
+        return safe()
+                && FilePattern.matcher(path).find()
+                && headers("Referer").findAny().isPresent();
     }
 
 
