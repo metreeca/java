@@ -594,7 +594,7 @@ public abstract class EngineTest {
 			final Map<IRI, Value> min=new HashMap<>();
 			final Map<IRI, Value> max=new HashMap<>();
 
-			resources.stream().filter(filter).flatMap(mapper).sequential().forEach(value -> {
+			resources.stream().filter(filter).flatMap(mapper).distinct().sequential().forEach(value -> {
 
 				final IRI type=type(value);
 
