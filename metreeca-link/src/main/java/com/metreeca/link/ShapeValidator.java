@@ -326,9 +326,24 @@ final class ShapeValidator extends Shape.Probe<Trace> {
     }
 
     @Override public Trace probe(final Or or) {
-        return or.shapes().stream().map(s -> s.map(this)).noneMatch(Trace::isEmpty)
-                ? trace("values don't match any alternative")
-                : trace();
+
+        final List<Trace> traces=or.shapes().stream()
+                .map(s -> s.map(this))
+                .collect(toList());
+
+        if ( traces.stream().anyMatch(Trace::isEmpty) ) { return trace(); } else {
+
+            final Collection<Trace> alternatives=new ArrayList<>();
+
+            for (int i=0; i < traces.size(); i++) {
+                alternatives.add(trace(format("#%d", i), traces.get(i)));
+            }
+
+            return trace("values don't match any alternative",
+                    alternatives.stream().reduce(trace(), Trace::trace)
+            );
+
+        }
     }
 
 

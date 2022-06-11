@@ -16,7 +16,6 @@
 
 package com.metreeca.link;
 
-import com.metreeca.core.Identifiers;
 import com.metreeca.core.Strings;
 import com.metreeca.link.shifts.Path;
 
@@ -28,6 +27,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.Identifiers.md5;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shifts.Alt.alt;
 import static com.metreeca.link.shifts.Seq.seq;
@@ -139,8 +139,7 @@ public final class Frame {
 
 
     public String skolemize() {
-
-        return Identifiers.md5(focus.stringValue());
+        return md5(focus.stringValue());
     }
 
     public String skolemize(final IRI... traits) {
@@ -149,7 +148,7 @@ public final class Frame {
             throw new NullPointerException("null traits");
         }
 
-        return Identifiers.md5(Arrays.stream(traits)
+        return md5(Arrays.stream(traits)
                 .flatMap(this::values)
                 .map(Value::stringValue)
                 .collect(joining("\n"))
@@ -162,7 +161,7 @@ public final class Frame {
             throw new NullPointerException("null shifts");
         }
 
-        return Identifiers.md5(Arrays.stream(shifts)
+        return md5(Arrays.stream(shifts)
                 .flatMap(this::values)
                 .map(Value::stringValue)
                 .collect(joining("\n"))
