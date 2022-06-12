@@ -133,25 +133,12 @@ The second form supports idiomatic collection filtering (e.g. `http://example.co
 ```
 <filter> ::= {
 
-    "^ <path>": "<datatype>", // datatype
-    "@ <path>": "<class>", // class
-    "% <path>": <value> | [<value>(, <value>)*], // range
-
-
     "> <path>": <value>, // minExclusive
     "< <path>: <value>, // maxExclusive
     ">= <path>": <value>, // minInclusive
     "<= <path>": <value>, // maxInclusive
     
-    "$> <path>": <value>, // minLength
-    "$< <path>": <value>, // maxLength
-    
-    "* <path>": "pattern", // pattern (regular expression matching)
     "~ <path>": "keywords", // like (stemmed word search)
-    "' <path>": "stem", // stem (prefix search)
-    
-    "#> <path>": <integer>, // minCount
-    "#< <path>": <integer>, // maxCount
     
     "! <path>": <value> | [<value>(, <value>)*], // all
     "? <path>": <value> | [<value>(, <value>)*], // any
