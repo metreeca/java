@@ -1,9 +1,8 @@
 ---
 title: "Idiomatic JSON-LD Serialization"
 trail: "Reference"
+excerpt: "JSON-LD serialization format grammar"
 ---
-
-[comment]: <> (excerpt:	JSON-LD serialization format grammar)
 
 
 Metreeca/Java generates and consumes linked data using a compacted/framed [JSON-LD](https://json-ld.org) format, which
