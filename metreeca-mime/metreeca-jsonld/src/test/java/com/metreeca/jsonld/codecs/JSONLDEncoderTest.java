@@ -31,7 +31,11 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import static com.metreeca.json.JSONAssert.assertThat;
+import static com.metreeca.link.Shape.optional;
 import static com.metreeca.link.Values.*;
+import static com.metreeca.link.shapes.And.and;
+import static com.metreeca.link.shapes.Field.field;
+import static com.metreeca.link.shapes.Lang.lang;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -70,7 +74,7 @@ final class JSONLDEncoderTest {
     @Nested final class Values {
 
         private JsonValue encode(final Value value) {
-            return new JSONLDEncoder(focus, Field.field(RDF.VALUE, Shape.optional()), emptyMap(), false)
+            return new JSONLDEncoder(focus, field(RDF.VALUE, Shape.optional()), emptyMap(), false)
                     .encode(singleton(statement(focus, RDF.VALUE, value))) // wrap value inside root object
                     .get("value"); // then unwrap
         }
@@ -147,7 +151,7 @@ final class JSONLDEncoderTest {
         @Test void testIgnoreNoNFocusNodes() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and()),
+                    field(RDF.VALUE, and()),
 
                     statement(x, RDF.VALUE, literal("x")),
                     statement(y, RDF.VALUE, literal("y"))
@@ -163,7 +167,7 @@ final class JSONLDEncoderTest {
         @Test void testHandleUnknownFocusNode() {
             assertThat(encode(z,
 
-                    Field.field(RDF.VALUE, And.and()),
+                    field(RDF.VALUE, optional()),
 
                     statement(x, RDF.VALUE, literal("x")),
                     statement(y, RDF.VALUE, literal("y"))
@@ -180,8 +184,8 @@ final class JSONLDEncoderTest {
         @Test void testExpandSharedTrees() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.repeatable(),
-                            Field.field(RDF.VALUE, Shape.required())
+                    field(RDF.VALUE, and(Shape.repeatable(),
+                            field(RDF.VALUE, Shape.required())
                     )),
 
                     statement(x, RDF.VALUE, w),
@@ -215,8 +219,8 @@ final class JSONLDEncoderTest {
         @Test void testHandleNamedLoops() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(),
-                            Field.field(RDF.VALUE, Shape.required())
+                    field(RDF.VALUE, and(Shape.required(),
+                            field(RDF.VALUE, Shape.required())
                     )),
 
                     statement(x, RDF.VALUE, y),
@@ -240,9 +244,9 @@ final class JSONLDEncoderTest {
 
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(),
-                            Field.field(RDF.VALUE, And.and(Shape.required(),
-                                    Field.field(RDF.VALUE, Shape.required())
+                    field(RDF.VALUE, and(Shape.required(),
+                            field(RDF.VALUE, and(Shape.required(),
+                                    field(RDF.VALUE, Shape.required())
                             ))
                     )),
 
@@ -267,8 +271,8 @@ final class JSONLDEncoderTest {
         @Test void testBNodeWithBackLinkToProvedResource() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(),
-                            Field.field(RDF.VALUE, And.and(Shape.required(), Datatype.datatype(ResourceType)))
+                    field(RDF.VALUE, and(Shape.required(),
+                            field(RDF.VALUE, and(Shape.required(), Datatype.datatype(ResourceType)))
                     )),
 
                     statement(x, RDF.VALUE, y),
@@ -290,7 +294,7 @@ final class JSONLDEncoderTest {
         @Test void testAliasDirectField() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Shape.required()),
+                    field(RDF.VALUE, Shape.required()),
 
                     statement(x, RDF.VALUE, y)
 
@@ -305,7 +309,7 @@ final class JSONLDEncoderTest {
         @Test void testAliasInverseField() {
             assertThat(encode(x,
 
-                    Field.field(inverse(RDF.VALUE), Shape.required()),
+                    field(inverse(RDF.VALUE), Shape.required()),
 
                     statement(y, RDF.VALUE, x)
 
@@ -318,7 +322,7 @@ final class JSONLDEncoderTest {
         @Test void testAliasUserLabelledField() {
             assertThat(encode(x,
 
-                    Field.field("alias", RDF.VALUE, Shape.required()),
+                    field("alias", RDF.VALUE, Shape.required()),
 
                     statement(x, RDF.VALUE, y)
 
@@ -333,8 +337,8 @@ final class JSONLDEncoderTest {
         @Test void testAliasNestedField() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(),
-                            Field.field("alias", RDF.VALUE, Shape.required())
+                    field(RDF.VALUE, and(Shape.required(),
+                            field("alias", RDF.VALUE, Shape.required())
                     )),
 
                     statement(x, RDF.VALUE, y),
@@ -354,9 +358,9 @@ final class JSONLDEncoderTest {
         @Test void testRejectAliasClashes() {
             assertThatThrownBy(() -> encode(x,
 
-                    And.and(
-                            Field.field(RDF.VALUE),
-                            Field.field(iri(base, "value"))
+                    and(
+                            field(RDF.VALUE),
+                            field(iri(base, "value"))
                     )
 
             )).isInstanceOf(IllegalArgumentException.class);
@@ -366,7 +370,7 @@ final class JSONLDEncoderTest {
             assertThatThrownBy(() -> {
                 encode(x,
 
-                        Field.field("@id", RDF.VALUE)
+                        field("@id", RDF.VALUE)
 
                 );
             }).isInstanceOf(IllegalArgumentException.class);
@@ -382,7 +386,7 @@ final class JSONLDEncoderTest {
         @Test void testRootRelativizeProvedIRIs() {
             assertThat(encode(container,
 
-                    Field.field(RDF.VALUE, Datatype.datatype(IRIType)),
+                    field(RDF.VALUE, Datatype.datatype(IRIType)),
 
                     statement(container, RDF.VALUE, iri(base, "/container/x")),
                     statement(container, RDF.VALUE, iri(base, "/container/y"))
@@ -399,7 +403,7 @@ final class JSONLDEncoderTest {
         @Test void testRelativizeProvedIRIBackReferences() {
             assertThat(encode(container,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(), Datatype.datatype(IRIType))),
+                    field(RDF.VALUE, and(Shape.required(), Datatype.datatype(IRIType))),
 
                     statement(container, RDF.VALUE, container)
 
@@ -416,7 +420,7 @@ final class JSONLDEncoderTest {
         @Test void testOmitMissingValues() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Shape.optional())
+                    field(RDF.VALUE, Shape.optional())
 
             )).isEqualTo(createObjectBuilder()
                     .add("@id", "/x")
@@ -426,7 +430,7 @@ final class JSONLDEncoderTest {
         @Test void testOmitEmptyArrays() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and())
+                    field(RDF.VALUE, and())
 
             )).isEqualTo(createObjectBuilder()
                     .add("@id", "/x")
@@ -437,7 +441,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedScalarValue() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, MaxCount.maxCount(1)),
+                    field(RDF.VALUE, MaxCount.maxCount(1)),
 
                     statement(x, RDF.VALUE, y)
 
@@ -452,7 +456,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedLeafIRI() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(), Datatype.datatype(IRIType))),
+                    field(RDF.VALUE, and(Shape.required(), Datatype.datatype(IRIType))),
 
                     statement(x, RDF.VALUE, y)
 
@@ -465,7 +469,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedTypedLiteral() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, And.and(Shape.required(), Datatype.datatype(XSD.DATE))),
+                    field(RDF.VALUE, and(Shape.required(), Datatype.datatype(XSD.DATE))),
 
                     statement(x, RDF.VALUE, literal("2019-04-03", XSD.DATE))
 
@@ -479,7 +483,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedTaggedValues() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Datatype.datatype(RDF.LANGSTRING)),
+                    field(RDF.VALUE, Datatype.datatype(RDF.LANGSTRING)),
 
                     statement(x, RDF.VALUE, literal("one", "en")),
                     statement(x, RDF.VALUE, literal("two", "en")),
@@ -497,7 +501,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedLocalizedValues() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Localized.localized()),
+                    field(RDF.VALUE, Localized.localized()),
 
                     statement(x, RDF.VALUE, literal("one", "en")),
                     statement(x, RDF.VALUE, literal("uno", "it"))
@@ -514,7 +518,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedTaggedValuesWithKnownLanguage() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Lang.lang("en")),
+                    field(RDF.VALUE, lang("en")),
 
                     statement(x, RDF.VALUE, literal("one", "en")),
                     statement(x, RDF.VALUE, literal("two", "en"))
@@ -531,7 +535,7 @@ final class JSONLDEncoderTest {
         @Test void testCompactProvedLocalizedValuesWithKnownLanguage() {
             assertThat(encode(x,
 
-                    Field.field(RDF.VALUE, Localized.localized(), Lang.lang("en")),
+                    field(RDF.VALUE, Localized.localized(), lang("en")),
 
                     statement(x, RDF.VALUE, literal("one", "en"))
 
@@ -546,8 +550,8 @@ final class JSONLDEncoderTest {
             assertThat(encode(x,
 
                     Or.or(
-                            Field.field(RDF.FIRST, Shape.required()),
-                            Field.field(RDF.REST, Shape.required())
+                            field(RDF.FIRST, Shape.required()),
+                            field(RDF.REST, Shape.required())
                     ),
 
                     statement(x, RDF.FIRST, y),
@@ -571,7 +575,7 @@ final class JSONLDEncoderTest {
         @Test void testHandleType() {
             assertThat(encode(x,
 
-                    Field.field(RDF.TYPE, Shape.required(), Datatype.datatype(IRIType)),
+                    field(RDF.TYPE, Shape.required(), Datatype.datatype(IRIType)),
 
                     statement(x, RDF.TYPE, y)
 
@@ -584,7 +588,7 @@ final class JSONLDEncoderTest {
         @Test void testHandleAliasedType() {
             assertThat(encode(x,
 
-                    Field.field(RDF.TYPE, Shape.required(), Datatype.datatype(IRIType)),
+                    field(RDF.TYPE, Shape.required(), Datatype.datatype(IRIType)),
                     Map.ofEntries(
                             entry("@id", "id"),
                             entry(
@@ -602,7 +606,7 @@ final class JSONLDEncoderTest {
         @Test void testHandleKeywordAliases() {
             assertThat(encode(x,
 
-                    Field.field(RDF.FIRST),
+                    field(RDF.FIRST),
 
                     Map.ofEntries(
                             entry("@id", "id"),
@@ -641,13 +645,13 @@ final class JSONLDEncoderTest {
 
 
         @Test void testDirectFields() {
-            assertThat(encode(Field.field(RDF.VALUE)))
+            assertThat(encode(field(RDF.VALUE)))
                     .hasField("value", RDF.VALUE.stringValue());
 
         }
 
         @Test void testInverseFields() {
-            assertThat(encode(Field.field(inverse(RDF.VALUE))))
+            assertThat(encode(field(inverse(RDF.VALUE))))
                     .hasField("valueOf", createObjectBuilder()
                             .add("@reverse", RDF.VALUE.stringValue())
                     );
@@ -655,7 +659,7 @@ final class JSONLDEncoderTest {
         }
 
         @Test void testProvedIRIs() {
-            assertThat(encode(Field.field(RDF.VALUE, Datatype.datatype(IRIType))))
+            assertThat(encode(field(RDF.VALUE, Datatype.datatype(IRIType))))
                     .hasField("value", createObjectBuilder()
                             .add("@id", RDF.VALUE.stringValue())
                             .add("@type", "@id")
@@ -663,7 +667,7 @@ final class JSONLDEncoderTest {
         }
 
         @Test void testKnownDatatype() {
-            assertThat(encode(Field.field(RDF.VALUE, Datatype.datatype(RDF.FIRST))))
+            assertThat(encode(field(RDF.VALUE, Datatype.datatype(RDF.FIRST))))
                     .hasField("value", createObjectBuilder()
                             .add("@id", RDF.VALUE.stringValue())
                             .add("@type", RDF.FIRST.stringValue())
@@ -671,7 +675,7 @@ final class JSONLDEncoderTest {
         }
 
         @Test void testProvedTagged() {
-            assertThat(encode(Field.field(RDF.VALUE, Localized.localized())))
+            assertThat(encode(field(RDF.VALUE, Localized.localized())))
                     .hasField("value", createObjectBuilder()
                             .add("@id", RDF.VALUE.stringValue())
                             .add("@container", "@language")
@@ -679,7 +683,7 @@ final class JSONLDEncoderTest {
         }
 
         @Test void testKnownLanguage() {
-            assertThat(encode(Field.field(RDF.VALUE, Lang.lang("en"))))
+            assertThat(encode(field(RDF.VALUE, lang("en"))))
                     .hasField("value", createObjectBuilder()
                             .add("@id", RDF.VALUE.stringValue())
                             .add("@language", "en")

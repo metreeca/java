@@ -19,7 +19,6 @@ package com.metreeca.jsonld.codecs;
 import com.metreeca.core.Identifiers;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Field;
-import com.metreeca.link.shapes.MaxCount;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -37,6 +36,7 @@ import javax.json.*;
 import static com.metreeca.jsonld.codecs.JSONLDInspector.*;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.Field.labels;
+import static com.metreeca.link.shapes.MaxCount.maxCount;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -52,379 +52,388 @@ import static javax.json.Json.*;
  */
 final class JSONLDEncoder {
 
-	private static final Collection<IRI> InternalTypes=new HashSet<>(asList(ValueType, ResourceType, LiteralType));
+    private static final Collection<IRI> InternalTypes=new HashSet<>(asList(ValueType, ResourceType, LiteralType));
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final IRI focus;
-	private final Shape shape;
+    private final IRI focus;
+    private final Shape shape;
 
-	private final Map<String, String> keywords;
-	private final boolean context;
+    private final Map<String, String> keywords;
+    private final boolean context;
 
-	private final String root;
+    private final String root;
 
-	private final Function<String, String> aliaser;
+    private final Function<String, String> aliaser;
 
 
-	JSONLDEncoder(final IRI focus, final Shape shape, final Map<String, String> keywords, final boolean context) {
+    JSONLDEncoder(final IRI focus, final Shape shape, final Map<String, String> keywords, final boolean context) {
 
-		this.focus=focus;
-		this.shape=driver(shape);
+        this.focus=focus;
+        this.shape=driver(shape);
 
-		this.keywords=keywords;
-		this.context=context;
+        this.keywords=keywords;
+        this.context=context;
 
-		this.root=Optional.ofNullable(focus)
-				.map(Value::stringValue)
-				.map(Identifiers.IRIPattern::matcher)
-				.filter(Matcher::matches)
-				.map(matcher -> Optional.ofNullable(matcher.group("schemeall")).orElse("")
-						+Optional.ofNullable(matcher.group("hostall")).orElse("")
-						+"/"
-				)
-				.orElse(Base);
+        this.root=Optional.ofNullable(focus)
+                .map(Value::stringValue)
+                .map(Identifiers.IRIPattern::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> Optional.ofNullable(matcher.group("schemeall")).orElse("")
+                        +Optional.ofNullable(matcher.group("hostall")).orElse("")
+                        +"/"
+                )
+                .orElse(Base);
 
-		this.aliaser=keyword -> keywords.getOrDefault(keyword, keyword);
-	}
+        this.aliaser=keyword -> keywords.getOrDefault(keyword, keyword);
+    }
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	JsonObject encode(final Collection<Statement> model) {
+    JsonObject encode(final Collection<Statement> model) {
 
-		if ( model == null ) {
-			throw new NullPointerException("null model");
-		}
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
 
-		return resource(focus, shape, model, resource -> false).asJsonObject();
-	}
+        return resource(focus, shape, model, resource -> false).asJsonObject();
+    }
 
 
-	//// Values ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Values ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private JsonValue values(
-			final Collection<? extends Value> values, final Shape shape,
-			final Collection<Statement> model, final Predicate<Resource> trail
-	) {
+    private JsonValue values(
+            final Collection<? extends Value> values, final Shape shape,
+            final Collection<Statement> model, final Predicate<Resource> trail
+    ) {
 
-		final int maxCount=MaxCount.maxCount(shape);
+        final int maxCount=maxCount(shape);
 
-		if ( tagged(shape) ) { // tagged literals
+        if ( tagged(shape) ) { // tagged literals
 
-			return taggeds(values, shape, maxCount == 1);
+            return taggeds(values, shape, maxCount == 1);
 
-		} else if ( maxCount == 1 ) { // single value
+        } else if ( maxCount > 1 && !values.isEmpty() ) { // repeated values
 
-			return value(values.iterator().next(), shape, model, trail); // values required to be not empty
+            final JsonArrayBuilder array=createArrayBuilder();
 
-		} else { // multiple values
+            values.stream().map(value -> value(value, shape, model, trail)).forEach(array::add);
 
-			final JsonArrayBuilder array=createArrayBuilder();
+            return array.build();
 
-			values.stream().map(value -> value(value, shape, model, trail)).forEach(array::add);
+        } else if ( !values.isEmpty() ) { // single value
 
-			return array.build();
+            return value(values.iterator().next(), shape, model, trail); // values required to be not empty
 
-		}
+        } else {
 
-	}
+            return null;
 
-	private JsonValue value(
-			final Value value, final Shape shape,
-			final Collection<Statement> model, final Predicate<Resource> trail
-	) {
+        }
 
-		return value instanceof Resource ? resource((Resource)value, shape, model, trail)
-				: value instanceof Literal ? literal((Literal)value, shape)
-				: null; // unexpected
+    }
 
-	}
+    private JsonValue value(
+            final Value value, final Shape shape,
+            final Collection<Statement> model, final Predicate<Resource> trail
+    ) {
 
+        return value instanceof Resource ? resource((Resource)value, shape, model, trail)
+                : value instanceof Literal ? literal((Literal)value, shape)
+                : null; // unexpected
 
-	//// Resources ////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
 
-	private JsonValue resource(
-			final Resource resource, final Shape shape,
-			final Collection<Statement> model, final Predicate<Resource> trail
-	) { // !!! refactor
 
-		final Object datatype=datatype(shape).orElse(null);
-		final Map<String, Field> labels=labels(shape, keywords);
+    //// Resources ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		final boolean inlineable=IRIType.equals(datatype)
-				|| BNodeType.equals(datatype)
-				|| ResourceType.equals(datatype);
+    private JsonValue resource(
+            final Resource resource, final Shape shape,
+            final Collection<Statement> model, final Predicate<Resource> trail
+    ) { // !!! refactor
 
-		final String id=id(resource);
+        final Object datatype=datatype(shape).orElse(null);
+        final Map<String, Field> labels=labels(shape, keywords);
 
-		if ( trail.test(resource) ) { // a back-reference to an enclosing copy of self -> omit fields
+        final boolean inlineable=IRIType.equals(datatype)
+                || BNodeType.equals(datatype)
+                || ResourceType.equals(datatype);
 
-			return inlineable
-					? createValue(id)
-					: createObjectBuilder().add(aliaser.apply("@id"), id).build();
+        final String id=id(resource);
 
-		} else if ( inlineable && resource instanceof IRI && labels.isEmpty() ) { // inline proved leaf IRI
+        if ( trail.test(resource) ) { // a back-reference to an enclosing copy of self -> omit fields
 
-			return createValue(id);
+            return inlineable
+                    ? createValue(id)
+                    : createObjectBuilder().add(aliaser.apply("@id"), id).build();
 
-		} else {
+        } else if ( inlineable && resource instanceof IRI && labels.isEmpty() ) { // inline proved leaf IRI
 
-			final JsonObjectBuilder object=createObjectBuilder().add(aliaser.apply("@id"), id);
+            return createValue(id);
 
-			final Collection<Resource> references=new ArrayList<>();
+        } else {
 
-			final Predicate<Resource> nestedTrail=reference -> {
+            final JsonObjectBuilder object=createObjectBuilder().add(aliaser.apply("@id"), id);
 
-				if ( reference.equals(resource) ) {
-					references.add(reference); // mark resource as back-referenced
-				}
+            final Collection<Resource> references=new ArrayList<>();
 
-				return reference.equals(resource) || trail.test(reference);
+            final Predicate<Resource> nestedTrail=reference -> {
 
-			};
+                if ( reference.equals(resource) ) {
+                    references.add(reference); // mark resource as back-referenced
+                }
 
-			for (final Map.Entry<String, Field> entry : labels.entrySet()) {
+                return reference.equals(resource) || trail.test(reference);
 
-				final String label=entry.getKey();
-				final Field field=entry.getValue();
+            };
 
-				final Shape nestedShape=field.shape();
+            for (final Map.Entry<String, Field> entry : labels.entrySet()) {
 
-				final Collection<? extends Value> values=traverse(field.iri(),
-						iri -> objects(model, resource, iri),
-						iri -> subjects(model, resource, iri)
-				);
+                final String label=entry.getKey();
+                final Field field=entry.getValue();
 
-				if ( !values.isEmpty() ) { // omit null value and empty arrays
+                final Shape nestedShape=field.shape();
 
-					object.add(label, values(values, nestedShape, model, nestedTrail));
 
-				}
+                final Collection<? extends Value> values=traverse(field.iri(),
+                        iri -> objects(model, resource, iri),
+                        iri -> subjects(model, resource, iri)
+                );
 
-			}
+                final JsonValue value=values(values, nestedShape, model, nestedTrail);
 
-			if ( resource instanceof BNode && references.isEmpty() ) { // no back-references > drop id
-				object.remove(aliaser.apply("@id"));
-			}
+                if ( value != null ) {
+                    object.add(label, value);
+                }
 
-			if ( context ) {
-				context(resource.equals(focus) ? keywords : emptyMap(), labels).ifPresent(context ->
-						object.add("@context", context)
-				);
-			}
+            }
 
-			return object.build();
+            if ( resource instanceof BNode && references.isEmpty() ) { // no back-references > drop id
+                object.remove(aliaser.apply("@id"));
+            }
 
-		}
+            if ( context ) {
+                context(resource.equals(focus) ? keywords : emptyMap(), labels).ifPresent(context ->
+                        object.add("@context", context)
+                );
+            }
 
-	}
+            return object.build();
 
-	private Optional<JsonObject> context(final Map<String, String> keywords, final Map<String, Field> fields) {
-		if ( keywords.isEmpty() && fields.isEmpty() ) { return Optional.empty(); } else {
+        }
 
-			final JsonObjectBuilder context=createObjectBuilder();
+    }
 
-			keywords.forEach((keyword, alias) ->
+    private Optional<JsonObject> context(final Map<String, String> keywords, final Map<String, Field> fields) {
+        if ( keywords.isEmpty() && fields.isEmpty() ) { return Optional.empty(); } else {
 
-					context.add(alias, keyword)
+            final JsonObjectBuilder context=createObjectBuilder();
 
-			);
+            keywords.forEach((keyword, alias) ->
 
-			fields.forEach((alias, field) -> {
+                    context.add(alias, keyword)
 
-				final IRI iri=field.iri();
-				final Shape shape=field.shape();
+            );
 
+            fields.forEach((alias, field) -> {
 
-				final Optional<IRI> datatype=datatype(shape);
+                final IRI iri=field.iri();
+                final Shape shape=field.shape();
 
-				final String traverse=direct(iri) ? "@id" : "@reverse";
-				final String label=traverse(iri, Value::stringValue, Value::stringValue);
 
-				if ( datatype.filter(IRIType::equals).isPresent() ) {
+                final Optional<IRI> datatype=datatype(shape);
 
-					context.add(alias, createObjectBuilder()
-							.add(traverse, label)
-							.add("@type", "@id")
-					);
+                final String traverse=direct(iri) ? "@id" : "@reverse";
+                final String label=traverse(iri, Value::stringValue, Value::stringValue);
 
-				} else if ( datatype.filter(RDF.LANGSTRING::equals).isPresent() ) {
+                if ( datatype.filter(IRIType::equals).isPresent() ) {
 
-					final Set<String> langs=langs(shape);
+                    context.add(alias, createObjectBuilder()
+                            .add(traverse, label)
+                            .add("@type", "@id")
+                    );
 
-					context.add(alias, langs.size() == 1
+                } else if ( datatype.filter(RDF.LANGSTRING::equals).isPresent() ) {
 
-							? createObjectBuilder()
-							.add(traverse, label)
-							.add("@language", langs.iterator().next())
+                    final Set<String> langs=langs(shape);
 
-							: createObjectBuilder()
-							.add(traverse, label)
-							.add("@container", "@language")
-					);
+                    context.add(alias, langs.size() == 1
 
-				} else if ( datatype.filter(type -> !InternalTypes.contains(type)).isPresent() ) {
+                            ? createObjectBuilder()
+                            .add(traverse, label)
+                            .add("@language", langs.iterator().next())
 
-					context.add(alias, createObjectBuilder()
-							.add(traverse, label)
-							.add("@type", datatype.get().stringValue())
-					);
+                            : createObjectBuilder()
+                            .add(traverse, label)
+                            .add("@container", "@language")
+                    );
 
-				} else if ( direct(iri) ) {
+                } else if ( datatype.filter(type -> !InternalTypes.contains(type)).isPresent() ) {
 
-					context.add(alias, label);
+                    context.add(alias, createObjectBuilder()
+                            .add(traverse, label)
+                            .add("@type", datatype.get().stringValue())
+                    );
 
-				} else {
+                } else if ( direct(iri) ) {
 
-					context.add(alias, createObjectBuilder().add("@reverse", label));
+                    context.add(alias, label);
 
-				}
+                } else {
 
-			});
+                    context.add(alias, createObjectBuilder().add("@reverse", label));
 
-			return Optional.of(context.build());
+                }
 
-		}
-	}
+            });
 
+            return Optional.of(context.build());
 
-	//// Literals /////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
 
-	private JsonValue literal(final Literal literal, final Shape shape) {
 
-		final IRI datatype=literal.getDatatype();
+    //// Literals /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		try {
+    private JsonValue literal(final Literal literal, final Shape shape) {
 
-			return datatype.equals(XSD.BOOLEAN) ? literal(literal.booleanValue())
-					: datatype.equals(XSD.STRING) ? literal(literal.stringValue())
-					: datatype.equals(XSD.INTEGER) ? literal(literal.integerValue())
-					: datatype.equals(XSD.DECIMAL) ? literal(literal.decimalValue())
-					: datatype.equals(RDF.LANGSTRING) ? literal(literal, literal.getLanguage().orElse(""))
-					: datatype(shape).isPresent() ? literal(literal.stringValue()) // only lexical if type is known
-					: literal(literal, datatype);
+        final IRI datatype=literal.getDatatype();
 
-		} catch ( final IllegalArgumentException ignored ) { // malformed literals
-			return literal(literal, datatype);
-		}
-	}
+        try {
 
+            return datatype.equals(XSD.BOOLEAN) ? literal(literal.booleanValue())
+                    : datatype.equals(XSD.STRING) ? literal(literal.stringValue())
+                    : datatype.equals(XSD.INTEGER) ? literal(literal.integerValue())
+                    : datatype.equals(XSD.DECIMAL) ? literal(literal.decimalValue())
+                    : datatype.equals(RDF.LANGSTRING) ? literal(literal, literal.getLanguage().orElse(""))
+                    : datatype(shape).isPresent() ? literal(literal.stringValue()) // only lexical if type is known
+                    : literal(literal, datatype);
 
-	private JsonValue literal(final boolean value) {
-		return value ? JsonValue.TRUE : JsonValue.FALSE;
-	}
+        } catch ( final IllegalArgumentException ignored ) { // malformed literals
+            return literal(literal, datatype);
+        }
+    }
 
-	private JsonValue literal(final String value) {
-		return createValue(value);
-	}
 
-	private JsonValue literal(final BigInteger value) {
-		return createValue(value);
-	}
+    private JsonValue literal(final boolean value) {
+        return value ? JsonValue.TRUE : JsonValue.FALSE;
+    }
 
-	private JsonValue literal(final BigDecimal value) {
-		return createValue(value);
-	}
+    private JsonValue literal(final String value) {
+        return createValue(value);
+    }
 
+    private JsonValue literal(final BigInteger value) {
+        return createValue(value);
+    }
 
-	private JsonValue literal(final Value literal, final String lang) {
-		return createObjectBuilder()
-				.add(aliaser.apply("@value"), literal.stringValue())
-				.add(aliaser.apply("@language"), lang)
-				.build();
-	}
+    private JsonValue literal(final BigDecimal value) {
+        return createValue(value);
+    }
 
-	private JsonValue literal(final Value literal, final IRI datatype) {
-		return createObjectBuilder()
-				.add(aliaser.apply("@value"), literal.stringValue())
-				.add(aliaser.apply("@type"), datatype.stringValue())
-				.build();
-	}
 
+    private JsonValue literal(final Value literal, final String lang) {
+        return createObjectBuilder()
+                .add(aliaser.apply("@value"), literal.stringValue())
+                .add(aliaser.apply("@language"), lang)
+                .build();
+    }
 
-	//// Tagged Literals //////////////////////////////////////////////////////////////////////////////////////////////
+    private JsonValue literal(final Value literal, final IRI datatype) {
+        return createObjectBuilder()
+                .add(aliaser.apply("@value"), literal.stringValue())
+                .add(aliaser.apply("@type"), datatype.stringValue())
+                .build();
+    }
 
-	private JsonValue taggeds(final Collection<? extends Value> values, final Shape shape, final boolean scalar) {
 
-		// !!! refactor
+    //// Tagged Literals //////////////////////////////////////////////////////////////////////////////////////////////
 
-		final boolean localized=localized(shape);
-		final Set<String> langs=langs(shape);
+    private JsonValue taggeds(final Collection<? extends Value> values, final Shape shape, final boolean scalar) {
 
-		final Map<String, List<String>> langToStrings=values.stream()
-				.map(Literal.class::cast) // datatype already checked by values()
-				.collect(groupingBy(
-						literal -> literal.getLanguage().orElse(""), // datatype already checked by values()
-						LinkedHashMap::new,
-						mapping(Value::stringValue, toList())
-				));
+        // !!! refactor
 
-		if ( langs.size() == 1 ) { // known language
+        final boolean localized=localized(shape);
+        final Set<String> langs=langs(shape);
 
-			final List<String> strings=langToStrings.values().iterator().next(); // values required to be non empty
+        final Map<String, List<String>> langToStrings=values.stream()
+                .map(Literal.class::cast) // datatype already checked by values()
+                .collect(groupingBy(
+                        literal -> literal.getLanguage().orElse(""), // datatype already checked by values()
+                        LinkedHashMap::new,
+                        mapping(Value::stringValue, toList())
+                ));
 
-			if ( localized || scalar ) { // single value
+        if ( langs.size() == 1 && !langToStrings.isEmpty() ) { // known language
 
-				return createValue(strings.get(0));
+            final List<String> strings=langToStrings.values().iterator().next(); // values required to be non empty
 
-			} else { // multiple values
+            if ( localized || scalar ) { // single value
 
-				return createArrayBuilder(strings).build();
+                return createValue(strings.get(0));
 
-			}
+            } else { // multiple values
 
-		} else { // multiple languages
+                return createArrayBuilder(strings).build();
 
-			final JsonObjectBuilder builder=createObjectBuilder();
+            }
 
-			langToStrings.forEach((lang, strings) -> {
+        } else if ( !langToStrings.isEmpty() ) { // multiple languages
 
-				if ( localized || scalar ) { // single value
+            final JsonObjectBuilder builder=createObjectBuilder();
 
-					builder.add(lang, createValue(strings.get(0)));
+            langToStrings.forEach((lang, strings) -> {
 
-				} else { // multiple values
+                if ( localized || scalar ) { // single value
 
-					builder.add(lang, createArrayBuilder(strings));
+                    builder.add(lang, createValue(strings.get(0)));
 
-				}
+                } else { // multiple values
 
-			});
+                    builder.add(lang, createArrayBuilder(strings));
 
-			return builder.build();
+                }
 
-		}
+            });
 
-	}
+            return builder.build();
 
+        } else {
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            return null;
 
-	private String id(final Resource resource) {
-		return resource instanceof BNode ? "_:"+resource.stringValue() : relativize(resource.stringValue());
-	}
+        }
 
-	private String relativize(final String iri) {
-		return iri.startsWith(root) ? iri.substring(root.length()-1) : iri;
-	}
+    }
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Set<Resource> subjects(final Collection<Statement> model, final Value resource, final Value predicate) {
-		return model.stream()
-				.filter(pattern(null, predicate, resource))
-				.map(Statement::getSubject)
-				.collect(toCollection(LinkedHashSet::new));
-	}
+    private String id(final Resource resource) {
+        return resource instanceof BNode ? "_:"+resource.stringValue() : relativize(resource.stringValue());
+    }
 
-	private Set<Value> objects(final Collection<Statement> model, final Value resource, final Value predicate) {
-		return model.stream()
-				.filter(pattern(resource, predicate, null))
-				.map(Statement::getObject)
-				.collect(toCollection(LinkedHashSet::new));
-	}
+    private String relativize(final String iri) {
+        return iri.startsWith(root) ? iri.substring(root.length()-1) : iri;
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private Set<Resource> subjects(final Collection<Statement> model, final Value resource, final Value predicate) {
+        return model.stream()
+                .filter(pattern(null, predicate, resource))
+                .map(Statement::getSubject)
+                .collect(toCollection(LinkedHashSet::new));
+    }
+
+    private Set<Value> objects(final Collection<Statement> model, final Value resource, final Value predicate) {
+        return model.stream()
+                .filter(pattern(resource, predicate, null))
+                .map(Statement::getObject)
+                .collect(toCollection(LinkedHashSet::new));
+    }
 
 }

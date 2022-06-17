@@ -35,7 +35,6 @@ import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Shape.Contains;
 import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Field.field;
 import static com.metreeca.link.shapes.Guard.*;
 
@@ -125,19 +124,24 @@ public final class Relator extends Operator {
 
             final IRI item=iri(request.item());
             final Shape shape=shape(request);
-
             final Query query=query(item, shape, request.query());
+
             return engine.relate(frame(item), query)
 
-                    .map(frame -> request.reply().map(response ->
-                            shape(response.status(OK), query.map(new ShapeProbe(collection)))
+                    .map(frame -> request.reply(OK)
+                            .map(response -> shape(response, query.map(new ShapeProbe(collection)))
                                     .body(new JSONLD(), frame)
-                    ))
+                            ))
 
-                    .orElseGet(() -> request.reply().map(response -> collection
-                            ? shape(response.status(OK), and()).body(new JSONLD(), frame(item)) // virtual container
-                            : response.status(NotFound)
-                    ));
+                    .orElseGet(() -> collection
+
+                            ? request.reply(OK) // virtual container
+                            .map(response -> shape(response, query.map(new ShapeProbe(collection))))
+                            .body(new JSONLD(), frame(item))
+
+                            : request.reply(NotFound)
+
+                    );
         };
     }
 
