@@ -31,7 +31,7 @@ import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.jsonld.codecs.JSONLD.query;
 import static com.metreeca.jsonld.codecs.JSONLD.shape;
-import static com.metreeca.jsonld.services.Engine.engine;
+import static com.metreeca.jsonld.services.Engine.*;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Shape.Contains;
 import static com.metreeca.link.Values.iri;
@@ -163,11 +163,11 @@ public final class Relator extends Operator {
         }
 
         @Override public Shape probe(final Stats stats) {
-            return Engine.StatsShape(stats);
+            return StatsShape(stats);
         }
 
         @Override public Shape probe(final Terms terms) {
-            return Engine.TermsShape(terms);
+            return TermsShape(terms);
         }
 
     }

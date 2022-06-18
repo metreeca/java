@@ -147,7 +147,8 @@ public interface Engine {
      *
      * @param query the reference query
      *
-     * @return a value shape incorporating resource {@linkplain #Annotations annotations} extracted from {@code query}
+     * @return a value shape incorporating constraints and possibly resource {@linkplain #Annotations annotations}
+     * extracted from {@code query}
      *
      * @throws NullPointerException if {@code query} is null
      */
@@ -157,12 +158,21 @@ public interface Engine {
             throw new NullPointerException("null query");
         }
 
-        return and(query.shape()
+        final Optional<Shape> root=query.shape()
                 .redact(Mode, Convey)
-                .walk(query.path())
-                .map(Field::fields)
-                .orElseGet(Stream::empty)
-                .filter(field -> Annotations.contains(field.iri())));
+                .walk(query.path());
+
+        return and(Stream.concat(
+
+                root
+                        .stream(),
+
+                root
+                        .map(Field::fields)
+                        .orElseGet(Stream::empty)
+                        .filter(field -> Annotations.contains(field.iri()))
+
+        ));
     }
 
 
