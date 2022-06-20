@@ -33,7 +33,7 @@ public final class MinCount extends Shape {
 
 	public static Shape minCount(final int limit) {
 
-		if ( limit < 1 ) {
+		if ( limit < 0 ) {
 			throw new IllegalArgumentException("illegal limit ["+limit+"]");
 		}
 
@@ -94,6 +94,7 @@ public final class MinCount extends Shape {
 	@Override public String toString() {
 		return "minCount("+limit+")";
 	}
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
