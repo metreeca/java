@@ -29,8 +29,6 @@ import static com.metreeca.link.Values.direct;
 import static com.metreeca.link.Values.format;
 import static com.metreeca.link.shapes.All.all;
 import static com.metreeca.link.shapes.Lang.lang;
-import static com.metreeca.link.shapes.MaxCount.maxCount;
-import static com.metreeca.link.shapes.MinCount.minCount;
 import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.link.shapes.Range.range;
 import static com.metreeca.link.shapes.When.when;
@@ -167,11 +165,21 @@ public final class And extends Shape {
 	}
 
 	private static Stream<? extends Shape> minCounts(final Stream<MinCount> minCounts) {
-		return Stream.of(minCount(minCounts.mapToInt(MinCount::limit).max().orElse(Integer.MIN_VALUE)));
+		return minCounts
+				.mapToInt(MinCount::limit)
+				.filter(limit -> limit > 0)
+				.max()
+				.stream()
+				.mapToObj(MinCount::minCount);
 	}
 
 	private static Stream<? extends Shape> maxCounts(final Stream<MaxCount> maxCounts) {
-		return Stream.of(maxCount(maxCounts.mapToInt(MaxCount::limit).min().orElse(Integer.MAX_VALUE)));
+		return maxCounts
+				.mapToInt(MaxCount::limit)
+				.filter(limit -> limit < Integer.MAX_VALUE)
+				.min()
+				.stream()
+				.mapToObj(MaxCount::maxCount);
 	}
 
 	private static Stream<? extends Shape> alls(final Stream<All> alls) {

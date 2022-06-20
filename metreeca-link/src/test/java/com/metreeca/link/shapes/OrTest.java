@@ -120,6 +120,14 @@ final class OrTest {
         }
 
 
+        @Test void testRemoveImmaterialMinCount() {
+            assertThat(or(minCount(0))).isEqualTo(or());
+        }
+
+        @Test void testRemoveImmaterialMaxCount() {
+            assertThat(or(maxCount(Integer.MAX_VALUE))).isEqualTo(or());
+        }
+
         @Test void testOptimizeMinCount() {
             assertThat(or(minCount(10), minCount(100))).isEqualTo(minCount(10));
         }

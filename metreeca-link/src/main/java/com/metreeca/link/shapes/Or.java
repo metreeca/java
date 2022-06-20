@@ -30,8 +30,6 @@ import static com.metreeca.link.Values.format;
 import static com.metreeca.link.shapes.And.and;
 import static com.metreeca.link.shapes.Any.any;
 import static com.metreeca.link.shapes.Lang.lang;
-import static com.metreeca.link.shapes.MaxCount.maxCount;
-import static com.metreeca.link.shapes.MinCount.minCount;
 import static com.metreeca.link.shapes.Range.range;
 import static com.metreeca.link.shapes.When.when;
 
@@ -151,11 +149,21 @@ public final class Or extends Shape {
 	}
 
 	private static Stream<? extends Shape> minCounts(final Stream<MinCount> minCounts) {
-		return Stream.of(minCount(minCounts.mapToInt(MinCount::limit).min().orElse(Integer.MIN_VALUE)));
+		return minCounts
+				.mapToInt(MinCount::limit)
+				.filter(limit -> limit > 0)
+				.min()
+				.stream()
+				.mapToObj(MinCount::minCount);
 	}
 
 	private static Stream<? extends Shape> maxCounts(final Stream<MaxCount> maxCounts) {
-		return Stream.of(maxCount(maxCounts.mapToInt(MaxCount::limit).max().orElse(Integer.MAX_VALUE)));
+		return maxCounts
+				.mapToInt(MaxCount::limit)
+				.filter(limit -> limit < Integer.MAX_VALUE)
+				.max()
+				.stream()
+				.mapToObj(MaxCount::maxCount);
 	}
 
 	private static Stream<? extends Shape> anys(final Stream<Any> anys) {

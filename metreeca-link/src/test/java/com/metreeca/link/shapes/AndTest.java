@@ -147,6 +147,14 @@ final class AndTest {
         }
 
 
+        @Test void testRemoveImmaterialMinCount() {
+            assertThat(and(minCount(0))).isEqualTo(and());
+        }
+
+        @Test void testRemoveImmaterialMaxCount() {
+            assertThat(and(maxCount(Integer.MAX_VALUE))).isEqualTo(and());
+        }
+
         @Test void testOptimizeMinCount() {
             assertThat(and(minCount(10), minCount(100))).isEqualTo(minCount(100));
         }
