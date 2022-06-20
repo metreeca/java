@@ -19,7 +19,7 @@ package com.metreeca.jsonld.services;
 import com.metreeca.link.*;
 import com.metreeca.link.queries.Stats;
 import com.metreeca.link.queries.Terms;
-import com.metreeca.link.shapes.Field;
+import com.metreeca.link.shapes.*;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -164,8 +164,15 @@ public interface Engine {
 
         return and(Stream.concat(
 
-                root
-                        .stream(),
+                Stream
+
+                        .of(
+                                root.map(MinCount::minCount).map(MinCount::minCount),
+                                root.map(MaxCount::maxCount).map(MaxCount::maxCount),
+                                root.flatMap(Datatype::datatype).map(Datatype::datatype)
+                        )
+
+                        .flatMap(Optional::stream),
 
                 root
                         .map(Field::fields)

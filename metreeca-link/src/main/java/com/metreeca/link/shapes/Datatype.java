@@ -20,7 +20,11 @@ import com.metreeca.link.Shape;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import java.util.*;
+
 import static com.metreeca.link.Values.format;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -46,6 +50,16 @@ public final class Datatype extends Shape {
         }
 
         return new Datatype(iri);
+    }
+
+
+    public static Optional<IRI> datatype(final Shape shape) {
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        return Optional.ofNullable(shape.map(new DatatypeProbe()));
     }
 
 
@@ -89,6 +103,51 @@ public final class Datatype extends Shape {
 
     @Override public String toString() {
         return "datatype("+format(iri)+")";
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static final class DatatypeProbe extends Probe<IRI> {
+
+        @Override public IRI probe(final Datatype datatype) {
+            return datatype.iri;
+        }
+
+
+        @Override public IRI probe(final Link link) {
+            return link.shape().map(this);
+        }
+
+
+        @Override public IRI probe(final When when) {
+
+            final IRI pass=when.pass().map(this);
+            final IRI fail=when.fail().map(this);
+
+            return Objects.equals(pass, fail) ? pass : null;
+        }
+
+        @Override public IRI probe(final And and) {
+
+            final List<IRI> types=and.shapes().stream()
+                    .map(shape -> shape.map(this))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(toList());
+
+            return types.size() == 1 ? types.get(0) : null;
+        }
+
+        @Override public IRI probe(final Or or) {
+
+            final List<IRI> types=or.shapes().stream()
+                    .map(shape -> shape.map(this))
+                    .collect(toList());
+
+            return types.size() == 1 ? types.get(0) : null;
+        }
+
     }
 
 }
