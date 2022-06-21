@@ -113,11 +113,13 @@ public final class Server extends Delegator {
 
                 .or(() -> request.header("X-Forwarded-Proto"));
 
-        final Optional<String> host=request.header("Forwarded")
+        final Optional<String> host=request.header("Host")
 
-                .map(HostPattern::matcher)
-                .filter(Matcher::find)
-                .map(matcher -> matcher.group("host"))
+                .or(() -> request.header("Forwarded")
+                        .map(HostPattern::matcher)
+                        .filter(Matcher::find)
+                        .map(matcher -> matcher.group("host"))
+                )
 
                 .or(() -> request.header("X-Forwarded-Host"));
 
