@@ -136,7 +136,7 @@ public final class Untag implements Function<Node, String> {
 
                 case "br":
 
-                    return wrap();
+                    return append("  ").wrap();
 
                 case "hr":
 
