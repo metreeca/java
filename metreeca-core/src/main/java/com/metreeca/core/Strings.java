@@ -59,7 +59,28 @@ public final class Strings {
             throw new NullPointerException("null string");
         }
 
-        return string.isEmpty() ? string : SpacePattern.matcher(string.trim()).replaceAll(" ");
+        return normalize(string, false);
+    }
+
+    /**
+     * Normalizes spaces.
+     *
+     * @param string the string to be normalized
+     * @param border {@code true} if leading/trailing whitespace is to be retained; {@code false} otherwise
+     *
+     * @return a copy of {@code string} where leading and trailing sequences of control and space characters are removed
+     * and other sequences replaced with a single space character
+     *
+     * @throws NullPointerException if {@code string} is null
+     */
+    public static String normalize(final String string, final boolean border) {
+
+        if ( string == null ) {
+            throw new NullPointerException("null string");
+        }
+
+        return string.isEmpty() ? string
+                : SpacePattern.matcher(border ? string : string.trim()).replaceAll(" ");
     }
 
     /**

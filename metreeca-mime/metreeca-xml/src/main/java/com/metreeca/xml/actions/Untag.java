@@ -22,12 +22,14 @@ import org.w3c.dom.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.core.Strings.normalize;
 import static com.metreeca.xml.codecs.HTML.html;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
 
 /**
  * X/HTML to Markdown conversion.
@@ -35,7 +37,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <p>Converts an X/HTMl document to a markdown-based plain text representation.</p>
  */
 public final class Untag implements Function<Node, String> {
-
 
     /**
      * Converts an X/HTMl document to a markdown-based plain text representation.
@@ -157,12 +158,10 @@ public final class Untag implements Function<Node, String> {
 
         private Builder format(final Text text) {
 
-            final String value=normalize(text.getNodeValue());
-            final boolean border=text.getPreviousSibling() == null || text.getNextSibling() == null;
-
-            if ( !value.isEmpty() ) {
-                builder.append(value);
-            }
+            Optional.ofNullable(text.getNodeValue())
+                    .map(s -> normalize(s, true)) // preserve border whitespace to handle misplaced emphasis tags
+                    .filter(not(String::isEmpty))
+                    .ifPresent(builder::append);
 
             return this;
         }
