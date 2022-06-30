@@ -33,8 +33,7 @@ import static com.metreeca.link.shifts.Alt.alt;
 import static com.metreeca.link.shifts.Seq.seq;
 
 import static java.util.Collections.unmodifiableSet;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.*;
 
 /**
  * Linked data frame.
@@ -109,7 +108,7 @@ public final class Frame {
     }
 
 
-    public boolean empty() {
+    public boolean isEmpty() {
         return model.isEmpty();
     }
 
@@ -132,9 +131,12 @@ public final class Frame {
         return focus;
     }
 
-
     public Set<Statement> model() {
         return unmodifiableSet(model);
+    }
+
+    public Stream<Statement> stream() {
+        return model.stream();
     }
 
 
@@ -165,6 +167,35 @@ public final class Frame {
                 .flatMap(this::values)
                 .map(Value::stringValue)
                 .collect(joining("\n"))
+        );
+    }
+
+
+    public Frame refocus(final Value focus) {
+
+        if ( focus == null ) {
+            throw new NullPointerException("null focus");
+        }
+
+        return new Frame(focus, model.stream()
+
+                .map(statement -> {
+
+                    final Resource subject=statement.getSubject();
+
+                    final IRI predicate=statement.getPredicate();
+                    final Value object=statement.getObject();
+                    final Resource context=statement.getContext();
+
+                    return statement(
+                            focus.isResource() && subject.equals(this.focus) ? (Resource)focus : subject,
+                            focus.isIRI() && predicate.equals(this.focus) ? (IRI)focus : predicate,
+                            object.equals(this.focus) ? focus : object,
+                            context.isResource() && context.equals(this.focus) ? (Resource)focus : context
+                    );
+                })
+
+                .collect(toSet())
         );
     }
 

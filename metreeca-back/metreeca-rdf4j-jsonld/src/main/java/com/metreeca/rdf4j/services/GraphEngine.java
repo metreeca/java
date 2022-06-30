@@ -68,7 +68,7 @@ public final class GraphEngine implements Engine {
 
 				.of(query.map(new QueryProbe(this, frame.focus())))
 
-				.filter(current -> !current.empty());
+				.filter(current -> !current.isEmpty());
 	}
 
 	@Override public Optional<Frame> update(final Frame frame, final Shape shape) {
@@ -76,7 +76,7 @@ public final class GraphEngine implements Engine {
 
 				.of(items(shape).map(new QueryProbe(this, frame.focus())))
 
-				.filter(current -> !current.empty())
+				.filter(current -> !current.isEmpty())
 
 				.map(current -> {
 
@@ -94,7 +94,7 @@ public final class GraphEngine implements Engine {
 
 				.of(items(shape).map(new QueryProbe(this, frame.focus())))
 
-				.filter(current -> !current.empty())
+				.filter(current -> !current.isEmpty())
 
 				.map(current -> {
 

@@ -54,7 +54,7 @@ public final class FrameAssert extends AbstractAssert<FrameAssert, Frame> {
 
         isNotNull();
 
-        if ( !actual.empty() ) {
+        if ( !actual.isEmpty() ) {
             failWithMessage("expected frame to be empty but was <\n%s\n>", format(actual));
         }
 
@@ -65,7 +65,7 @@ public final class FrameAssert extends AbstractAssert<FrameAssert, Frame> {
 
         isNotNull();
 
-        if ( !actual.empty() ) {
+        if ( !actual.isEmpty() ) {
             failWithMessage("expected frame not to be empty");
         }
 
