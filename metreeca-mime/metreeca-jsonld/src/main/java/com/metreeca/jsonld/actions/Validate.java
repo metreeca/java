@@ -27,6 +27,7 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.link.Values.format;
 
 import static java.lang.String.format;
 
@@ -64,7 +65,7 @@ public final class Validate implements Function<Frame, Optional<Frame>> {
 
                 .map(trace -> {
 
-                    logger.warning(this, () -> format("%s %s", frame.focus(), trace));
+                    logger.warning(this, () -> format("%s %s", format(frame), trace));
 
                     return Optional.<Frame>empty();
 
