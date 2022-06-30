@@ -37,7 +37,7 @@ import static java.util.Collections.singletonMap;
  *
  * @see <a href="https://javaee.github.io/jsonp/">JSR 374 - Java API for JSON Processing</a>
  */
-public final class JSON implements Codec<JsonObject> {
+public final class JSON implements Codec<JsonValue> {
 
     /**
      * The default MIME type for JSON messages ({@value}).
@@ -59,16 +59,16 @@ public final class JSON implements Codec<JsonObject> {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Parses a JSON object.
+     * Parses a JSON value.
      *
-     * @param reader the reader the JSON object is to be parsed from
+     * @param reader the reader the JSON value is to be parsed from
      *
      * @return the JSON object parsed from {@code reader}
      *
      * @throws NullPointerException if {@code reader} is null
      * @throws CodecException       if {@code reader} contains a malformed document
      */
-    public static JsonObject json(final Reader reader) throws CodecException {
+    public static JsonValue json(final Reader reader) throws CodecException {
 
         if ( reader == null ) {
             throw new NullPointerException("null reader");
@@ -76,7 +76,7 @@ public final class JSON implements Codec<JsonObject> {
 
         try ( final JsonReader jsonReader=Json.createReader(reader) ) {
 
-            return jsonReader.readObject();
+            return jsonReader.readValue();
 
         } catch ( final JsonParsingException e ) {
 
@@ -86,29 +86,29 @@ public final class JSON implements Codec<JsonObject> {
     }
 
     /**
-     * Writes a JSON object.
+     * Writes a JSON value.
      *
-     * @param <W>    the type of the {@code writer} the JSON object is to be written to
-     * @param writer the writer the JSON object is to be written to
-     * @param object the JSON object to be written
+     * @param <W>    the type of the {@code writer} the JSON value is to be written to
+     * @param writer the writer the JSON value is to be written to
+     * @param value  the JSON value to be written
      *
      * @return the target {@code writer}
      *
-     * @throws NullPointerException if either {@code writer} or {@code object} is null
+     * @throws NullPointerException if either {@code writer} or {@code value} is null
      */
-    public static <W extends Writer> W json(final W writer, final JsonObject object) {
+    public static <W extends Writer> W json(final W writer, final JsonValue value) {
 
         if ( writer == null ) {
             throw new NullPointerException("null writer");
         }
 
-        if ( object == null ) {
+        if ( value == null ) {
             throw new NullPointerException("null object");
         }
 
         try ( final JsonWriter jsonWriter=JsonWriters.createWriter(writer) ) {
 
-            jsonWriter.writeObject(object);
+            jsonWriter.write(value);
 
             return writer;
 
@@ -125,8 +125,8 @@ public final class JSON implements Codec<JsonObject> {
         return MIME;
     }
 
-    @Override public Class<JsonObject> type() {
-        return JsonObject.class;
+    @Override public Class<JsonValue> type() {
+        return JsonValue.class;
     }
 
 
@@ -134,7 +134,7 @@ public final class JSON implements Codec<JsonObject> {
      * @return the JSON payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty optional if
      * the {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
-    @Override public Optional<JsonObject> decode(final Message<?> message) {
+    @Override public Optional<JsonValue> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
@@ -169,7 +169,7 @@ public final class JSON implements Codec<JsonObject> {
      * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the JSON {@code
      * value}
      */
-    @Override public <M extends Message<M>> M encode(final M message, final JsonObject value) {
+    @Override public <M extends Message<M>> M encode(final M message, final JsonValue value) {
         return message
 
                 .header("Content-Type", message.header("Content-Type").orElse(MIME))

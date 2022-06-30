@@ -63,7 +63,7 @@ public final class DBpedia implements Function<String, Xtream<Frame>> {
 				.optMap(new Fetch())
 				.optMap(new Parse<>(new JSON()))
 
-				.flatMap(response -> response.getJsonArray("results").stream()
+				.flatMap(response -> response.asJsonObject().getJsonArray("results").stream()
 						.map(JsonValue::asJsonObject)
 						.map(this::result)
 				);

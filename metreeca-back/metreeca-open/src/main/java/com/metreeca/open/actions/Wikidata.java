@@ -146,7 +146,7 @@ public final class Wikidata implements Function<String, Xtream<Frame>> {
 				.optMap(new Fetch())
 				.optMap(new Parse<>(new JSON()))
 
-				.flatMap(response -> response.getJsonArray("search").stream()
+				.flatMap(response -> response.asJsonObject().getJsonArray("search").stream()
 						.map(JsonValue::asJsonObject)
 						.map(this::match)
 				);
