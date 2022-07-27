@@ -509,4 +509,20 @@ public final class XPath {
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public boolean equals(final Object object) {
+        return this == object || object instanceof XPath
+                && node.equals(((XPath)object).node);
+    }
+
+    @Override public int hashCode() {
+        return node.hashCode();
+    }
+
+    @Override public String toString() {
+        return node.toString();
+    }
+
 }

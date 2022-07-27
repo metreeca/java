@@ -371,4 +371,20 @@ public final class JSONPath {
         );
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public boolean equals(final Object object) {
+        return this == object || object instanceof JSONPath
+                && target.equals(((JSONPath)object).target);
+    }
+
+    @Override public int hashCode() {
+        return target.hashCode();
+    }
+
+    @Override public String toString() {
+        return target.toString();
+    }
+
 }
