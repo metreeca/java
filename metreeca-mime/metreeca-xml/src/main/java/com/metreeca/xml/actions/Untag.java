@@ -110,30 +110,30 @@ public final class Untag implements Function<Node, String> {
 
                 case "h1":
 
-                    return feed().append("# ").append(normalize(element.getTextContent()));
+                    return append("# ").append(normalize(element.getTextContent())).feed();
 
                 case "h2":
 
-                    return feed().append("## ").append(normalize(element.getTextContent()));
+                    return append("## ").append(normalize(element.getTextContent())).feed();
 
                 case "h3":
 
-                    return feed().append("### ").append(normalize(element.getTextContent()));
+                    return append("### ").append(normalize(element.getTextContent())).feed();
 
                 case "p":
                 case "div":
                 case "section":
 
-                    return feed().format(element.getChildNodes());
+                    return format(element.getChildNodes()).feed();
 
                 case "ul":
                 case "ol":
 
-                    return indent().format(element.getChildNodes()).outdent();
+                    return indent().format(element.getChildNodes()).outdent().feed();
 
                 case "li":
 
-                    return wrap().append("- ").format(element.getChildNodes()).append("\n");
+                    return append("- ").format(element.getChildNodes()).wrap();
 
                 case "br":
 
@@ -141,7 +141,7 @@ public final class Untag implements Function<Node, String> {
 
                 case "hr":
 
-                    return feed().append("---");
+                    return append("---").feed();
 
                 case "head":
                 case "style":
