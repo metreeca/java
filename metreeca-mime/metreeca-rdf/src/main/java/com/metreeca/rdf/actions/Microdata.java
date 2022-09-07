@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.rdf4j.actions;
+package com.metreeca.rdf.actions;
 
 import com.metreeca.core.Identifiers;
 import com.metreeca.http.services.Logger;

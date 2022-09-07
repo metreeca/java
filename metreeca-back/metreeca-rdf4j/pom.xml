@@ -86,12 +86,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-xml</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-repository-sail</artifactId>
 			<scope>test</scope>
