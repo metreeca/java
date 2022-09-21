@@ -136,10 +136,6 @@ public final class GCPRepository implements Repository {
 
 	}
 
-	@Override @Deprecated public void initialize() throws RepositoryException {
-		init();
-	}
-
 	@Override public void shutDown() throws RepositoryException {
 		delegate.shutDown();
 	}
