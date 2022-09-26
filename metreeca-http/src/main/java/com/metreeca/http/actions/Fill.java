@@ -181,7 +181,7 @@ public final class Fill<V> implements Function<V, Stream<String>> {
 	 *
 	 * @throws NullPointerException if either {@code name} or {@code values} is null
 	 */
-	public Fill<V> values(final String name, final Collection<Object> values) {
+	public Fill<V> values(final String name, final Collection<?> values) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
@@ -204,7 +204,7 @@ public final class Fill<V> implements Function<V, Stream<String>> {
 	 *
 	 * @throws NullPointerException if either {@code name} or {@code values} is null
 	 */
-	public Fill<V> values(final String name, final Stream<Object> values) {
+	public Fill<V> values(final String name, final Stream<?> values) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
