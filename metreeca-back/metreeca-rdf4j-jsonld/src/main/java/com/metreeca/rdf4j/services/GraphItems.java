@@ -164,10 +164,11 @@ final class GraphItems extends GraphFacts {
 
 		return frame(focus, models.getOrDefault(focus, emptySet()))
 
-				.frames(Shape.Contains, models.entrySet().stream()
-						.filter(entry -> !entry.getKey().equals(focus))
-						.map(entry -> frame(entry.getKey(), entry.getValue()))
+				.frames(Shape.Contains, focus.stringValue().endsWith("/")
+						? models.entrySet().stream().map(entry -> frame(entry.getKey(), entry.getValue()))
+						: Stream.empty()
 				);
+
 	}
 
 
