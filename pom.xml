@@ -183,6 +183,7 @@
 
 			<!-- Data Connectors -->
 
+
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
@@ -192,6 +193,20 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-json</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-jsonld</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-jsonld</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -203,12 +218,6 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-ical</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
@@ -216,17 +225,17 @@
 				<version>${project.version}</version>
 			</dependency>
 
+
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jsonld</artifactId>
+				<artifactId>metreeca-csv</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jsonld</artifactId>
+				<artifactId>metreeca-ical</artifactId>
 				<version>${project.version}</version>
-				<type>test-jar</type>
 			</dependency>
 
 
