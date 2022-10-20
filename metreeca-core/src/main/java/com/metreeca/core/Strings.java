@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
 
@@ -344,6 +345,40 @@ public final class Strings {
 
         return string.isEmpty() ? string
                 : NewlinePattern.matcher(string).replaceAll("$0"+Matcher.quoteReplacement(prefix));
+    }
+
+
+    /**
+     * Splits semicolon-separated values.
+     *
+     * @param values the semicolon-separated values to be split
+     *
+     * @return a stream of trimmed, non-empty values extracted from {@code values}
+     *
+     * @throws NullPointerException if {@code values} is null
+     */
+    public static Stream<String> split(final String values) { return split(values, ';'); }
+
+    /**
+     * Splits character-separated values.
+     *
+     * @param values    the character-separated values to be split
+     * @param separator the separator character used to separate {@code values}
+     *
+     * @return a stream of trimmed, non-empty values extracted from {@code values}
+     *
+     * @throws NullPointerException if {@code values} is null
+     */
+    public static Stream<String> split(final String values, final char separator) {
+
+        if ( values == null ) {
+            throw new NullPointerException("null values");
+        }
+
+        return Stream.of(values)
+                .flatMap(v -> Arrays.stream(v.split(String.valueOf(separator))))
+                .map(String::trim)
+                .filter(not(String::isEmpty));
     }
 
 
