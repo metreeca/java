@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.services;
+package com.metreeca.core.services;
 
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.Locator.storage;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.Locator.storage;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.*;

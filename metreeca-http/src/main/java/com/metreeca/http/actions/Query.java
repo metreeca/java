@@ -16,15 +16,15 @@
 
 package com.metreeca.http.actions;
 
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.Request;
-import com.metreeca.http.services.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static java.lang.String.format;
 
@@ -32,7 +32,7 @@ import static java.lang.String.format;
 /**
  * Request generation.
  *
- * <p>Maps textual resource URIs to optional resource requests.</p>
+ * <p>Maps textual resource URLs to optional resource requests.</p>
  */
 public final class Query implements Function<String, Optional<Request>> {
 

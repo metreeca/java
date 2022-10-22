@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 import com.metreeca.jsonld.services.EngineTest;
 
 import org.eclipse.rdf4j.repository.sail.SailRepository;

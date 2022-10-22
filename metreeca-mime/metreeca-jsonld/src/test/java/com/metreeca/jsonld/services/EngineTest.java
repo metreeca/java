@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.jsonld.services.EngineData.*;
 import static com.metreeca.link.Focus.focus;

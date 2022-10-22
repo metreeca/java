@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.metreeca.core.Lambdas.guarded;
+import static com.metreeca.core.toolkits.Lambdas.guarded;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.rdf.codecs.RDF.service;

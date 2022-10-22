@@ -16,7 +16,7 @@
 
 package com.metreeca.http.codecs;
 
-import com.metreeca.core.Feeds;
+import com.metreeca.core.toolkits.Feeds;
 import com.metreeca.http.*;
 
 import org.junit.jupiter.api.Nested;

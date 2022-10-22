@@ -16,8 +16,8 @@
 
 package com.metreeca.rdf4j.services;
 
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.*;
-import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
 
 import org.eclipse.rdf4j.model.*;
@@ -31,9 +31,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.*;
 
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.http.services.Logger.time;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.services.Logger.time;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.link.Values.literal;

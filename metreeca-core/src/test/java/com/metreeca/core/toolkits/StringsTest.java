@@ -14,8 +14,23 @@
  * limitations under the License.
  */
 
-/**
- * Core tools.
- */
+package com.metreeca.core.toolkits;
 
-package com.metreeca.core;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import static com.metreeca.core.toolkits.Strings.indent;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+final class StringsTest {
+
+    @Nested final class IndentTest {
+
+        @Test void testIndentTrailingLines() {
+            assertThat(indent("a\nb\nc")).isEqualTo("a\n\tb\n\tc");
+        }
+
+    }
+
+}

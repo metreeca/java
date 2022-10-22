@@ -23,8 +23,8 @@ import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Guard;
 
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.jsonld.services.Engine.engine;

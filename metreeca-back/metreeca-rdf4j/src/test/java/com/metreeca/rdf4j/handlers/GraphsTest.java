@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.Unauthorized;
 import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.link.ModelAssert.assertThat;

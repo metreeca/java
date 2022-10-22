@@ -15,7 +15,7 @@
  */
 
 /**
- * Basic data processors.
+ * Core data processing actions.
  */
 
-package com.metreeca.http.processors;
+package com.metreeca.core.actions;

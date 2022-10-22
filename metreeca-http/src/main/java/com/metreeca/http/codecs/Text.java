@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.Feeds.text;
+import static com.metreeca.core.toolkits.Feeds.text;
 
 import static java.lang.String.valueOf;
 

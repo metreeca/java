@@ -16,7 +16,7 @@
 
 package com.metreeca.link.shapes;
 
-import com.metreeca.core.Strings;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.Shape;
 
 import static com.metreeca.link.shapes.And.and;

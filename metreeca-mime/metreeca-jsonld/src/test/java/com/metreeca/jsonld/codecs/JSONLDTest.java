@@ -16,6 +16,7 @@
 
 package com.metreeca.jsonld.codecs;
 
+import com.metreeca.core.Locator;
 import com.metreeca.http.*;
 import com.metreeca.json.JSONAssert;
 import com.metreeca.json.codecs.JSON;
@@ -32,7 +33,7 @@ import java.io.ByteArrayOutputStream;
 
 import javax.json.Json;
 
-import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.jsonld.codecs.JSONLD.*;

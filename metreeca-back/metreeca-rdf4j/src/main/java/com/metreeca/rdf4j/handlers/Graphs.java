@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.handlers;
 
-import com.metreeca.core.Identifiers;
+import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.codecs.Data;
@@ -35,7 +35,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.metreeca.core.Lambdas.task;
+import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.link.Values.iri;

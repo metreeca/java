@@ -16,9 +16,9 @@
 
 package com.metreeca.open.processors;
 
-import com.metreeca.core.Strings;
-import com.metreeca.http.Xtream;
-import com.metreeca.http.actions.Fill;
+import com.metreeca.core.Xtream;
+import com.metreeca.core.actions.Fill;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Values;
 import com.metreeca.open.actions.Wikidata;
@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Strings.quote;
+import static com.metreeca.core.toolkits.Strings.quote;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.shifts.Alt.alt;
 

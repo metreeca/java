@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.metreeca.core;
+package com.metreeca.core.toolkits;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.core.Snippets.code;
-import static com.metreeca.core.Snippets.text;
+import static com.metreeca.core.toolkits.Snippets.code;
+import static com.metreeca.core.toolkits.Snippets.text;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

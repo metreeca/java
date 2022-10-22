@@ -16,14 +16,14 @@
 
 package com.metreeca.rdf4j.handlers;
 
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.Request;
 import com.metreeca.http.handlers.Delegator;
-import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 
 import java.util.*;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;

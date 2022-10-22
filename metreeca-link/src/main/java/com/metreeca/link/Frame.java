@@ -16,7 +16,7 @@
 
 package com.metreeca.link;
 
-import com.metreeca.core.Strings;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.shifts.Path;
 
 import org.eclipse.rdf4j.model.*;
@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Identifiers.md5;
+import static com.metreeca.core.toolkits.Identifiers.md5;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shifts.Alt.alt;
 import static com.metreeca.link.shifts.Seq.seq;

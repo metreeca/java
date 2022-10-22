@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.services;
+package com.metreeca.core.services;
 
 import java.net.URL;
 import java.util.Optional;

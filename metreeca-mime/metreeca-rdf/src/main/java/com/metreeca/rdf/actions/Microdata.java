@@ -18,8 +18,8 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.core.Identifiers;
-import com.metreeca.http.services.Logger;
+import com.metreeca.core.services.Logger;
+import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.link.Values;
 import com.metreeca.rdf.schemas.Schema;
 
@@ -37,8 +37,8 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
 import static com.metreeca.link.Values.*;
 
 import static java.lang.String.format;

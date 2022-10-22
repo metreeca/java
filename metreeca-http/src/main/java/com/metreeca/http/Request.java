@@ -21,7 +21,7 @@ import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.Identifiers.AbsoluteIRIPattern;
+import static com.metreeca.core.toolkits.Identifiers.AbsoluteIRIPattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;

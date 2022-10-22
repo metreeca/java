@@ -16,7 +16,7 @@
 
 package com.metreeca.xml;
 
-import com.metreeca.http.Xtream;
+import com.metreeca.core.Xtream;
 
 import org.junit.jupiter.api.Test;
 

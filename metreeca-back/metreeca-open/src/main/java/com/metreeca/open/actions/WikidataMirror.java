@@ -16,11 +16,11 @@
 
 package com.metreeca.open.actions;
 
-import com.metreeca.core.Identifiers;
-import com.metreeca.core.Strings;
-import com.metreeca.http.Xtream;
-import com.metreeca.http.actions.Fill;
-import com.metreeca.http.services.Logger;
+import com.metreeca.core.Xtream;
+import com.metreeca.core.actions.Fill;
+import com.metreeca.core.services.Logger;
+import com.metreeca.core.toolkits.Identifiers;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.services.Graph;
@@ -36,10 +36,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.http.services.Logger.time;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.services.Logger.time;
+import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;

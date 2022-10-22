@@ -16,9 +16,9 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.core.Snippets;
-import com.metreeca.core.Strings;
-import com.metreeca.http.services.Logger;
+import com.metreeca.core.services.Logger;
+import com.metreeca.core.toolkits.Snippets;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Values;
@@ -33,11 +33,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Snippets.text;
-import static com.metreeca.core.Snippets.*;
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.http.services.Logger.time;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.services.Logger.time;
+import static com.metreeca.core.toolkits.Snippets.text;
+import static com.metreeca.core.toolkits.Snippets.*;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.All.all;
 import static com.metreeca.link.shapes.And.and;

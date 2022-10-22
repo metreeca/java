@@ -16,9 +16,10 @@
 
 package com.metreeca.jee;
 
+import com.metreeca.core.Locator;
+import com.metreeca.core.services.Loader;
 import com.metreeca.http.*;
 import com.metreeca.http.handlers.Server;
-import com.metreeca.http.services.Loader;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -31,8 +32,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.metreeca.core.services.Logger.logger;
 import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.services.Logger.logger;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;

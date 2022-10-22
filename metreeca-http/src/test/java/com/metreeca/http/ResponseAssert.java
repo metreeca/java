@@ -16,7 +16,7 @@
 
 package com.metreeca.http;
 
-import com.metreeca.core.Feeds;
+import com.metreeca.core.toolkits.Feeds;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

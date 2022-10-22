@@ -16,7 +16,7 @@
 
 package com.metreeca.json;
 
-import com.metreeca.http.Xtream;
+import com.metreeca.core.Xtream;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

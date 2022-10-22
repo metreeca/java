@@ -19,8 +19,8 @@
 package com.metreeca.gcp.services;
 
 
-import com.metreeca.http.services.Logger;
-import com.metreeca.http.services.Store;
+import com.metreeca.core.services.Logger;
+import com.metreeca.core.services.Store;
 
 import org.eclipse.rdf4j.common.iteration.CloseableIteration;
 import org.eclipse.rdf4j.model.Statement;
@@ -38,10 +38,10 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.http.services.Logger.time;
-import static com.metreeca.http.services.Store.store;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.services.Logger.time;
+import static com.metreeca.core.services.Store.store;
 
 /**
  * Google Cloud RDF4J repository.

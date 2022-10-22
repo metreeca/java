@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import javax.json.*;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.codecs.JSONLDInspector.driver;

@@ -16,7 +16,7 @@
 
 package com.metreeca.link;
 
-import com.metreeca.core.*;
+import com.metreeca.core.toolkits.*;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.base.AbstractNamespace;
@@ -37,7 +37,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
-import static com.metreeca.core.Strings.indent;
+import static com.metreeca.core.toolkits.Strings.indent;
 
 import static java.util.Locale.ROOT;
 import static java.util.Map.Entry.comparingByKey;

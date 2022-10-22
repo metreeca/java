@@ -16,7 +16,9 @@
 
 package com.metreeca.open.actions;
 
-import com.metreeca.http.Xtream;
+import com.metreeca.core.Xtream;
+import com.metreeca.core.actions.Fill;
+import com.metreeca.core.actions.Limit;
 import com.metreeca.http.actions.*;
 import com.metreeca.json.codecs.JSON;
 import com.metreeca.link.Frame;

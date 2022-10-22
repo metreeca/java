@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.services;
 
-import com.metreeca.core.Identifiers;
+import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
@@ -30,10 +30,10 @@ import org.eclipse.rdf4j.query.*;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.core.Snippets.text;
-import static com.metreeca.core.Snippets.*;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.toolkits.Lambdas.task;
+import static com.metreeca.core.toolkits.Snippets.text;
+import static com.metreeca.core.toolkits.Snippets.*;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Values.*;
 import static com.metreeca.link.shapes.And.and;

@@ -15,7 +15,7 @@
  */
 
 /**
- * Basic data processing actions.
+ * Basic network data processing actions.
  */
 
 package com.metreeca.http.actions;

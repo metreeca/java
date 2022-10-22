@@ -16,7 +16,7 @@
 
 package com.metreeca.link;
 
-import com.metreeca.core.Strings;
+import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.queries.*;
 
 import org.eclipse.rdf4j.model.IRI;

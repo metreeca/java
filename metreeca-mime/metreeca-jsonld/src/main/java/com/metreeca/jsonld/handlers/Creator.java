@@ -31,9 +31,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.metreeca.core.Identifiers.md5;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.toolkits.Identifiers.md5;
 import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Request.encode;
 import static com.metreeca.http.Response.Created;
 import static com.metreeca.jsonld.services.Engine.engine;

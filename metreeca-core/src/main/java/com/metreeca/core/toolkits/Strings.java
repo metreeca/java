@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.core;
+package com.metreeca.core.toolkits;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -304,6 +304,7 @@ public final class Strings {
         return builder.toString();
 
     }
+
 
     /**
      * Indents lines.

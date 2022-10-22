@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.http.Xtream;
+import com.metreeca.core.Xtream;
 import com.metreeca.xml.XPath;
 
 import org.w3c.dom.*;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import static com.metreeca.core.Strings.normalize;
+import static com.metreeca.core.toolkits.Strings.normalize;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingDouble;

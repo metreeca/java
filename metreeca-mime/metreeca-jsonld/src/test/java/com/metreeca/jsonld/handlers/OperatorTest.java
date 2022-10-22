@@ -16,7 +16,7 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 import com.metreeca.jsonld.services.Engine;
 import com.metreeca.link.*;
 

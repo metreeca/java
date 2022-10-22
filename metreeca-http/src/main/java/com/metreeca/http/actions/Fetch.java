@@ -17,15 +17,16 @@
 package com.metreeca.http.actions;
 
 
+import com.metreeca.core.actions.Limit;
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.services.Fetcher;
-import com.metreeca.http.services.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 
 /**

@@ -16,7 +16,7 @@
 
 package com.metreeca.jsonld.codecs;
 
-import com.metreeca.core.Identifiers;
+import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.link.Shape;
 import com.metreeca.link.shapes.Field;
 

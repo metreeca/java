@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf.codecs;
 
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.rio.RDFFormat;

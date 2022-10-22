@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Strings.indent;
+import static com.metreeca.core.toolkits.Strings.indent;
 import static com.metreeca.link.Values.derives;
 import static com.metreeca.link.Values.direct;
 import static com.metreeca.link.Values.format;

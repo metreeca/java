@@ -18,8 +18,10 @@
 package com.metreeca.rdf4j.services;
 
 
-import com.metreeca.core.Strings;
-import com.metreeca.http.*;
+import com.metreeca.core.Locator;
+import com.metreeca.core.toolkits.Strings;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.link.Frame;
 
 import org.eclipse.rdf4j.model.*;
@@ -37,8 +39,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import static com.metreeca.core.Lambdas.task;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.ModelAssert.assertThat;
 import static com.metreeca.link.Values.*;

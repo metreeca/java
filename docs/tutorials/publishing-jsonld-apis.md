@@ -259,7 +259,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.rest._wrappers.Server.server;
 
 public final class Server {
@@ -349,7 +349,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -401,7 +401,7 @@ import static com.metreeca.link.Values.statement;
 import static com.metreeca.rdf.codecs.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.rest.Wrapper.preprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest._wrappers.Server.server;
@@ -582,7 +582,7 @@ import static com.metreeca.link.Values.statement;
 import static com.metreeca.rdf.codecs.RDFFormat.rdf;
 import static com.metreeca.rdf4j.services.Graph.graph;
 import static com.metreeca.rest.Response.OK;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.rest.handlers.Router.router;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
@@ -787,7 +787,7 @@ import java.io.UncheckedIOException;
 
 import static com.metreeca.link.Values.iri;
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
@@ -1120,7 +1120,7 @@ insert { $this toys:stock 0 } where {};
 ```
 
 ```java
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 import com.metreeca.rest.Handler.Delegator;
 
 import org.eclipse.rdf4j.model.vocabulary.*;
@@ -1138,7 +1138,7 @@ import static com.metreeca.link.shapes.MinInclusive.minInclusive;
 import static com.metreeca.link.shapes.Or.or;
 import static com.metreeca.link.shapes.Pattern.pattern;
 import static com.metreeca.rdf4j.services.Graph.update;
-import static com.metreeca.http.Locator.text;
+import static com.metreeca.core.Locator.text;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.handlers.Creator.creator;
@@ -1227,7 +1227,7 @@ import org.eclipse.rdf4j.repository.RepositoryResult;
 import java.util.function.Function;
 
 import static com.metreeca.rdf4j.services.Graph.graph;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 import static com.metreeca.rest._formats.JSONLDFormat.jsonld;
 
 import static org.eclipse.rdf4j.model.util.Values.literal;

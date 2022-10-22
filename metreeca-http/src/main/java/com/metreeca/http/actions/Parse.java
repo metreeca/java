@@ -16,14 +16,14 @@
 
 package com.metreeca.http.actions;
 
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.*;
-import com.metreeca.http.services.Logger;
 
 import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static java.lang.String.format;
 

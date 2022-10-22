@@ -16,21 +16,21 @@
 
 package com.metreeca.http.handlers;
 
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.*;
 import com.metreeca.http.codecs.Text;
-import com.metreeca.http.services.Logger;
 
 import java.io.*;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.Feeds.text;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.Level.*;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.toolkits.Feeds.text;
 import static com.metreeca.http.Request.*;
 import static com.metreeca.http.Response.InternalServerError;
-import static com.metreeca.http.services.Logger.Level.*;
-import static com.metreeca.http.services.Logger.logger;
 
 import static java.lang.String.format;
 

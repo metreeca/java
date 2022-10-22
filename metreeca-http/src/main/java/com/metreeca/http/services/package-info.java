@@ -15,7 +15,7 @@
  */
 
 /**
- * Basic shared services.
+ * Basic network shared services.
  */
 
 package com.metreeca.http.services;

@@ -31,10 +31,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Lambdas.checked;
-import static com.metreeca.core.Resources.input;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.toolkits.Lambdas.checked;
+import static com.metreeca.core.toolkits.Resources.input;
 import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Request.HEAD;
 import static com.metreeca.http.Response.NotModified;
 import static com.metreeca.http.Response.OK;

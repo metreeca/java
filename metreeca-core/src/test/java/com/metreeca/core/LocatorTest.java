@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.metreeca.http;
+package com.metreeca.core;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

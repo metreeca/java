@@ -16,6 +16,8 @@
 
 package com.metreeca.http.services;
 
+import com.metreeca.core.services.Cache;
+import com.metreeca.core.services.Logger;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 
@@ -28,15 +30,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
-import static com.metreeca.core.Feeds.data;
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.core.toolkits.Feeds.data;
 import static com.metreeca.http.Request.GET;
 import static com.metreeca.http.Response.MethodNotAllowed;
-import static com.metreeca.http.services.Logger.logger;
 
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 import static java.lang.String.format;
+
 
 /**
  * Resource fetcher.

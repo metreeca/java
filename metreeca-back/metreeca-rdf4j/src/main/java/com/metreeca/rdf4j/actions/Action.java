@@ -26,7 +26,7 @@ import org.eclipse.rdf4j.query.impl.SimpleDataset;
 
 import java.util.*;
 
-import static com.metreeca.http.Locator.service;
+import static com.metreeca.core.Locator.service;
 
 
 /**

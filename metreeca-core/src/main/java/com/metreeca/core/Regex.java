@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.processors;
-
-import com.metreeca.http.Xtream;
+package com.metreeca.core;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

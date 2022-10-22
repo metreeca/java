@@ -16,7 +16,9 @@
 
 package com.metreeca.http.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.core.Locator;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Request;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

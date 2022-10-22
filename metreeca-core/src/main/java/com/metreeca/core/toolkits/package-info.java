@@ -15,7 +15,7 @@
  */
 
 /**
- * Core tools.
+ * Core utilities.
  */
 
-package com.metreeca.core;
+package com.metreeca.core.toolkits;

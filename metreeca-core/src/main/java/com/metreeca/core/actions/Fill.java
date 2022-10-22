@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.actions;
+package com.metreeca.core.actions;
 
 
 import java.io.UncheckedIOException;

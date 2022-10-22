@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Strings.indent;
+import static com.metreeca.core.toolkits.Strings.indent;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableCollection;

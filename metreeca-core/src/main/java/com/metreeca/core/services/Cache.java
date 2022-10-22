@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.services;
+package com.metreeca.core.services;
 
-import com.metreeca.http.Locator;
+import com.metreeca.core.Locator;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,9 +26,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.Locator.storage;
-import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.Locator.storage;
+import static com.metreeca.core.services.Logger.logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Instant.now;

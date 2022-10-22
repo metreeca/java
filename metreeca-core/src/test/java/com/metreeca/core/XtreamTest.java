@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http;
+package com.metreeca.core;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;

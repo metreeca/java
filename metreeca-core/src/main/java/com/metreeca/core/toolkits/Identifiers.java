@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.core;
+package com.metreeca.core.toolkits;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

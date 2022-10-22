@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.metreeca.http.services;
+package com.metreeca.core.services;
 
 
 import java.io.*;
@@ -25,8 +25,8 @@ import java.util.logging.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Strings.indent;
-import static com.metreeca.http.services.Logger.Level.*;
+import static com.metreeca.core.services.Logger.Level.*;
+import static com.metreeca.core.toolkits.Strings.indent;
 
 import static java.util.Arrays.stream;
 
