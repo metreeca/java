@@ -22,7 +22,6 @@ import com.metreeca.http.Request;
 import org.junit.jupiter.api.Test;
 
 import static com.metreeca.http.Request.POST;
-import static com.metreeca.http.Response.MethodNotAllowed;
 import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.http.handlers.Publisher.mime;
 import static com.metreeca.http.handlers.Publisher.variants;
@@ -74,13 +73,13 @@ final class PublisherTest {
 	}
 
 
-	@Test void testRejectUnsafeRequests() {
+	@Test void testForwardUnsafeRequests() {
 		exec(() -> new Publisher().assets(getClass().getResource("/"))
 
 				.handle(new Request().method(POST), Request::reply)
 
 				.map(response -> assertThat(response)
-						.hasStatus(MethodNotAllowed)
+						.hasStatus(0)
 				)
 		);
 	}

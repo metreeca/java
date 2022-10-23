@@ -35,6 +35,7 @@ import static com.metreeca.core.Locator.service;
 import static com.metreeca.core.toolkits.Lambdas.checked;
 import static com.metreeca.core.toolkits.Resources.input;
 import static com.metreeca.http.Handler.handler;
+import static com.metreeca.http.Request.GET;
 import static com.metreeca.http.Request.HEAD;
 import static com.metreeca.http.Response.NotModified;
 import static com.metreeca.http.Response.OK;
@@ -160,14 +161,10 @@ public final class Publisher extends Delegator {
 
 
     public Publisher() {
-        delegate(new Router()
-
-                .get(handler(
-                        (Handler)this::assets,
-                        (Handler)this::fallback
-                ))
-
-        );
+        delegate(handler(
+                (Handler)this::assets,
+                (Handler)this::fallback
+        ));
     }
 
 
@@ -279,8 +276,8 @@ public final class Publisher extends Delegator {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Response assets(final Request request, final Function<Request, Response> forward) {
-        if ( assets != null && request.asset() ) {
+    private Response assets(final Request request, final Function<Request, Response> forward) { // !!! handle HEAD
+        if ( assets != null && request.method().equals(GET) && request.asset() ) {
 
             return variants(request.path())
 
@@ -326,8 +323,8 @@ public final class Publisher extends Delegator {
         }
     }
 
-    private Response fallback(final Request request, final Function<Request, Response> forward) {
-        if ( fallback != null && request.route() && !request.path().equals(fallback) ) {
+    private Response fallback(final Request request, final Function<Request, Response> forward) { // !!! handle HEAD
+        if ( fallback != null && request.method().equals(GET) && request.route() && !request.path().equals(fallback) ) {
 
             // retrieve fallback with a new request to support static content delivery on dedicated server
 
