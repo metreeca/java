@@ -52,7 +52,40 @@ public final class HTML implements Codec<Document> {
     public static final Pattern MIMEPattern=compile("(?i)^text/html(?:\\s*;.*)?$");
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Parses an HTML document.
+     *
+     * <p><strong>Warning</strong> / The {@code .getElementById()} method of the parsed document will return always
+     * {@code null}, as HTML id attributes aren't recognized as ID XML attributes.</p>
+     *
+     * @param html the source of the HTML document to be parsed
+     * @param base the possibly null base URL for the HTML document to be parsed
+     *
+     * @return the HTML document parsed from {@code input}
+     *
+     * @throws NullPointerException if either {@code html} or {@code base} is null
+     * @throws CodecException       if {@code input} contains a malformed document
+     */
+    public static Document html(
+            final String html, final String base
+    ) throws CodecException {
+
+        if ( html == null ) {
+            throw new NullPointerException("null html");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base URL");
+        }
+
+        final Document document=W3CDom.convert(Jsoup.parse(html, base));
+
+        document.normalize();
+
+        return document;
+    }
 
     /**
      * Parses an HTML document.
@@ -66,7 +99,7 @@ public final class HTML implements Codec<Document> {
      *
      * @return the HTML document parsed from {@code input}
      *
-     * @throws NullPointerException if either {@code input} or {@code charset} is null
+     * @throws NullPointerException if any parameter is null
      * @throws CodecException       if {@code input} contains a malformed document
      */
     public static Document html(
@@ -82,21 +115,21 @@ public final class HTML implements Codec<Document> {
         }
 
         if ( base == null ) {
-			throw new NullPointerException("null base URL");
-		}
+            throw new NullPointerException("null base URL");
+        }
 
-		try {
+        try {
 
-			final Document document=W3CDom.convert(Jsoup.parse(input, charset.name(), base));
+            final Document document=W3CDom.convert(Jsoup.parse(input, charset.name(), base));
 
-			document.normalize();
+            document.normalize();
 
             return document;
 
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 	/**
 	 * Writes an HTML node.
