@@ -491,7 +491,7 @@ public final class GraphDBMatcher implements Function<Stream<String>, Stream<Mat
         }
 
         public GraphDBMatcher update() {
-            return execute("ipdating", connection ->
+            return execute("updating", connection ->
 
                     connection.add(bnode(), compute, bnode())
 
