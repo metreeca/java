@@ -45,9 +45,10 @@ import static java.lang.String.format;
 public final class GCPServer {
 
     private static final String ServiceVariable="GAE_SERVICE";
+    private static final String VersionVariable="GAE_VERSION";
     private static final String AddressVariable="PORT";
 
-    private static final String DefaultService="default";
+    private static final String Default="default";
 
 
     /**
@@ -84,7 +85,16 @@ public final class GCPServer {
      * @return the Google App Engine service name
      */
     public static String service() {
-        return System.getenv().getOrDefault(ServiceVariable, DefaultService);
+        return System.getenv().getOrDefault(ServiceVariable, Default);
+    }
+
+    /**
+     * Retrieves the service version.
+     *
+     * @return the Google App Engine service version
+     */
+    public static String version() {
+        return System.getenv().getOrDefault(VersionVariable, Default);
     }
 
 
@@ -115,7 +125,7 @@ public final class GCPServer {
     private final JSEServer delegate=new JSEServer()
 
             .context(Optional.of(service())
-                    .filter(service -> !service.equals(DefaultService))
+                    .filter(service -> !service.equals(Default))
                     .map(service -> format("/%s/", service))
                     .orElse("/")
             );
