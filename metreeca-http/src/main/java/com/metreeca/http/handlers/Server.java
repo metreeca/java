@@ -43,8 +43,11 @@ import static java.lang.String.format;
  */
 public final class Server extends Delegator {
 
-    private static final Pattern HostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
-    private static final Pattern ProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
+    private static final Pattern ForwardedHostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
+    private static final Pattern ForwardedProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
+
+    private static final Pattern URLSchemePattern=Pattern.compile("^\\w+:");
+    private static final Pattern URLHostPattern=Pattern.compile("//[^/?#]+");
 
     private static final Pattern TextualPattern=Pattern.compile("(?i:^text/.+|.+/.*\bjson$)");
     private static final Pattern URLEncodedPattern=Pattern.compile("application/x-www-form-urlencoded\\b");
@@ -107,7 +110,7 @@ public final class Server extends Delegator {
 
         final Optional<String> proto=request.header("Forwarded")
 
-                .map(ProtoPattern::matcher)
+                .map(ForwardedProtoPattern::matcher)
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group("proto"))
 
@@ -116,17 +119,20 @@ public final class Server extends Delegator {
         final Optional<String> host=request.header("Host")
 
                 .or(() -> request.header("Forwarded")
-                        .map(HostPattern::matcher)
+                        .map(ForwardedHostPattern::matcher)
                         .filter(Matcher::find)
                         .map(matcher -> matcher.group("host"))
                 )
 
                 .or(() -> request.header("X-Forwarded-Host"));
 
-        return proto
 
-                .flatMap(_proto -> host.map(_host -> request.base(format("%s://%s/", _proto, _host))))
+        return Optional.of(request.base())
 
+                .map(base -> proto.map(p -> URLSchemePattern.matcher(base).replaceFirst(format("%s:", p))).orElse(base))
+                .map(base -> host.map(h -> URLHostPattern.matcher(base).replaceFirst(format("//%s", h))).orElse(base))
+
+                .map(request::base)
                 .orElse(request);
     }
 
