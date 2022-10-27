@@ -43,10 +43,10 @@ import static java.lang.String.format;
  */
 public final class Server extends Delegator {
 
-    private static final Pattern ForwardedHostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[^;]+)");
-    private static final Pattern ForwardedProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>[^;]+)");
+    private static final Pattern ForwardedProtoPattern=Pattern.compile("\\bproto\\s*=\\s*(?<proto>\\w+)");
+    private static final Pattern ForwardedHostPattern=Pattern.compile("\\bhost\\s*=\\s*(?<host>[-.\\w]+)");
 
-    private static final Pattern URLSchemePattern=Pattern.compile("^\\w+:");
+    private static final Pattern URLProtoPattern=Pattern.compile("^\\w+:");
     private static final Pattern URLHostPattern=Pattern.compile("//[^/?#]+");
 
     private static final Pattern TextualPattern=Pattern.compile("(?i:^text/.+|.+/.*\bjson$)");
@@ -129,7 +129,7 @@ public final class Server extends Delegator {
 
         return Optional.of(request.base())
 
-                .map(base -> proto.map(p -> URLSchemePattern.matcher(base).replaceFirst(format("%s:", p))).orElse(base))
+                .map(base -> proto.map(p -> URLProtoPattern.matcher(base).replaceFirst(format("%s:", p))).orElse(base))
                 .map(base -> host.map(h -> URLHostPattern.matcher(base).replaceFirst(format("//%s", h))).orElse(base))
 
                 .map(request::base)
