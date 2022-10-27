@@ -334,14 +334,12 @@ public final class Request extends Message<Request> {
     /**
      * Checks if this request targets a browser asset.
      *
-     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe}, its {@link
-     * #path() path} contains a filename extension (e.g. {@code .html}) and a {@code Referer} header is set; {@code
-     * false}, otherwise
+     * @return {@code true} if the {@linkplain #method() method} of this request is {@link #safe() safe} and its {@link
+     * #path() path} contains a filename extension (e.g. {@code .html}); {@code false}, otherwise
      */
     public boolean asset() {
         return safe()
-                && FilePattern.matcher(path).find()
-                && headers("Referer").findAny().isPresent();
+                && FilePattern.matcher(path).find();
     }
 
 
