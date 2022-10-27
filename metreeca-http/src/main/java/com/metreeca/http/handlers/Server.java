@@ -114,7 +114,9 @@ public final class Server extends Delegator {
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group("proto"))
 
-                .or(() -> request.header("X-Forwarded-Proto"));
+                .or(() -> request.header("X-Forwarded-Proto"))
+
+                .map(v -> v.split(",")[0]); // comma separated for multiple forwards
 
         final Optional<String> host=request.header("Host")
 
@@ -124,8 +126,9 @@ public final class Server extends Delegator {
                         .map(matcher -> matcher.group("host"))
                 )
 
-                .or(() -> request.header("X-Forwarded-Host"));
+                .or(() -> request.header("X-Forwarded-Host"))
 
+                .map(v -> v.split(",")[0]); // comma separated for multiple forwards
 
         return Optional.of(request.base())
 
