@@ -611,6 +611,94 @@ public final class Values {
     }
 
 
+    //// Rewriters /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static IRI rewrite(final IRI iri, final String source, final String target) {
+
+        if ( source == null ) {
+            throw new NullPointerException("null source");
+        }
+
+        if ( target == null ) {
+            throw new NullPointerException("null target");
+        }
+
+        return Optional.ofNullable(iri)
+                .map(Value::stringValue)
+                .filter(s -> s.startsWith(source))
+                .map(s -> iri(target, s.substring(source.length())))
+                .orElse(iri);
+    }
+
+    public static Statement rewrite(final Statement statement, final String source, final String target) {
+
+        if ( source == null ) {
+            throw new NullPointerException("null source");
+        }
+
+        if ( target == null ) {
+            throw new NullPointerException("null target");
+        }
+
+        if ( statement == null ) { return null; } else {
+
+            final Resource subject=statement.getSubject();
+            final IRI predicate=statement.getPredicate();
+            final Value object=statement.getObject();
+
+            return statement(
+                    subject.isIRI() ? rewrite((IRI)subject, source, target) : subject,
+                    rewrite(predicate, source, target),
+                    object.isIRI() ? rewrite((IRI)object, source, target) : object
+            );
+
+        }
+    }
+
+
+    public static IRI adopt(final IRI iri, final String external, final String internal) {
+
+        if ( external == null ) {
+            throw new NullPointerException("null external");
+        }
+
+        if ( internal == null ) {
+            throw new NullPointerException("null internal");
+        }
+
+        return Optional.ofNullable(iri)
+                .map(Value::stringValue)
+                .filter(s -> s.startsWith(external))
+                .map(s -> iri(internal, Identifiers.md5(s)))
+                .orElse(iri);
+    }
+
+    public static Statement adopt(final Statement statement, final String external, final String internal) {
+
+        if ( external == null ) {
+            throw new NullPointerException("null external");
+        }
+
+        if ( internal == null ) {
+            throw new NullPointerException("null internal");
+        }
+
+        if ( statement == null ) { return null; } else {
+
+            final Resource subject=statement.getSubject();
+            final IRI predicate=statement.getPredicate();
+            final Value object=statement.getObject();
+
+            return statement(
+                    subject.isIRI() ? adopt((IRI)subject, external, internal) : subject,
+                    adopt(predicate, external, internal),
+                    object.isIRI() ? adopt((IRI)object, external, internal) : object
+            );
+
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Values() { }

@@ -19,7 +19,6 @@ package com.metreeca.open.actions;
 import com.metreeca.core.Xtream;
 import com.metreeca.core.actions.Fill;
 import com.metreeca.core.services.Logger;
-import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.core.toolkits.Strings;
 import com.metreeca.link.Values;
 import com.metreeca.rdf4j.actions.*;
@@ -56,26 +55,6 @@ import static java.util.stream.Collectors.toList;
  * Wikidata mirror.
  */
 public final class WikidataMirror implements Consumer<Stream<String>>, Function<Stream<String>, Stream<Resource>> {
-
-	public static UnaryOperator<IRI> rewriter(final String external, final String internal) {
-
-		if ( external == null ) {
-			throw new NullPointerException("null external");
-		}
-
-		if ( internal == null ) {
-			throw new NullPointerException("null internal");
-		}
-
-		return iri -> Optional.of(iri)
-				.map(Value::stringValue)
-				.filter(s -> s.startsWith(external))
-				.map(s -> iri(internal, Identifiers.md5(s)))
-				.orElse(iri);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private String item="item";
 
@@ -196,7 +175,7 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 			throw new NullPointerException("null internal base IRI");
 		}
 
-		return rewriter(rewriter(Wikidata.WD, internal));
+		return rewriter(iri -> adopt(iri, Wikidata.WD, internal));
 	}
 
 	public WikidataMirror rewriter(final UnaryOperator<IRI> rewriter) {
