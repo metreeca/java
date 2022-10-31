@@ -39,7 +39,6 @@ import static org.eclipse.rdf4j.rio.RDFFormat.TURTLE;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
 
 /**
  * RDF configuration action.
@@ -144,6 +143,8 @@ public final class Configure implements Consumer<Collection<URL>> {
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override public void accept(final Collection<URL> ontologies) {
 
         if ( ontologies == null || ontologies.stream().anyMatch(Objects::isNull) ) {
@@ -157,7 +158,25 @@ public final class Configure implements Consumer<Collection<URL>> {
             ontologies.forEach(path -> {
                 try ( final InputStream input=path.openStream() ) {
 
-                    Rio.createParser(TURTLE).setRDFHandler(new ModelHandler(model)).parse(input); // !!! guess format
+                    Rio.createParser(TURTLE) // !!! guess format
+
+                            .setRDFHandler(new AbstractRDFHandler() {
+
+                                @Override public void handleNamespace(final String prefix, final String uri) {
+                                    if ( !prefix.isEmpty() ) { // ignore default namespaces
+                                        model.setNamespace(prefix, uri);
+                                    }
+                                }
+
+                                @Override public void handleStatement(final Statement statement) {
+                                    if ( langs.isEmpty() || langs.contains(lang(statement.getObject())) ) {
+                                        model.add(statement);
+                                    }
+                                }
+
+                            })
+
+                            .parse(input);
 
                 } catch ( final IOException e ) {
 
@@ -168,13 +187,8 @@ public final class Configure implements Consumer<Collection<URL>> {
 
             time(() -> {
 
-                connection.clear(context);
-
                 model.getNamespaces().stream()
 
-                        .filter(namespace -> !namespace.getPrefix().isEmpty()) // ignore default namespaces
-
-                        .distinct()
                         .sorted(comparing(Namespace::getPrefix))
 
                         .peek(entry -> logger.info(this, format(
@@ -185,37 +199,14 @@ public final class Configure implements Consumer<Collection<URL>> {
                                 connection.setNamespace(namespace.getPrefix(), namespace.getName())
                         );
 
-                connection.add(model.stream()
+                connection.clear(context);
+                connection.add(model, context);
 
-                        .filter(statement -> langs.isEmpty() || langs.contains(lang(statement.getObject())))
-
-                        .collect(toList())
-                );
-
-            }).apply(t -> logger.info(this, format(
-                    "uploaded <%,d> statements to <%s> in <%,d> ms", model.size(), context, t
+            }).apply(elapsed -> logger.info(this, format(
+                    "uploaded <%,d> statements to <%s> in <%,d> ms", model.size(), context, elapsed
             )));
 
         }));
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static final class ModelHandler extends AbstractRDFHandler {
-
-        private final Model model;
-
-        private ModelHandler(final Model model) { this.model=model; }
-
-        @Override public void handleNamespace(final String prefix, final String uri) {
-            model.setNamespace(prefix, uri);
-        }
-
-        @Override public void handleStatement(final Statement statement) {
-            model.add(statement);
-        }
-
     }
 
 }
