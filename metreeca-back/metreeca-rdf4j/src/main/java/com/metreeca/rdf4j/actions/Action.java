@@ -57,7 +57,7 @@ public abstract class Action<T extends Action<T>> {
     /**
      * Retrieves the target graph.
      *
-     * @return the target graph of this action.
+     * @return the target graph for this action.
      */
     protected Graph graph() {
         return graph;
@@ -66,15 +66,19 @@ public abstract class Action<T extends Action<T>> {
     /**
      * Retrieves the base IRI.
      *
-     * @return the (possibly null) base IRI of this action.
+     * @return the (possibly null) base IRI for this action.
      */
     protected String base() {
         return base;
     }
 
-
-    private SimpleDataset dataset() {
-        return dataset != null ? dataset : (dataset=new SimpleDataset());
+    /**
+     * Retrieves the dataset.
+     *
+     * @return the (possibly null) dataset for this action.
+     */
+    protected Dataset dataset() {
+        return dataset;
     }
 
 
@@ -207,7 +211,9 @@ public abstract class Action<T extends Action<T>> {
             throw new NullPointerException("null graphs");
         }
 
-        Arrays.stream(graphs).forEach(g -> dataset().addDefaultGraph(g));
+        if ( dataset == null ) { dataset=new SimpleDataset(); }
+
+        Arrays.stream(graphs).forEach(g -> dataset.addDefaultGraph(g));
 
         return self();
     }
@@ -227,7 +233,9 @@ public abstract class Action<T extends Action<T>> {
             throw new NullPointerException("null graphs");
         }
 
-        Arrays.stream(graphs).forEach(g -> dataset().addNamedGraph(g));
+        if ( dataset == null ) { dataset=new SimpleDataset(); }
+
+        Arrays.stream(graphs).forEach(g -> dataset.addNamedGraph(g));
 
         return self();
     }
@@ -247,7 +255,9 @@ public abstract class Action<T extends Action<T>> {
             throw new NullPointerException("null graphs");
         }
 
-        Arrays.stream(graphs).forEach(g -> dataset().addDefaultRemoveGraph(g));
+        if ( dataset == null ) { dataset=new SimpleDataset(); }
+
+        Arrays.stream(graphs).forEach(g -> dataset.addDefaultRemoveGraph(g));
 
         return self();
     }
@@ -267,7 +277,9 @@ public abstract class Action<T extends Action<T>> {
             throw new NullPointerException("null graph");
         }
 
-        dataset().setDefaultInsertGraph(graph);
+        if ( dataset == null ) { dataset=new SimpleDataset(); }
+
+        dataset.setDefaultInsertGraph(graph);
 
         return self();
     }
