@@ -27,7 +27,6 @@ import com.metreeca.rdf4j.services.Graph;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.*;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,491 +55,491 @@ import static java.util.stream.Collectors.toList;
  */
 public final class WikidataMirror implements Consumer<Stream<String>>, Function<Stream<String>, Stream<Resource>> {
 
-	private String item="item";
+    private String item="item";
 
-	private boolean local; // strip language tag if working with a single language
-	private boolean historic;
+    private boolean local; // strip language tag if working with a single language
+    private boolean historic;
 
-	private IRI[] contexts={};
+    private IRI[] contexts={};
 
-	private Set<String> languages=singleton("en");
+    private Set<String> languages=singleton("en");
 
-	private UnaryOperator<IRI> rewriter=UnaryOperator.identity();
+    private UnaryOperator<IRI> rewriter=UnaryOperator.identity();
 
 
-	private final Graph source=service(Wikidata::Graph);
-	private final Graph target=service(graph());
+    private final Graph source=service(Wikidata::Graph);
+    private final Graph target=service(graph());
 
-	private final Logger logger=service(logger());
+    private final Logger logger=service(logger());
 
 
-	/**
-	 * Configures the name of the target item variable.
-	 *
-	 * @param item the name of the variable to be bound to the IRI of matched resources
-	 *
-	 * @return this action
-	 *
-	 * @throws NullPointerException if {@code item} is null
-	 */
-	public WikidataMirror item(final String item) {
+    /**
+     * Configures the name of the target item variable.
+     *
+     * @param item the name of the variable to be bound to the IRI of matched resources
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code item} is null
+     */
+    public WikidataMirror item(final String item) {
 
-		if ( item == null ) {
-			throw new NullPointerException("null item");
-		}
+        if ( item == null ) {
+            throw new NullPointerException("null item");
+        }
 
-		this.item=item;
+        this.item=item;
 
-		return this;
-	}
+        return this;
+    }
 
-	public WikidataMirror historic(final boolean historic) {
+    public WikidataMirror historic(final boolean historic) {
 
-		this.historic=historic;
+        this.historic=historic;
 
-		return this;
-	}
+        return this;
+    }
 
-	public WikidataMirror contexts(final IRI... contexts) {
+    public WikidataMirror contexts(final IRI... contexts) {
 
-		if ( contexts == null || Arrays.stream(contexts).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null contexts");
-		}
+        if ( contexts == null || Arrays.stream(contexts).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null contexts");
+        }
 
-		this.contexts=contexts.clone();
+        this.contexts=contexts.clone();
 
-		return this;
-	}
+        return this;
+    }
 
 
-	public WikidataMirror language(final String language) {
+    public WikidataMirror language(final String language) {
 
-		if ( language == null ) {
-			throw new NullPointerException("null language");
-		}
+        if ( language == null ) {
+            throw new NullPointerException("null language");
+        }
 
-		return language(language, false);
-	}
+        return language(language, false);
+    }
 
-	public WikidataMirror language(final String language, final boolean local) {
+    public WikidataMirror language(final String language, final boolean local) {
 
-		if ( language == null ) {
-			throw new NullPointerException("null language");
-		}
+        if ( language == null ) {
+            throw new NullPointerException("null language");
+        }
 
-		this.local=local;
-		this.languages=singleton(language);
+        this.local=local;
+        this.languages=singleton(language);
 
-		return this;
-	}
+        return this;
+    }
 
 
-	public WikidataMirror languages(final String... languages) {
+    public WikidataMirror languages(final String... languages) {
 
-		if ( languages == null || Arrays.stream(languages).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null languages");
-		}
+        if ( languages == null || Arrays.stream(languages).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null languages");
+        }
 
-		this.local=false;
-		this.languages=new HashSet<>(asList(languages));
+        this.local=false;
+        this.languages=new HashSet<>(asList(languages));
 
-		return this;
-	}
+        return this;
+    }
 
-	public WikidataMirror languages(final Collection<String> languages) {
+    public WikidataMirror languages(final Collection<String> languages) {
 
-		if ( languages == null || languages.stream().anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null languages");
-		}
+        if ( languages == null || languages.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null languages");
+        }
 
-		this.local=false;
-		this.languages=new HashSet<>(languages);
+        this.local=false;
+        this.languages=new HashSet<>(languages);
 
-		return this;
-	}
+        return this;
+    }
 
 
-	public WikidataMirror rewriter(final IRI internal) {
+    public WikidataMirror rewriter(final IRI internal) {
 
-		if ( internal == null ) {
-			throw new NullPointerException("null internal base IRI");
-		}
+        if ( internal == null ) {
+            throw new NullPointerException("null internal base IRI");
+        }
 
-		return rewriter(internal.stringValue());
-	}
+        return rewriter(internal.stringValue());
+    }
 
-	public WikidataMirror rewriter(final String internal) {
+    public WikidataMirror rewriter(final String internal) {
 
-		if ( internal == null ) {
-			throw new NullPointerException("null internal base IRI");
-		}
+        if ( internal == null ) {
+            throw new NullPointerException("null internal base IRI");
+        }
 
-		return rewriter(iri -> adopt(iri, Wikidata.WD, internal));
-	}
+        return rewriter(iri -> adopt(iri, Wikidata.WD, internal));
+    }
 
-	public WikidataMirror rewriter(final UnaryOperator<IRI> rewriter) {
+    public WikidataMirror rewriter(final UnaryOperator<IRI> rewriter) {
 
-		if ( rewriter == null ) {
-			throw new NullPointerException("null rewriter");
-		}
+        if ( rewriter == null ) {
+            throw new NullPointerException("null rewriter");
+        }
 
-		this.rewriter=rewriter;
+        this.rewriter=rewriter;
 
-		return this;
-	}
+        return this;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public void accept(final Stream<String> stream) {
-		apply(stream);
-	}
+    @Override public void accept(final Stream<String> stream) {
+        apply(stream);
+    }
 
-	@Override public Stream<Resource> apply(final Stream<String> patterns) {
+    @Override public Stream<Resource> apply(final Stream<String> patterns) {
 
-		final Set<Resource> alive=Collections.newSetFromMap(new ConcurrentHashMap<>());
+        final Set<Resource> alive=Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-		Xtream.from(patterns)
+        Xtream.from(patterns)
 
-				.pipe(this::scan)
+                .pipe(this::scan)
 
-				.peek(entry -> alive.add(rewrite(entry.getKey()))) // trace alive items
+                .peek(entry -> alive.add(rewrite(entry.getKey()))) // trace alive items
 
-				.pipe(this::test)
-				.pipe(this::sync)
+                .pipe(this::test)
+                .pipe(this::sync)
 
-				.sink(this::load);
+                .sink(this::load);
 
-		reap(alive::contains);
+        reap(alive::contains);
 
-		return alive.stream();
-	}
+        return alive.stream();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Identifies relevant items in wikidata.
-	 *
-	 * @param patterns a stream of SPARQL pattern identifying relevant items using the {@link #item(String)} variable
-	 *
-	 * @return a stream of entries mapping relevant wikidata item identifiers to their version literal
-	 */
-	private Xtream<Entry<IRI, Value>> scan(final Xtream<String> patterns) {
-		return patterns
+    /**
+     * Identifies relevant items in wikidata.
+     *
+     * @param patterns a stream of SPARQL pattern identifying relevant items using the {@link #item(String)} variable
+     *
+     * @return a stream of entries mapping relevant wikidata item identifiers to their version literal
+     */
+    private Xtream<Entry<IRI, Value>> scan(final Xtream<String> patterns) {
+        return patterns
 
-				.filter(pattern -> pattern != null && !pattern.isEmpty())
+                .filter(pattern -> pattern != null && !pattern.isEmpty())
 
-				.flatMap(historic ? Stream::of : new Fill<>()
+                .flatMap(historic ? Stream::of : new Fill<>()
 
-						.model("{\n"
-								+"\t{pattern}\n"
-								+"\n"
-								+"} minus {\n"
-								+"\n"
-								+"\t?{item} wdt:P576 [] # dissolved, abolished or demolished\n"
-								+"\n"
-								+"}\n"
-						)
+                        .model("{\n"
+                                +"\t{pattern}\n"
+                                +"\n"
+                                +"} minus {\n"
+                                +"\n"
+                                +"\t?{item} wdt:P576 [] # dissolved, abolished or demolished\n"
+                                +"\n"
+                                +"}\n"
+                        )
 
-						.value("item", item)
+                        .value("item", item)
 
-						.value("pattern")
+                        .value("pattern")
 
-				)
+                )
 
-				.flatMap(new Fill<>()
+                .flatMap(new Fill<>()
 
-						.model("select ?{item} ?__version__ {\n"
-								+"\n"
-								+"\t{pattern}\n"
-								+"\n"
-								+"\t?{item} schema:version ?__version__.\n"
-								+"\n"
-								+"}"
-						)
+                        .model("select ?{item} ?__version__ {\n"
+                                +"\n"
+                                +"\t{pattern}\n"
+                                +"\n"
+                                +"\t?{item} schema:version ?__version__.\n"
+                                +"\n"
+                                +"}"
+                        )
 
-						.value("item", item)
+                        .value("item", item)
 
-						.value("pattern")
+                        .value("pattern")
 
-				)
+                )
 
-				.flatMap(new TupleQuery()
-						.graph(source)
-				)
+                .flatMap(new TupleQuery()
+                        .graph(source)
+                )
 
-				.map(bindings -> new SimpleImmutableEntry<>(
-						(IRI)bindings.getValue(item),
-						bindings.getValue("__version__")
-				));
-	}
+                .map(bindings -> Map.entry(
+                        (IRI)bindings.getValue(item),
+                        bindings.getValue("__version__")
+                ));
+    }
 
-	/**
-	 * Identifies missing or stale items in the local graph.
-	 *
-	 * @param items a stream of entries mapping wikidata item identifiers to their current version literals
-	 *
-	 * @return a stream of missing or stale wikidata item identifiers
-	 */
-	private Xtream<IRI> test(final Xtream<Entry<IRI, Value>> items) {
-		return items
+    /**
+     * Identifies missing or stale items in the local graph.
+     *
+     * @param items a stream of entries mapping wikidata item identifiers to their current version literals
+     *
+     * @return a stream of missing or stale wikidata item identifiers
+     */
+    private Xtream<IRI> test(final Xtream<Entry<IRI, Value>> items) {
+        return items
 
-				.batch(1_000)
+                .batch(1_000)
 
-				.flatMap(new Fill<Collection<? extends Entry<IRI, Value>>>()
+                .flatMap(new Fill<Collection<? extends Entry<IRI, Value>>>()
 
-						.model("prefix schema: <http://schema.org/>\n"+
-								"\n"
-								+"select distinct ?external {\n"
-								+"\n"
-								+"\tvalues (?external ?internal ?current) {\n"
-								+"\t\t{entries}\n"
-								+"\t"
-								+"}\n"
-								+"\t\n"
-								+"\tfilter not exists { \n"
-								+"\n"
-								+"\t\t?internal schema:version ?version filter (?version >= ?current)\n"
-								+"\n"
-								+"\t}\n"
-								+"\n"
-								+"}"
-						)
+                        .model("prefix schema: <http://schema.org/>\n"+
+                                "\n"
+                                +"select distinct ?external {\n"
+                                +"\n"
+                                +"\tvalues (?external ?internal ?current) {\n"
+                                +"\t\t{entries}\n"
+                                +"\t"
+                                +"}\n"
+                                +"\t\n"
+                                +"\tfilter not exists { \n"
+                                +"\n"
+                                +"\t\t?internal schema:version ?version filter (?version >= ?current)\n"
+                                +"\n"
+                                +"\t}\n"
+                                +"\n"
+                                +"}"
+                        )
 
-						.value("entries", solutions -> solutions.stream()
-								.map(entry -> String.format("(%s %s %s)",
-										format(entry.getKey()),
-										format(rewrite(entry.getKey())),
-										format(entry.getValue())
-								))
-								.collect(joining("\n\t\t"))
-						)
+                        .value("entries", solutions -> solutions.stream()
+                                .map(entry -> String.format("(%s %s %s)",
+                                        format(entry.getKey()),
+                                        format(rewrite(entry.getKey())),
+                                        format(entry.getValue())
+                                ))
+                                .collect(joining("\n\t\t"))
+                        )
 
-				)
+                )
 
-				.flatMap(new TupleQuery()
-						.graph(target)
-						.dflt(contexts)
-				)
+                .flatMap(new TupleQuery()
+                        .graph(target)
+                        .dflt(contexts)
+                )
 
-				.map(bindings -> (IRI)bindings.getValue("external"));
-	}
+                .map(bindings -> (IRI)bindings.getValue("external"));
+    }
 
-	/**
-	 * Retrieves item updates from wikidata.
-	 *
-	 * @param items a stream of wikidata item identifiers to be retrieved
-	 *
-	 * @return a stream of wikidata item updates; each item description is contained in a single update
-	 */
-	private Xtream<Collection<Statement>> sync(final Xtream<IRI> items) {
-		return items
+    /**
+     * Retrieves item updates from wikidata.
+     *
+     * @param items a stream of wikidata item identifiers to be retrieved
+     *
+     * @return a stream of wikidata item updates; each item description is contained in a single update
+     */
+    private Xtream<Collection<Statement>> sync(final Xtream<IRI> items) {
+        return items
 
-				.batch(1_000)
+                .batch(1_000)
 
-				.peek(new Consumer<Collection<?>>() {
+                .peek(new Consumer<Collection<?>>() {
 
-					private final AtomicInteger count=new AtomicInteger();
+                    private final AtomicInteger count=new AtomicInteger();
 
-					@Override public void accept(final Collection<?> batch) {
-						service(logger()).info(WikidataMirror.this, String.format("syncing items <%,d>/<%,d>",
-								batch.size(),
-								count.addAndGet(batch.size())
-						));
-					}
+                    @Override public void accept(final Collection<?> batch) {
+                        service(logger()).info(WikidataMirror.this, String.format("syncing items <%,d>/<%,d>",
+                                batch.size(),
+                                count.addAndGet(batch.size())
+                        ));
+                    }
 
-				})
+                })
 
-				.flatMap(new Fill<Collection<IRI>>()
+                .flatMap(new Fill<Collection<IRI>>()
 
-						.model("construct {\n"
-								+"\n"
-								+"\t?s a wikibase:Item; ?p ?o.\n"
-								+"\t?p rdfs:label ?pl.\n"
-								+"\t?o rdfs:label ?ol.\n"
-								+"\n"
-								+"} where {\n"
-								+"\n"
-								+"\tvalues ?s {\n"
-								+"\t\t{items}\n"
-								+"\t}\n"
-								+"\n"
-								+"\t?s ?p ?o filter ( !isLiteral(?o) || lang(?o) in ({languages}) )\n\n"
-								+"\toptional { [wikibase:directClaim ?p; rdfs:label ?pl] filter ( lang(?pl) in "
-								+"({languages}) ) }\n"
-								+"\toptional { ?o rdfs:label ?ol filter ( lang(?ol) in ({languages}) ) "
-								+"}\n\n"+
-								"}\n"
-						)
+                        .model("construct {\n"
+                                +"\n"
+                                +"\t?s a wikibase:Item; ?p ?o.\n"
+                                +"\t?p rdfs:label ?pl.\n"
+                                +"\t?o rdfs:label ?ol.\n"
+                                +"\n"
+                                +"} where {\n"
+                                +"\n"
+                                +"\tvalues ?s {\n"
+                                +"\t\t{items}\n"
+                                +"\t}\n"
+                                +"\n"
+                                +"\t?s ?p ?o filter ( !isLiteral(?o) || lang(?o) in ({languages}) )\n\n"
+                                +"\toptional { [wikibase:directClaim ?p; rdfs:label ?pl] filter ( lang(?pl) in "
+                                +"({languages}) ) }\n"
+                                +"\toptional { ?o rdfs:label ?ol filter ( lang(?ol) in ({languages}) ) "
+                                +"}\n\n"+
+                                "}\n"
+                        )
 
-						.value("items", batch -> batch.stream()
-								.map(Values::format)
-								.collect(joining("\n\t\t"))
-						)
+                        .value("items", batch -> batch.stream()
+                                .map(Values::format)
+                                .collect(joining("\n\t\t"))
+                        )
 
-						.value("languages", Stream
+                        .value("languages", Stream
                                 .concat(Stream.of(""), languages.stream()) // empty e.g. for version literals
                                 .map(Strings::quote)
-								.collect(joining(", "))
-						)
+                                .collect(joining(", "))
+                        )
 
-				)
+                )
 
-				.map(new GraphQuery()
-						.graph(source)
-						.andThen(updates -> updates.collect(toList()))
-				);
-	}
+                .map(new GraphQuery()
+                        .graph(source)
+                        .andThen(updates -> updates.collect(toList()))
+                );
+    }
 
-	/**
-	 * Loads item updates to the local graph.
-	 *
-	 * @param updates a stream of wikidata item updates
-	 */
-	private void load(final Xtream<Collection<Statement>> updates) {
-		updates.sequential().forEach(update -> target.update(task(connection -> { // inside a single txn
+    /**
+     * Loads item updates to the local graph.
+     *
+     * @param updates a stream of wikidata item updates
+     */
+    private void load(final Stream<Collection<Statement>> updates) {
+        updates.sequential().forEach(update -> target.update(task(connection -> { // inside a single txn
 
-			Xtream.from(update)
+            Xtream.from(update) // remove existing data // !!! logging
 
-					.filter(pattern(null, RDF.TYPE, ITEM))
-					.map(Statement::getSubject)
-					.distinct()
+                    .filter(pattern(null, RDF.TYPE, ITEM))
+                    .map(Statement::getSubject)
+                    .distinct()
 
-					.forEach(external -> {
+                    .forEach(external -> connection.remove(rewrite(external), null, null, contexts));
 
-						final Resource internal=rewrite(external);
+            Xtream.from(update) // upload updates
 
-						// remove existing data // !!! logging
+                    .map(this::rewrite)
+                    .map(this::localize)
 
-						connection.remove(internal, null, null, contexts);
+                    .batch(100_000)
 
-						// add alias
+                    .forEach(new Upload()
+                            .graph(target)
+                            .contexts(contexts)
+                    );
 
-						if ( !internal.equals(external) ) {
-							connection.add(internal, OWL.SAMEAS, external, contexts);
-						}
+            Xtream.from(update) // upload aliases
 
-					});
+                    .flatMap(statement -> Stream.of(statement.getSubject(), statement.getObject()))
+                    .filter(Value::isIRI)
 
-			Xtream.from(update) // upload updates
+                    .distinct()
 
-					.map(this::rewrite)
-					.map(this::localize)
+                    .map(value -> statement((Resource)value, OWL.SAMEAS, rewrite((IRI)value)))
+                    .filter(statement -> !statement.getSubject().equals(statement.getObject()))
 
-					.batch(100_000)
+                    .batch(100_000)
 
-					.forEach(new Upload()
-							.graph(target)
-							.contexts(contexts)
-					);
+                    .forEach(statements -> connection.add(statements, contexts));
 
-			Xtream.from(update) // upload WGS84 coordinates
+            Xtream.from(update) // upload WGS84 coordinates
 
-					.filter(pattern(null, Wikidata.P625, null))
+                    .filter(pattern(null, Wikidata.P625, null))
 
-					.flatMap(statement -> point(statement.getObject().stringValue())
+                    .flatMap(statement -> point(statement.getObject().stringValue())
 
-							.map(point -> {
+                            .map(point -> {
 
-								final Resource resource=rewrite(statement.getSubject());
+                                final Resource resource=rewrite(statement.getSubject());
 
-								return Stream.of(
-										statement(resource, WGS84.LAT, literal(point.getKey())),
-										statement(resource, WGS84.LONG, literal(point.getValue()))
-								);
-							})
+                                return Stream.of(
+                                        statement(resource, WGS84.LAT, literal(point.getKey())),
+                                        statement(resource, WGS84.LONG, literal(point.getValue()))
+                                );
+                            })
 
-							.orElseGet(Stream::empty)
+                            .orElseGet(Stream::empty)
 
-					)
+                    )
 
-					.batch(100_000)
+                    .batch(100_000)
 
-					.forEach(new Upload()
-							.graph(target)
-							.contexts(contexts)
-					);
+                    .forEach(new Upload()
+                            .graph(target)
+                            .contexts(contexts)
+                    );
 
-		})));
-	}
+        })));
+    }
 
-	/**
-	 * Remove dead items from the local graph.
-	 *
-	 * @param alive an internal item aliveness test
-	 */
-	private void reap(final Predicate<? super Resource> alive) {
+    /**
+     * Remove dead items from the local graph.
+     *
+     * @param alive an internal item aliveness test
+     */
+    private void reap(final Predicate<? super Resource> alive) {
 
-		final AtomicInteger reaped=new AtomicInteger();
+        final AtomicInteger reaped=new AtomicInteger();
 
-		time(() -> {
+        time(() -> {
 
-			target.update(task(connection -> stream(connection.getStatements(null, RDF.TYPE, ITEM, contexts))
+            target.update(task(connection -> stream(connection.getStatements(null, RDF.TYPE, ITEM, contexts))
 
-					.map(Statement::getSubject)
+                    .map(Statement::getSubject)
 
-					.filter(alive.negate())
+                    .filter(alive.negate())
 
-					.peek(resource -> reaped.incrementAndGet())
+                    .peek(resource -> reaped.incrementAndGet())
 
-					// !!! remove symmetric concise bounded description?
+                    // !!! remove symmetric concise bounded description?
 
-					.forEach(resource -> {
-						connection.remove(resource, null, null, contexts);
-						connection.remove(null, null, resource, contexts);
-					})
+                    .forEach(resource -> {
+                        connection.remove(resource, null, null, contexts);
+                        connection.remove(null, null, resource, contexts);
+                    })
 
-			));
+            ));
 
-		}).apply(t ->
+        }).apply(t ->
 
-				logger.info(this, String.format("reaped <%,d> entities in <%,d> ms", reaped.get(), t))
+                logger.info(this, String.format("reaped <%,d> entities in <%,d> ms", reaped.get(), t))
 
-		);
+        );
 
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Statement rewrite(final Statement statement) {
-		if ( rewriter.equals(UnaryOperator.identity()) ) { return statement; } else {
-
-			final Resource subject=statement.getSubject();
-			final IRI predicate=statement.getPredicate();
-			final Value object=statement.getObject();
-
-			return statement(
-					subject instanceof IRI ? rewrite((IRI)subject) : subject,
-					rewrite(predicate),
-					object instanceof IRI ? rewrite((IRI)object) : object
-			);
-
-		}
-	}
-
-	private Resource rewrite(final Resource resource) {
-		return resource instanceof IRI ? rewrite((IRI)resource) : resource;
-	}
-
-	private IRI rewrite(final IRI iri) {
-		return rewriter.equals(UnaryOperator.identity()) ? iri : rewriter.apply(iri);
-	}
+    }
 
 
-	private Statement localize(final Statement statement) {
-		return !local ? statement : literal(statement.getObject())
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				.filter(literal -> literal.getLanguage().filter(languages::contains).isPresent())
+    private Statement rewrite(final Statement statement) {
+        if ( rewriter.equals(UnaryOperator.identity()) ) { return statement; } else {
 
-				.map(literal -> statement(
-						statement.getSubject(),
-						statement.getPredicate(),
-						literal(literal.stringValue())
-				))
+            final Resource subject=statement.getSubject();
+            final IRI predicate=statement.getPredicate();
+            final Value object=statement.getObject();
 
-				.orElse(statement);
-	}
+            return statement(
+                    subject instanceof IRI ? rewrite((IRI)subject) : subject,
+                    rewrite(predicate),
+                    object instanceof IRI ? rewrite((IRI)object) : object
+            );
+
+        }
+    }
+
+    private Resource rewrite(final Resource resource) {
+        return resource instanceof IRI ? rewrite((IRI)resource) : resource;
+    }
+
+    private IRI rewrite(final IRI iri) {
+        return rewriter.equals(UnaryOperator.identity()) ? iri : rewriter.apply(iri);
+    }
+
+
+    private Statement localize(final Statement statement) {
+        return !local ? statement : literal(statement.getObject())
+
+                .filter(literal -> literal.getLanguage().filter(languages::contains).isPresent())
+
+                .map(literal -> statement(
+                        statement.getSubject(),
+                        statement.getPredicate(),
+                        literal(literal.stringValue())
+                ))
+
+                .orElse(statement);
+    }
 
 }
