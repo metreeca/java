@@ -424,10 +424,9 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 
                     .flatMap(statement -> Stream.of(statement.getSubject(), statement.getObject()))
                     .filter(Value::isIRI)
-
                     .distinct()
 
-                    .map(value -> statement((Resource)value, OWL.SAMEAS, rewrite((IRI)value)))
+                    .map(value -> statement(rewrite((IRI)value), OWL.SAMEAS, value))
                     .filter(statement -> !statement.getSubject().equals(statement.getObject()))
 
                     .batch(100_000)
