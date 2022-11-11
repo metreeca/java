@@ -103,8 +103,9 @@ public final class Configure implements Consumer<Collection<URL>> {
     /**
      * Configures the languages to be retained.
      *
-     * @param langs the languages to be retained; may include the empty string for retaining untagged literals; if empty
-     *              retains every language
+     * <p>Untagged literals are always retained</p>
+     *
+     * @param langs the languages to be retained; if empty retains every language
      *
      * @return this action
      *
@@ -124,8 +125,9 @@ public final class Configure implements Consumer<Collection<URL>> {
     /**
      * Configures the languages to be retained.
      *
-     * @param langs the languages to be retained; may include the empty string for retaining untagged literals; if empty
-     *              retains every language
+     * <p>Untagged literals are always retained</p>
+     *
+     * @param langs the languages to be retained; if empty retains every language
      *
      * @return this action
      *
@@ -169,11 +171,13 @@ public final class Configure implements Consumer<Collection<URL>> {
                                 }
 
                                 @Override public void handleStatement(final Statement statement) {
-                                    if ( !statement.getObject().isLiteral()
-                                            || langs.isEmpty() || langs.contains(lang(statement.getObject()))
-                                    ) {
+
+                                    final String lang=lang(statement.getObject());
+
+                                    if ( langs.isEmpty() || lang.isEmpty() || langs.contains(lang) ) {
                                         model.add(statement);
                                     }
+
                                 }
 
                             })
