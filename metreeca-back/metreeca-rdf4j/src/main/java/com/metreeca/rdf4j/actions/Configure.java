@@ -169,7 +169,9 @@ public final class Configure implements Consumer<Collection<URL>> {
                                 }
 
                                 @Override public void handleStatement(final Statement statement) {
-                                    if ( langs.isEmpty() || langs.contains(lang(statement.getObject())) ) {
+                                    if ( !statement.getObject().isLiteral()
+                                            || langs.isEmpty() || langs.contains(lang(statement.getObject()))
+                                    ) {
                                         model.add(statement);
                                     }
                                 }
