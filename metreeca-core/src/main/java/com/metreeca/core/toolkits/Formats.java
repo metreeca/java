@@ -44,7 +44,20 @@ public final class Formats {
             .toFormatter(Locale.ROOT);
 
     /**
-     * A compact ISO local date formatter ({@code yyyyMMddThhmmss}).
+     * A compact ISO local date formatter ({@code yyyyMMdd}).
+     */
+    public static final DateTimeFormatter ISO_LOCAL_DATE_COMPACT=new DateTimeFormatterBuilder()
+
+            .parseStrict()
+
+            .appendValue(YEAR, 4)
+            .appendValue(MONTH_OF_YEAR, 2)
+            .appendValue(DAY_OF_MONTH, 2)
+
+            .toFormatter(Locale.ROOT);
+
+    /**
+     * A compact ISO local datetime formatter ({@code yyyyMMddThhmmss}).
      */
     public static final DateTimeFormatter ISO_LOCAL_DATE_TIME_COMPACT=new DateTimeFormatterBuilder()
 
