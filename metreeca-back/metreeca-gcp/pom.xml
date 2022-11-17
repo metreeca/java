@@ -50,9 +50,9 @@
 			<artifactId>google-cloud-secretmanager</artifactId>
 		</dependency>
 
-		<dependency> <!-- !!! remove -->
+		<dependency>
 			<groupId>com.google.cloud</groupId>
-			<artifactId>google-cloud-datastore</artifactId>
+			<artifactId>google-cloud-translate</artifactId>
 		</dependency>
 
 	</dependencies>
