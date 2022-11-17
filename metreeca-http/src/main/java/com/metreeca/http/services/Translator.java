@@ -125,7 +125,7 @@ public interface Translator {
 
             if ( text.isBlank() ) { return Optional.of(text); } else {
 
-                return translators.stream()
+                return translators.stream().sequential()
                         .peek(translator -> service(logger()).info(this, format(
                                 "translating from <%s> to <%s> with <%s>", source, target,
                                 translator.getClass().getSimpleName()
