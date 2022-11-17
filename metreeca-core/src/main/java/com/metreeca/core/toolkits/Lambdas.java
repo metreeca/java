@@ -131,7 +131,7 @@ public final class Lambdas {
      *
      * @throws NullPointerException if {@code runnable} is null
      */
-    public static Runnable checked(final CheckedRunnable runnable) {
+    public static Runnable unchecked(final CheckedRunnable runnable) {
 
         if ( runnable == null ) {
             throw new NullPointerException("null runnable");
@@ -164,7 +164,7 @@ public final class Lambdas {
      *
      * @throws NullPointerException if {@code supplier} is null
      */
-    public static <V> Supplier<V> checked(final CheckedSupplier<? extends V> supplier) {
+    public static <V> Supplier<V> unchecked(final CheckedSupplier<? extends V> supplier) {
 
         if ( supplier == null ) {
             throw new NullPointerException("null supplier");
@@ -197,7 +197,7 @@ public final class Lambdas {
      *
      * @throws NullPointerException if {@code consumer} is null
      */
-    public static <V> Consumer<V> checked(final CheckedConsumer<? super V> consumer) {
+    public static <V> Consumer<V> unchecked(final CheckedConsumer<? super V> consumer) {
 
         if ( consumer == null ) {
             throw new NullPointerException("null consumer");
@@ -231,7 +231,7 @@ public final class Lambdas {
      *
      * @throws NullPointerException if {@code function} is null
      */
-    public static <V, R> Function<V, R> checked(final CheckedFunction<? super V, ? extends R> function) {
+    public static <V, R> Function<V, R> unchecked(final CheckedFunction<? super V, ? extends R> function) {
 
         if ( function == null ) {
             throw new NullPointerException("null function");

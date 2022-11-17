@@ -16,6 +16,7 @@
 
 package com.metreeca.http.handlers;
 
+import com.metreeca.core.toolkits.Lambdas;
 import com.metreeca.http.*;
 import com.metreeca.http.codecs.Data;
 import com.metreeca.http.services.Fetcher.URLFetcher;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.toolkits.Lambdas.checked;
+import static com.metreeca.core.toolkits.Lambdas.unchecked;
 import static com.metreeca.core.toolkits.Resources.input;
 import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Request.GET;
@@ -232,7 +233,7 @@ public final class Publisher extends Delegator {
             // load the filesystem from the service locator to have it automatically closed
             // !!! won't handle multiple publishers from the same filesystem
 
-            final FileSystem filesystem=service(checked(() ->
+            final FileSystem filesystem=service(Lambdas.unchecked(() ->
                     FileSystems.newFileSystem(URI.create(jar), emptyMap())
             ));
 
@@ -290,7 +291,7 @@ public final class Publisher extends Delegator {
 
                     .findFirst()
 
-                    .map(file -> request.reply().map(checked(response -> {
+                    .map(file -> request.reply().map(unchecked(response -> {
 
                         final String mime=mime(file.getFileName().toString());
                         final String length=String.valueOf(Files.size(file));
@@ -310,7 +311,7 @@ public final class Publisher extends Delegator {
                                 .header("Content-Type", mime)
                                 .header("Content-Length", length)
                                 .header("ETag", etag)
-                                .output(checked(output -> { Files.copy(file, output); }));
+                                .output(Lambdas.unchecked(output -> { Files.copy(file, output); }));
 
                     })))
 
