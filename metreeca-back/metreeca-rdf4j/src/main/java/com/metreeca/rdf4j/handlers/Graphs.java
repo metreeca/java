@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.metreeca.http.handlers.Router;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.VOID;
 import org.eclipse.rdf4j.repository.*;
@@ -32,7 +33,8 @@ import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.metreeca.core.toolkits.Lambdas.task;
@@ -91,7 +93,7 @@ public final class Graphs extends Endpoint<Graphs> {
         } else if ( catalog ) { // graph catalog
 
             final IRI focus=iri(request.item());
-            final Collection<Statement> model=new ArrayList<>();
+            final Model model=new LinkedHashModel();
 
             graph().query(task(connection -> {
                 try ( final RepositoryResult<Resource> contexts=connection.getContextIDs() ) {

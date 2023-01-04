@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ import com.metreeca.http.*;
 
 import org.eclipse.rdf4j.common.lang.FileFormat;
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.rio.*;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
@@ -46,7 +45,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * RDF message codec.
  */
-public final class RDF implements Codec<Collection<Statement>> {
+public final class RDF implements Codec<Model> {
 
     /**
      * The default MIME type for RDF messages ({@value}).
@@ -121,14 +120,12 @@ public final class RDF implements Codec<Collection<Statement>> {
      * @param base   the possibly null base URL for the RDF document to be parsed
      * @param parser the RDF parser
      *
-     * @return the RDF model parsed from {@code input}
+     * @return an unmodifiable RDF model parsed from {@code input}
      *
      * @throws NullPointerException if either {@code input} or {@code parser} is null
      * @throws CodecException       if {@code input} contains a malformed document
      */
-    public static Collection<Statement> rdf(
-            final InputStream input, final String base, final RDFParser parser
-    ) throws CodecException {
+    public static Model rdf(final InputStream input, final String base, final RDFParser parser) throws CodecException {
 
         if ( input == null ) {
             throw new NullPointerException("null input");
@@ -142,9 +139,13 @@ public final class RDF implements Codec<Collection<Statement>> {
 
         parser.setParseErrorListener(errorCollector);
 
-        final Collection<Statement> model=new LinkedHashModel(); // order-preserving and writable
+        final Model model=new LinkedHashModel(); // order-preserving and writable
 
         parser.setRDFHandler(new AbstractRDFHandler() {
+
+            @Override public void handleNamespace(final String prefix, final String uri) {
+                model.setNamespace(prefix, uri);
+            }
 
             @Override public void handleStatement(final Statement statement) {
                 model.add(statement);
@@ -174,7 +175,7 @@ public final class RDF implements Codec<Collection<Statement>> {
 
         if ( fatals.isEmpty() ) {
 
-            return model;
+            return model.unmodifiable();
 
         } else { // !!! log warnings/error/fatals?
 
@@ -185,6 +186,7 @@ public final class RDF implements Codec<Collection<Statement>> {
                             errors.stream().map(error -> format(" !! %s", error)),
                             warnings.stream().map(warning -> format("  ! %s", warning))
                     )
+
                     .flatMap(stream -> stream)
 
                     .collect(joining("/b"))
@@ -226,9 +228,8 @@ public final class RDF implements Codec<Collection<Statement>> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
-    @Override public Class<Collection<Statement>> type() {
-        return (Class<Collection<Statement>>)(Class<?>)Collection.class;
+    @Override public Class<Model> type() {
+        return Model.class;
     }
 
     /**
@@ -242,10 +243,10 @@ public final class RDF implements Codec<Collection<Statement>> {
     /**
      * @return the RDF payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account the
      * RDF serialization format defined by the  {@code "Content-Type"} {@code message} header or an empty optional if the
-     * {@code "Content-Type"} {@code message} is not empty and is not associated with an RDF format in the {@link
-     * RDFParserRegistry}
+     * {@code "Content-Type"} {@code message} is not empty and is not associated with an RDF format in the
+     * {@link RDFParserRegistry}
      */
-    @Override public Optional<Collection<Statement>> decode(final Message<?> message) {
+    @Override public Optional<Model> decode(final Message<?> message) {
         return message
 
                 .header("Content-Type")
@@ -277,11 +278,11 @@ public final class RDF implements Codec<Collection<Statement>> {
 
     /**
      * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless
-     * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the RDF {@code
-     * value}, taking into account the RDF serialization selected according to the {@code "Accept"} header of the {@code
-     * message} originating request, defaulting to {@code text/turtle}
+     * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the RDF
+     * {@code value}, taking into account the RDF serialization selected according to the {@code "Accept"} header of the
+     * {@code message} originating request, defaulting to {@code text/turtle}
      */
-    @Override public <M extends Message<M>> M encode(final M message, final Collection<Statement> value) {
+    @Override public <M extends Message<M>> M encode(final M message, final Model value) {
 
         final List<String> types=mimes(message.request().header("Accept").orElse(""));
 

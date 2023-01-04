@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package com.metreeca.rdf.actions;
 import com.metreeca.http.actions.*;
 import com.metreeca.rdf.codecs.RDF;
 
-import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParserRegistry;
 
@@ -38,7 +39,10 @@ import static java.util.stream.Collectors.toList;
  * <p>Maps linked datasets URLs to RDF descriptions retrieved by dereferencing them; unknown datasets are mapped to
  * empty descriptions.</p>
  */
-public final class Retrieve implements Function<String, Collection<Statement>> {
+public final class Retrieve implements Function<String, Model> {
+
+	private static final Model EmptyModel=new LinkedHashModel().unmodifiable();
+
 
 	private static String mimes() {
 
@@ -68,7 +72,7 @@ public final class Retrieve implements Function<String, Collection<Statement>> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Collection<Statement> apply(final String url) {
+	@Override public Model apply(final String url) {
 		return Optional.of(url)
 
 				.flatMap(new Query(request -> request.headers("Accept", mimes())))
@@ -76,13 +80,13 @@ public final class Retrieve implements Function<String, Collection<Statement>> {
 				.flatMap(new Fetch())
 
 				.flatMap(new Parse<>(new RDF(codec -> codec
-
 						.set(VERIFY_URI_SYNTAX, false)
 						.set(FAIL_ON_UNKNOWN_DATATYPES, false)
 						.set(VERIFY_DATATYPE_VALUES, false)
-						.set(NORMALIZE_DATATYPE_VALUES, false))))
+						.set(NORMALIZE_DATATYPE_VALUES, false)
+				)))
 
-				.orElseGet(Collections::emptySet);
+				.orElseGet(() -> EmptyModel);
 	}
 
 }
