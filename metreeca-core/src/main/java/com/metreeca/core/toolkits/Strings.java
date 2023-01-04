@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,10 +84,11 @@ public final class Strings {
                 : SpacePattern.matcher(border ? string : string.trim()).replaceAll(" ");
     }
 
+
     /**
-     * Normalize to lower case.
+     * Converts to lower case.
      *
-     * @param string the string to be normalized
+     * @param string the string to be converted
      *
      * @return a copy of {@code string} converted to lower case according to the {@link Locale#ROOT root locale}
      *
@@ -103,9 +104,9 @@ public final class Strings {
     }
 
     /**
-     * Normalize to upper case.
+     * Converts to upper case.
      *
-     * @param string the string to be normalized
+     * @param string the string to be converted
      *
      * @return a copy of {@code string} converted to upper case according to the {@link Locale#ROOT root locale}
      *
@@ -120,14 +121,46 @@ public final class Strings {
         return string.isEmpty() ? string : string.toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * Converts to title case.
+     *
+     * @param string the string to be converted
+     *
+     * @return a copy of {@code string} where leading characters and characters at following
+     * {@linkplain Character#isWhitespace(char) whitespaces} are converted to
+     * {@linkplain Character#toTitleCase(char) title case}
+     *
+     * @throws NullPointerException if {@code string} is null
+     */
+    public static String title(final String string) {
+
+        if ( string == null ) {
+            throw new NullPointerException("null string");
+        }
+
+        if ( string.isEmpty() ) { return string; } else {
+
+            final StringBuilder title=new StringBuilder(string.length());
+
+            for (int i=0, l=string.length(); i < l; ++i) {
+                title.append(i == 0 || Character.isWhitespace(string.charAt(i-1))
+                        ? Character.toTitleCase(string.charAt(i))
+                        : string.charAt(i)
+                );
+            }
+
+            return title.toString();
+        }
+    }
+
 
     /**
      * Limits length.
      *
      * @param string the string to be clipped
      *
-     * @return the input {@code string} {@linkplain #clip(String, int) clipped} to the default line length limit ({@value
-     * #LineLength})
+     * @return the input {@code string} {@linkplain #clip(String, int) clipped} to the default line length
+     * limit ({@value #LineLength})
      *
      * @throws NullPointerException if {@code string} is null
      */
@@ -169,8 +202,8 @@ public final class Strings {
      *
      * @param string the string to be folded
      *
-     * @return the input {@code string} {@linkplain #fold(String, int) folded} to the default line length limit ({@value
-     * #LineLength})
+     * @return the input {@code string} {@linkplain #fold(String, int) folded} to the default line length
+     * limit ({@value #LineLength})
      *
      * @throws NullPointerException if {@code string} is null
      */
