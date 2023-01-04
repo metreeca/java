@@ -72,12 +72,42 @@ public final class Retrieve implements Function<String, Model> {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private String base="";
+
+
+	/**
+	 * Configures dataset base.
+	 *
+	 * @param base the base IRI for resolving relative IRIs in retrieved dataset; defaults to dataset IRI
+	 *
+	 * @return this action
+	 *
+	 * @throws NullPointerException if {@code base} is null
+	 */
+	public Retrieve base(final String base) {
+
+		if ( base == null ) {
+			throw new NullPointerException("null base");
+		}
+
+		this.base=base;
+
+		return this;
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	@Override public Model apply(final String url) {
 		return Optional.of(url)
 
 				.flatMap(new Query(request -> request.headers("Accept", mimes())))
 
 				.flatMap(new Fetch())
+
+				.map(response -> response
+						.header("Location", base.isEmpty() ? url : base)
+				)
 
 				.flatMap(new Parse<>(new RDF(codec -> codec
 						.set(VERIFY_URI_SYNTAX, false)
