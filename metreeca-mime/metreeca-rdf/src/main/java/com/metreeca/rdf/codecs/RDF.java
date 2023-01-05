@@ -16,6 +16,7 @@
 
 package com.metreeca.rdf.codecs;
 
+import com.metreeca.core.toolkits.Resources;
 import com.metreeca.http.*;
 
 import org.eclipse.rdf4j.common.lang.FileFormat;
@@ -25,15 +26,18 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.rio.*;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
 import org.eclipse.rdf4j.rio.helpers.ParseErrorCollector;
+import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.metreeca.core.toolkits.Resources.resource;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
 import static com.metreeca.link.Values.iri;
@@ -193,6 +197,79 @@ public final class RDF implements Codec<Model> {
 
             );
 
+        }
+    }
+
+
+    /**
+     * Parses an RDF class {@linkplain Resources#resource(Object, String) resource}.
+     *
+     * @param master   the target class or an instance of the target class for the RDF resource to be parsed
+     * @param resource the path of the RDF resource to be parsed, relative to the target class
+     *
+     * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
+     * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
+     *
+     * @throws MissingResourceException if {@code resource} is not available
+     * @throws CodecException           if {@code resource} contains a malformed document
+     */
+    public static Model rdf(final Object master, final String resource) throws CodecException {
+
+        if ( master == null ) {
+            throw new NullPointerException("null master");
+        }
+
+        if ( resource == null ) {
+            throw new NullPointerException("null resource");
+        }
+
+        return rdf(master, resource, "");
+    }
+
+    /**
+     * Parses an RDF class {@linkplain Resources#resource(Object, String) resource}.
+     *
+     * @param master   the target class or an instance of the target class for the RDF resource to be parsed
+     * @param resource the path of the RDF resource to be parsed, relative to the target class
+     * @param base     the base IRI relative IRIs in {@code resource} will be resolved against; if empty, defaults to the
+     *                 {@code resource} URL
+     *
+     * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
+     * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
+     *
+     * @throws MissingResourceException if {@code resource} is not available
+     * @throws CodecException           if {@code resource} contains a malformed document
+     */
+    public static Model rdf(final Object master, final String resource, final String base) throws CodecException {
+
+        if ( master == null ) {
+            throw new NullPointerException("null master");
+        }
+
+        if ( resource == null ) {
+            throw new NullPointerException("null resource");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
+        final URL url=resource(master, resource);
+
+        final RDFParserRegistry registry=RDFParserRegistry.getInstance();
+
+        final RDFParser parser=registry
+                .getFileFormatForFileName(url.getFile())
+                .flatMap(registry::get)
+                .orElseGet(TurtleParserFactory::new)
+                .getParser();
+
+        try ( final InputStream input=url.openConnection().getInputStream() ) {
+
+            return rdf(input, base.isEmpty() ? url.toString() : base, parser);
+
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
         }
     }
 
