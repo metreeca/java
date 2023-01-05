@@ -30,8 +30,7 @@ import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -159,7 +158,7 @@ public final class RDF implements Codec<Model> {
 
         try {
 
-            parser.parse(input, base); // resolve relative IRIs wrt the request focus
+            parser.parse(input, base);
 
         } catch ( final RDFParseException e ) {
 
@@ -202,6 +201,115 @@ public final class RDF implements Codec<Model> {
 
 
     /**
+     * Parses an RDF document.
+     *
+     * @param url the URL of the document to be parsed
+     *
+     * @return an unmodifiable RDF model parsed from {@code url}
+     *
+     * @throws NullPointerException     if {@code url} or {@code parser} is null
+     * @throws IllegalArgumentException if {@code url} is malformed
+     * @throws CodecException           if {@code url} points to a malformed document
+     */
+    public static Model rdf(final String url) {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        return rdf(url, "");
+    }
+
+    /**
+     * Parses an RDF document.
+     *
+     * @param url  the URL of the document to be parsed
+     * @param base the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
+     *             {@code url}
+     *
+     * @return an unmodifiable RDF model parsed from {@code url}
+     *
+     * @throws NullPointerException     if {@code url} or {@code base} is null
+     * @throws IllegalArgumentException if {@code url} is malformed
+     * @throws CodecException           if {@code url} points to a malformed document
+     */
+    public static Model rdf(final String url, final String base) {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        try {
+
+            return rdf(new URL(url), "");
+
+        } catch ( final MalformedURLException e ) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    /**
+     * Parses an RDF document.
+     *
+     * @param url the URL of the document to be parsed
+     *
+     * @return an unmodifiable RDF model parsed from {@code url}
+     *
+     * @throws NullPointerException     if {@code url} or {@code parser} is null
+     * @throws IllegalArgumentException if {@code url} is malformed
+     * @throws CodecException           if {@code url} points to a malformed document
+     */
+    public static Model rdf(final URL url) {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        return rdf(url, "");
+    }
+
+    /**
+     * Parses an RDF document.
+     *
+     * @param url  the URL of the document to be parsed
+     * @param base the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
+     *             {@code url}
+     *
+     * @return an unmodifiable RDF model parsed from {@code url}
+     *
+     * @throws NullPointerException     if {@code url} or {@code base} is null
+     * @throws IllegalArgumentException if {@code url} is malformed
+     * @throws CodecException           if {@code url} points to a malformed document
+     */
+    public static Model rdf(final URL url, final String base) {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
+        final RDFParserRegistry registry=RDFParserRegistry.getInstance();
+
+        final RDFParser parser=registry
+                .getFileFormatForFileName(url.getFile())
+                .flatMap(registry::get)
+                .orElseGet(TurtleParserFactory::new)
+                .getParser();
+
+        try ( final InputStream input=url.openConnection().getInputStream() ) {
+
+            return rdf(input, base.isEmpty() ? url.toString() : base, parser);
+
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+
+    /**
      * Parses an RDF class {@linkplain Resources#resource(Object, String) resource}.
      *
      * @param master   the target class or an instance of the target class for the RDF resource to be parsed
@@ -210,6 +318,7 @@ public final class RDF implements Codec<Model> {
      * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
      * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
      *
+     * @throws NullPointerException     if any argument is null
      * @throws MissingResourceException if {@code resource} is not available
      * @throws CodecException           if {@code resource} contains a malformed document
      */
@@ -237,6 +346,7 @@ public final class RDF implements Codec<Model> {
      * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
      * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
      *
+     * @throws NullPointerException     if any argument is null
      * @throws MissingResourceException if {@code resource} is not available
      * @throws CodecException           if {@code resource} contains a malformed document
      */
@@ -256,21 +366,7 @@ public final class RDF implements Codec<Model> {
 
         final URL url=resource(master, resource);
 
-        final RDFParserRegistry registry=RDFParserRegistry.getInstance();
-
-        final RDFParser parser=registry
-                .getFileFormatForFileName(url.getFile())
-                .flatMap(registry::get)
-                .orElseGet(TurtleParserFactory::new)
-                .getParser();
-
-        try ( final InputStream input=url.openConnection().getInputStream() ) {
-
-            return rdf(input, base.isEmpty() ? url.toString() : base, parser);
-
-        } catch ( final IOException e ) {
-            throw new UncheckedIOException(e);
-        }
+        return rdf(url, base);
     }
 
 
