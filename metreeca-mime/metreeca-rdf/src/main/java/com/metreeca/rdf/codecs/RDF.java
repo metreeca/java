@@ -192,7 +192,7 @@ public final class RDF implements Codec<Model> {
 
                     .flatMap(stream -> stream)
 
-                    .collect(joining("/b"))
+                    .collect(joining("\n", format("%s\n", parser.getRDFFormat().toString()), ""))
 
             );
 
