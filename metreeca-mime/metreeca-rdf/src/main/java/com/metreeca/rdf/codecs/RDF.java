@@ -241,7 +241,7 @@ public final class RDF implements Codec<Model> {
 
         try {
 
-            return rdf(new URL(url), "");
+            return rdf(new URL(url), base);
 
         } catch ( final MalformedURLException e ) {
             throw new IllegalArgumentException(e.getMessage());
