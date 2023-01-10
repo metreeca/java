@@ -73,11 +73,11 @@ public final class Retrieve implements Function<String, Model> {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private String base="";
-    private String mime="";
+    private String type="";
 
 
     /**
-     * Configures dataset base.
+     * Configures the dataset base.
      *
      * @param base the base IRI for resolving relative IRIs in retrieved dataset; if empty, defaults to dataset IRI
      *
@@ -97,24 +97,45 @@ public final class Retrieve implements Function<String, Model> {
     }
 
     /**
-     * Configures dataset MIME type.
+     * Configures the dataset MIME type.
      *
-     * @param mime the expected MIME type of the dataset; if empty, defaults to server-provided type
+     * @param type the expected MIME type of the dataset; if empty, defaults to server-provided type
      *
      * @return this action
      *
-     * @throws NullPointerException if {@code base} is null
+     * @throws NullPointerException if {@code type} is null
      */
-    public Retrieve mime(final String mime) {
+    public Retrieve type(final String type) {
 
-        if ( mime == null ) {
-            throw new NullPointerException("null mime");
+        if ( type == null ) {
+            throw new NullPointerException("null type");
         }
 
-        this.mime=mime;
+        this.type=type;
 
         return this;
     }
+
+    /**
+     * Configures the dataset MIME type.
+     *
+     * @param format the expected RDF format of the dataset
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code format} is null
+     */
+    public Retrieve format(final RDFFormat format) {
+
+        if ( format == null ) {
+            throw new NullPointerException("null format");
+        }
+
+        this.type=format.getDefaultMIMEType();
+
+        return this;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -127,9 +148,9 @@ public final class Retrieve implements Function<String, Model> {
 
                 .map(response -> response
                         .header("Location", base.isEmpty() ? url : base)
-                        .header("Content-Type", mime.isEmpty()
+                        .header("Content-Type", type.isEmpty()
                                 ? response.header("Content-Type").orElse("")
-                                : mime
+                                : type
                         )
                 )
 
