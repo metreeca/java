@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ final class GraphFactsTest {
 
 					emptyList()
 
-			)).isEqualTo(value(root));
+			)).isEqualTo(root);
 		}
 
 		@Test void testShallowDirectLink() {
@@ -184,7 +184,7 @@ final class GraphFactsTest {
 
 					singletonList(p)
 
-			)).isEqualTo(value("p"));
+			)).isEqualTo("p");
 		}
 
 		@Test void testDeepDirectLink() {
@@ -194,7 +194,7 @@ final class GraphFactsTest {
 
 					asList(p, q)
 
-			)).isEqualTo(value("q"));
+			)).isEqualTo("q");
 		}
 
 
@@ -205,7 +205,7 @@ final class GraphFactsTest {
 
 					emptyList()
 
-			)).isEqualTo(alias(root));
+			)).isEqualTo(root);
 		}
 
 		@Test void testShallowInverseLink() {
@@ -215,7 +215,7 @@ final class GraphFactsTest {
 
 					singletonList(p)
 
-			)).isEqualTo(alias("p"));
+			)).isEqualTo("p");
 		}
 
 		@Test void testDeepInverseLink() {
@@ -225,7 +225,7 @@ final class GraphFactsTest {
 
 					asList(p, q)
 
-			)).isEqualTo(alias("q"));
+			)).isEqualTo("q");
 		}
 
 	}

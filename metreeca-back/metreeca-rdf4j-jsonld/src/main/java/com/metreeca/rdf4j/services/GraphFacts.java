@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.metreeca.link.shapes.*;
 import com.metreeca.rdf4j.SPARQL;
 
 import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -76,30 +76,6 @@ import static java.lang.String.valueOf;
 abstract class GraphFacts {
 
 	static final String root="0";
-
-
-	static String alias(final String id) {
-		return id+'a';
-	}
-
-	static String value(final String id) {
-		return id+'v';
-	}
-
-
-	/**
-	 * @param id  a template node id
-	 * @param ids the set of known template node ids
-	 *
-	 * @return the id of the principal node proxied by {@code id}
-	 *
-	 * @see "linking @ metreeca-link design notes"
-	 */
-	static String principal(final String id, final Collection<String> ids) {
-		return id.endsWith("a") ? id
-				: id.endsWith("v") ? id.substring(0, id.length()-1)
-				: Optional.of(alias(id)).filter(ids::contains).orElse(id);
-	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +155,7 @@ abstract class GraphFacts {
 
 
 	private static String hook(final String anchor, final Shape shape, final List<IRI> path) {
-		return Optional.ofNullable(shape.map(new HookProbe(anchor, path)))
+		return Optional.ofNullable(shape.map(new HookProbe(path)))
 
 				.orElseGet(() -> {
 
@@ -197,14 +173,31 @@ abstract class GraphFacts {
 
 	private static final class TreeProbe extends Shape.Probe<Consumer<Appendable>> {
 
+		private static final Map<IRI, String> shorthands=Map.of(
+				OWL.SAMEAS, "owl:sameAs",
+				RDFS.SEEALSO, "rdfs:seeAlso",
+				RDFS.ISDEFINEDBY, "rdfs:isDefinedBy"
+		);
+
 		private final String anchor;
-
 		private final boolean required;
+		private final IRI link;
 
 
-		private TreeProbe(final String anchor, final boolean filter) {
+		private TreeProbe(final String anchor, final boolean filter) { this(anchor, filter, null); }
+
+		private TreeProbe(final String anchor, final boolean filter, final IRI link) {
 			this.anchor=anchor;
 			this.required=filter;
+			this.link=link;
+		}
+
+
+		private Consumer<Appendable> link(final Consumer<Appendable> path) {
+			return list(link == null ? nothing() : list(
+					Optional.ofNullable(shorthands.get(link)).map(Snippets::text).orElseGet(() -> SPARQL.value(link)),
+					text("?/")
+			), path);
 		}
 
 
@@ -227,7 +220,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public Consumer<Appendable> probe(final Clazz clazz) {
-			return edge(var(anchor), text("a/rdfs:subClassOf*"), SPARQL.value(clazz.iri()));
+			return edge(var(anchor), link(text("a/rdfs:subClassOf*")), SPARQL.value(clazz.iri()));
 		}
 
 		@Override public Consumer<Appendable> probe(final Range range) {
@@ -348,7 +341,7 @@ abstract class GraphFacts {
 
 					final Consumer<Appendable> list=list(
 
-							space(edge(var(anchor), SPARQL.value(iri), indent(list(", ", Stream.concat(
+							space(edge(var(anchor), link(SPARQL.value(iri)), indent(list(", ", Stream.concat(
 
 									Stream.of(var(label)), // filtering/projection hook
 
@@ -372,15 +365,7 @@ abstract class GraphFacts {
 			final IRI iri=link.iri();
 			final Shape shape=link.shape();
 
-			final String id=direct(iri) ? value(anchor) : alias(anchor);
-
-			return list(
-
-					space(edge(var(anchor), SPARQL.value(iri), var(id))),
-
-					space(shape.map(new TreeProbe(id, required)))
-
-			);
+			return shape.map(new TreeProbe(anchor, required, iri));
 		}
 
 
@@ -441,12 +426,10 @@ abstract class GraphFacts {
 
 	private static final class HookProbe extends Shape.Probe<String> {
 
-		private final String anchor;
 		private final List<IRI> path;
 
 
-		HookProbe(final String anchor, final List<IRI> path) {
-			this.anchor=anchor;
+		HookProbe(final List<IRI> path) {
 			this.path=path;
 		}
 
@@ -458,9 +441,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public String probe(final Link link) {
-			return Optional
-					.ofNullable(link.shape().map(this))
-					.orElseGet(() -> direct(link.iri()) ? value(anchor) : alias(anchor));
+			return link.shape().map(this);
 		}
 
 

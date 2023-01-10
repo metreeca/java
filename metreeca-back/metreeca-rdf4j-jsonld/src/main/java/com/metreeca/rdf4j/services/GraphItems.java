@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,13 +136,11 @@ final class GraphItems extends GraphFacts {
 								final Value object=statement.getObject();
 
 								final Value source=subject instanceof BNode
-										? bindings.getValue(principal(((BNode)subject).getID(),
-										bindings.getBindingNames()))
+										? bindings.getValue(((BNode)subject).getID())
 										: subject;
 
 								final Value target=object instanceof BNode
-										? bindings.getValue(principal(((BNode)object).getID(),
-										bindings.getBindingNames()))
+										? bindings.getValue(((BNode)object).getID())
 										: object;
 
 								if ( source instanceof Resource && target != null ) {
