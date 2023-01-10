@@ -41,82 +41,106 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Retrieve implements Function<String, Model> {
 
-	private static final Model EmptyModel=new LinkedHashModel().unmodifiable();
+    private static final Model EmptyModel=new LinkedHashModel().unmodifiable();
 
 
-	private static String mimes() {
+    private static String mimes() {
 
-		final List<RDFFormat> formats=RDFParserRegistry.getInstance().getKeys().stream()
+        final List<RDFFormat> formats=RDFParserRegistry.getInstance().getKeys().stream()
 
-				.sorted(Comparator
+                .sorted(Comparator
 
-						.comparing(RDFFormat::supportsRDFStar, Boolean::compareTo)
-						.thenComparing(RDFFormat::supportsContexts, Boolean::compareTo)
-						.thenComparing(RDFFormat::supportsNamespaces, Boolean::compareTo)
-						.thenComparing(RDFFormat.TURTLE::equals, Boolean::compareTo)
+                        .comparing(RDFFormat::supportsRDFStar, Boolean::compareTo)
+                        .thenComparing(RDFFormat::supportsContexts, Boolean::compareTo)
+                        .thenComparing(RDFFormat::supportsNamespaces, Boolean::compareTo)
+                        .thenComparing(RDFFormat.TURTLE::equals, Boolean::compareTo)
 
-						.reversed()
-				)
+                        .reversed()
+                )
 
-				.collect(toList());
+                .collect(toList());
 
-		final int size=formats.size();
+        final int size=formats.size();
 
-		return IntStream.range(0, size).boxed().flatMap(i -> formats.get(i).getMIMETypes().stream().map(mime ->
+        return IntStream.range(0, size).boxed().flatMap(i -> formats.get(i).getMIMETypes().stream().map(mime ->
 
-				String.format("%s;q=%.2f", mime, (size-i.floatValue())/size))
+                String.format("%s;q=%.2f", mime, (size-i.floatValue())/size))
 
-		).collect(joining(", "));
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private String base="";
+        ).collect(joining(", "));
+    }
 
 
-	/**
-	 * Configures dataset base.
-	 *
-	 * @param base the base IRI for resolving relative IRIs in retrieved dataset; defaults to dataset IRI
-	 *
-	 * @return this action
-	 *
-	 * @throws NullPointerException if {@code base} is null
-	 */
-	public Retrieve base(final String base) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if ( base == null ) {
-			throw new NullPointerException("null base");
-		}
-
-		this.base=base;
-
-		return this;
-	}
+    private String base="";
+    private String mime="";
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Configures dataset base.
+     *
+     * @param base the base IRI for resolving relative IRIs in retrieved dataset; if empty, defaults to dataset IRI
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code base} is null
+     */
+    public Retrieve base(final String base) {
 
-	@Override public Model apply(final String url) {
-		return Optional.of(url)
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
 
-				.flatMap(new Query(request -> request.headers("Accept", mimes())))
+        this.base=base;
 
-				.flatMap(new Fetch())
+        return this;
+    }
 
-				.map(response -> response
-						.header("Location", base.isEmpty() ? url : base)
-				)
+    /**
+     * Configures dataset MIME type.
+     *
+     * @param mime the expected MIME type of the dataset; if empty, defaults to server-provided type
+     *
+     * @return this action
+     *
+     * @throws NullPointerException if {@code base} is null
+     */
+    public Retrieve mime(final String mime) {
 
-				.flatMap(new Parse<>(new RDF(codec -> codec
-						.set(VERIFY_URI_SYNTAX, false)
-						.set(FAIL_ON_UNKNOWN_DATATYPES, false)
-						.set(VERIFY_DATATYPE_VALUES, false)
-						.set(NORMALIZE_DATATYPE_VALUES, false)
-				)))
+        if ( mime == null ) {
+            throw new NullPointerException("null mime");
+        }
 
-				.orElseGet(() -> EmptyModel);
-	}
+        this.mime=mime;
+
+        return this;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public Model apply(final String url) {
+        return Optional.of(url)
+
+                .flatMap(new Query(request -> request.headers("Accept", mimes())))
+
+                .flatMap(new Fetch())
+
+                .map(response -> response
+                        .header("Location", base.isEmpty() ? url : base)
+                        .header("Content-Type", mime.isEmpty()
+                                ? response.header("Content-Type").orElse("")
+                                : mime
+                        )
+                )
+
+                .flatMap(new Parse<>(new RDF(codec -> codec
+                        .set(VERIFY_URI_SYNTAX, false)
+                        .set(FAIL_ON_UNKNOWN_DATATYPES, false)
+                        .set(VERIFY_DATATYPE_VALUES, false)
+                        .set(NORMALIZE_DATATYPE_VALUES, false)
+                )))
+
+                .orElseGet(() -> EmptyModel);
+    }
 
 }
