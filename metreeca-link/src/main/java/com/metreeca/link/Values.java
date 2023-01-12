@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -613,7 +613,7 @@ public final class Values {
 
     //// Rewriters /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static IRI rewrite(final IRI iri, final String source, final String target) {
+    public static Statement replace(final Statement statement, final IRI source, final IRI target) {
 
         if ( source == null ) {
             throw new NullPointerException("null source");
@@ -623,12 +623,35 @@ public final class Values {
             throw new NullPointerException("null target");
         }
 
-        return Optional.ofNullable(iri)
-                .map(Value::stringValue)
-                .filter(s -> s.startsWith(source))
-                .map(s -> iri(target, s.substring(source.length())))
-                .orElse(iri);
+
+        if ( statement == null ) { return null; } else {
+
+            final Resource subject=statement.getSubject();
+            final IRI predicate=statement.getPredicate();
+            final Value object=statement.getObject();
+
+            return statement(
+                    subject.isIRI() ? replace((IRI)subject, source, target) : subject,
+                    replace(predicate, source, target),
+                    object.isIRI() ? replace((IRI)object, source, target) : object
+            );
+
+        }
     }
+
+    public static IRI replace(final IRI resource, final IRI source, final IRI target) {
+
+        if ( source == null ) {
+            throw new NullPointerException("null source");
+        }
+
+        if ( target == null ) {
+            throw new NullPointerException("null target");
+        }
+
+        return resource.equals(source) ? target : resource;
+    }
+
 
     public static Statement rewrite(final Statement statement, final String source, final String target) {
 
@@ -655,23 +678,23 @@ public final class Values {
         }
     }
 
+    public static IRI rewrite(final IRI iri, final String source, final String target) {
 
-    public static IRI adopt(final IRI iri, final String external, final String internal) {
-
-        if ( external == null ) {
-            throw new NullPointerException("null external");
+        if ( source == null ) {
+            throw new NullPointerException("null source");
         }
 
-        if ( internal == null ) {
-            throw new NullPointerException("null internal");
+        if ( target == null ) {
+            throw new NullPointerException("null target");
         }
 
         return Optional.ofNullable(iri)
                 .map(Value::stringValue)
-                .filter(s -> s.startsWith(external))
-                .map(s -> iri(internal, Identifiers.md5(s)))
+                .filter(s -> s.startsWith(source))
+                .map(s -> iri(target, s.substring(source.length())))
                 .orElse(iri);
     }
+
 
     public static Statement adopt(final Statement statement, final String external, final String internal) {
 
@@ -696,6 +719,23 @@ public final class Values {
             );
 
         }
+    }
+
+    public static IRI adopt(final IRI iri, final String external, final String internal) {
+
+        if ( external == null ) {
+            throw new NullPointerException("null external");
+        }
+
+        if ( internal == null ) {
+            throw new NullPointerException("null internal");
+        }
+
+        return Optional.ofNullable(iri)
+                .map(Value::stringValue)
+                .filter(s -> s.startsWith(external))
+                .map(s -> iri(internal, Identifiers.md5(s)))
+                .orElse(iri);
     }
 
 
