@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.metreeca.jsonld.handlers;
 
 
+import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.*;
 import com.metreeca.jsonld.codecs.JSONLD;
 import com.metreeca.jsonld.services.Engine;
@@ -184,7 +185,7 @@ public final class Creator extends Operator {
                             .filter(Value::isIRI)
                             .map(IRI.class::cast)
                             .map(Value::stringValue)
-                            .map(Values::path) // root-relative to support relocation
+                            .map(Identifiers::path) // root-relative to support relocation
                             .orElse(focus.stringValue())
                     )))
 

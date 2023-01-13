@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.metreeca.core.toolkits;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,6 +74,22 @@ public final class Identifiers {
      * {@linkplain #IRIPattern base IRI pattern}.</p>
      */
     public static final Pattern AbsoluteIRIPattern=Pattern.compile("^"+IRIScheme+IRIHost+"?"+IRIPath+"$");
+
+
+    /**
+     * Extracts the path component of an IRI.
+     *
+     * @param iri the (nullable) source iri
+     *
+     * @return the path component of {@code iri}, if {@code iri} is not null and contains one; {@code null}, otherwise
+     */
+    public static String path(final String iri) {
+        return Optional.ofNullable(iri)
+                .map(IRIPattern::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("pathall"))
+                .orElse("/");
+    }
 
 
     /**

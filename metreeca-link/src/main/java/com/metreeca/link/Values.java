@@ -35,7 +35,6 @@ import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 
 import static com.metreeca.core.toolkits.Strings.indent;
 
@@ -48,16 +47,6 @@ import static java.util.stream.Collectors.*;
  * Value utilities.
  */
 public final class Values {
-
-
-    public static String path(final String iri) {
-        return Optional.ofNullable(iri)
-                .map(Identifiers.IRIPattern::matcher)
-                .filter(Matcher::matches)
-                .map(matcher -> matcher.group("pathall"))
-                .orElse("/");
-    }
-
 
     private static final ValueFactory factory=new AbstractValueFactory() { }; // before constant initialization
     private static final Comparator<Value> comparator=new ValueComparator();
