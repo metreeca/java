@@ -414,9 +414,13 @@ public final class Values {
     }
 
 
-    public static Literal literal(final byte[] value) {
-        return value == null ? null : factory.createLiteral(
-                "data:application/octet-stream;base64,"+Base64.getEncoder().encodeToString(value), XSD.ANYURI);
+    public static Literal literal(final byte[] value) { return literal(value, null); }
+
+    public static Literal literal(final byte[] value, final String mime) {
+        return value == null ? null : factory.createLiteral(String.format("data:%s;base64,%s",
+                mime == null ? "application/octet-stream" : mime,
+                Base64.getEncoder().encodeToString(value)
+        ), XSD.ANYURI);
     }
 
 
