@@ -180,7 +180,7 @@ abstract class GraphFacts {
 		);
 
 		private final String anchor;
-		private final boolean required;
+		private final boolean filter;
 		private final IRI link;
 
 
@@ -188,7 +188,7 @@ abstract class GraphFacts {
 
 		private TreeProbe(final String anchor, final boolean filter, final IRI link) {
 			this.anchor=anchor;
-			this.required=filter;
+			this.filter=filter;
 			this.link=link;
 		}
 
@@ -224,7 +224,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public Consumer<Appendable> probe(final Range range) {
-			if ( required ) {
+			if ( filter ) {
 
 				return probe((Shape)range); // !!! tbi (filter not exists w/ special root treatment)
 
@@ -238,7 +238,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public Consumer<Appendable> probe(final Lang lang) {
-			if ( required ) {
+			if ( filter ) {
 
 				return probe((Shape)lang); // !!! tbi (filter not exists w/ special root treatment)
 
@@ -299,16 +299,17 @@ abstract class GraphFacts {
 
 
 		@Override public Consumer<Appendable> probe(final MinCount minCount) {
-			return required ? probe((Shape)minCount) : nothing();
+			return filter && minCount.limit() != 1 ? probe((Shape)minCount)
+					: nothing(); // existential constraint handled by skeleton
 		}
 
 		@Override public Consumer<Appendable> probe(final MaxCount maxCount) {
-			return required ? probe((Shape)maxCount) : nothing();
+			return filter ? probe((Shape)maxCount) : nothing();
 		}
 
 
 		@Override public Consumer<Appendable> probe(final All all) {
-			return nothing(); // universal constraints handled by skeleton()
+			return nothing(); // universal constraints handled by skeleton
 		}
 
 		@Override public Consumer<Appendable> probe(final Any any) {
@@ -319,7 +320,7 @@ abstract class GraphFacts {
 		}
 
 		@Override public Consumer<Appendable> probe(final Localized localized) {
-			return required ? probe((Shape)localized) : nothing();
+			return filter ? probe((Shape)localized) : nothing();
 		}
 
 
@@ -349,11 +350,11 @@ abstract class GraphFacts {
 
 							))))),
 
-							space(shape.map(new TreeProbe(label, required)))
+							space(shape.map(new TreeProbe(label, filter)))
 
 					);
 
-					return required ? list : space(optional(list));
+					return filter ? list : space(optional(list));
 				}
 
 			});
@@ -365,7 +366,7 @@ abstract class GraphFacts {
 			final IRI iri=link.iri();
 			final Shape shape=link.shape();
 
-			return shape.map(new TreeProbe(anchor, required, iri));
+			return shape.map(new TreeProbe(anchor, filter, iri));
 		}
 
 
