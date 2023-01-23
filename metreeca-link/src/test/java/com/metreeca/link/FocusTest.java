@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 final class FocusTest {
 
-    private final IRI target=iri("http://example.org/collection/member/nested");
+    private final IRI target=iri("http://example.org/container/member/nested");
 
     @Test void testResolveRelativeValues() {
 
@@ -37,28 +37,28 @@ final class FocusTest {
 
         assertThat(focus(".").resolve(target))
                 .as("member w/o trailing slash")
-                .isEqualTo(iri("http://example.org/collection/member"));
+                .isEqualTo(iri("http://example.org/container/member"));
 
         assertThat(focus("./").resolve(target))
                 .as("member w/ trailing slash")
-                .isEqualTo(iri("http://example.org/collection/member/"));
+                .isEqualTo(iri("http://example.org/container/member/"));
 
         assertThat(focus("..").resolve(target))
-                .as("collection w/o trailing slash")
-                .isEqualTo(iri("http://example.org/collection"));
+                .as("container w/o trailing slash")
+                .isEqualTo(iri("http://example.org/container"));
 
         assertThat(focus("../").resolve(target))
-                .as("collection w/ trailing slash")
-                .isEqualTo(iri("http://example.org/collection/"));
+                .as("container w/ trailing slash")
+                .isEqualTo(iri("http://example.org/container/"));
 
         assertThat(focus("../sibling").resolve(target))
                 .as("sibling")
-                .isEqualTo(iri("http://example.org/collection/sibling"));
+                .isEqualTo(iri("http://example.org/container/sibling"));
 
 
         assertThat(focus("sibling").resolve(target))
                 .as("relative target")
-                .isEqualTo(iri("http://example.org/collection/member/sibling"));
+                .isEqualTo(iri("http://example.org/container/member/sibling"));
 
     }
 

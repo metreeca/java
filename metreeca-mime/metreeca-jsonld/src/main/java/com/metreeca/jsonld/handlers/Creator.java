@@ -51,7 +51,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Model-driven resource creator.
  *
- * <p>Handles creation requests on the linked data collection identified by the request {@linkplain Request#item()
+ * <p>Handles creation requests on the linked data container identified by the request {@linkplain Request#item()
  * focus item}:</p>
  *
  * <ul>
@@ -70,7 +70,7 @@ import static java.util.Objects.requireNonNull;
  * the value of the {@code Slug} request header, if one is found, or a random id, otherwise;</li>
  *
  * <li>rewrites the request body to the assigned IRI and stores it with the assistance of the shared linked data
- * {@linkplain Engine#create(Frame, Shape) engine}; the target collection identified by the request focus item is
+ * {@linkplain Engine#create(Frame, Shape) engine}; the target container identified by the request focus item is
  * connected to the newly created resource according to the filtering constraints in the request shape.</li>
  *
  * </ul>

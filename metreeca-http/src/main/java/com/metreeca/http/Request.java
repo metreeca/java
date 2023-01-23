@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,14 +306,14 @@ public final class Request extends Message<Request> {
     }
 
     /**
-     * Checks if this request targets a collection.
+     * Checks if this request targets a container.
      *
      * @return {@code true} if the {@link #path()} of this request includes a trailing slash; {@code false} otherwise
      *
      * @see <a href="https://www.w3.org/TR/ldp-bp/#include-a-trailing-slash-in-container-uris">Linked Data Platform Best
      * Practices and Guidelines - § 2.6 Include a trailing slash in container URIs</a>
      */
-    public boolean collection() {
+    public boolean container() {
         return path.endsWith("/");
     }
 

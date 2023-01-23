@@ -644,7 +644,7 @@ request [focus item](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/co
 
 | actor                                                        | action                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Relator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended collection [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
+| [Relator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended container [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
 | [Creator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
 | [Updater](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
 | [Deleter](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |

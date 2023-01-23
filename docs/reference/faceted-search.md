@@ -26,7 +26,7 @@ JSON-based queries are appended to container IRIs using one of the following enc
 - [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) (
   e.g. `"http://example.com/container/?"+new URLSearchParams({ <query> })`)
 
-The second form supports idiomatic collection filtering (e.g. `http://example.com/container/?<property>=<value>&…`, but
+The second form supports idiomatic container filtering (e.g. `http://example.com/container/?<property>=<value>&…`, but
 requires:
 
 - values to contain no comma;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ import static com.metreeca.link.shapes.Guard.*;
  *
  * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
  * the request shape enabled by the {@linkplain Guard#Relate} task and the {@linkplain Guard#Digest} view, if the
- * focus item is a {@linkplain Request#collection() collection}, or the {@linkplain Guard#Detail} view, otherwise.</li>
+ * focus item is a {@linkplain Request#container() container}, or the {@linkplain Guard#Detail} view, otherwise.</li>
  *
  * </ul>
  *
- * <p>If the focus item is a {@linkplain Request#collection() collection}, generates a response including:</p>
+ * <p>If the focus item is a {@linkplain Request#container() container}, generates a response including:</p>
  *
  * <ul>
  *
@@ -68,7 +68,7 @@ import static com.metreeca.link.shapes.Guard.*;
  * retrieved with the assistance of the shared linked data {@linkplain Engine#relate(Frame, Query) engine} according to
  * the filtering constraints collected from the request shape and the
  * {@linkplain JSONLD#query(IRI, Shape, String) query} component of the request IRI; the IRI of the target
- * collection is connected to the IRIs of the member resources using the {@link Shape#Contains ldp:contains} property.
+ * container is connected to the IRIs of the member resources using the {@link Shape#Contains ldp:contains} property.
  * </li>
  *
  * </ul>
@@ -107,7 +107,7 @@ public final class Relator extends Operator {
      */
     public Relator() {
         delegate(handler(
-                handler(Request::collection,
+                handler(Request::container,
                         keeper(Relate, Digest),
                         keeper(Relate, Detail)
                 ),
@@ -120,7 +120,7 @@ public final class Relator extends Operator {
     private Handler relate() {
         return (request, forward) -> {
 
-            final boolean collection=request.collection();
+            final boolean container=request.container();
 
             final IRI item=iri(request.item());
             final Shape shape=shape(request);
@@ -129,14 +129,14 @@ public final class Relator extends Operator {
             return engine.relate(frame(item), query)
 
                     .map(frame -> request.reply(OK)
-                            .map(response -> shape(response, query.map(new ShapeProbe(collection)))
+                            .map(response -> shape(response, query.map(new ShapeProbe(container)))
                                     .body(new JSONLD(), frame)
                             ))
 
-                    .orElseGet(() -> collection
+                    .orElseGet(() -> container
 
                             ? request.reply(OK) // virtual container
-                            .map(response -> shape(response, query.map(new ShapeProbe(collection))))
+                            .map(response -> shape(response, query.map(new ShapeProbe(container))))
                             .body(new JSONLD(), frame(item))
 
                             : request.reply(NotFound)
@@ -150,16 +150,16 @@ public final class Relator extends Operator {
 
     private static final class ShapeProbe extends Query.Probe<Shape> {
 
-        private final boolean collection;
+        private final boolean container;
 
 
-        private ShapeProbe(final boolean collection) {
-            this.collection=collection;
+        private ShapeProbe(final boolean container) {
+            this.container=container;
         }
 
 
         @Override public Shape probe(final Items items) { // !!! add Shape.Contains if items.path is not empty
-            return (collection ? field(Contains, items.shape()) : items.shape()).redact(Mode, Convey); // remove filters
+            return (container ? field(Contains, items.shape()) : items.shape()).redact(Mode, Convey); // remove filters
         }
 
         @Override public Shape probe(final Stats stats) {

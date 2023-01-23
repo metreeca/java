@@ -154,8 +154,8 @@ Content-Type: application/json;charset=UTF-8
 
 ## Collections
 
-To retrieve the description of a published collections, as specified by the associated data model, perform a `GET`
-operation on the URL identifying the collection.
+To retrieve the description of a published container, as specified by the associated data model, perform a `GET`
+operation on the URL identifying the container.
 
 ```shell
 % curl --include "http://localhost:8080/products/"
@@ -199,7 +199,7 @@ publishing process.
 
 ## Creating Resources
 
-New resources are created by submitting an description to the REST API of a writable collection using the `POST` HTTP
+New resources are created by submitting an description to the REST API of a writable container using the `POST` HTTP
 method.
 
 Note that property values that may be inferred from the associated linked data model, like `rdf:type`, may be safely
@@ -345,8 +345,8 @@ The deleted resource is immediately no longer available for retrieval.
 Metreeca/Java REST APIs engine supports model-driven faceted search and related facet-related queries without additional
 effort.
 
-To retrieve a digest description of collection items matching a set of facet filters, perform a `GET` operation on the
-URL identifying the collection, appending a URL-encoded JSON query
+To retrieve a digest description of container items matching a set of facet filters, perform a `GET` operation on the
+URL identifying the container, appending a URL-encoded JSON query
 object [describing the filters](../reference/faceted-search.md) to be applied.
 
 ```json
@@ -387,7 +387,7 @@ Content-Type: application/json;charset=UTF-8
 }
 ```
 
-Note that collection descriptions are omitted from faceted search results.
+Note that container descriptions are omitted from faceted search results.
 
 ## Sorting and Pagination
 
