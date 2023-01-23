@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.codecs.Data;
-import com.metreeca.http.handlers.Router;
+import com.metreeca.http.handlers.Worker;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -60,7 +60,7 @@ public final class SPARQL extends Endpoint<SPARQL> {
 
 
     public SPARQL() {
-        delegate(new Router()
+        delegate(new Worker()
                 .get(this::process)
                 .post(this::process)
         );

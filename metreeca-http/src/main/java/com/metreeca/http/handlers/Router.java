@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,66 +25,37 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static com.metreeca.http.Request.*;
-import static com.metreeca.http.Response.MethodNotAllowed;
-import static com.metreeca.http.Response.OK;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Map.entry;
-import static java.util.stream.Collectors.toList;
 
 
 /**
- * Request router.
+ * Path-based request dispatcher.
  *
- * <dl>
+ * <p>Delegates request processing to a handler selected on the basis of the request HTTP
+ * {@linkplain Request#path() path}, ignoring the leading segment possibly already matched by wrapping routers.</p>
  *
- *     <dt><strong>Path-Based Routing</strong></dt>
+ * <p>Requests are forwarded to a {@linkplain #path(String, Handler) registered} handler if their path is
+ * matched (in order of definition) by an associated pattern defined by a sequence of steps according to the following
+ * rules:</p>
  *
- *     <dd>
+ * <ul>
+ *      <li>the empty step ({@code /}) matches only an empty step ({@code /});</li>
  *
- *          <p>Delegates request processing to a handler selected on the basis of the request HTTP
- *          {@linkplain Request#path() path}, ignoring the leading segment possibly already matched by wrapping
- *          routers.</p>
+ *      <li>literal steps {@code /<steli>} match path steps verbatim;</li>
  *
- *          <p>Requests are forwarded to a {@linkplain #path(String, Handler) registered} handler if their path is
- *          matched by an associated pattern defined by a sequence of steps according to the following rules:</p>
+ *      <li>wildcard steps {@code /{}} match a single path step;</li>
  *
- *          <ul>
+ *      <li>placeholder steps {@code /{<key>}} match a single path step, adding the matched {@code <key>}/{@code
+ *      <steli>} entry to request {@linkplain Request#parameters() parameters}; the matched {@code <steli>} name is
+ *      URL-decoded before use;</li>
  *
- *          <li>the empty step ({@code /}) matches only an empty step ({@code /});</li>
+ *      <li>prefix steps {@code /*} match one or more trailing path steps.</li>
+ * </ul>
  *
- *          <li>literal steps {@code /<step>} match path steps verbatim;</li>
- *
- *          <li>wildcard steps {@code /{}} match a single path step;</li>
- *
- *          <li>placeholder steps {@code /{<key>}} match a single path step, adding the matched {@code <key>}/{@code
- *          <step>} entry to request {@linkplain Request#parameters() parameters}; the matched {@code <step>} name is
- *          URL-decoded before use;</li>
- *
- *          <li>prefix steps {@code /*} match one or more trailing path steps.</li>
- *
- *          </ul>
- *
- *          <p>Registered path patterns are tested in order of definition.</p>
- *
- *     </dd>
- *
- *     <dt><strong>Method-Based Routing</strong></dt>
- *
- *     <dd>
- *
- *          <p>If the route index doesn't contain a matching handler, delegates request processing to a handler
- *          selected on the basis of the request HTTP {@linkplain Request#method() method}.</p>
- *
- *          <p>{@linkplain Request#OPTIONS OPTIONS} and {@linkplain Request#HEAD HEAD} methods are delegated to
- *          user-overridable default handlers.</p>
- *
- *     </dd>
- *
- * </dl>
+ * <p>If no matching path is found, {@linkplain Handler#handle(Request, Function) forwards} the request to the tail of
+ * the handling pipeline.</p>
  */
 public final class Router implements Handler {
 
@@ -105,7 +76,6 @@ public final class Router implements Handler {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private final Map<String, Handler> routes=new LinkedHashMap<>();
-    private final Map<String, Handler> methods=new LinkedHashMap<>();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,132 +127,6 @@ public final class Router implements Handler {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Configures the handler for the OPTIONS HTTP method.
-     *
-     * @param handler the handler to be delegated for OPTIONS HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router options(final Handler handler) {
-        return method(OPTIONS, handler);
-    }
-
-
-    /**
-     * Configures the handler for the HEAD HTTP method.
-     *
-     * @param handler the handler to be delegated for HEAD HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router head(final Handler handler) {
-        return method(HEAD, handler);
-    }
-
-    /**
-     * Configures the handler for the GET HTTP method.
-     *
-     * @param handler the handler to be delegated for GET HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router get(final Handler handler) {
-        return method(GET, handler);
-    }
-
-
-    /**
-     * Configures the handler for the POST HTTP method.
-     *
-     * @param handler the handler to be delegated for POST HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router post(final Handler handler) {
-        return method(POST, handler);
-    }
-
-    /**
-     * Configures the handler for the PUT HTTP method.
-     *
-     * @param handler the handler to be delegated for HTTP PUT method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router put(final Handler handler) {
-        return method(PUT, handler);
-    }
-
-    /**
-     * Configures the handler for the PATCH HTTP method.
-     *
-     * @param handler the handler to be delegated for PATCH HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router patch(final Handler handler) {
-        return method(PATCH, handler);
-    }
-
-    /**
-     * Configures the handler for the DELETE HTTP method.
-     *
-     * @param handler the handler to be delegated for DELETE HTTP method
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if {@code handler} is null
-     */
-    public Router delete(final Handler handler) {
-        return method(DELETE, handler);
-    }
-
-
-    /**
-     * Configures the handler for a HTTP method.
-     *
-     * @param method  the HTTP method whose handler is to be configured
-     * @param handler the handler to be delegated for {@code method}
-     *
-     * @return this dispatcher
-     *
-     * @throws NullPointerException if either {@code method} or {@code handler} is null
-     */
-    public Router method(final String method, final Handler handler) {
-
-        if ( method == null ) {
-            throw new NullPointerException("null method");
-        }
-
-        if ( handler == null ) {
-            throw new NullPointerException("null handler");
-        }
-
-        if ( method.equals(GET) ) {
-            methods.putIfAbsent(HEAD, this::head);
-        }
-
-        methods.put(method, handler);
-
-        return this;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
         if ( request == null ) {
@@ -296,10 +140,7 @@ public final class Router implements Handler {
                 .filter(Objects::nonNull)
                 .findFirst()
 
-                .orElseGet(() -> methods.isEmpty()
-                        ? forward.apply(request) // fall through
-                        : methods.getOrDefault(request.method(), this::options).handle(request, forward)
-                );
+                .orElseGet(() -> forward.apply(request)); // fall through
     }
 
 
@@ -354,24 +195,6 @@ public final class Router implements Handler {
                     .orElse(null);
 
         };
-    }
-
-
-    private Response head(final Request request, final Function<Request, Response> forward) {
-        return handle(request.method(GET), forward).map(response -> response
-                .header("Content-Length", "")
-                .output(target -> { })
-        );
-    }
-
-    private Response options(final Request request, final Function<Request, Response> forward) {
-        return request.reply().map(response -> response
-                .status(request.method().equals(OPTIONS) ? OK : MethodNotAllowed)
-                .headers("Allow", Stream.of(Set.of(OPTIONS), methods.keySet())
-                        .flatMap(Collection::stream)
-                        .collect(toList())
-                )
-        );
     }
 
 }

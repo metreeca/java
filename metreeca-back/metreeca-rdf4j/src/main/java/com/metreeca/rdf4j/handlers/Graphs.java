@@ -20,7 +20,7 @@ import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.codecs.Data;
-import com.metreeca.http.handlers.Router;
+import com.metreeca.http.handlers.Worker;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.model.*;
@@ -61,7 +61,7 @@ import static java.lang.String.format;
 public final class Graphs extends Endpoint<Graphs> {
 
     public Graphs() {
-        delegate(new Router()
+        delegate(new Worker()
                 .get(this::get)
                 .put(this::put)
                 .delete(this::delete)
