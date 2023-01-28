@@ -18,6 +18,7 @@ package com.metreeca.link;
 
 import com.metreeca.core.toolkits.*;
 
+import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.base.AbstractNamespace;
 import org.eclipse.rdf4j.model.base.AbstractValueFactory;
@@ -482,8 +483,14 @@ public final class Values {
 
     //// Formatters ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public static String format(final Iterable<Statement> statements) {
+        return statements == null ? null : Streams.stream(statements)
+                .map(Values::format)
+                .collect(joining("\n"));
+    }
+
     public static String format(final Statement statement) {
-        return statement == null ? null : String.format("%s %s %s",
+        return statement == null ? null : String.format("%s %s %s .",
                 format(statement.getSubject()), format(statement.getPredicate()), format(statement.getObject())
         );
     }
