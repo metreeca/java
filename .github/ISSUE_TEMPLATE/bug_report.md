@@ -38,8 +38,3 @@ assignees: ""
 **notes**
 
 *Would you share any observation or additional context about the bug?*
-
-
-**screenshots /recordings**
-
-*Are you able to document the issue with screenshot and/or recordings?*
