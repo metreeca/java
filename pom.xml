@@ -298,7 +298,7 @@
 			<dependency> <!-- https://search.maven.org/artifact/com.google.code.gson/gson -->
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
-				<version>2.9.0</version>
+				<version>2.10.1</version>
 			</dependency>
 
 			<dependency> <!-- https://search.maven.org/artifact/org.mnode.ical4j/ical4j -->
