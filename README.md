@@ -40,7 +40,7 @@ may be easily plugged as a specialized component into your framework of choice.
         <dependencies>
 
 			<dependency>
-				<groupId>${project.group}</groupId>
+				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-java</artifactId>
 				<version>0.0.0-SNAPSHOT</version>
 				<type>pom</type>

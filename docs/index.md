@@ -40,7 +40,7 @@ may be easily plugged as a specialized component into your framework of choice.
         <dependencies>
 
             <dependency>
-                <groupId>${project.group}</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>${project.artifactId}</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -105,9 +105,9 @@ Content-Length: 12
 Hello world!
 ```
 
-4. Delve into the the [docs](https://metreeca.github.io/base/) to learn how
-   to [publish](http://metreeca.github.io/base/tutorials/publishing-jsonld-apis)
-   and [consume](https://metreeca.github.io/base/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD
+4. Delve into the [docs](https://metreeca.github.io/java/) to learn how
+   to [publish](http://metreeca.github.io/java/tutorials/publishing-jsonld-apis)
+   and [consume](https://metreeca.github.io/java/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD
    APIs…
 
 # Support
