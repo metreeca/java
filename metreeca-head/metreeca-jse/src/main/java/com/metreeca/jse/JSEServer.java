@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,9 +152,13 @@ public final class JSEServer {
             throw new NullPointerException("null handler factory");
         }
 
+        // ;( create delegate before server to give it a chance of configuring a pristine service locator
+
+        final Handler delegate=requireNonNull(factory.apply(locator), "null delegate");
+
         locator.set(delegate(), () -> handler(
                 new Server(),
-                requireNonNull(factory.apply(locator), "null handler")
+                delegate
         ));
 
         return this;
