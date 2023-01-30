@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -250,7 +250,7 @@ public final class Publisher extends Delegator {
 
 
     /**
-     * Configures the fallback content.
+     * Configures the fallback content for {@linkplain Request#route()} requests.
      *
      * @param fallback the absolute path of the fallback content
      *
@@ -278,7 +278,7 @@ public final class Publisher extends Delegator {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Response assets(final Request request, final Function<Request, Response> forward) { // !!! handle HEAD
-        if ( assets != null && request.method().equals(GET) && request.asset() ) {
+        if ( assets != null && request.method().equals(GET) && (fallback == null || !request.route()) ) {
 
             return variants(request.path())
 
