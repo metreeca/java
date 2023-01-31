@@ -681,7 +681,7 @@
 
 						<dependencies>
 
-						<dependency>
+							<dependency>  <!-- !!! https://issues.sonatype.org/browse/NEXUS-26993 -->
 								<groupId>com.thoughtworks.xstream</groupId>
 								<artifactId>xstream</artifactId>
 								<version>1.4.15</version>
