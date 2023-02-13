@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.storage;
+import static com.metreeca.core.Locator.path;
 import static com.metreeca.core.services.Store.store;
 import static com.metreeca.core.services.Vault.vault;
 import static com.metreeca.http.Response.Forbidden;
@@ -150,7 +150,7 @@ public final class GCPServer {
 
         delegate.delegate(context -> factory.apply(context
 
-                .set(storage(), () -> Paths.get("/tmp"))
+                .set(path(), () -> Paths.get("/tmp"))
 
                 .set(vault(), production() ? GCPVault::new : vault())
                 .set(store(), production() ? GCPStore::new : store())

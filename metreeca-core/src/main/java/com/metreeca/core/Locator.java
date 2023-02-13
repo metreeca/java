@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,12 @@ import static java.lang.String.format;
 
 
     /**
-     * Retrieves the default storage factory.
+     * Retrieves the default base path factory.
      *
-     * @return the default storage factory, which returns the current working directory of the process in the host
-     * filesystem
+     * @return the default base path factory, which returns the path of the current working directory of the process in
+     * the host filesystem
      */
-    public static Supplier<Path> storage() {
+    public static Supplier<Path> path() {
         return () -> Paths.get("").toAbsolutePath();
     }
 
@@ -55,8 +55,8 @@ import static java.lang.String.format;
      *                thread-safe object
      * @param <T>     the type of the shared service created by {@code factory}
      *
-     * @return the shared service created by {@code factory} or by its plugin replacement if one was {@linkplain
-     * #set(Supplier, Supplier) specified}
+     * @return the shared service created by {@code factory} or by its plugin replacement if one was
+     * {@linkplain #set(Supplier, Supplier) specified}
      *
      * @throws IllegalArgumentException if {@code factory} is null
      * @throws IllegalStateException    if called outside an active locator or a circular service dependency is detected
@@ -79,13 +79,13 @@ import static java.lang.String.format;
      *                 is detected
      * @param <T>      the type of the shared service created by {@code factory} and {@code delegate}
      *
-     * @return the shared service created by {@code factory} or by its plugin replacement if one was {@linkplain
-     * #set(Supplier, Supplier) specified}
+     * @return the shared service created by {@code factory} or by its plugin replacement if one was
+     * {@linkplain #set(Supplier, Supplier) specified}
      *
      * @throws IllegalArgumentException if either {@code factory} or {@code delegate} is null
      * @throws IllegalStateException    if called outside an active locator
      */
-    public static <T> T service(final Supplier<T> factory, final Supplier<T> delegate) {
+    public static <T> T service(final Supplier<T> factory, final Supplier<? extends T> delegate) {
 
         if ( factory == null ) {
             throw new NullPointerException("null factory");
@@ -135,8 +135,8 @@ import static java.lang.String.format;
      *                thread-safe object
      * @param <T>     the type of the shared service created by {@code factory}
      *
-     * @return the shared service created by {@code factory} or by its plugin replacement if one was {@linkplain
-     * #set(Supplier, Supplier) specified}
+     * @return the shared service created by {@code factory} or by its plugin replacement if one was
+     * {@linkplain #set(Supplier, Supplier) specified}
      *
      * @throws IllegalArgumentException if {@code factory} is null
      * @throws IllegalStateException    if a circular service dependency is detected
@@ -161,8 +161,8 @@ import static java.lang.String.format;
      *                 is detected
      * @param <T>      the type of the shared service created by {@code factory} and {@code delegate}
      *
-     * @return the shared service created by {@code factory} or by its plugin replacement if one was {@linkplain
-     * #set(Supplier, Supplier) specified}
+     * @return the shared service created by {@code factory} or by its plugin replacement if one was
+     * {@linkplain #set(Supplier, Supplier) specified}
      *
      * @throws IllegalArgumentException if either {@code factory} or {@code delegate} is null
      */
@@ -296,8 +296,7 @@ import static java.lang.String.format;
      * Executes a set of tasks using shared services managed by this locator.
      *
      * <p>During task execution, shared service may be retrieved from this locator through the static {@linkplain
-     * #service(Supplier) service locator} method of the locator class. The locator used by the service locator
-     * method is
+     * #service(Supplier) service locator} method of the locator class. The locator used by the service locator method is
      * managed through a {@link ThreadLocal} variable, so it won't be available to methods executed on a different
      * thread.</p>
      *

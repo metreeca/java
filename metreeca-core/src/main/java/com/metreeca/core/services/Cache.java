@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.metreeca.core.Locator.path;
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.Locator.storage;
 import static com.metreeca.core.services.Logger.logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -75,16 +75,16 @@ import static java.time.Instant.now;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Storage blob cache.
-     *
-     * <p>Caches data blobs in the {@code cache} folder of the system file {@linkplain Locator#storage storage}.</p>
-     */
+	/**
+	 * Storage blob cache.
+	 *
+	 * <p>Caches data blobs in the {@code cache} folder of the system file {@linkplain Locator#path storage}.</p>
+	 */
 	public static final class FileCache implements Cache {
 
 		private Duration ttl=Duration.ZERO; // no expiry
 
-		private final Path path=service(storage()).resolve("cache");
+		private final Path path=service(path()).resolve("cache");
 		private final Logger logger=service(logger());
 
 

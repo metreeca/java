@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.nio.file.*;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.metreeca.core.Locator.path;
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.Locator.storage;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.*;
@@ -103,14 +103,14 @@ public interface Store {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Storage blob store.
-     *
-     * <p>Stores data blobs in the {@code store} folder of the system file {@linkplain Locator#storage storage}.</p>
-     */
-	public static class FileStore implements Store {
+	/**
+	 * File-based blob store.
+	 *
+	 * <p>Stores data blobs in the {@code store} folder under the {@linkplain Locator#path default base path}.</p>
+	 */
+	public static final class FileStore implements Store {
 
-		private final Path path=service(storage()).resolve("store");
+		private final Path path=service(path()).resolve("store");
 
 		@Override public boolean has(final String id) throws IOException {
 			return Files.exists(path.resolve(id));

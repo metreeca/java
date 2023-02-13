@@ -110,7 +110,7 @@ public abstract class JEEServer implements Filter {
 
             locator
 
-                    .set(Locator.storage(), () -> storage(context))
+                    .set(Locator.path(), () -> path(context))
                     .set(Loader.loader(), () -> loader(context))
 
                     .get(delegate()); // force handler loading during filter initialization
@@ -147,7 +147,7 @@ public abstract class JEEServer implements Filter {
     }
 
 
-    private Path storage(final ServletContext context) {
+    private Path path(final ServletContext context) {
         return ((File)context.getAttribute(ServletContext.TEMPDIR)).toPath();
     }
 
