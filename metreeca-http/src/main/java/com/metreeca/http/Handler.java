@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package com.metreeca.http;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -143,6 +143,63 @@ import static java.util.Arrays.asList;
 
         }
 
+    }
+
+
+    /**
+     * Creates a request body preprocessing handler.
+     *
+     * @param codec  the message codec used to handle the request body
+     * @param mapper the request body mapper
+     * @param <T>    the type of the structured payload managed by {@code codec}
+     *
+     * @return a handler replacing the original request body managed by {@code codec} with the value produced by mapping
+     * it with {@code mapper}
+     *
+     * @throws NullPointerException if either {@code codec} or {@code mapper} is null or {@code mapper} returns a null
+     *                              value
+     */
+    public static <T> Handler request(final Codec<T> codec, final UnaryOperator<T> mapper) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
+
+        return (request, forward) -> forward.apply(request.body(codec,
+                requireNonNull(mapper.apply(request.body(codec)), "null mapper return value ")
+        ));
+    }
+
+    /**
+     * Creates a response body postprocessing handler.
+     *
+     * @param codec  the message codec used to handle the response body
+     * @param mapper the response body mapper
+     * @param <T>    the type of the structured payload managed by {@code codec}
+     *
+     * @return a handler replacing the original response body managed by {@code codec} with the value produced by mapping
+     * it with {@code mapper}
+     *
+     * @throws NullPointerException if either {@code codec} or {@code mapper} is null or {@code mapper} returns a null
+     *                              value
+     */
+    public static <T> Handler response(final Codec<T> codec, final UnaryOperator<T> mapper) {
+
+        if ( codec == null ) {
+            throw new NullPointerException("null codec");
+        }
+
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
+
+        return (request, forward) -> forward.apply(request).map(response -> response.body(codec,
+                requireNonNull(mapper.apply(response.body(codec)), "null mapper return value ")
+        ));
     }
 
 
