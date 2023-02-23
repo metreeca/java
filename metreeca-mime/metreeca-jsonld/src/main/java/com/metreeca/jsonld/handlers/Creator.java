@@ -175,8 +175,7 @@ public final class Creator extends Operator {
             final IRI item=iri(request.item());
             final Shape shape=JSONLD.shape(request);
 
-            return engine.create(request.body(new JSONLD()),
-                            shape)
+            return engine.create(request.body(new JSONLD()), shape)
 
                     .map(Frame::focus)
 

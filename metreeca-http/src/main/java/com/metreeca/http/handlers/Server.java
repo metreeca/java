@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,11 @@ public final class Server extends Delegator {
 
                 logger.entry(warning, this, () -> format("%s %s > %d", method, item, e.getStatus()), e);
 
+                final String text=e.getMessage().trim();
+                final String mime=text.startsWith("{") ? "application/json" : "text/plain";
+
                 return e.getStatus() < 500
-                        ? request.reply(e.getStatus()).body(new Text(), e.getMessage())
+                        ? request.reply(e.getStatus()).header("Content-Type", mime).body(new Text(), text)
                         : request.reply(e.getStatus());
 
             } catch ( final RuntimeException e ) { // try to send a new response
