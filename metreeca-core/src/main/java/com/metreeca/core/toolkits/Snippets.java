@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,10 +60,10 @@ public final class Snippets {
         return list(text("("), list(snippets), text(")"));
     }
 
+
     @SafeVarargs public static Consumer<Appendable> line(final Consumer<Appendable>... snippets) {
         return list(text('\n'), list(snippets), text('\n'));
     }
-
 
     @SafeVarargs public static Consumer<Appendable> space(final Consumer<Appendable>... snippets) {
         return list(text('\f'), list(snippets), text('\f'));

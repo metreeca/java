@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,10 +109,6 @@ final class SnippetsTest {
 
         @Test void testInlineBraceBlocks() {
             assertThat(format("{ {\nx\n} }\ny")).isEqualTo("{ {\n    x\n} }\ny");
-        }
-
-        @Test void test() {
-            System.out.println(code(text("\rwhere {\f{\rselect {\f@\f} limit }\f}")));
         }
 
     }
