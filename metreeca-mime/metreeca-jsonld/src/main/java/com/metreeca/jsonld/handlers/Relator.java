@@ -111,7 +111,7 @@ public final class Relator extends Operator {
                         keeper(Relate, Digest),
                         keeper(Relate, Detail)
                 ),
-                wrapper(),
+                processor(),
                 relate()
         ));
     }

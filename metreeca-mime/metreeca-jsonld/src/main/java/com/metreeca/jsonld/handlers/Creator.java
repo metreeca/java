@@ -98,7 +98,7 @@ public final class Creator extends Operator {
     public Creator() {
         delegate(handler(
                 keeper(Create, Detail),
-                wrapper(),
+                processor(),
                 rewrite(),
                 create()
         ));

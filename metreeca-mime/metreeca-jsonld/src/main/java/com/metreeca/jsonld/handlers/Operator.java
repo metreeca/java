@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import static com.metreeca.link.shapes.Guard.*;
  */
 public abstract class Operator extends Delegator {
 
-    private Handler wrapper=(request, forward) -> forward.apply(request);
+    private Handler processor=(request, forward) -> forward.apply(request);
 
 
     /**
@@ -94,30 +94,30 @@ public abstract class Operator extends Delegator {
 
 
     /**
-     * Retrieves the custom wrapper handler.
+     * Retrieves the custom handler.
      *
-     * @return the wrapper handler used to customize requests and responses
+     * @return the handler used to customize requests and responses
      */
-    protected Handler wrapper() {
-        return (request, forward) -> wrapper.handle(request, forward);
+    protected Handler processor() {
+        return (request, forward) -> processor.handle(request, forward);
     }
 
     /**
-     * Configures the custom wrapper handler.
+     * Configures the custom processor handler.
      *
-     * @param wrapper the wrapper handler used to customize requests and responses
+     * @param handler the handler used to customize requests and responses
      *
      * @return this operator
      *
-     * @throws NullPointerException if {@code wrappers} is null or contains null elements
+     * @throws NullPointerException if {@code handler} is null
      */
-    public Operator wrapper(final Handler wrapper) {
+    public Operator processor(final Handler handler) {
 
-        if ( wrapper == null ) {
+        if ( handler == null ) {
             throw new NullPointerException("null wrappers");
         }
 
-        this.wrapper=wrapper;
+        this.processor=handler;
 
         return this;
     }

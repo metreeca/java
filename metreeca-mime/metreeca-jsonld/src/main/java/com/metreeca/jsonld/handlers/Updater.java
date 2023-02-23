@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public final class Updater extends Operator {
 	public Updater() {
 		delegate(handler(
 				keeper(Update, Detail),
-				wrapper(),
+				processor(),
 				update()
 		));
 	}
