@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,10 @@ public final class GraphEngine implements Engine {
 				.filter(current -> !current.isEmpty())
 
 				.map(current -> {
+
+					// ;( remove also server-managed properties…
+
+					connection.remove((Resource)frame.focus(), null, null);
 
 					connection.remove(statements(current));
 					connection.add(statements(frame));

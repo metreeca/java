@@ -27,6 +27,7 @@ import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
+import static com.metreeca.jsonld.codecs.JSONLD.shape;
 import static com.metreeca.jsonld.services.Engine.engine;
 import static com.metreeca.link.shapes.Guard.Detail;
 import static com.metreeca.link.shapes.Guard.Update;
@@ -92,9 +93,7 @@ public final class Updater extends Operator {
 	private Handler update() {
         return (request, next) -> {
 
-	        final Shape shape=JSONLD.shape(request);
-
-	        return engine.update(request.body(new JSONLD()), shape)
+	        return engine.update(request.body(new JSONLD()), shape(request))
 
 			        .map(iri -> request.reply(NoContent))
 
