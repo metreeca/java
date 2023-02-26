@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2022 Metreeca srl
+ * Copyright © 2013-2023 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public final class Guard extends Shape {
 	/*
 	 * Marks shapes as server-defined read-only.
 	 */
-	public static Shape server(final Shape... shapes) { return task(Relate, Delete).then(shapes); }
+	public static Shape server(final Shape... shapes) { return task(Relate, Update, Delete).then(shapes); }
 
 	/*
 	 * Marks shapes as client-defined write-once.
@@ -86,7 +86,7 @@ public final class Guard extends Shape {
 	/*
 	 * Marks shapes as hidden server-stored.
 	 */
-	public static Shape hidden(final Shape... shapes) { return task().then(shapes); }
+	public static Shape hidden(final Shape... shapes) { return task(Delete).then(shapes); }
 
 
 	public static Shape digest(final Shape... shapes) { return view(Digest).then(shapes); }

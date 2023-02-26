@@ -80,7 +80,7 @@ public final class GraphEngine implements Engine {
 
 				.map(current -> {
 
-					// ;( remove also server-managed properties…
+					// ;( remove also direct server-managed properties…
 
 					connection.remove((Resource)frame.focus(), null, null);
 
@@ -101,6 +101,11 @@ public final class GraphEngine implements Engine {
 				.filter(current -> !current.isEmpty())
 
 				.map(current -> {
+
+					// ;( remove everything…
+
+					connection.remove((Resource)frame.focus(), null, null);
+					connection.remove(null, null, frame.focus());
 
 					connection.remove(statements(current));
 
