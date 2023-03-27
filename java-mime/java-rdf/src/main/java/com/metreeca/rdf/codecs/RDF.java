@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import static com.metreeca.core.toolkits.Resources.resource;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
-import static com.metreeca.link.Values.iri;
+import static com.metreeca.rdf.Values.iri;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;

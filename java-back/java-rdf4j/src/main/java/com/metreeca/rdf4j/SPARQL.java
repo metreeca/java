@@ -17,7 +17,7 @@
 package com.metreeca.rdf4j;
 
 import com.metreeca.core.toolkits.Snippets;
-import com.metreeca.link.Values;
+import com.metreeca.rdf.Values;
 
 import org.eclipse.rdf4j.model.*;
 
@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 
 import static com.metreeca.core.toolkits.Snippets.*;
 import static com.metreeca.core.toolkits.Strings.quote;
-import static com.metreeca.link.Values.format;
-import static com.metreeca.link.Values.traverse;
+import static com.metreeca.rdf.Values.format;
+import static com.metreeca.rdf.Values.traverse;
 
 import static java.util.Arrays.stream;
 

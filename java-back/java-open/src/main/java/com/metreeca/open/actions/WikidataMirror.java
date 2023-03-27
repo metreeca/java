@@ -20,7 +20,7 @@ import com.metreeca.core.Xtream;
 import com.metreeca.core.actions.Fill;
 import com.metreeca.core.services.Logger;
 import com.metreeca.core.toolkits.Strings;
-import com.metreeca.link.Values;
+import com.metreeca.rdf.Values;
 import com.metreeca.rdf4j.actions.*;
 import com.metreeca.rdf4j.services.Graph;
 
@@ -38,9 +38,9 @@ import static com.metreeca.core.Locator.service;
 import static com.metreeca.core.services.Logger.logger;
 import static com.metreeca.core.services.Logger.time;
 import static com.metreeca.core.toolkits.Lambdas.task;
-import static com.metreeca.link.Values.*;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;
+import static com.metreeca.rdf.Values.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
 
 import static org.eclipse.rdf4j.common.iteration.Iterations.stream;

@@ -16,13 +16,13 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.link.Frame;
+import com.metreeca.rdf.Frame;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Values.iri;
+import static com.metreeca.rdf.Frame.frame;
+import static com.metreeca.rdf.Values.iri;
 
 
 /**
@@ -33,14 +33,14 @@ import static com.metreeca.link.Values.iri;
  */
 public final class Lookup implements Function<String, Frame> {
 
-	@Override public Frame apply(final String iri) {
-		return Optional.of(iri)
+    @Override public Frame apply(final String iri) {
+        return Optional.of(iri)
 
-				.map(new Retrieve())
+                .map(new Retrieve())
 
-				.map(model -> frame(iri(iri), model))
+                .map(model -> frame(iri(iri), model))
 
-				.orElseGet(() -> frame(iri(iri)));
-	}
+                .orElseGet(() -> frame(iri(iri)));
+    }
 
 }

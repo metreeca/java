@@ -73,7 +73,6 @@
 
 		<module>java-core</module>
 		<module>java-http</module>
-		<module>java-link</module>
 
 		<module>java-mime</module>
 		<module>java-head</module>
@@ -152,20 +151,6 @@
 			</dependency>
 
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>java-link</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>java-link</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-
 			<!-- Data Connectors -->
 
 			<dependency>
@@ -207,6 +192,13 @@
 				<groupId>com.metreeca</groupId>
 				<artifactId>java-rdf</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>java-rdf</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
 			</dependency>
 
 
@@ -541,7 +533,6 @@
 
 								<link>https://javadoc.io/doc/com.metreeca/java-core/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/java-http/latest/</link>
-								<!-- !!! <link>https://javadoc.io/doc/com.metreeca/java-link/latest/</link>-->
 
 								<link>https://javadoc.io/doc/com.metreeca/java-json/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/java-jsonld/latest/</link>

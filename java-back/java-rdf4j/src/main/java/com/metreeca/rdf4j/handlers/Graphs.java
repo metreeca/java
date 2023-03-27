@@ -40,8 +40,8 @@ import java.util.function.Function;
 import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.Values.statement;
+import static com.metreeca.rdf.Values.iri;
+import static com.metreeca.rdf.Values.statement;
 import static com.metreeca.rdf.codecs.RDF.service;
 
 import static java.lang.String.format;

@@ -31,7 +31,7 @@ import java.util.function.Function;
 import javax.json.*;
 
 import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Values.iri;
+import static com.metreeca.rdf.Values.iri;
 
 
 /**

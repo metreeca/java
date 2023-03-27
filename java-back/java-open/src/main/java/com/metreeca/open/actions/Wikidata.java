@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import javax.json.*;
 
 import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Values.iri;
+import static com.metreeca.rdf.Values.iri;
 
 import static java.lang.Double.parseDouble;
 import static java.util.Arrays.asList;

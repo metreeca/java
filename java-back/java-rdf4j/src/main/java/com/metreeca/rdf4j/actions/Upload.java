@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.core.services.Logger.logger;
 import static com.metreeca.core.services.Logger.time;
-import static com.metreeca.link.Values.lang;
+import static com.metreeca.rdf.Values.lang;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;

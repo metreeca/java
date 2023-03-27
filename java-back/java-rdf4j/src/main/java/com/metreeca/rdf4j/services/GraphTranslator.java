@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.services.Translator.translator;
-import static com.metreeca.link.Values.*;
+import static com.metreeca.rdf.Values.*;
 
 import static java.util.stream.Collectors.toList;
 

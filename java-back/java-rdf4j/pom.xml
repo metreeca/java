@@ -34,13 +34,6 @@
 
 	<dependencies>
 
-		<dependency> <!-- !!! remove -->
-			<groupId>com.metreeca</groupId>
-            <artifactId>java-link</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
@@ -69,25 +62,32 @@
             <artifactId>java-http</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
-        </dependency>
+		</dependency>
 
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>java-json</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>java-json</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>java-rdf</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 
 
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>java-json</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>java-json</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.eclipse.rdf4j</groupId>
-            <artifactId>rdf4j-repository-sail</artifactId>
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-repository-sail</artifactId>
 			<scope>test</scope>
 		</dependency>
 

@@ -20,7 +20,7 @@ import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.json.JSONAssert;
 import com.metreeca.json.codecs.JSON;
-import com.metreeca.link.Values;
+import com.metreeca.rdf.Values;
 
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -31,8 +31,7 @@ import java.util.function.Consumer;
 import javax.json.JsonValue;
 
 import static com.metreeca.http.ResponseAssert.assertThat;
-import static com.metreeca.link.ModelAssert.assertThat;
-import static com.metreeca.link.Values.statement;
+import static com.metreeca.rdf.Values.statement;
 import static com.metreeca.rdf4j.services.GraphTest.exec;
 import static com.metreeca.rdf4j.services.GraphTest.model;
 
