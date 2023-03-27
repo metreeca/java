@@ -1,4 +1,4 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-java.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-java/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/java-java.svg)](https://search.maven.org/artifact/com.metreeca/java-java/)
 
 # Metreeca/Java
 
@@ -21,13 +21,13 @@ may be easily plugged as a specialized component into your framework of choice.
 
 |    area | javadocs                                                     | description                             |
 | ------: | :----------------------------------------------------------- | :-------------------------------------- |
-|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/metreeca-link) | shape-based JSON modelling framework    |
-|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/metreeca-rest) | model-driven REST publishing framework  |
-|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/metreeca-xml) | XML/HTML codecs and utilities           |
-|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/metreeca-rdf) | RDF codecs and utilities                |
-|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/metreeca-jse) | Java SE HTTP server connector          |
-|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/metreeca-jee) | Servlet 3.1 containers connector        |
-| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j) | RDF4J-based SPARQL repository connector |
+|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/java-link) | shape-based JSON modelling framework    |
+|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/java-rest) | model-driven REST publishing framework  |
+|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/java-xml) | XML/HTML codecs and utilities           |
+|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/java-rdf) | RDF codecs and utilities                |
+|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/java-jse) | Java SE HTTP server connector          |
+|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/java-jee) | Servlet 3.1 containers connector        |
+| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/java-rdf4j) | RDF4J-based SPARQL repository connector |
 
 # Getting Started
 
@@ -41,7 +41,7 @@ may be easily plugged as a specialized component into your framework of choice.
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-java</artifactId>
+				<artifactId>java/artifactId>
 				<version>0.0.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -54,12 +54,12 @@ may be easily plugged as a specialized component into your framework of choice.
 
         <dependency> <!-- server connector -->
             <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-jse</artifactId>
+            <artifactId>java-jse</artifactId>
         </dependency>
 
         <dependency> <!-- storage connector -->
             <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-rdf4j</artifactId>
+            <artifactId>java-rdf4j</artifactId>
         </dependency>
 
     </dependencies>

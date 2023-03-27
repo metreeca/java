@@ -54,7 +54,7 @@ To get started, set up a Maven Java 1.8 project, importing the BOM module for Me
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-java</artifactId>
+				<artifactId>java/artifactId>
 				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -84,12 +84,12 @@ Add the following dependencies to your Maven project:
 
 	<dependency>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-jse</artifactId>
+		<artifactId>java-jse</artifactId>
 	</dependency>
 
 	<dependency>
 		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-rdf4j</artifactId>
+		<artifactId>java-rdf4j</artifactId>
 	</dependency>
 
 	<dependency>
@@ -148,12 +148,12 @@ Add the following definitions and dependencies to your Maven project:
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-jee</artifactId>
+			<artifactId>java-jee</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-rdf4j</artifactId>
+			<artifactId>java-rdf4j</artifactId>
 		</dependency>
 
 		<dependency>
@@ -221,11 +221,11 @@ Compile and deploy the web app to your favorite servlet container.
 ## Test Connection
 
 Both stubs configure the application to handle any resource using a
-barebone [handler](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Handler.html) always
-replying to incoming [requests](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html)
-with a [response](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Response.html) including
+barebone [handler](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Handler.html) always
+replying to incoming [requests](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Request.html)
+with a [response](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Response.html) including
 a `200` HTTP status code. The
-standard [Server](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/wrappers/Server.html)
+standard [Server](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/wrappers/Server.html)
 wrapper provides default pre/postprocessing services and shared error handling.
 
 The server should now be up and running and you can try your first request:
@@ -241,7 +241,7 @@ as well.
 
 ## Sample Data
 
-The [locator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/http/Locator.html) argument handled
+The [locator](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/http/Locator.html) argument handled
 to the app loader lambda manages the shared system-provided services and can be used to customize them and to run app
 initialization tasks. Copy [`toys.ttl`](toys/toys.ttl)
 to the `src/main/resources/` folder, extend the stub as follows and relaunch the application:
@@ -300,10 +300,10 @@ public final class Server {
 ```
 
 Here we are customizing the shared
-system-wide [graph](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html)
+system-wide [graph](https://javadoc.io/doc/com.metreeca/java-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html)
 database as an ephemeral memory-based RDF4J store, initializing it on demand with the BIRT dataset.
 
-The static [Locator.service()](https://javadoc.io/static/com.metreeca/metreeca-rest/1.0.1/com/metreeca/http/Locator.
+The static [Locator.service()](https://javadoc.io/static/com.metreeca/java-rest/1.0.1/com/metreeca/http/Locator.
 html#service(java.util.function.Supplier))
 locator method provides access to shared services.
 
@@ -469,7 +469,7 @@ public final class Server {
 }
 ```
 
-[Wrappers](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html) inspect and possibly
+[Wrappers](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Wrapper.html) inspect and possibly
 alter incoming requests and outgoing responses before they are forwarded to wrapped handlers and returned to wrapping
 containers.
 
@@ -501,10 +501,10 @@ Content-Type: text/turtle;charset=UTF-8
 
 ## Request Routing
 
-[Routers](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/handlers/Router.html) dispatch
+[Routers](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/handlers/Router.html) dispatch
 requests on the basis of
-the [request path](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#path()) and
-the [request method](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html##method()),
+the [request path](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Request.html#path()) and
+the [request method](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Request.html##method()),
 ignoring leading path segments possibly already matched by wrapping routers.
 
 Requests are forwarded to a registered handler if their path is matched by an associated pattern defined by a sequence of
@@ -515,7 +515,7 @@ steps according to the following rules:
 | `/`          | `/`                  | empty / matches only the empty step                          |
 | `/<step>`    | `/<step>`            | literal / matches step verbatim                              |
 | `/{}`        | `/<step>`            | wildcard / matches a single step                             |
-| `/{<key>}`   | `/<step>`            | placeholder / match a single path step, adding the matched `<key>`/`<step>` entry to request [parameters](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#parameters()); the matched `<step>` name is URL-decoded before use |
+| `/{<key>}`   | `/<step>`            | placeholder / match a single path step, adding the matched `<key>`/`<step>` entry to request [parameters](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Request.html#parameters()); the matched `<step>` name is URL-decoded before use |
 | `/*`         | `/<step>[/<step>/…]` | prefix / matches one or more trailing steps                  |
 
 Registered path patterns are tested in order of definition.
@@ -628,7 +628,7 @@ public final class Products extends Delegator {
 }
 ```
 
-The [Delegator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/handlers/Delegator.html)
+The [Delegator](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/handlers/Delegator.html)
 abstract handler provides a convenient way of packaging complex handlers assembled as a combination of other handlers and
 wrappers.
 
@@ -640,14 +640,14 @@ and idiomatic [compacted/framed](../references/jsonld -format) JSON-LD payloads,
 the [REST APIs interaction tutorial](consuming-jsonld-apis.md).
 
 Actors provide default shape-driven implementations for CRUD actions on resources and containers identified by the
-request [focus item](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Request.html#item()).
+request [focus item](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Request.html#item()).
 
 | actor                                                        | action                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Relator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended container [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
-| [Creator](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
-| [Updater](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
-| [Deleter](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/operators/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |
+| [Relator](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/operators/Relator.html) | resource retrieval / retrieves the detailed RDF description of the target resource; supports extended container [faceted search](consuming-jsonld-apis.md#faceted-search), sorting and pagination |
+| [Creator](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/operators/Creator.html) | container resource creation / uploads the detailed RDF description of a new resource to be inserted into the target container |
+| [Updater](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/operators/Updater.html) | resource updating / updates the detailed RDF description of the target resource |
+| [Deleter](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/operators/Deleter.html) | resource deletion / deletes the detailed RDF description of the target resource |
 
 ```java
 import com.metreeca.jse.JSEServer;
@@ -697,7 +697,7 @@ public final class Server {
 Actors delegate transaction management, data validation and trimming and CRUD operations to a customizable engine.
 
 CRUD perations are performed on the graph neighbourhood of the target target item(s)  matched by
-the  [shape](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/Shape.html)
+the  [shape](https://javadoc.io/doc/com.metreeca/java-link/latest/com/metreeca/json/Shape.html)
 model associated to the request, after redaction according to the request user roles and to actor-specific task, area and
 mode parameters.
 
@@ -748,7 +748,7 @@ public final class Products extends Delegator {
 }
 ```
 
-The [Driver](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/wrappers/Driver.html) wrapper
+The [Driver](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/wrappers/Driver.html) wrapper
 associated a linked data model to incoming requests, driving the operations of nested actors and other model-aware
 handlers.
 
@@ -1278,21 +1278,21 @@ The *ProductsCreate.ql* SPARQL Update postprocessing script updates server-manag
 properties after a new product is added to the catalog.
 
 SPARQL Update postprocessing scripts are executed after the state-mutating HTTP request is successfully completed, with
-some [pre-defined bindings](https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html#configure(M,O,java.util.function.BiConsumer...))
+some [pre-defined bindings](https://javadoc.io/doc/com.metreeca/java-rdf4j/latest/com/metreeca/rdf4j/services/Graph.html#configure(M,O,java.util.function.BiConsumer...))
 like the `$this` variable holding the IRI of the targe resource either as derived from the HTTP request or as defined by
 the `Location` HTTP header after a POST request.
 
 Request and response RDF payloads may also
-be [pre](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html#preprocessor(java.util.function.Function))
-and [post](https://javadoc.io/doc/com.metreeca/metreeca-rest/latest/com/metreeca/rest/Wrapper.html#postprocessor(java.util.function.Function))
+be [pre](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Wrapper.html#preprocessor(java.util.function.Function))
+and [post](https://javadoc.io/doc/com.metreeca/java-rest/latest/com/metreeca/rest/Wrapper.html#postprocessor(java.util.function.Function))
 using custom filtering functions.
 
 # Localization
 
 Multi-lingual content retrieval is fully supported,
 with [compact rendering](https://www.w3.org/TR/json-ld11/#language-indexing) for shapes including
-either [`localized()`](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/shapes/Localized.html)
-or  [`lang()`](https://javadoc.io/doc/com.metreeca/metreeca-link/latest/com/metreeca/json/shapes/Lang.html) constraints.
+either [`localized()`](https://javadoc.io/doc/com.metreeca/java-link/latest/com/metreeca/json/shapes/Localized.html)
+or  [`lang()`](https://javadoc.io/doc/com.metreeca/java-link/latest/com/metreeca/json/shapes/Lang.html) constraints.
 
 Retrieved localizations may be limited to a predefined set of language tags using a `convey` language constraint, like
 for instance:

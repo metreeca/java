@@ -1,0 +1,184 @@
+/*
+ * Copyright © 2013-2023 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.metreeca.link;
+
+import com.metreeca.core.toolkits.Strings;
+import com.metreeca.link.queries.*;
+
+import org.eclipse.rdf4j.model.IRI;
+
+import java.util.*;
+import java.util.function.Function;
+
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
+
+
+/**
+ * Shape-driven linked data query.
+ */
+public abstract class Query {
+
+    private final Shape shape;
+
+    private final List<IRI> path;
+    private final List<Order> orders;
+
+    private final int offset;
+    private final int limit;
+
+
+    protected Query(final Shape shape,
+            final List<IRI> path, final List<Order> orders,
+            final int offset, final int limit
+    ) {
+
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
+
+        if ( path == null || path.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null path or path IRI");
+        }
+
+        if ( orders == null ) {
+            throw new NullPointerException("null orders");
+        }
+
+        if ( offset < 0 ) {
+            throw new IllegalArgumentException("illegal offset <"+offset+">");
+        }
+
+        if ( limit < 0 ) {
+            throw new IllegalArgumentException("illegal limit <"+limit+">");
+        }
+
+        this.shape=shape;
+
+        this.path=new ArrayList<>(path);
+        this.orders=new ArrayList<>(orders);
+
+        this.offset=offset;
+        this.limit=limit;
+    }
+
+
+    public Shape shape() {
+        return shape;
+    }
+
+
+    public List<IRI> path() {
+        return unmodifiableList(path);
+    }
+
+    public List<Order> orders() {
+        return unmodifiableList(orders);
+    }
+
+
+    public int offset() {
+        return offset;
+    }
+
+    public int limit() {
+        return limit;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public abstract <V> V map(final Probe<V> probe);
+
+    public final <V> V map(final Function<Query, V> mapper) {
+
+        if ( mapper == null ) {
+            throw new NullPointerException("null mapper");
+        }
+
+        return mapper.apply(this);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public boolean equals(final Object object) {
+        return this == object || getClass().equals(object.getClass())
+                && shape.equals(((Query)object).shape)
+                && path.equals(((Query)object).path)
+                && orders.equals(((Query)object).orders)
+                && offset == ((Query)object).offset
+                && limit == ((Query)object).limit;
+    }
+
+    @Override public int hashCode() {
+        return shape.hashCode()
+                ^path.hashCode()
+                ^orders.hashCode()
+                ^Integer.hashCode(offset)
+                ^Integer.hashCode(limit);
+    }
+
+    @Override public String toString() {
+        return format(
+                "%s {\n\tshape: %s\n\tpath: %s\n\torder: %s\n\toffset: %d\n\tlimit: %d\n}",
+                getClass().getSimpleName().toLowerCase(Locale.ROOT),
+                Strings.indent(shape.toString()),
+                path, orders, offset, limit
+        );
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Query probe.
+     *
+     * <p>Generates a result by probing queries.</p>
+     *
+     * @param <V> the type of the generated result value
+     */
+    public abstract static class Probe<V> implements Function<Query, V> {
+
+        @Override public final V apply(final Query query) {
+            return query == null ? null : query.map(this);
+        }
+
+
+        //// Queries ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public V probe(final Items items) { return probe((Query)items); }
+
+        public V probe(final Terms terms) { return probe((Query)terms); }
+
+        public V probe(final Stats stats) { return probe((Query)stats); }
+
+
+        //// Fallback //////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * Probes a generic query.
+         *
+         * @param query the generic query to be probed
+         *
+         * @return the result generated by probing {@code query}; by default {@code null}
+         */
+        public V probe(final Query query) { return null; }
+
+    }
+
+}

@@ -22,7 +22,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.metreeca</groupId>
-	<artifactId>metreeca-java</artifactId>
+	<artifactId>java</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 
@@ -71,13 +71,13 @@
 
 	<modules>
 
-		<module>metreeca-core</module>
-		<module>metreeca-http</module>
-		<module>metreeca-link</module>
+		<module>java-core</module>
+		<module>java-http</module>
+		<module>java-link</module>
 
-		<module>metreeca-mime</module>
-		<module>metreeca-head</module>
-		<module>metreeca-back</module>
+		<module>java-mime</module>
+		<module>java-head</module>
+		<module>java-back</module>
 
 	</modules>
 
@@ -126,27 +126,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-core</artifactId>
+				<artifactId>java-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-core</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-http</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-http</artifactId>
+				<artifactId>java-core</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -154,13 +140,27 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-link</artifactId>
+				<artifactId>java-http</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-link</artifactId>
+				<artifactId>java-http</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>java-link</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>java-link</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -170,55 +170,55 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-json</artifactId>
+				<artifactId>java-json</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-json</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jsonld</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jsonld</artifactId>
+				<artifactId>java-json</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
-
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-xml</artifactId>
+				<artifactId>java-jsonld</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf</artifactId>
+				<artifactId>java-jsonld</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>java-xml</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-csv</artifactId>
+				<artifactId>java-rdf</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>java-csv</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-ical</artifactId>
+				<artifactId>java-ical</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -227,13 +227,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jee</artifactId>
+				<artifactId>java-jee</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-jse</artifactId>
+				<artifactId>java-jse</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -242,19 +242,19 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-open</artifactId>
+				<artifactId>java-open</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf4j</artifactId>
+				<artifactId>java-rdf4j</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-gcp</artifactId>
+				<artifactId>java-gcp</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -335,6 +335,8 @@
 	</repositories>
 
 	<build>
+
+		<finalName>metreeca-${project.artifactId}-${project.version}</finalName>
 
 		<resources>
 			<resource>
@@ -514,11 +516,7 @@
 
 						<configuration>
 
-							<!-- !!! remove after metreeca-root is upgraded -->
-
 							<quiet>true</quiet>
-
-							<!-- !!! remove after metreeca-root is upgraded -->
 
 							<tags>
 								<tag>
@@ -541,24 +539,21 @@
 							<links>
 
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-core/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-http/latest/</link>
-								<!-- !!! <link>https://javadoc.io/doc/com.metreeca/metreeca-link/latest/</link>-->
+								<link>https://javadoc.io/doc/com.metreeca/java-core/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-http/latest/</link>
+								<!-- !!! <link>https://javadoc.io/doc/com.metreeca/java-link/latest/</link>-->
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-jsonld/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-xml/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-json/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-jsonld/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-rdf/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-xml/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-jse/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-jee/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-jse/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-jee/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j-jsonld/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
-
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp-rdf4j/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-rdf4j/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-open/latest/</link>
+								<link>https://javadoc.io/doc/com.metreeca/java-gcp/latest/</link>
 
 								<link>https://rdf4j.org/javadoc/latest/</link>
 

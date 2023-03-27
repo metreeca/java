@@ -3,7 +3,7 @@
 /.idea/
 /.vscode/
 
-/metreeca-java.*
+/java.*
 
 target/
 pom-flattened.xml
