@@ -55,7 +55,7 @@
 
 	<properties>
 
-		<revision>0.0-SNAPSHOT</revision>
+		<revision>3.0-SNAPSHOT</revision>
 		<timestamp>${maven.build.timestamp}</timestamp>
 
 		<maven.version>3.6</maven.version>
