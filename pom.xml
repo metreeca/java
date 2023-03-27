@@ -74,7 +74,6 @@
 		<module>metreeca-core</module>
 		<module>metreeca-http</module>
 		<module>metreeca-link</module>
-		<module>metreeca-text</module>
 
 		<module>metreeca-mime</module>
 		<module>metreeca-head</module>
@@ -167,22 +166,7 @@
 			</dependency>
 
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-text</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-text</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-
 			<!-- Data Connectors -->
-
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
@@ -270,12 +254,6 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-rdf4j-text</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-rdf4j-jsonld</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -295,6 +273,14 @@
 
 			<!-- Exported dependencies -->
 
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>bean</artifactId>
+				<version>0.1-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<dependency> <!-- https://search.maven.org/artifact/com.google.code.gson/gson -->
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
@@ -307,46 +293,12 @@
 				<version>3.2.2</version>
 			</dependency>
 
-			<dependency> <!-- https://search.maven.org/artifact/org.eclipse.rdf4j/rdf4j-bom -->
-				<groupId>org.eclipse.rdf4j</groupId>
-				<artifactId>rdf4j-bom</artifactId>
-				<version>4.2.2</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<dependency> <!-- https://search.maven.org/artifact/com.google.cloud/libraries-bom -->
 				<groupId>com.google.cloud</groupId>
 				<artifactId>libraries-bom</artifactId>
 				<version>24.3.0</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-
-			<dependency> <!-- https://search.maven.org/artifact/org.slf4j/slf4j-parent -->
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-parent</artifactId>
-				<version>2.0.6</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-
-			<!-- Test Harness -->
-
-			<dependency>  <!-- https://search.maven.org/artifact/org.junit/junit-bom -->
-				<groupId>org.junit</groupId>
-				<artifactId>junit-bom</artifactId>
-				<version>5.9.2</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency> <!-- https://search.maven.org/artifact/org.assertj/assertj-core -->
-				<groupId>org.assertj</groupId>
-				<artifactId>assertj-core</artifactId>
-				<version>3.24.2</version>
-				<scope>test</scope>
 			</dependency>
 
 		</dependencies>
@@ -373,6 +325,32 @@
 		</dependency>
 
 	</dependencies>
+
+	<repositories>
+
+		<repository>
+
+			<id>central-releases</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+
+		</repository>
+
+		<repository>
+
+			<id>central-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+
+		</repository>
+
+	</repositories>
 
 	<build>
 
@@ -584,7 +562,6 @@
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-core/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-http/latest/</link>
 								<!-- !!! <link>https://javadoc.io/doc/com.metreeca/metreeca-link/latest/</link>-->
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-text/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-json/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-jsonld/latest/</link>
@@ -596,7 +573,6 @@
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j-jsonld/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/metreeca-rdf4j-text/latest/</link>
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-open/latest/</link>
 
 								<link>https://javadoc.io/doc/com.metreeca/metreeca-gcp/latest/</link>

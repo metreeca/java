@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Copyright © 2013-2022 Metreeca srl
+  Copyright © 2013-2023 Metreeca srl
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -42,11 +42,6 @@
         <dependency>
             <groupId>com.metreeca</groupId>
             <artifactId>metreeca-rdf4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.metreeca</groupId>
-            <artifactId>metreeca-rdf4j-text</artifactId>
         </dependency>
 
 		<dependency>
