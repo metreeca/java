@@ -16,22 +16,21 @@
 
 package com.metreeca.jsonld.handlers;
 
+import com.metreeca.bean.*;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.JSONLD;
-import com.metreeca.jsonld.services.Engine;
-import com.metreeca.link.Frame;
-import com.metreeca.link.Shape;
-import com.metreeca.link.shapes.Guard;
+import com.metreeca.jsonld.codecs.Bean;
 
+import java.util.Optional;
+import java.util.function.Function;
+
+import static com.metreeca.bean.Frame.frame;
+import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Response.NoContent;
-import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.jsonld.codecs.JSONLD.shape;
-import static com.metreeca.jsonld.services.Engine.engine;
-import static com.metreeca.link.shapes.Guard.Detail;
-import static com.metreeca.link.shapes.Guard.Update;
+import static com.metreeca.http.Response.*;
+import static com.metreeca.jsonld.codecs.Bean.engine;
 
+import static java.lang.String.format;
+import static java.util.function.Predicate.not;
 
 /**
  * Model-driven resource updater.
@@ -41,18 +40,12 @@ import static com.metreeca.link.shapes.Guard.Update;
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
- * user {@linkplain Request#roles() roles};</li>
- *
- * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
- * the request shape enabled by the {@linkplain Guard#Update} task and the {@linkplain Guard#Detail} view.</li>
- *
- * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid
+ * <li>validates the {@link Bean JSON-LD} request body against its expected shape; malformed or invalid
  * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
  * status code;</li>
  *
  * <li>updates the existing description of the resource matching the redacted request shape with the assistance of the
- * shared linked data {@linkplain Engine#update(Frame, Shape) engine}.</li>
+ * shared linked data {@linkplain Engine#update(Object) engine}.</li>
  *
  * </ul>
  *
@@ -73,33 +66,60 @@ import static com.metreeca.link.shapes.Guard.Update;
  *
  * </ul>
  */
-public final class Updater extends Operator {
+public class Updater implements Handler {
 
-	private final Engine engine=service(engine());
+    private final Class<?> type;
 
-
-	/**
-	 * Creates a resource updater.
-	 */
-	public Updater() {
-		delegate(handler(
-				keeper(Update, Detail),
-				processor(),
-				update()
-		));
-	}
+    private final Engine engine=service(engine());
 
 
-	private Handler update() {
-        return (request, next) -> {
+    public Updater(final Class<?> type) {
 
-	        return engine.update(request.body(new JSONLD()), shape(request))
+        if ( type == null ) {
+            throw new NullPointerException("null type");
+        }
 
-			        .map(iri -> request.reply(NoContent))
+        this.type=type;
+    }
 
-			        .orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known;
 
-		};
-	}
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+
+        final Frame<?> body=frame(request.body(new Bean<>(type)));
+
+        final String expected=request.item();
+        final String provided=body.id();
+
+        if ( Optional.ofNullable(provided)
+
+                .filter(not(String::isEmpty))
+                .filter(not(expected::equals))
+
+                .isPresent()
+
+        ) {
+
+            return request.reply(UnprocessableEntity)
+                    .body(new Bean<>(Trace.class), trace(format("mismatched id ‹%s›", provided)));
+
+        } else {
+
+            return body.validate()
+
+                    .map(trace -> request.reply(UnprocessableEntity)
+                            .body(new Bean<>(Trace.class), trace)
+                    )
+
+                    .orElseGet(() -> engine.update(body.id(expected))
+
+                            .map(frame -> request.reply(NoContent))
+
+                            .orElseGet(() -> request.reply(NotFound))
+
+                    );
+
+        }
+
+    }
 
 }

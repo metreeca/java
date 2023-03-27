@@ -15,7 +15,7 @@ may be easily plugged as a specialized component into your framework of choice.
 
 - **[Tutorials](tutorials/index.md)**
 - **[How-To](how-to/index.md)**
-- **[Reference](reference/index.md)**
+- **[Reference](../../Bean/docs/_reference/index.md)**
 
 # Modules
 

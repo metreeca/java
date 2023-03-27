@@ -16,76 +16,44 @@
 
 package com.metreeca.jsonld.handlers;
 
+import com.metreeca.bean.*;
+import com.metreeca.bean.json.JSON;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.JSONLD;
-import com.metreeca.jsonld.services.Engine;
-import com.metreeca.link.*;
-import com.metreeca.link.queries.*;
-import com.metreeca.link.shapes.Guard;
+import com.metreeca.jsonld.codecs.Bean;
 
-import org.eclipse.rdf4j.model.IRI;
+import java.net.URLDecoder;
+import java.util.Optional;
+import java.util.function.Function;
 
+import static com.metreeca.bean.Frame.frame;
+import static com.metreeca.bean.Query.filter;
+import static com.metreeca.bean.Query.query;
+import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.http.Response.OK;
-import static com.metreeca.jsonld.codecs.JSONLD.query;
-import static com.metreeca.jsonld.codecs.JSONLD.shape;
-import static com.metreeca.jsonld.services.Engine.*;
-import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Shape.Contains;
-import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.shapes.Field.field;
-import static com.metreeca.link.shapes.Guard.*;
+import static com.metreeca.http.Response.*;
+import static com.metreeca.jsonld.codecs.Bean.engine;
+import static com.metreeca.jsonld.codecs.Bean.json;
+
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toList;
 
 
 /**
- * Model-driven resource relator.
+ * Model-driven resource retriever.
  *
  * <p>Handles retrieval requests on the linked data resource identified by the request {@linkplain Request#item()
  * focus item}.</p>
  *
- * <ul>
- *
- * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
- * user {@linkplain Request#roles() roles};</li>
- *
- * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
- * the request shape enabled by the {@linkplain Guard#Relate} task and the {@linkplain Guard#Digest} view, if the
- * focus item is a {@linkplain Request#container() container}, or the {@linkplain Guard#Detail} view, otherwise.</li>
- *
- * </ul>
- *
- * <p>If the focus item is a {@linkplain Request#container() container}, generates a response including:</p>
- *
- * <ul>
- *
- * <li>a {@value Response#OK} status code;</li>
- *
- * <li>a shape describing the results;</li>
- *
- * <li>a {@link JSONLD JSON-LD} body containing a description of member linked data resources
- * retrieved with the assistance of the shared linked data {@linkplain Engine#relate(Frame, Query) engine} according to
- * the filtering constraints collected from the request shape and the
- * {@linkplain JSONLD#query(IRI, Shape, String) query} component of the request IRI; the IRI of the target
- * container is connected to the IRIs of the member resources using the {@link Shape#Contains ldp:contains} property.
- * </li>
- *
- * </ul>
- *
- * <p>Otherwise, if the shared linked data {@linkplain Engine#relate(Frame, Query) engine} is able to retrieve a
+ * <p>Otherwise, if the shared linked data {@linkplain Engine#retrieve(Object) engine} was able to retrieve a
  * resource matching the request focus item IRI, generates a response including:</p>
  *
  * <ul>
  *
  * <li>a {@value Response#OK} status code;</li>
  *
- * <li>the response includes the derived shape actually used in the retrieval process;</li>
- *
- * <li>a shape describing the results;</li>
- *
- * <li>a {@link JSONLD JSON-LD} body containing a description of the request item retrieved with the assistance
- * of the shared linked data {@linkplain Engine#relate(Frame, Query) engine}. </li>
+ * <li>a {@link Bean JSON-LD} body containing a description of the request item. </li>
  *
  * </ul>
  *
@@ -97,78 +65,107 @@ import static com.metreeca.link.shapes.Guard.*;
  *
  * </ul>
  */
-public final class Relator extends Operator {
+public class Relator implements Handler {
 
+    private final Frame<Object> model;
+
+    private final JSON json=service(json());
     private final Engine engine=service(engine());
 
 
-    /**
-     * Creates a resource relator.
-     */
-    public Relator() {
-        delegate(handler(
-                handler(Request::container,
-                        keeper(Relate, Digest),
-                        keeper(Relate, Detail)
-                ),
-                processor(),
-                relate()
-        ));
+    public Relator(final Object model) {
+
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
+
+        this.model=frame(model);
     }
 
 
-    private Handler relate() {
-        return (request, forward) -> {
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-            final boolean container=request.container();
+        final Frame<?> template=Optional.of(request.query())
+                .filter(not(String::isEmpty))
+                .map(this::decode)
+                .map(query -> merge(frame(json.decode(query, model.value().getClass())), model))
+                .orElseGet(model::copy);
 
-            final IRI item=iri(request.item());
-            final Shape shape=shape(request);
-            final Query query=query(item, shape, request.query());
 
-            return engine.relate(frame(item), query)
+        final String expected=request.item();
+        final String provided=template.id();
+
+        if ( Optional.ofNullable(provided)
+
+                .filter(not(String::isEmpty))
+                .filter(not(expected::equals))
+
+                .isPresent()
+
+        ) {
+
+            return request.reply(UnprocessableEntity)
+                    .body(new Bean<>(Trace.class), trace(format("mismatched id ‹%s›", provided)));
+
+        } else {
+
+            return engine.retrieve(template.id(expected))
 
                     .map(frame -> request.reply(OK)
-                            .map(response -> shape(response, query.map(new ShapeProbe(container)))
-                                    .body(new JSONLD(), frame)
-                            ))
+                            .body(new Bean<>(Object.class), provided == null ? frame.id(null) : frame) // !!! factor
+                    )
 
-                    .orElseGet(() -> container
+                    .orElseGet(() -> request.reply(NotFound));
 
-                            ? request.reply(OK) // virtual container
-                            .map(response -> shape(response, query.map(new ShapeProbe(container))))
-                            .body(new JSONLD(), frame(item))
+        }
 
-                            : request.reply(NotFound)
-
-                    );
-        };
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static final class ShapeProbe extends Query.Probe<Shape> {
+    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> template) { // !!! factor
 
-        private final boolean container;
+        frame.entries(true).forEach(entry -> {
+
+            final String field=entry.getKey();
+
+            final Object value=entry.getValue();
+            final Object model=template.get(field);
+
+            // extend frame with template values to support virtual entities
+
+            if ( value instanceof Query ) { // merge filters
+
+                if ( model instanceof Query ) {
+
+                    frame.set(field, query((Query<?>)value, query(((Query<?>)model)
+                            .filters().entrySet().stream()
+                            .map(filter -> filter(filter.getKey(), filter.getValue()))
+                            .collect(toList())
+                    )));
+
+                }
+
+            } else { // copy value
+
+                frame.set(field, model);
+
+            }
+
+        });
+
+        return frame;
+    }
 
 
-        private ShapeProbe(final boolean container) {
-            this.container=container;
-        }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-        @Override public Shape probe(final Items items) { // !!! add Shape.Contains if items.path is not empty
-            return (container ? field(Contains, items.shape()) : items.shape()).redact(Mode, Convey); // remove filters
-        }
-
-        @Override public Shape probe(final Stats stats) {
-            return StatsShape(stats);
-        }
-
-        @Override public Shape probe(final Terms terms) {
-            return TermsShape(terms);
-        }
+    private String decode(final String query) {
+        return query.startsWith("%7B") ? URLDecoder.decode(query, UTF_8)
+                // !!! Base64
+                // !!! form
+                : query;
 
     }
 

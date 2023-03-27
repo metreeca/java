@@ -16,25 +16,16 @@
 
 package com.metreeca.jsonld.handlers;
 
+import com.metreeca.bean.Engine;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.JSONLD;
-import com.metreeca.jsonld.services.Engine;
-import com.metreeca.link.Frame;
-import com.metreeca.link.Shape;
-import com.metreeca.link.shapes.Guard;
 
-import org.eclipse.rdf4j.model.IRI;
+import java.util.function.Function;
 
+import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.core.Locator.service;
-import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.jsonld.services.Engine.engine;
-import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.shapes.Guard.Delete;
-import static com.metreeca.link.shapes.Guard.Detail;
-
+import static com.metreeca.jsonld.codecs.Bean.engine;
 
 /**
  * Model-driven resource deleter.
@@ -43,15 +34,8 @@ import static com.metreeca.link.shapes.Guard.Detail;
  * item}.</p>
  *
  * <ul>
- *
- * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
- * user {@linkplain Request#roles() roles};</li>
- *
- * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
- * the request shape enabled by the {@linkplain Guard#Delete} task and the {@linkplain Guard#Detail} view.</li>
- *
  * <li>deletes the existing description of the resource matching the redacted request shape with the assistance of the
- * shared linked data {@linkplain Engine#delete(Frame, Shape) engine}.</li>
+ * shared linked data {@linkplain Engine#delete(Object) engine}.</li>
  *
  * </ul>
  *
@@ -72,35 +56,33 @@ import static com.metreeca.link.shapes.Guard.Detail;
  *
  * </ul>
  */
-public final class Deleter extends Operator {
+public class Deleter implements Handler {
+
+    private final Class<?> type;
 
     private final Engine engine=service(engine());
 
 
-    /**
-     * Creates a resource deleter.
-     */
-    public Deleter() {
-        delegate(handler(
-                keeper(Delete, Detail),
-                processor(),
-                delete()
-        ));
+    public Deleter(final Class<?> type) {
+
+        if ( type == null ) {
+            throw new NullPointerException("null type");
+        }
+
+        this.type=type;
     }
 
 
-    private Handler delete() {
-        return (request, next) -> {
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-            final IRI item=iri(request.item());
-            final Shape shape=JSONLD.shape(request);
+        final String item=request.item();
 
-            return engine.delete(frame(item), shape)
+        return engine.delete(frame(type).id(item))
 
-                    .map(frame -> request.reply(NoContent))
+                .map(frame -> request.reply(NoContent))
 
-                    .orElseGet(() -> request.reply(NotFound)); // !!! 410 Gone if previously known
+                .orElseGet(() -> request.reply(NotFound));
 
-        };
     }
+
 }

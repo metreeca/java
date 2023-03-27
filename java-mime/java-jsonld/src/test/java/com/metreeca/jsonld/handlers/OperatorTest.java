@@ -16,56 +16,53 @@
 
 package com.metreeca.jsonld.handlers;
 
+import com.metreeca.bean.Engine;
 import com.metreeca.core.Locator;
-import com.metreeca.jsonld.services.Engine;
-import com.metreeca.link.*;
+import com.metreeca.jsonld.codecs.Bean;
 
 import java.util.Optional;
 import java.util.function.Predicate;
 
 
-
 final class OperatorTest {
 
-	private OperatorTest() {}
+    private OperatorTest() { }
 
 
-	static void exec(final Predicate<Frame> success, final Runnable task) {
+    static void exec(final Predicate<Object> success, final Runnable task) {
         new Locator()
-                .set(Engine.engine(), () -> new MockEngine(success))
-				.exec(task)
-				.clear();
-	}
+                .set(Bean.engine(), () -> new MockEngine(success))
+                .exec(task)
+                .clear();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final class MockEngine implements Engine {
+    private static final class MockEngine implements Engine {
 
-		private final Predicate<Frame> success;
-
-
-		private MockEngine(final Predicate<Frame> success) {
-			this.success=success;
-		}
+        private final Predicate<Object> success;
 
 
-		@Override public Optional<Frame> create(final Frame frame, final Shape shape) {
-			return Optional.of(frame).filter(success);
-		}
+        private MockEngine(final Predicate<Object> success) {
+            this.success=success;
+        }
 
-		@Override public Optional<Frame> relate(final Frame frame, final Query query) {
-			return Optional.of(frame).filter(success);
-		}
+        @Override public <V> Optional<V> retrieve(final V v) {
+            return Optional.of(v).filter(success);
+        }
 
-		@Override public Optional<Frame> update(final Frame frame, final Shape shape) {
-			return Optional.of(frame).filter(success);
-		}
+        @Override public <V> Optional<V> create(final V v) {
+            return Optional.of(v).filter(success);
+        }
 
-		@Override public Optional<Frame> delete(final Frame frame, final Shape shape) {
-			return Optional.of(frame).filter(success);
-		}
+        @Override public <V> Optional<V> update(final V v) {
+            return Optional.of(v).filter(success);
+        }
 
-	}
+        @Override public <V> Optional<V> delete(final V v) {
+            return Optional.of(v).filter(success);
+        }
+    }
 
 }

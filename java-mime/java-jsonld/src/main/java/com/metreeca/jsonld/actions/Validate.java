@@ -18,64 +18,48 @@
 
 package com.metreeca.jsonld.actions;
 
+import com.metreeca.bean.Frame;
 import com.metreeca.core.services.Logger;
-import com.metreeca.link.Frame;
-import com.metreeca.link.Shape;
 
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.core.services.Logger.logger;
-import static com.metreeca.link.Values.format;
 
 import static java.lang.String.format;
 
 /**
- * Shape-based validation.
+ * Model-based validation.
  *
- * <p>Validates {@linkplain Frame frames} against a {@linkplain Shape shape}.</p>
+ * <p>{@linkplain Frame#validate() Validates} objects against their expected shape.</p>
  */
-public final class Validate implements Function<Frame, Optional<Frame>> {
-
-    private final Shape shape;
+public final class Validate implements Function<Object, Optional<Object>> {
 
     private final Logger logger=service(logger());
 
 
-    /**
-     * Creates a shape-based validation action.
-     *
-     * @param shape the shape frames are to be validated against
-     *
-     * @throws NullPointerException if {@code shape} is null
-     */
-    public Validate(final Shape shape) {
-
-        if ( shape == null ) {
-            throw new NullPointerException("null shape");
-        }
-
-        this.shape=shape;
-    }
+    @Override public Optional<Object> apply(final Object object) {
 
 
-    @Override public Optional<Frame> apply(final Frame frame) {
-        return shape.validate(frame.focus(), frame.model())
+        final Frame<Object> frame=frame(object);
+
+        return frame.validate()
 
                 .map(trace -> {
 
-                    logger.warning(this, () -> format("%s %s", format(frame), trace));
+                    logger.warning(this, () -> format("%s %s", object, trace));
 
-                    return Optional.<Frame>empty();
+                    return Optional.empty();
 
                 })
 
                 .orElseGet(() -> {
 
-                    logger.debug(this, () -> format("%s {}", frame.focus()));
+                    logger.debug(this, () -> format("%s {}", frame.id()));
 
-                    return Optional.of(frame);
+                    return Optional.of(frame.value());
 
                 });
     }

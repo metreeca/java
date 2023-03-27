@@ -16,53 +16,36 @@
 
 package com.metreeca.jsonld.handlers;
 
-
+import com.metreeca.bean.*;
 import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.JSONLD;
-import com.metreeca.jsonld.services.Engine;
-import com.metreeca.link.*;
-import com.metreeca.link.shapes.Guard;
+import com.metreeca.jsonld.codecs.Bean;
 
-import org.eclipse.rdf4j.model.*;
-
-import java.util.Collection;
+import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import static com.metreeca.bean.Frame.frame;
+import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
+import static com.metreeca.core.toolkits.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.core.toolkits.Identifiers.md5;
-import static com.metreeca.http.Handler.handler;
-import static com.metreeca.http.Request.encode;
-import static com.metreeca.http.Response.Created;
-import static com.metreeca.jsonld.services.Engine.engine;
-import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Values.format;
-import static com.metreeca.link.Values.iri;
-import static com.metreeca.link.shapes.Guard.Create;
-import static com.metreeca.link.shapes.Guard.Detail;
+import static com.metreeca.http.Response.*;
+import static com.metreeca.jsonld.codecs.Bean.engine;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
-
+import static java.util.function.Predicate.not;
 
 /**
  * Model-driven resource creator.
  *
- * <p>Handles creation requests on the linked data container identified by the request {@linkplain Request#item()
+ * <p>Handles creation requests on the linked data resources identified by the request {@linkplain Request#item()
  * focus item}:</p>
  *
  * <ul>
  *
- * <li>redacts the {@linkplain JSONLD#shape(Message) shape} associated with the request according to the request
- * user {@linkplain Request#roles() roles};</li>
- *
- * <li>performs shape-based {@linkplain Operator#keeper(Object, Object) authorization}, considering the subset of
- * the request shape enabled by the {@linkplain Guard#Create} task and the {@linkplain Guard#Detail} view;</li>
- *
- * <li>validates the {@link JSONLD JSON-LD} request body against the request shape; malformed or invalid
+ * <li>validates the {@link Bean JSON-LD} request body against its expected shape; malformed or invalid
  * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
  * status code;</li>
  *
@@ -70,12 +53,12 @@ import static java.util.Objects.requireNonNull;
  * the value of the {@code Slug} request header, if one is found, or a random id, otherwise;</li>
  *
  * <li>rewrites the request body to the assigned IRI and stores it with the assistance of the shared linked data
- * {@linkplain Engine#create(Frame, Shape) engine}; the target container identified by the request focus item is
- * connected to the newly created resource according to the filtering constraints in the request shape.</li>
+ * {@linkplain Engine#create(Object) engine}.</li>
  *
  * </ul>
  *
- * <p>On successful completion, generates a response including:</p>
+ * <p>If the shared linked data engine was able to create a resource matching the request item, generates a response
+ * including:</p>
  *
  * <ul>
  *
@@ -84,34 +67,39 @@ import static java.util.Objects.requireNonNull;
  * <li>a {@code Location} HTTP response header advertising the IRI of the newly created resource.</li>
  *
  * </ul>
+ *
+ * <p>Otherwise, generates a response including:</p>
+ *
+ * <ul>
+ *
+ * <li>a {@value Response#Conflict} status code.</li>
+ *
+ * </ul>
  */
-public final class Creator extends Operator {
+public class Creator implements Handler {
+
+    private final Frame<Object> model;
 
     private Function<Request, String> slug=request -> md5();
 
     private final Engine engine=service(engine());
 
 
-    /**
-     * Creates a resource creator with a UUID-based slug generator.
-     */
-    public Creator() {
-        delegate(handler(
-                keeper(Create, Detail),
-                processor(),
-                rewrite(),
-                create()
-        ));
+    public Creator(final Object model) {
+
+        if ( model == null ) {
+            throw new NullPointerException("null model");
+        }
+
+        this.model=frame(model);
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Configures the slug generator.
      *
      * @param slug a function mapping from the creation request to the identifier to be assigned to the newly created
-     *             resource; must return a non-null non-clashing value
+     *             resource; must return a non-null non-clashing absolute IRI
      *
      * @return this creator handler
      *
@@ -128,92 +116,52 @@ public final class Creator extends Operator {
         return this;
     }
 
-    /**
-     * Configures the slug generator.
-     *
-     * @param slug a function mapping from the creation request and its {@linkplain JSONLD JSON-LD} payload to the
-     *             identifier to be assigned to the newly created resource; must return a non-null non-clashing value
-     *
-     * @return this creator handler
-     *
-     * @throws NullPointerException if {@code slug} is null or returns null values
-     */
-    public Creator slug(final BiFunction<? super Request, ? super Frame, String> slug) {
-
-        if ( slug == null ) {
-            throw new NullPointerException("null slug");
-        }
-
-        this.slug=request -> slug.apply(request, request.body(new JSONLD()));
-
-        return this;
-    }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Handler rewrite() {
-        return (request, next) -> {
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-            final String name=encode( // encode slug as IRI path component
-                    requireNonNull(slug.apply(request), "null resource name")
-            );
+        final Frame<?> body=frame(request.body(new Bean<>(model.getClass())));
 
-            final IRI source=iri(request.item());
-            final IRI target=iri(source, name);
+        final String expected=request.item();
+        final String provided=body.id();
 
-            return next.apply(request
-                    .path(request.path()+name)
-                    .body(new JSONLD(), rewrite(target, source, request.body(new JSONLD())))
-            );
-        };
-    }
+        if ( Optional.ofNullable(provided)
 
-    private Handler create() {
-        return (request, next) -> {
+                .filter(not(String::isEmpty))
+                .filter(not(expected::equals))
 
-            final IRI item=iri(request.item());
-            final Shape shape=JSONLD.shape(request);
+                .isPresent()
 
-            return engine.create(request.body(new JSONLD()), shape)
+        ) {
 
-                    .map(Frame::focus)
+            return request.reply(UnprocessableEntity)
+                    .body(new Bean<>(Trace.class), trace(format("mismatched id ‹%s›", provided)));
 
-                    .map(focus -> request.reply().map(response -> response.status(Created).header("Location", Optional
-                            .of(focus)
-                            .filter(Value::isIRI)
-                            .map(IRI.class::cast)
-                            .map(Value::stringValue)
-                            .map(Identifiers::path) // root-relative to support relocation
-                            .orElse(focus.stringValue())
-                    )))
+        } else {
 
-                    .orElseThrow(() ->
-                            new IllegalStateException(format("existing resource identifier %s", format(item)))
+            final String created=Objects.requireNonNull(slug.apply(request), "null generated slug");
+
+            if ( !AbsoluteIRIPattern.matcher(created).matches() ) {
+                throw new IllegalArgumentException(format("generated slug ‹%s› is not an absolute IRI", created));
+            }
+
+            return body.validate()
+
+                    .map(trace -> request.reply(UnprocessableEntity)
+                            .body(new Bean<>(Trace.class), trace)
+                    )
+
+                    .orElseGet(() -> engine.create(body.id(created))
+
+                            .map(frame -> request.reply(Created, URI.create(Identifiers.path(frame.id()))))
+
+                            .orElseGet(() -> request.reply(Conflict))
+
                     );
 
-        };
-    }
+        }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private Frame rewrite(final IRI target, final IRI source, final Frame frame) {
-        return frame(rewrite(target, source, frame.focus()), rewrite(target, source, frame.model()));
-    }
-
-    private Collection<Statement> rewrite(final IRI target, final IRI source, final Collection<Statement> model) {
-        return model.stream()
-                .map(statement -> Values.statement(
-                        (Resource)rewrite(target, source, statement.getSubject()),
-                        (IRI)rewrite(target, source, statement.getPredicate()),
-                        rewrite(target, source, statement.getObject())
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private Value rewrite(final IRI target, final IRI source, final Value focus) {
-        return source.equals(focus) ? target : focus;
     }
 
 }

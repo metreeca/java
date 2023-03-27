@@ -16,19 +16,14 @@
 
 package com.metreeca.jsonld.handlers;
 
+import com.metreeca.bean.Trace;
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.Text;
 
 import java.util.*;
 import java.util.function.Function;
 
-import javax.json.Json;
-
-import static com.metreeca.http.Response.UnprocessableEntity;
-
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -38,69 +33,68 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Validator implements Handler {
 
-	private final Collection<Function<Request, Collection<String>>> rules;
+    private final Collection<Function<Request, Trace>> rules;
 
 
-	/**
-	 * Creates a validating preprocessor.
-	 *
-	 * <p>Validation rules handle a target request and must return a non-null but possibly empty collection of
-	 * validation issues; if the collection is not empty, the request fails with a {@link Response#UnprocessableEntity}
-	 * status code; otherwise, the request is routed to the wrapped handler.</p>
-	 *
-	 * @param rules the custom validation rules to be applied to incoming requests
-	 *
-	 * @throws NullPointerException if {@code rules} is null or contains null values
-	 */
-	@SafeVarargs public Validator(final Function<Request, Collection<String>>... rules) {
+    /**
+     * Creates a validating preprocessor.
+     *
+     * <p>Validation rules handle a target request and must return a non-null but possibly
+     * {@linkplain Trace#empty() empty} validation traces; if the trace is not empty, the request fails with a
+     * {@link Response#UnprocessableEntity} status code; otherwise, the request is routed to the wrapped handler.</p>
+     *
+     * @param rules the custom validation rules to be applied to incoming requests
+     *
+     * @throws NullPointerException if {@code rules} is null or contains null values
+     */
+    @SafeVarargs public Validator(final Function<Request, Trace>... rules) {
 
-		if ( rules == null || stream(rules).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null rules");
-		}
+        if ( rules == null || stream(rules).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null rules");
+        }
 
-		this.rules=new LinkedHashSet<>(asList(rules));
-	}
+        this.rules=new LinkedHashSet<>(asList(rules));
+    }
 
-	/**
-	 * Creates a validating preprocessor.
-	 *
-	 * <p>Validation rules handle a target request and must return a non-null but possibly empty collection of
-	 * validation issues; if the collection is not empty, the request fails with a {@link Response#UnprocessableEntity}
-	 * status code; otherwise, the request is routed to the wrapped handler.</p>
-	 *
-	 * @param rules the custom validation rules to be applied to incoming requests
-	 *
-	 * @throws NullPointerException if {@code rules} is null or contains null values
-	 */
-	public Validator(final Collection<Function<Request, Collection<String>>> rules) {
+    /**
+     * Creates a validating preprocessor.
+     *
+     * <p>Validation rules handle a target request and must return a non-null but possibly
+     * {@linkplain Trace#empty() empty} validation traces; if the trace is not empty, the request fails with a
+     * {@link Response#UnprocessableEntity} status code; otherwise, the request is routed to the wrapped handler.</p>
+     *
+     * @param rules the custom validation rules to be applied to incoming requests
+     *
+     * @throws NullPointerException if {@code rules} is null or contains null values
+     */
+    public Validator(final Collection<Function<Request, Trace>> rules) {
 
-		if ( rules == null || rules.stream().anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null rules");
-		}
+        if ( rules == null || rules.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null rules");
+        }
 
-		this.rules=new LinkedHashSet<>(rules);
-	}
+        this.rules=new LinkedHashSet<>(rules);
+    }
 
 
-	@Override public Response handle(final Request request, final Function<Request, Response> forward) {
-		return Optional
+    @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-				.of(rules.stream()
-						.flatMap(rule -> rule.apply(request).stream())
-						.collect(toList())
-				)
+        throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-				.filter(issues -> !issues.isEmpty())
-
-				.map(issues -> Json.createObjectBuilder()
-						.add("", Json.createArrayBuilder(issues)) // !!! align with JSON validator format
-						.build()
-				)
-
-				.map(details -> request.reply(UnprocessableEntity).body(new Text(), details.toString())) // !!! JSON
-				// body
-
-				.orElseGet(() -> forward.apply(request));
-	}
+        //return Optional
+        //
+        //		.of(Trace.trace(rules.stream()
+        //				.flatMap(rule -> rule.apply(request).stream())
+        //				.collect(toList())
+        //		))
+        //
+        //		.filter(issues -> !issues.isEmpty())
+        //
+        //		.map(trace -> request.reply(UnprocessableEntity)
+        //				.body(new Bean<>(Trace.class), trace)
+        //		)
+        //
+        //		.orElseGet(() -> forward.apply(request));
+    }
 
 }
