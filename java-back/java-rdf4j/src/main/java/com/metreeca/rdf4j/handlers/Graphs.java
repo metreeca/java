@@ -19,7 +19,7 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.codecs.Data;
+import com.metreeca.http.formats.Data;
 import com.metreeca.http.handlers.Worker;
 import com.metreeca.rdf4j.services.Graph;
 
@@ -42,7 +42,7 @@ import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.rdf.Values.iri;
 import static com.metreeca.rdf.Values.statement;
-import static com.metreeca.rdf.codecs.RDF.service;
+import static com.metreeca.rdf.formats.RDF.service;
 
 import static java.lang.String.format;
 
@@ -109,7 +109,7 @@ public final class Graphs extends Endpoint<Graphs> {
             }));
 
             return request.reply(OK)
-                    .body(new com.metreeca.rdf.codecs.RDF(), model);
+                    .body(new com.metreeca.rdf.formats.RDF(), model);
 
         } else {
 

@@ -16,7 +16,7 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.http.CodecException;
+import com.metreeca.http.FormatException;
 
 import org.w3c.dom.*;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.core.toolkits.Strings.normalize;
-import static com.metreeca.xml.codecs.HTML.html;
+import static com.metreeca.xml.formats.HTML.html;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
@@ -58,7 +58,7 @@ public final class Untag implements Function<Node, String> {
 
             return new Untag().apply(html(new ByteArrayInputStream(document.getBytes(UTF_8)), UTF_8, ""));
 
-        } catch ( final CodecException e ) {
+        } catch ( final FormatException e ) {
 
             return document;
 

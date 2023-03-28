@@ -18,7 +18,7 @@ package com.metreeca.jsonld.handlers;
 
 import com.metreeca.bean.*;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.Bean;
+import com.metreeca.jsonld.formats.Bean;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,7 +27,7 @@ import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.jsonld.codecs.Bean.engine;
+import static com.metreeca.jsonld.formats.Bean.engine;
 
 import static java.lang.String.format;
 import static java.util.function.Predicate.not;

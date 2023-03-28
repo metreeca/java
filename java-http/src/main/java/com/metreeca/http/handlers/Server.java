@@ -18,7 +18,7 @@ package com.metreeca.http.handlers;
 
 import com.metreeca.core.services.Logger;
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.Text;
+import com.metreeca.http.formats.Text;
 
 import java.io.*;
 import java.util.Optional;
@@ -76,7 +76,7 @@ public final class Server extends Delegator {
                         .map(this::logging)
                         .map(this::charset);
 
-            } catch ( final CodecException e ) {
+            } catch ( final FormatException e ) {
 
                 final String method=request.method();
                 final String item=request.item();

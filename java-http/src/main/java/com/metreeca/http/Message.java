@@ -17,7 +17,7 @@
 package com.metreeca.http;
 
 
-import com.metreeca.http.codecs.Multipart;
+import com.metreeca.http.formats.Multipart;
 
 import java.io.*;
 import java.net.URI;
@@ -633,68 +633,68 @@ public abstract class Message<M extends Message<M>> {
     /**
      * Decodes the message body.
      *
-     * @param codec the message codec
-     * @param <V>   the expected message body type
+     * @param format the message format
+     * @param <V>    the expected message body type
      *
-     * @return the {@linkplain Codec#decode(Message) decoded} body of this message
+     * @return the {@linkplain Format#decode(Message) decoded} body of this message
      *
-     * @throws NullPointerException if {@code codec} is null
-     * @throws CodecException       if the raw {@code message} input is malformed
+     * @throws NullPointerException if {@code format} is null
+     * @throws FormatException      if the raw {@code message} input is malformed
      * @throws UncheckedIOException if an I/O error occurred while decoding the raw {@code message} input
-     * @see Codec#decode(Message)
+     * @see Format#decode(Message)
      */
-    public <V> V body(final Codec<V> codec) throws CodecException, UncheckedIOException {
+    public <V> V body(final Format<V> format) throws FormatException, UncheckedIOException {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
-        return attribute(key(codec))
+        return attribute(key(format))
 
-                .or(() -> codec.decode(self()).map(value -> {
+                .or(() -> format.decode(self()).map(value -> {
 
-                    attribute(key(codec), value);
+                    attribute(key(format), value);
 
                     return value;
 
                 }))
 
-                .orElseThrow(() -> new CodecException(Response.BadRequest, format(
-                        "missing <%s> message body", codec.getClass().getSimpleName()
+                .orElseThrow(() -> new FormatException(Response.BadRequest, format(
+                        "missing <%s> message body", format.getClass().getSimpleName()
                 )));
     }
 
     /**
      * Encodes the message body.
      *
-     * @param codec the message coded
-     * @param value the body to be encoded
-     * @param <V>   the type of the value to be encoded
+     * @param format the message coded
+     * @param value  the body to be encoded
+     * @param <V>    the type of the value to be encoded
      *
-     * @return this message with {@code value} {@linkplain Codec#encode(Message, Object) encoded} by {@code codec} as
+     * @return this message with {@code value} {@linkplain Format#encode(Message, Object) encoded} by {@code format} as
      * body
      *
-     * @throws NullPointerException if either {@code codec} or {@code value} is null
-     * @throws CodecException       if {@code value} cannot be legally encoded into {@code message} according to the
+     * @throws NullPointerException if either {@code format} or {@code value} is null
+     * @throws FormatException      if {@code value} cannot be legally encoded into {@code message} according to the
      *                              specs included in the {@linkplain Message#request() originating request}
-     * @see Codec#encode(Message, Object)
+     * @see Format#encode(Message, Object)
      */
-    public <V> M body(final Codec<V> codec, final V value) throws CodecException {
+    public <V> M body(final Format<V> format, final V value) throws FormatException {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
         if ( value == null ) {
             throw new NullPointerException("null value");
         }
 
-        return codec.encode(self().attribute(key(codec), value), value);
+        return format.encode(self().attribute(key(format), value), value);
     }
 
 
-    private <V> Entry<Class<V>, String> key(final Codec<V> codec) {
-        return entry(codec.type(), codec.getClass().getName());
+    private <V> Entry<Class<V>, String> key(final Format<V> format) {
+        return entry(format.type(), format.getClass().getName());
     }
 
 

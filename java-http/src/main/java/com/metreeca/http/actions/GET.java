@@ -17,7 +17,7 @@
 
 package com.metreeca.http.actions;
 
-import com.metreeca.http.Codec;
+import com.metreeca.http.Format;
 import com.metreeca.http.Request;
 
 import java.util.Optional;
@@ -34,46 +34,46 @@ import static java.util.function.Function.identity;
  */
 public final class GET<R> implements Function<String, Optional<R>> {
 
-    private final Codec<R> codec;
+    private final Format<R> format;
     private final Function<Request, Request> customizer;
 
 
     /**
      * Creates a resource retriever.
      *
-     * @param codec the format of the resource to be retrieved
+     * @param format the format of the resource to be retrieved
      *
      * @throws NullPointerException if {@code format} is null
      */
-    public GET(final Codec<R> codec) {
+    public GET(final Format<R> format) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
-        this.codec=codec;
+        this.format=format;
         this.customizer=identity();
     }
 
     /**
      * Creates a customized retriever.
      *
-     * @param codec      the format of the resource to be retrieved
+     * @param format     the format of the resource to be retrieved
      * @param customizer the request customizer
      *
      * @throws NullPointerException if either {@code format} or {@code customizer} is null
      */
-    public GET(final Codec<R> codec, final Function<Request, Request> customizer) {
+    public GET(final Format<R> format, final Function<Request, Request> customizer) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
         if ( customizer == null ) {
             throw new NullPointerException("null customizer");
         }
 
-        this.codec=codec;
+        this.format=format;
         this.customizer=customizer;
     }
 
@@ -82,11 +82,11 @@ public final class GET<R> implements Function<String, Optional<R>> {
         return Optional.of(url)
 
                 .flatMap(new Query(customizer.compose(request -> request
-                        .header("Accept", codec.mime())
+                        .header("Accept", format.mime())
                 )))
 
                 .flatMap(new Fetch())
-                .flatMap(new Parse<>(codec));
+                .flatMap(new Parse<>(format));
     }
 
 }

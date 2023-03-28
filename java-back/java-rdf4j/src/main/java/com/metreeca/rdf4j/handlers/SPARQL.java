@@ -18,7 +18,7 @@ package com.metreeca.rdf4j.handlers;
 
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.codecs.Data;
+import com.metreeca.http.formats.Data;
 import com.metreeca.http.handlers.Worker;
 import com.metreeca.rdf4j.services.Graph;
 
@@ -40,7 +40,7 @@ import java.util.function.Function;
 import static com.metreeca.core.toolkits.Lambdas.guarded;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.rdf.codecs.RDF.service;
+import static com.metreeca.rdf.formats.RDF.service;
 
 
 /**

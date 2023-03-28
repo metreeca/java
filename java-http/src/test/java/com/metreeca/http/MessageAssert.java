@@ -305,18 +305,18 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
         return myself;
     }
 
-    public A hasBody(final Codec<?> codec) {
+    public A hasBody(final Format<?> format) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
-        return hasBody(codec, body -> { });
+        return hasBody(format, body -> { });
     }
 
-    public <V> A hasBody(final Codec<V> codec, final Consumer<V> assertions) {
+    public <V> A hasBody(final Format<V> format, final Consumer<V> assertions) {
 
-        if ( codec == null ) {
+        if ( format == null ) {
             throw new NullPointerException("null body");
         }
 
@@ -328,13 +328,13 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
 
         try {
 
-            assertions.accept(actual.body(codec));
+            assertions.accept(actual.body(format));
 
-        } catch ( final CodecException error ) {
+        } catch ( final FormatException error ) {
 
             fail(
                     "expected message to have a <%s> body but was unable to retrieve one (%s)",
-                    codec.getClass().getSimpleName(), error
+                    format.getClass().getSimpleName(), error
             );
 
         }
@@ -360,16 +360,16 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
         return myself;
     }
 
-    public A doesNotHaveBody(final Codec<?> codec) {
+    public A doesNotHaveBody(final Format<?> format) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
         isNotNull();
 
-        codec.decode(actual).ifPresent(value ->
-                fail(format("expected message to have no <%s> body but has one", codec.getClass().getSimpleName()))
+        format.decode(actual).ifPresent(value ->
+                fail(format("expected message to have no <%s> body but has one", format.getClass().getSimpleName()))
         );
 
         return myself;

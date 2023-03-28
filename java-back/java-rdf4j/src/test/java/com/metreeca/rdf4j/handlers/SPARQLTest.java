@@ -1,5 +1,17 @@
 /*
- * Copyright © 2013-2023 Metreeca srl. All rights reserved.
+ * Copyright © 2013-2023 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.metreeca.rdf4j.handlers;
@@ -7,7 +19,7 @@ package com.metreeca.rdf4j.handlers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.json.JSONAssert;
-import com.metreeca.json.codecs.JSON;
+import com.metreeca.json.formats.JSON;
 import com.metreeca.rdf.Values;
 
 import org.eclipse.rdf4j.model.*;
@@ -350,7 +362,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST))
                         )
                 ));
@@ -363,7 +375,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST)))
                 ));
     }
@@ -376,7 +388,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST)))
                 ));
     }
@@ -388,7 +400,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST)))
                 ));
     }
@@ -400,7 +412,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST))
                         )
                 ));
@@ -413,7 +425,7 @@ final class SPARQLTest {
 
                 .map(response -> assertThat(response)
                         .hasStatus(Response.OK)
-                        .hasBody(new com.metreeca.rdf.codecs.RDF(), rdf -> assertThat(rdf)
+                        .hasBody(new com.metreeca.rdf.formats.RDF(), rdf -> assertThat(rdf)
                                 .satisfies(hasObjects(RDF.FIRST, RDF.REST))
                         )
                 ));

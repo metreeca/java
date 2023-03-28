@@ -149,56 +149,57 @@ import static java.util.Objects.requireNonNull;
     /**
      * Creates a request body preprocessing handler.
      *
-     * @param codec  the message codec used to handle the request body
+     * @param format the message format used to handle the request body
      * @param mapper the request body mapper
-     * @param <T>    the type of the structured payload managed by {@code codec}
+     * @param <T>    the type of the structured payload managed by {@code format}
      *
-     * @return a handler replacing the original request body managed by {@code codec} with the value produced by mapping
+     * @return a handler replacing the original request body managed by {@code format} with the value produced by mapping
      * it with {@code mapper}
      *
-     * @throws NullPointerException if either {@code codec} or {@code mapper} is null or {@code mapper} returns a null
+     * @throws NullPointerException if either {@code format} or {@code mapper} is null or {@code mapper} returns a null
      *                              value
      */
-    public static <T> Handler request(final Codec<T> codec, final UnaryOperator<T> mapper) {
+    public static <T> Handler request(final Format<T> format, final UnaryOperator<T> mapper) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
         }
 
-        return (request, forward) -> forward.apply(request.body(codec,
-                requireNonNull(mapper.apply(request.body(codec)), "null mapper return value ")
+        return (request, forward) -> forward.apply(request.body(format,
+                requireNonNull(mapper.apply(request.body(format)), "null mapper return value ")
         ));
     }
 
     /**
      * Creates a response body postprocessing handler.
      *
-     * @param codec  the message codec used to handle the response body
+     * @param format  the message format used to handle the response body
      * @param mapper the response body mapper
-     * @param <T>    the type of the structured payload managed by {@code codec}
+     * @param <T>    the type of the structured payload managed by {@code format}
      *
-     * @return a handler replacing the original response body managed by {@code codec} with the value produced by mapping
+     * @return a handler replacing the original response body managed by {@code format} with the value produced by
+     * mapping
      * it with {@code mapper}
      *
-     * @throws NullPointerException if either {@code codec} or {@code mapper} is null or {@code mapper} returns a null
+     * @throws NullPointerException if either {@code format} or {@code mapper} is null or {@code mapper} returns a null
      *                              value
      */
-    public static <T> Handler response(final Codec<T> codec, final UnaryOperator<T> mapper) {
+    public static <T> Handler response(final Format<T> format, final UnaryOperator<T> mapper) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
         if ( mapper == null ) {
             throw new NullPointerException("null mapper");
         }
 
-        return (request, forward) -> forward.apply(request).map(response -> response.body(codec,
-                requireNonNull(mapper.apply(response.body(codec)), "null mapper return value ")
+        return (request, forward) -> forward.apply(request).map(response -> response.body(format,
+                requireNonNull(mapper.apply(response.body(format)), "null mapper return value ")
         ));
     }
 

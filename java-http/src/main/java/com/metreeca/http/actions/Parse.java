@@ -37,7 +37,7 @@ import static java.lang.String.format;
  */
 public final class Parse<R> implements Function<Message<?>, Optional<R>> {
 
-    private final Codec<R> codec;
+    private final Format<R> format;
 
     private final Logger logger=service(Logger.logger());
 
@@ -45,17 +45,17 @@ public final class Parse<R> implements Function<Message<?>, Optional<R>> {
     /**
      * Creates a new message body parser.
      *
-     * @param codec the codec for the message body to be extracted
+     * @param format the format for the message body to be extracted
      *
-     * @throws NullPointerException if {@code codec} is null
+     * @throws NullPointerException if {@code format} is null
      */
-    public Parse(final Codec<R> codec) {
+    public Parse(final Format<R> format) {
 
-        if ( codec == null ) {
-            throw new NullPointerException("null codec");
+        if ( format == null ) {
+            throw new NullPointerException("null format");
         }
 
-        this.codec=codec;
+        this.format=format;
     }
 
 
@@ -76,12 +76,12 @@ public final class Parse<R> implements Function<Message<?>, Optional<R>> {
 
             try {
 
-                final Optional<R> value=codec.decode(message);
+                final Optional<R> value=format.decode(message);
 
                 if ( value.isEmpty() ) {
 
                     logger.warning(this,
-                            format("no <%s> message body", codec.getClass().getSimpleName())
+                            format("no <%s> message body", format.getClass().getSimpleName())
                     );
 
                 }
@@ -89,12 +89,12 @@ public final class Parse<R> implements Function<Message<?>, Optional<R>> {
                 return value;
 
 
-            } catch ( final CodecException error ) {
+            } catch ( final FormatException error ) {
 
                 // !!! review formatting >> avoid newlines in log
 
                 logger.error(this,
-                        format("unable to parse message body as <%s>", codec.getClass().getSimpleName()),
+                        format("unable to parse message body as <%s>", format.getClass().getSimpleName()),
                         new RuntimeException(error.toString(), error)
                 );
 

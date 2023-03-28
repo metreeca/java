@@ -18,7 +18,7 @@ package com.metreeca.jsonld.handlers;
 
 import com.metreeca.bean.Engine;
 import com.metreeca.core.Locator;
-import com.metreeca.jsonld.codecs.Bean;
+import com.metreeca.jsonld.formats.Bean;
 
 import java.util.Optional;
 import java.util.function.Predicate;

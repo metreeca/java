@@ -22,7 +22,7 @@ import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.actions.*;
 import com.metreeca.xml.XPath;
-import com.metreeca.xml.codecs.HTML;
+import com.metreeca.xml.formats.HTML;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

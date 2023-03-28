@@ -25,7 +25,7 @@ import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.jsonld.codecs.Bean.engine;
+import static com.metreeca.jsonld.formats.Bean.engine;
 
 /**
  * Model-driven resource deleter.

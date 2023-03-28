@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static com.metreeca.xml.XPath.decode;
-import static com.metreeca.xml.codecs.XML.xml;
+import static com.metreeca.xml.formats.XML.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

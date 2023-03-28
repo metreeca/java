@@ -16,7 +16,7 @@
 
 package com.metreeca.http;
 
-import com.metreeca.http.codecs.Text;
+import com.metreeca.http.formats.Text;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

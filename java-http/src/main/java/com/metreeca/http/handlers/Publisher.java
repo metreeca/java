@@ -18,7 +18,7 @@ package com.metreeca.http.handlers;
 
 import com.metreeca.core.toolkits.Lambdas;
 import com.metreeca.http.*;
-import com.metreeca.http.codecs.Data;
+import com.metreeca.http.formats.Data;
 import com.metreeca.http.services.Fetcher.URLFetcher;
 
 import java.io.*;

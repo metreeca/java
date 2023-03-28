@@ -17,7 +17,7 @@
 package com.metreeca.rdf.actions;
 
 import com.metreeca.http.actions.*;
-import com.metreeca.rdf.codecs.RDF;
+import com.metreeca.rdf.formats.RDF;
 
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;

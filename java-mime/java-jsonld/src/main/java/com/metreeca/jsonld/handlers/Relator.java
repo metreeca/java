@@ -1,14 +1,26 @@
 /*
- * Copyright © 2013-2023 Metreeca srl. All rights reserved.
+ * Copyright © 2013-2023 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.bean.*;
-import com.metreeca.bean.json.JSON;
 import com.metreeca.http.*;
-import com.metreeca.jsonld.codecs.Bean;
+import com.metreeca.jsonld.formats.Bean;
 
+import java.io.*;
 import java.net.URLDecoder;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,8 +31,8 @@ import static com.metreeca.bean.Query.query;
 import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.jsonld.codecs.Bean.codec;
-import static com.metreeca.jsonld.codecs.Bean.engine;
+import static com.metreeca.jsonld.formats.Bean.codec;
+import static com.metreeca.jsonld.formats.Bean.engine;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -57,7 +69,7 @@ public class Relator implements Handler {
 
     private final Frame<Object> model;
 
-    private final JSON json=service(codec());
+    private final Codec codec=service(codec());
     private final Engine engine=service(engine());
 
 
@@ -76,9 +88,18 @@ public class Relator implements Handler {
         final Frame<?> template=Optional.of(request.query())
                 .filter(not(String::isEmpty))
                 .map(this::decode)
-                .map(query -> merge(frame(json.decode(query, model.value().getClass())), model))
-                .orElseGet(model::copy);
+                .map(query -> {
 
+                    try {
+                        return merge(frame(codec.decode(new StringReader(query), model.value().getClass())), model);
+                    } catch ( final IOException e ) {
+
+                        throw new UncheckedIOException(e);
+
+                    }
+
+                })
+                .orElseGet(model::copy);
 
         final String expected=request.item();
         final String provided=template.id();
@@ -110,9 +131,9 @@ public class Relator implements Handler {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// !!! factor ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> template) { // !!! factor
+    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> template) {
 
         frame.entries(true).forEach(entry -> {
 
@@ -146,8 +167,6 @@ public class Relator implements Handler {
         return frame;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private String decode(final String query) {
         return query.startsWith("%7B") ? URLDecoder.decode(query, UTF_8)
