@@ -1,17 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright © 2013-2023 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.jsonld.handlers;
@@ -31,8 +19,8 @@ import static com.metreeca.bean.Query.query;
 import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
+import static com.metreeca.jsonld.codecs.Bean.codec;
 import static com.metreeca.jsonld.codecs.Bean.engine;
-import static com.metreeca.jsonld.codecs.Bean.json;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -69,7 +57,7 @@ public class Relator implements Handler {
 
     private final Frame<Object> model;
 
-    private final JSON json=service(json());
+    private final JSON json=service(codec());
     private final Engine engine=service(engine());
 
 

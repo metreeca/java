@@ -1,17 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright © 2013-2023 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.jsonld.codecs;
@@ -60,7 +48,7 @@ public final class Bean<T> implements Codec<T> {
      *
      * @return the default wire format codec factory, which returns a codec instance with the default configuration
      */
-    public static Supplier<JSON> json() {
+    public static Supplier<com.metreeca.bean.Codec> codec() {
         return JSON::json;
     }
 
@@ -122,7 +110,7 @@ public final class Bean<T> implements Codec<T> {
                             final Reader reader=new InputStreamReader(input, message.charset())
                     ) {
 
-                        return service(json()).decode(reader, clazz);
+                        return service(codec()).decode(reader, clazz);
 
                     } catch ( final UnsupportedEncodingException|JSON.Exception e ) {
 
@@ -189,7 +177,7 @@ public final class Bean<T> implements Codec<T> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        service(json()).encode(writer, value);
+                        service(codec()).encode(writer, value);
 
                         // !!! mime.equals(MIME) // include context objects for application/ld+json
 
