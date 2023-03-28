@@ -1,29 +1,22 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright © 2013-2023 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.bean.Trace;
 import com.metreeca.http.*;
+import com.metreeca.jsonld.codecs.Bean;
 
 import java.util.*;
 import java.util.function.Function;
 
+import static com.metreeca.bean.Trace.trace;
+import static com.metreeca.http.Response.UnprocessableEntity;
+
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -78,23 +71,20 @@ public final class Validator implements Handler {
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
+        return Optional
 
-        throw new UnsupportedOperationException(";( be implemented"); // !!!
+                .of(trace(rules.stream()
+                        .map(rule -> rule.apply(request))
+                        .collect(toList())
+                ))
 
-        //return Optional
-        //
-        //		.of(Trace.trace(rules.stream()
-        //				.flatMap(rule -> rule.apply(request).stream())
-        //				.collect(toList())
-        //		))
-        //
-        //		.filter(issues -> !issues.isEmpty())
-        //
-        //		.map(trace -> request.reply(UnprocessableEntity)
-        //				.body(new Bean<>(Trace.class), trace)
-        //		)
-        //
-        //		.orElseGet(() -> forward.apply(request));
+                .filter(trace -> !trace.empty())
+
+                .map(trace -> request.reply(UnprocessableEntity)
+                        .body(new Bean<>(Trace.class), trace)
+                )
+
+                .orElseGet(() -> forward.apply(request));
     }
 
 }
