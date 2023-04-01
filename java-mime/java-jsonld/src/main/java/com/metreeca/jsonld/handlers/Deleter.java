@@ -63,13 +63,13 @@ public class Deleter implements Handler {
     private final Engine engine=service(engine());
 
 
-    public Deleter(final Class<?> type) {
+    public Deleter(final Object model) {
 
-        if ( type == null ) {
-            throw new NullPointerException("null type");
+        if ( model == null ) {
+            throw new NullPointerException("null model");
         }
 
-        this.type=type;
+        this.type=model.getClass();
     }
 
 

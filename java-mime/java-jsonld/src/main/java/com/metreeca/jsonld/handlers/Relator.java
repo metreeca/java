@@ -91,7 +91,9 @@ public class Relator implements Handler {
                 .map(query -> {
 
                     try {
+
                         return merge(frame(codec.decode(new StringReader(query), model.value().getClass())), model);
+
                     } catch ( final IOException e ) {
 
                         throw new UncheckedIOException(e);

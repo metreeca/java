@@ -73,13 +73,13 @@ public class Updater implements Handler {
     private final Engine engine=service(engine());
 
 
-    public Updater(final Class<?> type) {
+    public Updater(final Object model) {
 
-        if ( type == null ) {
-            throw new NullPointerException("null type");
+        if ( model == null ) {
+            throw new NullPointerException("null model");
         }
 
-        this.type=type;
+        this.type=model.getClass();
     }
 
 
