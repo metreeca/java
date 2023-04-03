@@ -22,11 +22,11 @@ import com.metreeca.http.Request;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.Response.UnprocessableEntity;
 import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.rest.Trace.trace;
 
 
 final class ValidatorTest {

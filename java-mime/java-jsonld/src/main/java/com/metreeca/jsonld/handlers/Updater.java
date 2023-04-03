@@ -16,18 +16,18 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.bean.*;
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
+import com.metreeca.rest.*;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.bean.Frame.frame;
-import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.formats.Bean.engine;
+import static com.metreeca.rest.Frame.frame;
+import static com.metreeca.rest.Trace.trace;
 
 import static java.lang.String.format;
 import static java.util.function.Predicate.not;
@@ -100,7 +100,7 @@ public class Updater implements Handler {
         ) {
 
             return request.reply(UnprocessableEntity)
-                    .body(new Bean<>(Trace.class), trace(format("mismatched id ‹%s›", provided)));
+                    .body(new Bean<>(Trace.class), trace(format("mismatched id <%s>", provided)));
 
         } else {
 

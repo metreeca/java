@@ -42,7 +42,7 @@
 
         <dependency>
             <groupId>com.metreeca</groupId>
-            <artifactId>bean-json</artifactId>
+            <artifactId>rest-json</artifactId>
         </dependency>
 
         <dependency>

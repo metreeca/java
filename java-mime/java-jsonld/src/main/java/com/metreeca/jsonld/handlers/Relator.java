@@ -16,23 +16,24 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.bean.*;
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
+import com.metreeca.rest.*;
+import com.metreeca.rest.json.JSON;
 
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.bean.Frame.frame;
-import static com.metreeca.bean.Query.filter;
-import static com.metreeca.bean.Query.query;
-import static com.metreeca.bean.Trace.trace;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.formats.Bean.codec;
 import static com.metreeca.jsonld.formats.Bean.engine;
+import static com.metreeca.rest.Frame.frame;
+import static com.metreeca.rest.Query.filter;
+import static com.metreeca.rest.Query.query;
+import static com.metreeca.rest.Trace.trace;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -94,6 +95,10 @@ public class Relator implements Handler {
 
                         return merge(frame(codec.decode(new StringReader(query), model.value().getClass())), model);
 
+                    } catch ( final JSON.Exception e ) {
+
+                        throw new FormatException(BadRequest, e.getMessage());
+
                     } catch ( final IOException e ) {
 
                         throw new UncheckedIOException(e);
@@ -116,7 +121,7 @@ public class Relator implements Handler {
         ) {
 
             return request.reply(UnprocessableEntity)
-                    .body(new Bean<>(Trace.class), trace(format("mismatched id ‹%s›", provided)));
+                    .body(new Bean<>(Trace.class), trace(format("mismatched id <%s>", provided)));
 
         } else {
 

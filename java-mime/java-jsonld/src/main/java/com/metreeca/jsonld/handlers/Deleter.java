@@ -16,16 +16,16 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.bean.Engine;
 import com.metreeca.http.*;
+import com.metreeca.rest.Engine;
 
 import java.util.function.Function;
 
-import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.jsonld.formats.Bean.engine;
+import static com.metreeca.rest.Frame.frame;
 
 /**
  * Model-driven resource deleter.

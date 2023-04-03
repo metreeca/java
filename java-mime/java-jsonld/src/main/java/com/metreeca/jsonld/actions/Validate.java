@@ -18,15 +18,15 @@
 
 package com.metreeca.jsonld.actions;
 
-import com.metreeca.bean.Frame;
 import com.metreeca.core.services.Logger;
+import com.metreeca.rest.Frame;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.bean.Frame.frame;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.rest.Frame.frame;
 
 import static java.lang.String.format;
 
