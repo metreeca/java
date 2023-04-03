@@ -90,8 +90,8 @@ public final class Publisher extends Delegator {
      *
      * <ul>
      *
-     *     <li>{@code …/path/} >> {@code …/path/}, {@code …/path/index.html}</li>
-     *     <li>{@code …/path/file} >> {@code …/path/file}, {@code …/path/file.html}</li>
+     *     <li>{@code …/path/} ›› {@code …/path/}, {@code …/path/index.html}</li>
+     *     <li>{@code …/path/file} ›› {@code …/path/file}, {@code …/path/file.html}</li>
      *
      * </ul>
      *

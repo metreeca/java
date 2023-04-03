@@ -108,10 +108,8 @@ public final class Identifiers {
      *
      * @param text the content to be hashed in the generated UUID
      *
-     * @return a name-based
-     * <a
-     * href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions_3_and_5_(namespace_name-based)
-     * ">Version 3
+     * @return a name-based <a href=
+     * "https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions_3_and_5_(namespace_name-based)" >Version 3
      * UUID</a> based on {@code text}
      *
      * @throws NullPointerException if {@code text} is null
@@ -130,11 +128,9 @@ public final class Identifiers {
      *
      * @param data the content to be hashed in the generated UUID
      *
-     * @return a name-based
-     * <a
-     * href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions_3_and_5_(namespace_name-based)
-     * ">Version 3
-     * UUID</a> based on {@code data}
+     * @return a name-based <a
+     * href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions_3_and_5_(namespace_name-based)"
+     * >Version 3 UUID</a> based on {@code data}
      *
      * @throws NullPointerException if {@code data} is null
      */
