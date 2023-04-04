@@ -3,7 +3,7 @@
 /.idea/
 /.vscode/
 
-/java.*
+/http.*
 
 target/
 pom-flattened.xml

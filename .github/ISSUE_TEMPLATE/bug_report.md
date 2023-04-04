@@ -1,7 +1,7 @@
 ---
 name: "Bug Report"
 about: "Create a report to help us improve"
-title: "What's wrong with metreeca/java?"
+title: "What's wrong with metreeca/http?"
 labels: "Issue"
 assignees: ""
 ---
@@ -9,7 +9,7 @@ assignees: ""
 
 **environment**
 
-- metreeca/java: *version*
+- metreeca/http: *version*
 - operating system: *name/version*
 - java vm: *vendor/version*
 

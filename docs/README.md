@@ -1,33 +1,29 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/java-java.svg)](https://search.maven.org/artifact/com.metreeca/java-java/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/http.svg)](https://central.sonatype.com/artifact/com.metreeca/http/3.0.0/versions)
 
-# Metreeca/Java
+# Metreeca/HTTP
 
-Metreeca/Java is a model‑driven Java framework for rapid REST/JSON‑LD development.
-
-Its engines automatically convert high-level declarative JSON-LD models into extended REST APIs supporting CRUD
-operations, faceted search, data validation and fine‑grained role‑based access control, relieving backend developers
-from low-level chores and completely shielding frontend developers from linked data technicalities.
-
-While collectively providing a floor-to-ceiling development solution, Metreeca/Java modules are loosely coupled and
-may be easily plugged as a specialized component into your framework of choice.
+Metreeca/HTTP is a lightweight Java framework for rapid REST service development.
 
 # Documentation
-
 - **[Tutorials](tutorials/index.md)**
 - **[How-To](how-to/index.md)**
-- **[Reference](../../Bean/docs/_reference/index.md)**
 
 # Modules
 
-|    area | javadocs                                                     | description                              |
-| ------: | :----------------------------------------------------------- |:-----------------------------------------|
-|    core | [metreeca‑json](https://javadoc.io/doc/com.metreeca/java-link) | shape-based JSON modelling framework     |
-|         | [metreeca‑rest](https://javadoc.io/doc/com.metreeca/java-rest) | model-driven REST publishing framework   |
-|    data | [metreeca‑xml](https://javadoc.io/doc/com.metreeca/java-xml) | XML/HTML codecs and utilities            |
-|         | [metreeca‑rdf](https://javadoc.io/doc/com.metreeca/java-rdf) | RDF codecs and utilities                 |
-|  server | [metreeca‑jse](https://javadoc.io/doc/com.metreeca/java-jse) | Java SE HTTP server connector            |
-|         | [metreeca‑jee](https://javadoc.io/doc/com.metreeca/java-jee) | Java EE Servlet 3.1 containers connector |
-| storage | [metreeca‑rdf4j](https://javadoc.io/doc/com.metreeca/java-rdf4j) | RDF4J-based SPARQL repository connector  |
+|              area | javadocs                                                     | description                                   |
+| ----------------: | :----------------------------------------------------------- | :-------------------------------------------- |
+|         framework | [http‑core](https://javadoc.io/doc/com.metreeca/http-core)   | HTTP processing framework                     |
+|       data codecs | [http-json](https://javadoc.io/doc/com.metreeca/http-json)   | JSON codecs and utilities                     |
+|                   | [http-jsonld](https://javadoc.io/doc/com.metreeca/http-jsonld) | JSON-LD codecs and model-driven REST handlers |
+|                   | [http‑xml](https://javadoc.io/doc/com.metreeca/http-xml)     | XML/HTML codecs and utilities                 |
+|                   | [http‑rdf](https://javadoc.io/doc/com.metreeca/http-rdf)     | RDF codecs and utilities                      |
+|                   | [http‑csv](https://javadoc.io/doc/com.metreeca/http-csv)     | CSV codecs and utilities                      |
+|                   | [http‑ical](https://javadoc.io/doc/com.metreeca/http-ical)   | iCalendar codecs and utilities                |
+| server connectors | [http‑jse](https://javadoc.io/doc/com.metreeca/http-jse)     | Java SE HTTP server connector                 |
+|                   | [http‑jee](https://javadoc.io/doc/com.metreeca/http-jee)     | Java EE Servlet 3.1 containers connector      |
+|   data connectors | [http‑open](https://javadoc.io/doc/com.metreeca/http-open)   | linked open data connector                    |
+|                   | [http‑rdf4j](https://javadoc.io/doc/com.metreeca/http-rdf4j) | RDF4J-based SPARQL repository connector       |
+|                   | [http‑gcp](https://javadoc.io/doc/com.metreeca/http-gcp)     | Google Cloud services connector               |
 
 # Getting Started
 
@@ -54,12 +50,12 @@ may be easily plugged as a specialized component into your framework of choice.
 
         <dependency> <!-- server connector -->
             <groupId>com.metreeca</groupId>
-            <artifactId>java-jse</artifactId>
+            <artifactId>http-jse</artifactId>
         </dependency>
 
         <dependency> <!-- storage connector -->
             <groupId>com.metreeca</groupId>
-            <artifactId>java-rdf4j</artifactId>
+            <artifactId>http-rdf4j</artifactId>
         </dependency>
 
     </dependencies>
@@ -105,17 +101,17 @@ Content-Length: 12
 Hello world!
 ```
 
-4. Delve into the [docs](https://metreeca.github.io/java/) to learn how
-   to [publish](http://metreeca.github.io/java/tutorials/publishing-jsonld-apis)
-   and [consume](https://metreeca.github.io/java/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD
+4. Delve into the [docs](https://metreeca.github.io/http/) to learn how
+   to [publish](http://metreeca.github.io/http/tutorials/publishing-jsonld-apis)
+   and [consume](https://metreeca.github.io/http/tutorials/consuming-jsonld-apis) your data as model-driven REST/JSON‑LD
    APIs…
 
 # Support
 
-- open an [issue](https://github.com/metreeca/java/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/java/discussions) to ask a how-to question or to share an idea
+- open an [issue](https://github.com/metreeca/http/issues) to report a problem or to suggest a new feature
+- start a [discussion](https://github.com/metreeca/http/discussions) to ask a how-to question or to share an idea
 
 # License
 
-This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/java/blob/main/LICENSE)
+This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/http/blob/main/LICENSE)
 file for details.

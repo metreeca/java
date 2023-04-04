@@ -19,26 +19,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.metreeca</groupId>
-	<artifactId>java</artifactId>
-	<version>${revision}</version>
-	<packaging>pom</packaging>
+    <groupId>com.metreeca</groupId>
+    <artifactId>http</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
 
-	<name>Metreeca/Java</name>
-	<description>A model‑driven Java framework for rapid REST/JSON‑LD development</description>
-	<url>https://github.com/metreeca/java</url>
-	<inceptionYear>2013</inceptionYear>
+    <name>Metreeca/HTTP</name>
+    <description>A lightweight Java framework for rapid REST service development.</description>
+    <url>https://github.com/metreeca/http</url>
+    <inceptionYear>2013</inceptionYear>
 
-	<organization>
-		<name>Metreeca</name>
-		<url>https://www.metreeca.com/</url>
-	</organization>
+    <organization>
+        <name>Metreeca</name>
+        <url>https://www.metreeca.com/</url>
+    </organization>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
 			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 		</license>
@@ -69,32 +69,32 @@
 
 	</properties>
 
-	<modules>
+    <modules>
 
-		<module>java-core</module>
-		<module>java-http</module>
+        <module>http-core</module>
+        <module>http-http</module>
 
-		<module>java-mime</module>
-		<module>java-head</module>
-		<module>java-back</module>
+        <module>http-wire</module>
+        <module>http-head</module>
+        <module>http-tail</module>
 
-	</modules>
+    </modules>
 
-	<scm>
-		<connection>scm:git:git@github.com:metreeca/java.git</connection>
-		<developerConnection>scm:git:git@github.com:metreeca/java.git</developerConnection>
-		<url>https://github.com/metreeca/java</url>
-	</scm>
+    <scm>
+        <connection>scm:git:git@github.com:metreeca/http.git</connection>
+        <developerConnection>scm:git:git@github.com:metreeca/http.git</developerConnection>
+        <url>https://github.com/metreeca/http</url>
+    </scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/metreeca/java/issues</url>
+        <url>https://github.com/metreeca/http/issues</url>
 	</issueManagement>
 
 	<distributionManagement>
 
 		<site>
-			<url>https://metreeca.github.io/java/</url>
+            <url>https://metreeca.github.io/http/</url>
 		</site>
 
 		<repository>
@@ -125,13 +125,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-core</artifactId>
+                <artifactId>http-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-core</artifactId>
+                <artifactId>http-core</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -139,13 +139,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-http</artifactId>
+                <artifactId>http-http</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-http</artifactId>
+                <artifactId>http-http</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -155,48 +155,27 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-json</artifactId>
+                <artifactId>http-json</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-json</artifactId>
-				<version>${project.version}</version>
-				<type>test-jar</type>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>java-jsonld</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>java-jsonld</artifactId>
+                <artifactId>http-json</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
 
-
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-xml</artifactId>
+                <artifactId>http-jsonld</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-rdf</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>java-rdf</artifactId>
+                <artifactId>http-jsonld</artifactId>
 				<version>${project.version}</version>
 				<type>test-jar</type>
 			</dependency>
@@ -204,13 +183,34 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-csv</artifactId>
+                <artifactId>http-xml</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+                <artifactId>http-rdf</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-ical</artifactId>
+                <artifactId>http-rdf</artifactId>
+				<version>${project.version}</version>
+				<type>test-jar</type>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+                <artifactId>http-csv</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+                <artifactId>http-ical</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -219,13 +219,13 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-jee</artifactId>
+                <artifactId>http-jee</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-jse</artifactId>
+                <artifactId>http-jse</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -234,19 +234,19 @@
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-open</artifactId>
+                <artifactId>http-open</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-rdf4j</artifactId>
+                <artifactId>http-rdf4j</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.metreeca</groupId>
-				<artifactId>java-gcp</artifactId>
+                <artifactId>http-gcp</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -496,27 +496,27 @@
 								</tag>
 							</tags>
 
-							<links>
+                            <links>
 
 
-								<link>https://javadoc.io/doc/com.metreeca/java-core/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-http/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-core/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-http/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/java-json/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-jsonld/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-rdf/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-xml/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-json/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-jsonld/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-rdf/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-xml/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/java-jse/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-jee/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-jse/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-jee/latest/</link>
 
-								<link>https://javadoc.io/doc/com.metreeca/java-rdf4j/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-open/latest/</link>
-								<link>https://javadoc.io/doc/com.metreeca/java-gcp/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-rdf4j/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-open/latest/</link>
+                                <link>https://javadoc.io/doc/com.metreeca/http-gcp/latest/</link>
 
-								<link>https://rdf4j.org/javadoc/latest/</link>
+                                <link>https://rdf4j.org/javadoc/latest/</link>
 
-							</links>
+                            </links>
 
 						</configuration>
 						<version>3.3.1</version>
