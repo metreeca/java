@@ -94,7 +94,14 @@ public class Relator implements Handler {
 
                     try {
 
-                        return merge(frame(codec.decode(new StringReader(query), model.value().getClass())), model);
+                        final Class<?> clazz=model.value().getClass();
+                        final Object object=codec.decode(new StringReader(query), clazz);
+
+                        // ;( may happen if query contains top-level filters, aggregates or range metadata…
+
+                        return merge(frame(object), model).orElseThrow(() -> new IllegalArgumentException(format(
+                                "unable to parse query as <%s> template", clazz.getSimpleName()
+                        )));
 
                     } catch ( final JSON.Exception e ) {
 
@@ -141,63 +148,72 @@ public class Relator implements Handler {
 
     //// !!! factor ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> specs) {
+    private static <T> Optional<Frame<T>> merge(final Frame<T> frame, final Frame<T> specs) {
 
-        frame.entries(true).forEach(entry -> {
+        if ( frame.value().getClass().isAssignableFrom(specs.value().getClass()) ) {
 
-            final String field=entry.getKey();
+            frame.entries(true).forEach(entry -> {
 
-            final Object value=entry.getValue();
-            final Object model=specs.get(field);
+                final String field=entry.getKey();
 
-            if ( model instanceof Query ) { // merge filters
+                final Object value=entry.getValue();
+                final Object model=specs.get(field);
 
-                final Query<Object> filters=query(((Query<?>)model)
-                        .filters().entrySet().stream()
-                        .map(filter -> filter(filter.getKey(), filter.getValue()))
-                        .collect(toList())
-                );
+                if ( model instanceof Query ) { // merge filters
 
-                if ( value instanceof Query ) {
+                    final Query<Object> filters=query(((Query<?>)model)
+                            .filters().entrySet().stream()
+                            .map(filter -> filter(filter.getKey(), filter.getValue()))
+                            .collect(toList())
+                    );
 
-                    frame.set(field, query((Query<?>)value, filters));
+                    if ( value instanceof Query ) {
 
-                } else if ( value instanceof Collection ) {
+                        frame.set(field, query((Query<?>)value, filters));
 
-                    // !!! merge specs filters
-                    // !!! handles 0/1/multiple items
+                    } else if ( value instanceof Collection ) {
 
-                    throw new UnsupportedOperationException(";( be implemented"); // !!!
+                        // !!! merge specs filters
+                        // !!! handles 0/1/multiple items
 
-                } else {
+                        throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-                    // !!! merge specs filters
-                    // !!! ignore? report?
+                    } else {
 
-                    throw new UnsupportedOperationException(";( be implemented"); // !!!
+                        // !!! merge specs filters
+                        // !!! ignore? report?
+
+                        throw new UnsupportedOperationException(";( be implemented"); // !!!
+
+                    }
+
+                } else if ( model != null && !(value instanceof Query) ) { // merge specs value to support virtual
+                    // entities
+
+                    if (
+
+                            value instanceof Boolean && value.equals(false)
+                                    || value instanceof Number && ((Number)value).intValue() == 0
+                                    || value instanceof String && ((String)value).isBlank()
+                                    || value instanceof Collection && ((Collection<?>)value).isEmpty()
+
+                    ) {
+
+                        frame.set(field, model);
+
+                    }
 
                 }
 
-            } else if ( model != null && !(value instanceof Query) ) { // merge specs value to support virtual entities
+            });
 
-                if (
+            return Optional.of(frame);
 
-                        value instanceof Boolean && value.equals(false)
-                                || value instanceof Number && ((Number)value).intValue() == 0
-                                || value instanceof String && ((String)value).isBlank()
-                                || value instanceof Collection && ((Collection<?>)value).isEmpty()
+        } else {
 
-                ) {
+            return Optional.empty();
 
-                    frame.set(field, model);
-
-                }
-
-            }
-
-        });
-
-        return frame;
+        }
     }
 
 
