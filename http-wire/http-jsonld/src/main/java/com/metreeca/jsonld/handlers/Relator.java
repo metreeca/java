@@ -23,6 +23,7 @@ import com.metreeca.rest.json.JSON;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -140,32 +141,57 @@ public class Relator implements Handler {
 
     //// !!! factor ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> template) {
+    private static <T> Frame<T> merge(final Frame<T> frame, final Frame<T> specs) {
 
         frame.entries(true).forEach(entry -> {
 
             final String field=entry.getKey();
 
             final Object value=entry.getValue();
-            final Object model=template.get(field);
+            final Object model=specs.get(field);
 
-            // extend frame with template values to support virtual entities
+            if ( model instanceof Query ) { // merge filters
 
-            if ( value instanceof Query ) { // merge filters
+                final Query<Object> filters=query(((Query<?>)model)
+                        .filters().entrySet().stream()
+                        .map(filter -> filter(filter.getKey(), filter.getValue()))
+                        .collect(toList())
+                );
 
-                if ( model instanceof Query ) {
+                if ( value instanceof Query ) {
 
-                    frame.set(field, query((Query<?>)value, query(((Query<?>)model)
-                            .filters().entrySet().stream()
-                            .map(filter -> filter(filter.getKey(), filter.getValue()))
-                            .collect(toList())
-                    )));
+                    frame.set(field, query((Query<?>)value, filters));
+
+                } else if ( value instanceof Collection ) {
+
+                    // !!! merge specs filters
+                    // !!! handles 0/1/multiple items
+
+                    throw new UnsupportedOperationException(";( be implemented"); // !!!
+
+                } else {
+
+                    // !!! merge specs filters
+                    // !!! ignore? report?
+
+                    throw new UnsupportedOperationException(";( be implemented"); // !!!
 
                 }
 
-            } else { // copy value
+            } else if ( model != null && !(value instanceof Query) ) { // merge specs value to support virtual entities
 
-                frame.set(field, model);
+                if (
+
+                        value instanceof Boolean && value.equals(false)
+                                || value instanceof Number && ((Number)value).intValue() == 0
+                                || value instanceof String && ((String)value).isBlank()
+                                || value instanceof Collection && ((Collection<?>)value).isEmpty()
+
+                ) {
+
+                    frame.set(field, model);
+
+                }
 
             }
 
