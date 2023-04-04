@@ -256,7 +256,7 @@
 			<dependency>
 				<groupId>com.metreeca</groupId>
 				<artifactId>rest</artifactId>
-				<version>0.1-SNAPSHOT</version>
+				<version>0.52-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -417,7 +417,6 @@
 
 			</plugin>
 
-
 			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
@@ -438,30 +437,12 @@
 
 			</plugin>
 
-			<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
-
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-
-				<executions>
-					<execution>
-
-						<id>attach-sources</id>
-
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-
-				</executions>
-
-			</plugin>
-
 		</plugins>
 
 	</build>
 
 	<profiles>
+
 		<profile>
 
 			<id>release</id>
@@ -469,34 +450,21 @@
 			<build>
 				<plugins>
 
-					<plugin>
+					<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
 
-						<groupId>com.metreeca</groupId>
-						<artifactId>mark-maven-plugin</artifactId>
-						<version>0.8.5</version>
-
-						<inherited>false</inherited>
-
-						<configuration>
-
-							<readme>true</readme>
-
-							<options>
-								<markdown-smart-links>true</markdown-smart-links>
-								<markdown-external-links>true</markdown-external-links>
-							</options>
-
-						</configuration>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
 
 						<executions>
 							<execution>
 
-								<goals>
-									<goal>clean</goal>
-									<goal>build</goal>
-								</goals>
+								<id>attach-sources</id>
 
+								<goals>
+									<goal>jar</goal>
+								</goals>
 							</execution>
+
 						</executions>
 
 					</plugin>
@@ -640,6 +608,57 @@
 			</build>
 
 		</profile>
+
+		<profile>
+
+			<id>publish</id>
+
+			<build>
+				<plugins>
+
+					<plugin> <!-- https://maven.apache.org/plugins/maven-resources-plugin/ -->
+
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.3.0</version>
+
+						<inherited>false</inherited>
+
+						<executions>
+							<execution>
+
+								<phase>site</phase>
+
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+
+								<configuration>
+
+									<outputDirectory>${basedir}</outputDirectory>
+
+									<resources>
+										<resource>
+											<filtering>true</filtering>
+											<directory>docs</directory>
+											<includes>
+												<include>README.md</include>
+											</includes>
+										</resource>
+									</resources>
+
+								</configuration>
+
+							</execution>
+						</executions>
+
+					</plugin>
+
+				</plugins>
+			</build>
+
+		</profile>
+
 	</profiles>
 
 </project>
