@@ -18,9 +18,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up java environment
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: temurin
           cache: maven
           server-id: ossrh
@@ -30,12 +30,12 @@ jobs:
           gpg-passphrase: MAVEN_PWD
 
       - name: Release version to ossrh
+        env:
+          OSSRH_USR: ${{ secrets.OSSRH_USR }}
+          OSSRH_PWD: ${{ secrets.OSSRH_PWD }}
+          MAVEN_PWD: ${{ secrets.MAVEN_PWD }}
         run: mvn --batch-mode
           --update-snapshots
           --activate-profiles release
           -Drevision=${{ github.ref_name }}
           deploy
-        env:
-          OSSRH_USR: ${{ secrets.OSSRH_USR }}
-          OSSRH_PWD: ${{ secrets.OSSRH_PWD }}
-          MAVEN_PWD: ${{ secrets.MAVEN_PWD }}

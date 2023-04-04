@@ -14,9 +14,25 @@ jobs:
 
     steps:
 
-      - name: Mirror the release branch to main
-        uses: google/mirror-branch-action@v1.0
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java environment
+        uses: actions/setup-java@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          source: ${{ github.ref_name }}
-          dest: 'main'
+          java-version: 17
+          distribution: temurin
+          cache: maven
+
+      - name: Generate docs
+        run: >
+          mvn --batch-mode
+          --activate-profiles publish
+          -Drevision=${{ github.ref_name }}
+          install site
+
+      - name: Publish docs
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Publish docs
+          branch: main

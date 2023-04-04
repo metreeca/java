@@ -20,7 +20,7 @@ jobs:
       - name: Set up java environment
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 17
           distribution: temurin
           cache: maven
           server-id: ossrh
@@ -35,12 +35,12 @@ jobs:
           name=version::$(echo ${{ github.ref_name }} | sed -r 's:release/([0-9]+\.[0-9]+).*:\1-SNAPSHOT:')
 
       - name: Release snapshot version to ossrh
+        env:
+          OSSRH_USR: ${{ secrets.OSSRH_USR }}
+          OSSRH_PWD: ${{ secrets.OSSRH_PWD }}
+          MAVEN_PWD: ${{ secrets.MAVEN_PWD }}
         run: mvn --batch-mode
           --update-snapshots
           --activate-profiles release
           -Drevision=${{ steps.revision.outputs.version }}
           deploy
-        env:
-          OSSRH_USR: ${{ secrets.OSSRH_USR }}
-          OSSRH_PWD: ${{ secrets.OSSRH_PWD }}
-          MAVEN_PWD: ${{ secrets.MAVEN_PWD }}
