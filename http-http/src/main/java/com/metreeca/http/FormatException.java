@@ -53,6 +53,31 @@ public final class FormatException extends RuntimeException {
         this.status=status;
     }
 
+    /**
+     * Creates a format exception.
+     *
+     * @param status  a client error HTTP status code ({@code 4xx})
+     * @param message the exception message
+     * @param cause   the (possibly null) exception cause
+     *
+     * @throws IllegalArgumentException if {@code status} is outside the client error message
+     * @throws NullPointerException     if {@code message} is null
+     */
+    public FormatException(final int status, final String message, final Throwable cause) {
+
+        super(message, cause);
+
+        if ( message == null ) {
+            throw new NullPointerException("null message");
+        }
+
+        if ( status < 400 ) {
+            throw new IllegalArgumentException("status outside client error range");
+        }
+
+        this.status=status;
+    }
+
 
     /**
      * Retrieves the exception client error HTTP status code

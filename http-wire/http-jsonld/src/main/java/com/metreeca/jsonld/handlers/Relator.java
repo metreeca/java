@@ -19,7 +19,7 @@ package com.metreeca.jsonld.handlers;
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
 import com.metreeca.rest.*;
-import com.metreeca.rest.json.JSON;
+import com.metreeca.rest.json.JSONException;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -97,15 +97,13 @@ public class Relator implements Handler {
                         final Class<?> clazz=model.value().getClass();
                         final Object object=codec.decode(new StringReader(query), clazz);
 
-                        // ;( may happen if query contains top-level filters, aggregates or range metadata…
-
                         return merge(frame(object), model).orElseThrow(() -> new IllegalArgumentException(format(
                                 "unable to parse query as <%s> template", clazz.getSimpleName()
                         )));
 
-                    } catch ( final JSON.Exception e ) {
+                    } catch ( final JSONException e ) {
 
-                        throw new FormatException(BadRequest, e.getMessage());
+                        throw new FormatException(BadRequest, e.getMessage(), e);
 
                     } catch ( final IOException e ) {
 

@@ -19,6 +19,7 @@ package com.metreeca.jsonld.formats;
 import com.metreeca.http.*;
 import com.metreeca.rest.*;
 import com.metreeca.rest.json.JSON;
+import com.metreeca.rest.json.JSONException;
 
 import java.io.*;
 import java.net.URI;
@@ -123,7 +124,7 @@ public final class Bean<T> implements Format<T> {
 
                         return service(codec()).decode(reader, clazz);
 
-                    } catch ( final UnsupportedEncodingException|JSON.Exception e ) {
+                    } catch ( final UnsupportedEncodingException|JSONException e ) {
 
                         throw new FormatException(BadRequest, e.getMessage());
 
