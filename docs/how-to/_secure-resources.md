@@ -24,13 +24,13 @@ import static com.metreeca.link.Values.uuid;
 import static com.metreeca.rdf4j.assets.Graph.graph;
 import static com.metreeca.rdf4j.handlers.Graphs.graphs;
 import static com.metreeca.rdf4j.handlers.SPARQL.sparql;
-import static com.metreeca.rest.Context.asset;
-import static com.metreeca.rest.assets.Logger.logger;
-import static com.metreeca.rest.assets.Vault.vault;
-import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest._wrappers.Bearer.bearer;
-import static com.metreeca.rest._wrappers.CORS.cors;
-import static com.metreeca.rest._wrappers.Gateway.gateway;
+import static com.metreeca.link.Context.asset;
+import static com.metreeca.link.assets.Logger.logger;
+import static com.metreeca.link.assets.Vault.vault;
+import static com.metreeca.link.handlers.Router.router;
+import static com.metreeca.link._wrappers.Bearer.bearer;
+import static com.metreeca.link._wrappers.CORS.cors;
+import static com.metreeca.link._wrappers.Gateway.gateway;
 
 import static java.lang.String.format;
 

@@ -18,13 +18,13 @@ package com.metreeca.jsonld.handlers;
 
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
-import com.metreeca.rest.Trace;
+import com.metreeca.link.Trace;
 
 import java.util.*;
 import java.util.function.Function;
 
 import static com.metreeca.http.Response.UnprocessableEntity;
-import static com.metreeca.rest.Trace.trace;
+import static com.metreeca.link.Trace.trace;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;

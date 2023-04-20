@@ -17,7 +17,7 @@
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.http.*;
-import com.metreeca.rest.Engine;
+import com.metreeca.link.Engine;
 
 import java.util.function.Function;
 
@@ -25,7 +25,7 @@ import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.jsonld.formats.Bean.engine;
-import static com.metreeca.rest.Frame.frame;
+import static com.metreeca.link.Frame.frame;
 
 /**
  * Model-driven resource deleter.

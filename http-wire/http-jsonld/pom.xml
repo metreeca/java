@@ -42,7 +42,7 @@
 
         <dependency>
             <groupId>com.metreeca</groupId>
-            <artifactId>rest-jsonld</artifactId>
+            <artifactId>link-jsonld</artifactId>
         </dependency>
 
         <dependency>

@@ -18,8 +18,8 @@ package com.metreeca.jsonld.handlers;
 
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
-import com.metreeca.rest.*;
-import com.metreeca.rest.json.JSONException;
+import com.metreeca.link.*;
+import com.metreeca.link.json.JSONException;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -31,10 +31,10 @@ import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.formats.Bean.codec;
 import static com.metreeca.jsonld.formats.Bean.engine;
-import static com.metreeca.rest.Frame.frame;
-import static com.metreeca.rest.Query.filter;
-import static com.metreeca.rest.Query.query;
-import static com.metreeca.rest.Trace.trace;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Query.filter;
+import static com.metreeca.link.Query.query;
+import static com.metreeca.link.Trace.trace;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;

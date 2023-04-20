@@ -4,7 +4,7 @@ trail: "How-To"
 ---
 
 Sometimes you need to access resources using alternate identifiers or to set up simplified query endpoints:
-the [Aliaser](../javadocs/com/metreeca/rest/wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting
+the [Aliaser](../javadocs/com.metreeca.link.wrappers/Aliaser.html) wrapper/handler supports these use cases redirecting
 requests to canonical resources located by a custom alias resolver.
 
 The following samples present typical setups built on the same data used in

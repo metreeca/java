@@ -19,7 +19,7 @@ package com.metreeca.jsonld.handlers;
 import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.*;
 import com.metreeca.jsonld.formats.Bean;
-import com.metreeca.rest.*;
+import com.metreeca.link.*;
 
 import java.net.URI;
 import java.util.Objects;
@@ -31,8 +31,8 @@ import static com.metreeca.core.toolkits.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.core.toolkits.Identifiers.md5;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.formats.Bean.engine;
-import static com.metreeca.rest.Frame.frame;
-import static com.metreeca.rest.Trace.trace;
+import static com.metreeca.link.Frame.frame;
+import static com.metreeca.link.Trace.trace;
 
 import static java.lang.String.format;
 import static java.util.function.Predicate.not;

@@ -26,7 +26,7 @@ import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.Response.UnprocessableEntity;
 import static com.metreeca.http.ResponseAssert.assertThat;
-import static com.metreeca.rest.Trace.trace;
+import static com.metreeca.link.Trace.trace;
 
 
 final class ValidatorTest {

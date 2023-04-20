@@ -17,9 +17,9 @@
 package com.metreeca.jsonld.formats;
 
 import com.metreeca.http.*;
-import com.metreeca.rest.*;
-import com.metreeca.rest.json.JSON;
-import com.metreeca.rest.json.JSONException;
+import com.metreeca.link.*;
+import com.metreeca.link.json.JSON;
+import com.metreeca.link.json.JSONException;
 
 import java.io.*;
 import java.net.URI;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import static com.metreeca.core.Locator.service;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
-import static com.metreeca.rest.Frame.frame;
+import static com.metreeca.link.Frame.frame;
 
 import static java.lang.String.format;
 import static java.util.function.Predicate.not;
