@@ -17,9 +17,13 @@
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.core.toolkits.Identifiers;
-import com.metreeca.http.*;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.jsonld.formats.Bean;
-import com.metreeca.link.*;
+import com.metreeca.link.Engine;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Trace;
 
 import java.net.URI;
 import java.util.Objects;
@@ -80,7 +84,7 @@ public class Creator implements Handler {
 
     private final Frame<Object> model;
 
-    private Function<Request, String> slug=request -> md5();
+    private Function<Request, String> slug=request -> URI.create(request.item()).resolve(md5()).toString();
 
     private final Engine engine=service(engine());
 
@@ -121,10 +125,10 @@ public class Creator implements Handler {
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        final Frame<?> body=frame(request.body(new Bean<>(model.getClass())));
+        final Frame<?> body=frame(request.body(new Bean<>(model.value().getClass())));
 
         final String expected=request.item();
-        final String provided=body.id();
+        final String provided=body.id(); // !!! resolve against request.base()
 
         if ( Optional.ofNullable(provided)
 

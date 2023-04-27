@@ -16,9 +16,13 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.jsonld.formats.Bean;
-import com.metreeca.link.*;
+import com.metreeca.link.Engine;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Trace;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -88,7 +92,7 @@ public class Updater implements Handler {
         final Frame<?> body=frame(request.body(new Bean<>(type)));
 
         final String expected=request.item();
-        final String provided=body.id();
+        final String provided=body.id(); // !!! resolve against request.base()
 
         if ( Optional.ofNullable(provided)
 

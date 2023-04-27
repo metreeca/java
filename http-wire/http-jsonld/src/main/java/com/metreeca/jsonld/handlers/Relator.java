@@ -16,12 +16,17 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.http.FormatException;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.jsonld.formats.Bean;
 import com.metreeca.link.*;
 import com.metreeca.link.json.JSONException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Optional;
@@ -115,7 +120,7 @@ public class Relator implements Handler {
                 .orElseGet(model::copy);
 
         final String expected=request.item();
-        final String provided=template.id();
+        final String provided=template.id(); // !!! resolve against request.base()
 
         if ( Optional.ofNullable(provided)
 
