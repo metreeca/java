@@ -17,11 +17,12 @@
 package com.metreeca.jsonld.handlers;
 
 import com.metreeca.core.Locator;
-import com.metreeca.jsonld.formats.Bean;
 import com.metreeca.link.Engine;
 
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static com.metreeca.jsonld.formats.Bean.engine;
 
 
 final class _OperatorTest {
@@ -31,7 +32,7 @@ final class _OperatorTest {
 
     static void exec(final Predicate<Object> success, final Runnable task) {
         new Locator()
-                .set(Bean.engine(), () -> new MockEngine(success))
+                .set(engine(), () -> new MockEngine(success))
                 .exec(task)
                 .clear();
     }
@@ -48,6 +49,7 @@ final class _OperatorTest {
             this.success=success;
         }
 
+
         @Override public <V> Optional<V> retrieve(final V v) {
             return Optional.of(v).filter(success);
         }
@@ -63,6 +65,7 @@ final class _OperatorTest {
         @Override public <V> Optional<V> delete(final V v) {
             return Optional.of(v).filter(success);
         }
+
     }
 
 }

@@ -181,7 +181,7 @@ public class Relator implements Handler {
 
                         throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-                    } else {
+                    } else if ( value != null ) {
 
                         // !!! merge specs filters
                         // !!! ignore? report?
@@ -190,8 +190,7 @@ public class Relator implements Handler {
 
                     }
 
-                } else if ( model != null && !(value instanceof Query) ) { // merge specs value to support virtual
-                    // entities
+                } else if ( model != null && !(value instanceof Query) ) { // merge specs to support virtual entities
 
                     if (
 
