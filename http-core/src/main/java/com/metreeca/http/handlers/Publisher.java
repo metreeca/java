@@ -42,7 +42,6 @@ import static com.metreeca.http.Request.GET;
 import static com.metreeca.http.Request.HEAD;
 import static com.metreeca.http.Response.NotModified;
 import static com.metreeca.http.Response.OK;
-import static com.metreeca.http.toolkits.Lambdas.unchecked;
 import static com.metreeca.http.toolkits.Resources.input;
 
 import static java.lang.Math.max;
@@ -295,29 +294,37 @@ public final class Publisher extends Delegator {
 
                     .findFirst()
 
-                    .map(file -> request.reply().map(unchecked(response -> {
+                    .map(file -> request.reply().map(response -> {
 
-                        final String mime=mime(file.getFileName().toString());
-                        final String length=String.valueOf(Files.size(file));
-                        final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
+                        try {
 
-                        return request.headers("If-None-Match").anyMatch(etag::equals)
+                            final String mime=mime(file.getFileName().toString());
+                            final String length=String.valueOf(Files.size(file));
+                            final String etag=format("\"%s\"", Files.getLastModifiedTime(file).toMillis());
 
-                                ? response.status(NotModified)
+                            return request.headers("If-None-Match").anyMatch(etag::equals)
 
-                                : request.method().equals(HEAD)
+                                    ? response.status(NotModified)
 
-                                ? response.status(OK)
-                                .header("Content-Type", mime)
-                                .header("ETag", etag)
+                                    : request.method().equals(HEAD)
 
-                                : response.status(OK)
-                                .header("Content-Type", mime)
-                                .header("Content-Length", length)
-                                .header("ETag", etag)
-                                .output(Lambdas.unchecked(output -> { Files.copy(file, output); }));
+                                    ? response.status(OK)
+                                    .header("Content-Type", mime)
+                                    .header("ETag", etag)
 
-                    })))
+                                    : response.status(OK)
+                                    .header("Content-Type", mime)
+                                    .header("Content-Length", length)
+                                    .header("ETag", etag)
+                                    .output(Lambdas.unchecked(output -> { Files.copy(file, output); }));
+
+                        } catch ( final IOException e ) {
+
+                            throw new UncheckedIOException(e);
+
+                        }
+
+                    }))
 
                     .orElseGet(() -> forward.apply(request));
 

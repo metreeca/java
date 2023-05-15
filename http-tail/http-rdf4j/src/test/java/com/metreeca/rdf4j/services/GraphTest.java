@@ -43,7 +43,6 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.toolkits.Lambdas.task;
 import static com.metreeca.rdf.Frame.frame;
 import static com.metreeca.rdf.ModelAssert.assertThat;
 import static com.metreeca.rdf.Values.*;
@@ -224,7 +223,13 @@ public final class GraphTest {
 
 
     public static Runnable model(final Iterable<Statement> model, final Resource... contexts) {
-        return () -> service(Graph.graph()).update(task(connection -> connection.add(model, contexts)));
+        return () -> service(Graph.graph()).update(connection -> {
+
+            connection.add(model, contexts);
+
+            return null;
+
+        });
     }
 
 

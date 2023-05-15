@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.http.toolkits.Lambdas.unchecked;
 
 import static java.lang.String.format;
 
@@ -139,11 +138,15 @@ public interface Translator {
             }
         }
 
-        @Override public void close() {
-            translators.stream()
-                    .filter(AutoCloseable.class::isInstance)
-                    .map(AutoCloseable.class::cast)
-                    .forEach(unchecked(AutoCloseable::close));
+        @Override public void close() throws Exception {
+
+            for (final Translator translator : translators) {
+                if ( translator instanceof AutoCloseable ) {
+                    ((AutoCloseable)translator).close();
+
+                }
+            }
+
         }
 
     }

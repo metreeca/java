@@ -47,7 +47,6 @@ import java.util.stream.Stream;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.http.services.Logger.time;
-import static com.metreeca.http.toolkits.Lambdas.task;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;
 import static com.metreeca.rdf.Values.*;
@@ -407,7 +406,7 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
      * @param updates a stream of wikidata item updates
      */
     private void load(final Stream<Collection<Statement>> updates) {
-        updates.sequential().forEach(update -> target.update(task(connection -> { // inside a single txn
+        updates.sequential().forEach(update -> target.update(connection -> { // inside a single txn
 
             Xtream.from(update) // remove existing data // !!! logging
 
@@ -469,7 +468,9 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
                             .contexts(contexts)
                     );
 
-        })));
+            return this;
+
+        }));
     }
 
     /**
@@ -483,22 +484,26 @@ public final class WikidataMirror implements Consumer<Stream<String>>, Function<
 
         time(() -> {
 
-            target.update(task(connection -> stream(connection.getStatements(null, RDF.TYPE, ITEM, contexts))
+            target.update(connection -> {
 
-                    .map(Statement::getSubject)
+                stream(connection.getStatements(null, RDF.TYPE, ITEM, contexts))
 
-                    .filter(alive.negate())
+                        .map(Statement::getSubject)
 
-                    .peek(resource -> reaped.incrementAndGet())
+                        .filter(alive.negate())
 
-                    // !!! remove symmetric concise bounded description?
+                        .peek(resource -> reaped.incrementAndGet())
 
-                    .forEach(resource -> {
-                        connection.remove(resource, null, null, contexts);
-                        connection.remove(null, null, resource, contexts);
-                    })
+                        // !!! remove symmetric concise bounded description?
 
-            ));
+                        .forEach(resource -> {
+                            connection.remove(resource, null, null, contexts);
+                            connection.remove(null, null, resource, contexts);
+                        });
+
+                return this;
+
+            });
 
         }).apply(t ->
 

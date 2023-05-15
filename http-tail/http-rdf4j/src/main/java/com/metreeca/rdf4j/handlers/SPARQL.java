@@ -45,7 +45,7 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.http.toolkits.Lambdas.guarded;
+import static com.metreeca.rdf.Values.guarded;
 import static com.metreeca.rdf.formats.RDF.service;
 
 

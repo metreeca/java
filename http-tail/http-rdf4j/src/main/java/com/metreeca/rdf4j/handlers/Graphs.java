@@ -46,7 +46,6 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.http.toolkits.Lambdas.task;
 import static com.metreeca.rdf.Values.iri;
 import static com.metreeca.rdf.Values.statement;
 import static com.metreeca.rdf.formats.RDF.service;
@@ -102,7 +101,8 @@ public final class Graphs extends Endpoint<Graphs> {
             final IRI focus=iri(request.item());
             final Model model=new LinkedHashModel();
 
-            graph().query(task(connection -> {
+            graph().query(connection -> {
+
                 try ( final RepositoryResult<Resource> contexts=connection.getContextIDs() ) {
                     while ( contexts.hasNext() ) {
 
@@ -113,7 +113,10 @@ public final class Graphs extends Endpoint<Graphs> {
 
                     }
                 }
-            }));
+
+                return this;
+
+            });
 
             return request.reply(OK)
                     .body(new com.metreeca.rdf.formats.RDF(), model);
@@ -128,7 +131,13 @@ public final class Graphs extends Endpoint<Graphs> {
 
             try ( final ByteArrayOutputStream data=new ByteArrayOutputStream() ) {
 
-                graph().query(task(connection -> connection.export(factory.getWriter(data), context)));
+                graph().query(connection -> {
+
+                    connection.export(factory.getWriter(data), context);
+
+                    return this;
+
+                });
 
                 return graph().query(connection -> request.reply().map(response -> response.status(OK)
 

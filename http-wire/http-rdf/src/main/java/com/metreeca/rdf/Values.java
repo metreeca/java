@@ -17,7 +17,6 @@
 package com.metreeca.rdf;
 
 import com.metreeca.http.toolkits.Identifiers;
-import com.metreeca.http.toolkits.Lambdas;
 import com.metreeca.http.toolkits.Strings;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
@@ -456,30 +455,30 @@ public final class Values {
 
 
     public static Optional<Boolean> bool(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::booleanValue));
+        return literal(value).map(guarded(Literal::booleanValue));
     }
 
 
     public static Optional<BigInteger> integer(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::integerValue));
+        return literal(value).map(guarded(Literal::integerValue));
     }
 
     public static Optional<BigDecimal> decimal(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::decimalValue));
+        return literal(value).map(guarded(Literal::decimalValue));
     }
 
 
     public static Optional<String> string(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::stringValue));
+        return literal(value).map(guarded(Literal::stringValue));
     }
 
 
     public static Optional<TemporalAccessor> temporalAccessor(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::temporalAccessorValue));
+        return literal(value).map(guarded(Literal::temporalAccessorValue));
     }
 
     public static Optional<TemporalAmount> temporalAmount(final Value value) {
-        return literal(value).map(Lambdas.guarded(Literal::temporalAmountValue));
+        return literal(value).map(guarded(Literal::temporalAmountValue));
     }
 
 
@@ -735,6 +734,40 @@ public final class Values {
                 .orElse(iri);
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Creates a guarded function.
+     *
+     * @param function the function to be wrapped
+     * @param <V>      the type of the {@code function} input value
+     * @param <R>      the type of the {@code function} return value
+     *
+     * @return a function returning the value produced by applying {@code function} to its input value, if the input
+     * value is not null and no exception is thrown in the process, or {@code null}, otherwise
+     *
+     * @throws NullPointerException if {@code function} is null
+     */
+    public static <V, R> Function<V, R> guarded(final Function<? super V, ? extends R> function) {
+
+        if ( function == null ) {
+            throw new NullPointerException("null function");
+        }
+
+        return value -> {
+            try {
+
+                return value == null ? null : function.apply(value);
+
+            } catch ( final RuntimeException e ) {
+
+                return null;
+
+            }
+        };
+
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
