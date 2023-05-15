@@ -66,7 +66,7 @@ Metreeca/HTTP is a lightweight Java framework for rapid REST service development
 2. Write your first server and launch it
 
 ```java
-import com.metreeca.jse.JSEServer;
+import com.metreeca.http.jse.JSEServer;
 
 import static com.metreeca.link.Response.OK;
 import static com.metreeca.link._formats.TextFormat.text;

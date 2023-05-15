@@ -12,8 +12,8 @@ title:      How To Secure Resources
 
 ```java
 
-import com.metreeca.jse.JSEServer;
-import com.metreeca.rdf4j.assets.Graph;
+import com.metreeca.http.jse.JSEServer;
+import com.metreeca.http.rdf4j.assets.Graph;
 
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
@@ -21,9 +21,9 @@ import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 import java.io.File;
 
 import static com.metreeca.link.Values.uuid;
-import static com.metreeca.rdf4j.assets.Graph.graph;
-import static com.metreeca.rdf4j.handlers.Graphs.graphs;
-import static com.metreeca.rdf4j.handlers.SPARQL.sparql;
+import static com.metreeca.http.rdf4j.assets.Graph.graph;
+import static com.metreeca.http.rdf4j.handlers.Graphs.graphs;
+import static com.metreeca.http.rdf4j.handlers.SPARQL.sparql;
 import static com.metreeca.link.Context.asset;
 import static com.metreeca.link.assets.Logger.logger;
 import static com.metreeca.link.assets.Vault.vault;

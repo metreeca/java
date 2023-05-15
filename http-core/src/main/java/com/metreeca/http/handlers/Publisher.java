@@ -21,7 +21,6 @@ import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.formats.Data;
 import com.metreeca.http.services.Fetcher.URLFetcher;
-import com.metreeca.http.toolkits.Lambdas;
 
 import java.io.*;
 import java.net.URI;
@@ -136,8 +135,8 @@ public final class Publisher extends Delegator {
      *
      * @param path the path of the resource whose MIME type is to be guessed
      *
-     * @return the well-known MIME type associated with the extension of the {@code path} filename or {@value Data#MIME},
-     * if {@code path} doesn't include an extension or no well-known MIME type is defined
+     * @return the well-known MIME type associated with the extension of the {@code path} filename or
+     * {@value Data#MIME}, if {@code path} doesn't include an extension or no well-known MIME type is defined
      *
      * @throws NullPointerException if {@code path} is null
      */
@@ -236,9 +235,13 @@ public final class Publisher extends Delegator {
             // load the filesystem from the service locator to have it automatically closed
             // !!! won't handle multiple publishers from the same filesystem
 
-            final FileSystem filesystem=service(Lambdas.unchecked(() ->
-                    FileSystems.newFileSystem(URI.create(jar), emptyMap())
-            ));
+            final FileSystem filesystem=service(() -> {
+                try {
+                    return FileSystems.newFileSystem(URI.create(jar), emptyMap());
+                } catch ( final IOException e ) {
+                    throw new UncheckedIOException(e);
+                }
+            });
 
             this.assets=filesystem.getPath(entry);
 
@@ -316,7 +319,13 @@ public final class Publisher extends Delegator {
                                     .header("Content-Type", mime)
                                     .header("Content-Length", length)
                                     .header("ETag", etag)
-                                    .output(Lambdas.unchecked(output -> { Files.copy(file, output); }));
+                                    .output(output -> {
+                                        try {
+                                            Files.copy(file, output);
+                                        } catch ( final IOException e ) {
+                                            throw new UncheckedIOException(e);
+                                        }
+                                    });
 
                         } catch ( final IOException e ) {
 
