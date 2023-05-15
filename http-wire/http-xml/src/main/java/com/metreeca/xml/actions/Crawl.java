@@ -16,11 +16,13 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.core.Regex;
-import com.metreeca.core.Xtream;
 import com.metreeca.http.Message;
 import com.metreeca.http.Request;
-import com.metreeca.http.actions.*;
+import com.metreeca.http.actions.Fetch;
+import com.metreeca.http.actions.Parse;
+import com.metreeca.http.actions.Query;
+import com.metreeca.http.work.Regex;
+import com.metreeca.http.work.Xtream;
 import com.metreeca.xml.XPath;
 import com.metreeca.xml.formats.HTML;
 
@@ -31,7 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;

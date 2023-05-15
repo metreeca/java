@@ -21,7 +21,9 @@ import com.metreeca.http.Response;
 import com.metreeca.rdf.ModelAssert;
 import com.metreeca.rdf4j.services.GraphTest;
 
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.VOID;
@@ -29,7 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.Unauthorized;
 import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.rdf.ModelAssert.assertThat;

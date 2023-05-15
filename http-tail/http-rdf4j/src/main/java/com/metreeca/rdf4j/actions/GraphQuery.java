@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.actions;
 
-import com.metreeca.core.services.Logger;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.model.Statement;
@@ -25,13 +25,12 @@ import org.eclipse.rdf4j.query.Operation;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.services.Logger.time;
-
-import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
-import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.time;
 
 import static java.lang.String.format;
+import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
+import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 
 
 /**
@@ -41,7 +40,7 @@ import static java.lang.String.format;
  */
 public final class GraphQuery extends Action<GraphQuery> implements Function<String, Stream<Statement>> {
 
-	private final Logger logger=service(Logger.logger());
+    private final Logger logger=service(Logger.logger());
 
 
     /**
@@ -55,11 +54,11 @@ public final class GraphQuery extends Action<GraphQuery> implements Function<Str
     @Override public Stream<Statement> apply(final String query) {
         return query == null || query.isEmpty() ? Stream.empty() : graph().query(connection -> time(() ->
 
-		        asList(configure(connection.prepareGraphQuery(SPARQL, query, base())).evaluate()).parallelStream()
+                asList(configure(connection.prepareGraphQuery(SPARQL, query, base())).evaluate()).parallelStream()
 
         ).apply((t, v) ->
 
-		        logger.info(this, format("executed in <%,d> ms", t))
+                logger.info(this, format("executed in <%,d> ms", t))
 
         ));
     }

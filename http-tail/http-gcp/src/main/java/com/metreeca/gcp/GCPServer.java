@@ -16,10 +16,10 @@
 
 package com.metreeca.gcp;
 
-import com.metreeca.core.Locator;
 import com.metreeca.gcp.services.GCPStore;
 import com.metreeca.gcp.services.GCPVault;
 import com.metreeca.http.Handler;
+import com.metreeca.http.Locator;
 import com.metreeca.jse.JSEServer;
 
 import com.google.cloud.ServiceOptions;
@@ -29,10 +29,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.path;
-import static com.metreeca.core.services.Store.store;
-import static com.metreeca.core.services.Vault.vault;
+import static com.metreeca.http.Locator.path;
 import static com.metreeca.http.Response.Forbidden;
+import static com.metreeca.http.services.Store.store;
+import static com.metreeca.http.services.Vault.vault;
 
 import static java.lang.String.format;
 
@@ -57,7 +57,7 @@ public final class GCPServer {
      * @return {@code true} if running in the development environment; {@code false}, otherwise
      */
     public static boolean development() {
-		return Objects.isNull(System.getenv(AddressVariable));
+        return Objects.isNull(System.getenv(AddressVariable));
     }
 
     /**

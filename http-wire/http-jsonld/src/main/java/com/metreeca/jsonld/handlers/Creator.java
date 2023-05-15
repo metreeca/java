@@ -16,10 +16,10 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
+import com.metreeca.http.toolkits.Identifiers;
 import com.metreeca.jsonld.formats.Bean;
 import com.metreeca.link.Engine;
 import com.metreeca.link.Frame;
@@ -30,10 +30,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.toolkits.Identifiers.AbsoluteIRIPattern;
-import static com.metreeca.core.toolkits.Identifiers.md5;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
+import static com.metreeca.http.toolkits.Identifiers.AbsoluteIRIPattern;
+import static com.metreeca.http.toolkits.Identifiers.md5;
 import static com.metreeca.jsonld.formats.Bean.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Trace.trace;

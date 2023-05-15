@@ -29,17 +29,23 @@ import org.eclipse.rdf4j.query.resultio.*;
 import org.eclipse.rdf4j.query.resultio.sparqljson.SPARQLBooleanJSONWriterFactory;
 import org.eclipse.rdf4j.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.rio.*;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.RDFWriterFactory;
+import org.eclipse.rdf4j.rio.RDFWriterRegistry;
 import org.eclipse.rdf4j.rio.ntriples.NTriplesWriterFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.metreeca.core.toolkits.Lambdas.guarded;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
+import static com.metreeca.http.toolkits.Lambdas.guarded;
 import static com.metreeca.rdf.formats.RDF.service;
 
 

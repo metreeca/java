@@ -16,24 +16,28 @@
 
 package com.metreeca.rdf4j.actions;
 
-import com.metreeca.core.services.Logger;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.query.Operation;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.services.Logger.time;
-
-import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.time;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
+import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 
 /**
  * SPARQL update action.

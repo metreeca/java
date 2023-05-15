@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.toolkits.Strings.normalize;
+import static com.metreeca.http.toolkits.Strings.normalize;
 import static com.metreeca.xml.formats.HTML.html;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

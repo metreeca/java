@@ -16,8 +16,12 @@
 
 package com.metreeca.jsonld.formats;
 
-import com.metreeca.http.*;
-import com.metreeca.link.*;
+import com.metreeca.http.Format;
+import com.metreeca.http.FormatException;
+import com.metreeca.http.Message;
+import com.metreeca.link.Codec;
+import com.metreeca.link.Engine;
+import com.metreeca.link.Frame;
 import com.metreeca.link.json.JSON;
 import com.metreeca.link.json.JSONException;
 
@@ -29,7 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
 import static com.metreeca.link.Frame.frame;

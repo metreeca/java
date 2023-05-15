@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf4j.actions;
 
-import com.metreeca.core.services.Logger;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 
 import org.eclipse.rdf4j.query.BindingSet;
@@ -25,13 +25,12 @@ import org.eclipse.rdf4j.query.Operation;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.services.Logger.time;
-
-import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
-import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.time;
 
 import static java.lang.String.format;
+import static org.eclipse.rdf4j.common.iteration.Iterations.asList;
+import static org.eclipse.rdf4j.query.QueryLanguage.SPARQL;
 
 /**
  * SPARQL tuple query action.
@@ -40,27 +39,27 @@ import static java.lang.String.format;
  */
 public final class TupleQuery extends Action<TupleQuery> implements Function<String, Stream<BindingSet>> {
 
-	private final Logger logger=service(Logger.logger());
+    private final Logger logger=service(Logger.logger());
 
 
-	/**
-	 * Executes a SPARQL tuple query.
-	 *
-	 * @param query the graph query to be executed
-	 *
-	 * @return a stream of binding sets produced by executing {@code query} against the {@linkplain #graph(Graph)
-	 * target graph} after {@linkplain #configure(Operation) configuring} it; null or empty queries are silently ignored
-	 */
-	@Override public Stream<BindingSet> apply(final String query) {
-		return query == null || query.isEmpty() ? Stream.empty() : graph().query(connection -> time(() ->
+    /**
+     * Executes a SPARQL tuple query.
+     *
+     * @param query the graph query to be executed
+     *
+     * @return a stream of binding sets produced by executing {@code query} against the {@linkplain #graph(Graph)
+     * target graph} after {@linkplain #configure(Operation) configuring} it; null or empty queries are silently ignored
+     */
+    @Override public Stream<BindingSet> apply(final String query) {
+        return query == null || query.isEmpty() ? Stream.empty() : graph().query(connection -> time(() ->
 
-				asList(configure(connection.prepareTupleQuery(SPARQL, query, base())).evaluate()).parallelStream()
+                asList(configure(connection.prepareTupleQuery(SPARQL, query, base())).evaluate()).parallelStream()
 
-		).apply((t, v) ->
+        ).apply((t, v) ->
 
-				logger.info(this, format("executed in <%,d> ms", t))
+                logger.info(this, format("executed in <%,d> ms", t))
 
-		));
-	}
+        ));
+    }
 
 }

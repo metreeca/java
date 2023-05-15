@@ -16,12 +16,14 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.http.*;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.link.Engine;
 
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.jsonld.formats.Bean.engine;

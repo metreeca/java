@@ -16,7 +16,7 @@
 
 package com.metreeca.gcp.services;
 
-import com.metreeca.core.services.Vault;
+import com.metreeca.http.services.Vault;
 
 import com.google.cloud.secretmanager.v1.*;
 

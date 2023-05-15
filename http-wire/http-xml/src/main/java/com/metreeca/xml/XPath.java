@@ -16,22 +16,22 @@
 
 package com.metreeca.xml;
 
-import com.metreeca.core.Xtream;
+import com.metreeca.http.work.Xtream;
 
 import org.w3c.dom.*;
 
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.*;
-
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
-
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 /**

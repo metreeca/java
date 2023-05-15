@@ -16,18 +16,19 @@
 
 package com.metreeca.xml.actions;
 
-import com.metreeca.core.Xtream;
+import com.metreeca.http.work.Xtream;
 import com.metreeca.xml.XPath;
 
 import org.w3c.dom.*;
 
-import java.util.*;
-import java.util.function.Function;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.function.Function;
 
-import static com.metreeca.core.toolkits.Strings.normalize;
+import static com.metreeca.http.toolkits.Strings.normalize;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingDouble;
@@ -39,119 +40,119 @@ import static java.util.Comparator.comparingDouble;
  */
 public final class Extract implements Function<Node, Optional<Node>> {
 
-	private static final Collection<String> textual=new HashSet<>(asList(
-			"h1", "h2", "h3", "h4", "h5", "h6",
-			"p", "blockquote", "pre",
-			"ul", "ol", "dl", "li", "dt", "dd",
-			"table", "th", "td"
-	));
+    private static final Collection<String> textual=new HashSet<>(asList(
+            "h1", "h2", "h3", "h4", "h5", "h6",
+            "p", "blockquote", "pre",
+            "ul", "ol", "dl", "li", "dt", "dd",
+            "table", "th", "td"
+    ));
 
-	private static final Collection<String> ignored=new HashSet<>(asList(
-			"style", "script"
-	));
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Optional<Node> apply(final Node root) {
-		if ( root == null ) { return Optional.empty(); } else {
-			return Xtream
-
-					.of(annotate(root))
-
-					.map(XPath::new).flatMap(xpath -> xpath.nodes("//*"))
-
-					.max(comparingDouble(value -> get(value, "echars", 0.0)))
-
-					.map((node -> {
-
-						try {
-
-							// create a new document to provide a root for xpath queries
-
-							final Document document=DocumentBuilderFactory
-									.newInstance()
-									.newDocumentBuilder()
-									.newDocument();
-
-							document.setDocumentURI(node.getBaseURI());
-							document.appendChild(document.adoptNode(node.cloneNode(true)));
-							document.normalizeDocument();
-
-							return document;
-
-						} catch ( final ParserConfigurationException unexpected ) {
-							throw new RuntimeException(unexpected);
-						}
-
-					}));
-		}
-	}
+    private static final Collection<String> ignored=new HashSet<>(asList(
+            "style", "script"
+    ));
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private <T extends Node> T annotate(final T node) {
+    @Override public Optional<Node> apply(final Node root) {
+        if ( root == null ) { return Optional.empty(); } else {
+            return Xtream
 
-		if ( node instanceof Document ) {
+                    .of(annotate(root))
 
-			((Document)node).normalizeDocument();
+                    .map(XPath::new).flatMap(xpath -> xpath.nodes("//*"))
 
-			annotate(((Document)node).getDocumentElement());
+                    .max(comparingDouble(value -> get(value, "echars", 0.0)))
 
-		} else if ( node instanceof Element && !ignored.contains(node.getNodeName()) ) {
+                    .map((node -> {
 
-			double xchars=0;
-			double echars=0;
+                        try {
 
-			int nodes=0;
-			int blobs=0;
+                            // create a new document to provide a root for xpath queries
 
-			final NodeList children=node.getChildNodes();
+                            final Document document=DocumentBuilderFactory
+                                    .newInstance()
+                                    .newDocumentBuilder()
+                                    .newDocument();
 
-			for (int i=0, n=children.getLength(); i < n; ++i) {
+                            document.setDocumentURI(node.getBaseURI());
+                            document.appendChild(document.adoptNode(node.cloneNode(true)));
+                            document.normalizeDocument();
 
-				final Node child=annotate(children.item(i));
+                            return document;
 
-				xchars+=get(child, "xchars", 0.0);
-				echars+=get(child, "echars", 0.0);
+                        } catch ( final ParserConfigurationException unexpected ) {
+                            throw new RuntimeException(unexpected);
+                        }
 
-				if ( child instanceof Element ) { ++nodes; }
-				if ( textual.contains(child.getNodeName()) ) { ++blobs; }
-
-			}
-
-			final boolean text=textual.contains(node.getNodeName()) && echars == 0;
-
-			set(node, "xchars", xchars);
-			set(node, "echars", text ? xchars : echars*(blobs+1)/(nodes+1));
-
-			((Element)node).setAttribute("chars", String.format("%.1f/%.0f",
-					get(node, "echars", 0.0),
-					get(node, "xchars", 0.0)
-			));
-
-		} else if ( node instanceof Text ) {
-
-			final double length=normalize(node.getTextContent()).length();
-
-			set(node, "xchars", length*length);
-
-		}
-
-		return node;
-
-	}
+                    }));
+        }
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@SuppressWarnings("unchecked") private <T> T get(final Node node, final String label, final T value) {
-		return Optional.ofNullable((T)node.getUserData(label)).orElse(value);
-	}
+    private <T extends Node> T annotate(final T node) {
 
-	private <T> void set(final Node node, final String label, final T value) {
-		node.setUserData(label, value, null);
-	}
+        if ( node instanceof Document ) {
+
+            ((Document)node).normalizeDocument();
+
+            annotate(((Document)node).getDocumentElement());
+
+        } else if ( node instanceof Element && !ignored.contains(node.getNodeName()) ) {
+
+            double xchars=0;
+            double echars=0;
+
+            int nodes=0;
+            int blobs=0;
+
+            final NodeList children=node.getChildNodes();
+
+            for (int i=0, n=children.getLength(); i < n; ++i) {
+
+                final Node child=annotate(children.item(i));
+
+                xchars+=get(child, "xchars", 0.0);
+                echars+=get(child, "echars", 0.0);
+
+                if ( child instanceof Element ) { ++nodes; }
+                if ( textual.contains(child.getNodeName()) ) { ++blobs; }
+
+            }
+
+            final boolean text=textual.contains(node.getNodeName()) && echars == 0;
+
+            set(node, "xchars", xchars);
+            set(node, "echars", text ? xchars : echars*(blobs+1)/(nodes+1));
+
+            ((Element)node).setAttribute("chars", String.format("%.1f/%.0f",
+                    get(node, "echars", 0.0),
+                    get(node, "xchars", 0.0)
+            ));
+
+        } else if ( node instanceof Text ) {
+
+            final double length=normalize(node.getTextContent()).length();
+
+            set(node, "xchars", length*length);
+
+        }
+
+        return node;
+
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @SuppressWarnings("unchecked") private <T> T get(final Node node, final String label, final T value) {
+        return Optional.ofNullable((T)node.getUserData(label)).orElse(value);
+    }
+
+    private <T> void set(final Node node, final String label, final T value) {
+        node.setUserData(label, value, null);
+    }
 
 }

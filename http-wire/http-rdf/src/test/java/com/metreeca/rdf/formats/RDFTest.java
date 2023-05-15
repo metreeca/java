@@ -16,7 +16,7 @@
 
 package com.metreeca.rdf.formats;
 
-import com.metreeca.core.Locator;
+import com.metreeca.http.Locator;
 
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
 import org.eclipse.rdf4j.rio.RDFFormat;
@@ -29,10 +29,9 @@ import java.util.NoSuchElementException;
 
 import static com.metreeca.http.Message.mimes;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
-import static java.util.Arrays.asList;
 
 
 final class RDFTest {

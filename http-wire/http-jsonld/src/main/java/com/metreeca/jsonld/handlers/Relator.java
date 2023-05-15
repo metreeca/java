@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.jsonld.formats.Bean.codec;
 import static com.metreeca.jsonld.formats.Bean.engine;

@@ -24,9 +24,12 @@ import org.eclipse.rdf4j.query.Dataset;
 import org.eclipse.rdf4j.query.Operation;
 import org.eclipse.rdf4j.query.impl.SimpleDataset;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 
 
 /**
@@ -40,7 +43,7 @@ public abstract class Action<T extends Action<T>> {
 
     private Graph graph=service(Graph.graph());
 
-	private String base;
+    private String base;
     private Boolean inferred;
     private Integer timeout;
 

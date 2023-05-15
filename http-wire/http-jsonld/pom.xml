@@ -37,7 +37,7 @@
 
         <dependency>
             <groupId>com.metreeca</groupId>
-            <artifactId>http-http</artifactId>
+            <artifactId>http-core</artifactId>
         </dependency>
 
         <dependency>
@@ -47,7 +47,7 @@
 
         <dependency>
             <groupId>com.metreeca</groupId>
-            <artifactId>http-http</artifactId>
+            <artifactId>http-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

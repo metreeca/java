@@ -16,30 +16,37 @@
 
 package com.metreeca.rdf4j.handlers;
 
-import com.metreeca.core.toolkits.Identifiers;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.formats.Data;
 import com.metreeca.http.handlers.Worker;
+import com.metreeca.http.toolkits.Identifiers;
 import com.metreeca.rdf4j.services.Graph;
 
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.VOID;
-import org.eclipse.rdf4j.repository.*;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.rio.*;
 import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.metreeca.core.toolkits.Lambdas.task;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.*;
+import static com.metreeca.http.toolkits.Lambdas.task;
 import static com.metreeca.rdf.Values.iri;
 import static com.metreeca.rdf.Values.statement;
 import static com.metreeca.rdf.formats.RDF.service;

@@ -16,13 +16,15 @@
 
 package com.metreeca.rdf;
 
-import org.assertj.core.api.*;
+import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.OptionalAssert;
 import org.eclipse.rdf4j.model.Statement;
 
 import java.util.Optional;
 import java.util.Set;
 
-import static com.metreeca.core.toolkits.Strings.indent;
+import static com.metreeca.http.toolkits.Strings.indent;
 import static com.metreeca.rdf.Values.format;
 
 import static org.eclipse.rdf4j.model.util.Models.isomorphic;

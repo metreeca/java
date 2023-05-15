@@ -17,10 +17,10 @@
 
 package com.metreeca.rdf.actions;
 
-import com.metreeca.core.Locator;
-import com.metreeca.core.Xtream;
-import com.metreeca.core.services.Logger;
-import com.metreeca.core.services.Logger.Level;
+import com.metreeca.http.Locator;
+import com.metreeca.http.services.Logger;
+import com.metreeca.http.services.Logger.Level;
+import com.metreeca.http.work.Xtream;
 
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
@@ -33,13 +33,12 @@ import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.rdf.Values.*;
 import static com.metreeca.xml.formats.HTML.html;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 final class MicrodataTest {
 

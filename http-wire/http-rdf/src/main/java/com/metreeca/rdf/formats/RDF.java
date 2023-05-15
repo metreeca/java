@@ -16,12 +16,16 @@
 
 package com.metreeca.rdf.formats;
 
-import com.metreeca.core.toolkits.Resources;
-import com.metreeca.http.*;
+import com.metreeca.http.Format;
+import com.metreeca.http.FormatException;
+import com.metreeca.http.Message;
+import com.metreeca.http.toolkits.Resources;
 
 import org.eclipse.rdf4j.common.lang.FileFormat;
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.rio.*;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
@@ -29,16 +33,20 @@ import org.eclipse.rdf4j.rio.helpers.ParseErrorCollector;
 import org.eclipse.rdf4j.rio.turtle.TurtleParserFactory;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.toolkits.Resources.resource;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
+import static com.metreeca.http.toolkits.Resources.resource;
 import static com.metreeca.rdf.Values.iri;
 
 import static java.lang.String.format;

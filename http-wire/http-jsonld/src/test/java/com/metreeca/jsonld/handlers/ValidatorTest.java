@@ -16,8 +16,8 @@
 
 package com.metreeca.jsonld.handlers;
 
-import com.metreeca.core.Locator;
 import com.metreeca.http.Handler;
+import com.metreeca.http.Locator;
 import com.metreeca.http.Request;
 
 import org.junit.jupiter.api.Test;

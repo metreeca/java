@@ -18,14 +18,14 @@
 
 package com.metreeca.jsonld.actions;
 
-import com.metreeca.core.services.Logger;
+import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.logger;
 import static com.metreeca.link.Frame.frame;
 
 import static java.lang.String.format;

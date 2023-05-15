@@ -16,11 +16,13 @@
 
 package com.metreeca.gcp.services;
 
-import com.metreeca.core.services.Store;
+import com.metreeca.http.services.Store;
 
 import com.google.cloud.storage.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.file.NoSuchFileException;
 import java.util.regex.Matcher;
@@ -41,139 +43,139 @@ import java.util.regex.Pattern;
  */
 public final class GCPStore implements Store {
 
-	private static final Pattern IdPattern=Pattern
-			.compile("(?:https://storage\\.cloud\\.google\\.com/|gs://)(?<bucket>[^/]+)/(?<object>[^/]+)");
+    private static final Pattern IdPattern=Pattern
+            .compile("(?:https://storage\\.cloud\\.google\\.com/|gs://)(?<bucket>[^/]+)/(?<object>[^/]+)");
 
 
-	@FunctionalInterface private static interface Task<R> {
+    @FunctionalInterface private static interface Task<R> {
 
-		public R exec(final String bucket, final String object) throws IOException;
+        public R exec(final String bucket, final String object) throws IOException;
 
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private final Storage storage;
+    }
 
 
-	public GCPStore() {
-		this(StorageOptions.getDefaultInstance());
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public GCPStore(final StorageOptions options) {
-
-		if ( options == null ) {
-			throw new NullPointerException("null options");
-		}
-
-		this.storage=options.getService();
-	}
+    private final Storage storage;
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public GCPStore() {
+        this(StorageOptions.getDefaultInstance());
+    }
 
-	@Override public boolean has(final String id) throws IOException {
+    public GCPStore(final StorageOptions options) {
 
-		if ( id == null ) {
-			throw new NullPointerException("null id");
-		}
+        if ( options == null ) {
+            throw new NullPointerException("null options");
+        }
 
-		return exec(id, this::has);
-	}
-
-	@Override public InputStream read(final String id) throws IOException {
-
-		if ( id == null ) {
-			throw new NullPointerException("null id");
-		}
-
-		return exec(id, this::read);
-	}
-
-	@Override public OutputStream write(final String id) throws IOException {
-
-		if ( id == null ) {
-			throw new NullPointerException("null id");
-		}
-
-		return exec(id, this::write);
-	}
+        this.storage=options.getService();
+    }
 
 
-	private <V> V exec(final String id, final Task<V> task) throws IOException {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		final Matcher matcher=IdPattern.matcher(id);
+    @Override public boolean has(final String id) throws IOException {
 
-		return matcher.matches()
-				? task.exec(matcher.group("bucket"), matcher.group("object"))
-				: task.exec(storage.getOptions().getProjectId()+".appspot.com", id);
-	}
+        if ( id == null ) {
+            throw new NullPointerException("null id");
+        }
+
+        return exec(id, this::has);
+    }
+
+    @Override public InputStream read(final String id) throws IOException {
+
+        if ( id == null ) {
+            throw new NullPointerException("null id");
+        }
+
+        return exec(id, this::read);
+    }
+
+    @Override public OutputStream write(final String id) throws IOException {
+
+        if ( id == null ) {
+            throw new NullPointerException("null id");
+        }
+
+        return exec(id, this::write);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private <V> V exec(final String id, final Task<V> task) throws IOException {
 
-	private boolean has(final String bucket, final String object) throws IOException {
+        final Matcher matcher=IdPattern.matcher(id);
 
-		if ( bucket == null ) {
-			throw new NullPointerException("null bucket");
-		}
+        return matcher.matches()
+                ? task.exec(matcher.group("bucket"), matcher.group("object"))
+                : task.exec(storage.getOptions().getProjectId()+".appspot.com", id);
+    }
 
-		if ( object == null ) {
-			throw new NullPointerException("null object");
-		}
 
-		try {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			return storage.get(BlobId.of(bucket, object)) != null;
+    private boolean has(final String bucket, final String object) throws IOException {
 
-		} catch ( final StorageException e ) {
-			throw new IOException(e);
-		}
-	}
+        if ( bucket == null ) {
+            throw new NullPointerException("null bucket");
+        }
 
-	private InputStream read(final String bucket, final String object) throws IOException {
+        if ( object == null ) {
+            throw new NullPointerException("null object");
+        }
 
-		if ( bucket == null ) {
-			throw new NullPointerException("null bucket");
-		}
+        try {
 
-		if ( object == null ) {
-			throw new NullPointerException("null object");
-		}
+            return storage.get(BlobId.of(bucket, object)) != null;
 
-		try {
+        } catch ( final StorageException e ) {
+            throw new IOException(e);
+        }
+    }
 
-			final Blob blob=storage.get(BlobId.of(bucket, object));
+    private InputStream read(final String bucket, final String object) throws IOException {
 
-			if ( blob == null ) {
-				throw new NoSuchFileException(String.format("gs://%s/%s", bucket, object));
-			}
+        if ( bucket == null ) {
+            throw new NullPointerException("null bucket");
+        }
 
-			return Channels.newInputStream(blob.reader());
+        if ( object == null ) {
+            throw new NullPointerException("null object");
+        }
 
-		} catch ( final StorageException e ) {
-			throw new IOException(e);
-		}
-	}
+        try {
 
-	private OutputStream write(final String bucket, final String object) throws IOException {
+            final Blob blob=storage.get(BlobId.of(bucket, object));
 
-		if ( bucket == null ) {
-			throw new NullPointerException("null bucket");
-		}
+            if ( blob == null ) {
+                throw new NoSuchFileException(String.format("gs://%s/%s", bucket, object));
+            }
 
-		if ( object == null ) {
-			throw new NullPointerException("null object");
-		}
+            return Channels.newInputStream(blob.reader());
 
-		try {
+        } catch ( final StorageException e ) {
+            throw new IOException(e);
+        }
+    }
 
-			return Channels.newOutputStream(storage.create(BlobInfo.newBuilder(bucket, object).build()).writer());
+    private OutputStream write(final String bucket, final String object) throws IOException {
 
-		} catch ( final StorageException e ) {
-			throw new IOException(e);
-		}
-	}
+        if ( bucket == null ) {
+            throw new NullPointerException("null bucket");
+        }
+
+        if ( object == null ) {
+            throw new NullPointerException("null object");
+        }
+
+        try {
+
+            return Channels.newOutputStream(storage.create(BlobInfo.newBuilder(bucket, object).build()).writer());
+
+        } catch ( final StorageException e ) {
+            throw new IOException(e);
+        }
+    }
 
 }

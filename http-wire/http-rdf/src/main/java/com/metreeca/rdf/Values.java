@@ -16,7 +16,9 @@
 
 package com.metreeca.rdf;
 
-import com.metreeca.core.toolkits.*;
+import com.metreeca.http.toolkits.Identifiers;
+import com.metreeca.http.toolkits.Lambdas;
+import com.metreeca.http.toolkits.Strings;
 
 import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 import org.eclipse.rdf4j.model.*;
@@ -37,7 +39,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.metreeca.core.toolkits.Strings.indent;
+import static com.metreeca.http.toolkits.Strings.indent;
 
 import static java.util.Locale.ROOT;
 import static java.util.Map.Entry.comparingByKey;

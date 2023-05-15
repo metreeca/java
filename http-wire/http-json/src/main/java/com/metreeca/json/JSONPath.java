@@ -16,16 +16,17 @@
 
 package com.metreeca.json;
 
-import com.metreeca.core.Xtream;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import com.metreeca.http.work.Xtream;
 
 import javax.json.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Map.entry;

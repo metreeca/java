@@ -16,26 +16,34 @@
 
 package com.metreeca.jse;
 
-import com.metreeca.core.Locator;
-import com.metreeca.core.services.Logger;
-import com.metreeca.http.*;
+import com.metreeca.http.Handler;
+import com.metreeca.http.Locator;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
 import com.metreeca.http.handlers.Server;
+import com.metreeca.http.services.Logger;
 
-import com.sun.net.httpserver.*;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.core.services.Logger.logger;
 import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.NotFound;
+import static com.metreeca.http.services.Logger.logger;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;

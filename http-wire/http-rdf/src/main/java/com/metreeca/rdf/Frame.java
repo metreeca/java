@@ -16,17 +16,22 @@
 
 package com.metreeca.rdf;
 
-import com.metreeca.core.toolkits.Strings;
+import com.metreeca.http.toolkits.Strings;
 
-import org.eclipse.rdf4j.model.*;
-import org.eclipse.rdf4j.model.vocabulary.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.DC;
+import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.toolkits.Identifiers.md5;
+import static com.metreeca.http.toolkits.Identifiers.md5;
 import static com.metreeca.rdf.Shift.Alt.alt;
 import static com.metreeca.rdf.Shift.Seq.seq;
 import static com.metreeca.rdf.Values.*;

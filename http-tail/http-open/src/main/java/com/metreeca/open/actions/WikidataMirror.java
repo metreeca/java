@@ -16,39 +16,48 @@
 
 package com.metreeca.open.actions;
 
-import com.metreeca.core.Xtream;
-import com.metreeca.core.actions.Fill;
-import com.metreeca.core.services.Logger;
-import com.metreeca.core.toolkits.Strings;
+import com.metreeca.http.actions.Fill;
+import com.metreeca.http.services.Logger;
+import com.metreeca.http.toolkits.Strings;
+import com.metreeca.http.work.Xtream;
 import com.metreeca.rdf.Values;
-import com.metreeca.rdf4j.actions.*;
+import com.metreeca.rdf4j.actions.GraphQuery;
+import com.metreeca.rdf4j.actions.TupleQuery;
+import com.metreeca.rdf4j.actions.Upload;
 import com.metreeca.rdf4j.services.Graph;
 
-import org.eclipse.rdf4j.model.*;
-import org.eclipse.rdf4j.model.vocabulary.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.WGS84;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Locator.service;
-import static com.metreeca.core.services.Logger.logger;
-import static com.metreeca.core.services.Logger.time;
-import static com.metreeca.core.toolkits.Lambdas.task;
+import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.services.Logger.logger;
+import static com.metreeca.http.services.Logger.time;
+import static com.metreeca.http.toolkits.Lambdas.task;
 import static com.metreeca.open.actions.Wikidata.ITEM;
 import static com.metreeca.open.actions.Wikidata.point;
 import static com.metreeca.rdf.Values.*;
 import static com.metreeca.rdf4j.services.Graph.graph;
 
-import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.rdf4j.common.iteration.Iterations.stream;
 
 /**
  * Wikidata mirror.

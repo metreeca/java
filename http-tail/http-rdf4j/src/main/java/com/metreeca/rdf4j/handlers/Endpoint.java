@@ -16,14 +16,17 @@
 
 package com.metreeca.rdf4j.handlers;
 
-import com.metreeca.core.services.Logger;
 import com.metreeca.http.Request;
 import com.metreeca.http.handlers.Delegator;
+import com.metreeca.http.services.Logger;
 import com.metreeca.rdf4j.services.Graph;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
@@ -50,144 +53,144 @@ public abstract class Endpoint<T extends Endpoint<T>> extends Delegator {
 
 
     @SuppressWarnings("unchecked") private T self() {
-		return (T)this;
-	}
+        return (T)this;
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected boolean queryable(final Collection<Object> roles) {
-		return query.isEmpty() || !disjoint(query, roles);
-	}
+    protected boolean queryable(final Collection<Object> roles) {
+        return query.isEmpty() || !disjoint(query, roles);
+    }
 
-	protected boolean updatable(final Collection<Object> roles) {
-		return update.isEmpty() || !disjoint(update, roles);
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected Graph graph() {
-		return graph;
-	}
+    protected boolean updatable(final Collection<Object> roles) {
+        return update.isEmpty() || !disjoint(update, roles);
+    }
 
 
-	protected Set<Object> query() {
-		return unmodifiableSet(query);
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected Set<Object> update() {
-		return unmodifiableSet(update);
-	}
+    protected Graph graph() {
+        return graph;
+    }
 
 
-	protected Logger logger() {
-		return logger;
-	}
+    protected Set<Object> query() {
+        return unmodifiableSet(query);
+    }
+
+    protected Set<Object> update() {
+        return unmodifiableSet(update);
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Configures the target graph.
-	 *
-	 * <p>By default configured to the shared {@linkplain Graph#graph() graph}.</p>
-	 *
-	 * @param graph the target graph for SPARQL operations on this endpoint
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code graph} is null
-	 */
-	public T graph(final Graph graph) {
-
-		if ( graph == null ) {
-			throw new NullPointerException("null graph");
-		}
-
-		this.graph=graph;
-
-		return self();
-	}
+    protected Logger logger() {
+        return logger;
+    }
 
 
-	/**
-	 * Configures the roles for query operations.
-	 *
-	 * <p>By default configured to block all query operations.</p>
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform query operations on this
-	 *              endpoint; empty for public access
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public T query(final Object... roles) {
-		return query(asList(roles));
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Configures the roles for query operations.
-	 *
-	 * <p>By default configured to block all query operations.</p>
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform query operations on this
-	 *              endpoint; empty for public access
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public T query(final Collection<?> roles) {
+    /**
+     * Configures the target graph.
+     *
+     * <p>By default configured to the shared {@linkplain Graph#graph() graph}.</p>
+     *
+     * @param graph the target graph for SPARQL operations on this endpoint
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code graph} is null
+     */
+    public T graph(final Graph graph) {
 
-		if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null roles");
-		}
+        if ( graph == null ) {
+            throw new NullPointerException("null graph");
+        }
 
-		this.query=new HashSet<>(roles);
+        this.graph=graph;
 
-		return self();
-	}
+        return self();
+    }
 
 
-	/**
-	 * Configures the roles for update operations.
-	 *
-	 * <p>By default configured to block all update operations.</p>
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform update operations on this
-	 *              endpoint; empty for public access
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public T update(final Object... roles) {
-		return update(asList(roles));
-	}
+    /**
+     * Configures the roles for query operations.
+     *
+     * <p>By default configured to block all query operations.</p>
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform query operations on this
+     *              endpoint; empty for public access
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public T query(final Object... roles) {
+        return query(asList(roles));
+    }
 
-	/**
-	 * Configures the roles for update operations.
-	 *
-	 * <p>By default configured to block all update operations.</p>
-	 *
-	 * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform update operations on this
-	 *              endpoint; empty for public access
-	 *
-	 * @return this endpoint
-	 *
-	 * @throws NullPointerException if {@code roles} is null or contains null values
-	 */
-	public T update(final Collection<?> roles) {
+    /**
+     * Configures the roles for query operations.
+     *
+     * <p>By default configured to block all query operations.</p>
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform query operations on this
+     *              endpoint; empty for public access
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public T query(final Collection<?> roles) {
 
-		if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null roles");
-		}
+        if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null roles");
+        }
 
-		this.update=new HashSet<>(roles);
+        this.query=new HashSet<>(roles);
 
-		return self();
-	}
+        return self();
+    }
+
+
+    /**
+     * Configures the roles for update operations.
+     *
+     * <p>By default configured to block all update operations.</p>
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform update operations on this
+     *              endpoint; empty for public access
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public T update(final Object... roles) {
+        return update(asList(roles));
+    }
+
+    /**
+     * Configures the roles for update operations.
+     *
+     * <p>By default configured to block all update operations.</p>
+     *
+     * @param roles the user {@linkplain Request#roles(Object...) roles} enabled to perform update operations on this
+     *              endpoint; empty for public access
+     *
+     * @return this endpoint
+     *
+     * @throws NullPointerException if {@code roles} is null or contains null values
+     */
+    public T update(final Collection<?> roles) {
+
+        if ( roles == null || roles.stream().anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null roles");
+        }
+
+        this.update=new HashSet<>(roles);
+
+        return self();
+    }
 
 }

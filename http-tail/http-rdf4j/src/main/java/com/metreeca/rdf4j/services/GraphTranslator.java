@@ -18,13 +18,19 @@ package com.metreeca.rdf4j.services;
 
 import com.metreeca.http.services.Translator;
 
-import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.query.TupleQuery;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.metreeca.core.Locator.service;
+import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Translator.translator;
 import static com.metreeca.rdf.Values.*;
 

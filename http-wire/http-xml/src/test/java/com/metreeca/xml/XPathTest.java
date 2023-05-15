@@ -16,7 +16,7 @@
 
 package com.metreeca.xml;
 
-import com.metreeca.core.Xtream;
+import com.metreeca.http.work.Xtream;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,8 @@ import java.io.ByteArrayInputStream;
 import static com.metreeca.xml.XPath.decode;
 import static com.metreeca.xml.formats.XML.xml;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 final class XPathTest {
