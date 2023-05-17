@@ -18,6 +18,7 @@ package com.metreeca.http.toolkits;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -42,6 +43,38 @@ public final class Strings {
 
     private static final Pattern SpacePattern=Pattern.compile("[ \\p{Cntrl}]+");
     private static final Pattern NewlinePattern=Pattern.compile("\r?\n");
+
+
+    /**
+     * Creates a lenient string parser.
+     *
+     * @param parser the delegate string parser
+     * @param <T>    the type of the parsed value
+     *
+     * @return a lenient string parser delegating to {@code parser} and returning {@code null} on
+     * {@code IllegalArgumentException}
+     *
+     * @throws NullPointerException if {@code parser} is null
+     */
+    public static <T> Function<String, T> lenient(final Function<String, T> parser) {
+
+        if ( parser == null ) {
+            throw new NullPointerException("null parser");
+        }
+
+        return string -> {
+
+            try {
+
+                return parser.apply(string);
+
+            } catch ( final IllegalArgumentException ignored ) {
+
+                return null;
+            }
+
+        };
+    }
 
 
     /**
