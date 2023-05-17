@@ -21,24 +21,21 @@ import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.Bean;
-import com.metreeca.link.Codec;
 import com.metreeca.link.Engine;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Trace;
+import com.metreeca.link.json.JSON;
 import com.metreeca.link.json.JSONException;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.http.jsonld.formats.Bean.codec;
 import static com.metreeca.http.jsonld.formats.Bean.engine;
 import static com.metreeca.link.Frame.frame;
 import static com.metreeca.link.Trace.trace;
+import static com.metreeca.link.json.JSON.json;
 
 import static java.lang.String.format;
 import static java.util.function.Predicate.not;
@@ -71,9 +68,13 @@ import static java.util.function.Predicate.not;
  */
 public class Relator implements Handler {
 
+    private static final JSON json=json();
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private final Frame<Object> model;
 
-    private final Codec codec=service(codec());
     private final Engine engine=service(engine());
 
 
@@ -96,7 +97,7 @@ public class Relator implements Handler {
                     try {
 
                         final Class<?> clazz=model.value().getClass();
-                        final Object object=codec.decode(new StringReader(query), clazz);
+                        final Object object=json.decode(query, clazz);
 
                         return frame(object).merge(model).orElseThrow(() -> new IllegalArgumentException(format(
                                 "unable to parse query as <%s> model", clazz.getSimpleName()
@@ -105,10 +106,6 @@ public class Relator implements Handler {
                     } catch ( final JSONException e ) {
 
                         throw new FormatException(BadRequest, e.getMessage(), e);
-
-                    } catch ( final IOException e ) {
-
-                        throw new UncheckedIOException(e);
 
                     }
 
