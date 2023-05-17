@@ -21,14 +21,15 @@ import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.Bean;
-import com.metreeca.link.*;
+import com.metreeca.link.Codec;
+import com.metreeca.link.Engine;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Trace;
 import com.metreeca.link.json.JSONException;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
-import java.net.URLDecoder;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -37,14 +38,10 @@ import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.Bean.codec;
 import static com.metreeca.http.jsonld.formats.Bean.engine;
 import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Query.filter;
-import static com.metreeca.link.Query.query;
 import static com.metreeca.link.Trace.trace;
 
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -94,7 +91,6 @@ public class Relator implements Handler {
 
         final Frame<?> template=Optional.of(request.query())
                 .filter(not(String::isEmpty))
-                .map(this::decode)
                 .map(query -> {
 
                     try {
@@ -102,8 +98,8 @@ public class Relator implements Handler {
                         final Class<?> clazz=model.value().getClass();
                         final Object object=codec.decode(new StringReader(query), clazz);
 
-                        return merge(frame(object), model).orElseThrow(() -> new IllegalArgumentException(format(
-                                "unable to parse query as <%s> template", clazz.getSimpleName()
+                        return frame(object).merge(model).orElseThrow(() -> new IllegalArgumentException(format(
+                                "unable to parse query as <%s> model", clazz.getSimpleName()
                         )));
 
                     } catch ( final JSONException e ) {
@@ -145,85 +141,6 @@ public class Relator implements Handler {
                     .orElseGet(() -> request.reply(NotFound));
 
         }
-
-    }
-
-
-    //// !!! factor ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static <T> Optional<Frame<T>> merge(final Frame<T> frame, final Frame<T> specs) {
-
-        if ( frame.value().getClass().isAssignableFrom(specs.value().getClass()) ) {
-
-            frame.entries(true).forEach(entry -> {
-
-                final String field=entry.getKey();
-
-                final Object value=entry.getValue();
-                final Object model=specs.get(field);
-
-                if ( model instanceof Query ) { // merge filters
-
-                    final Query<Object> filters=query(((Query<?>)model)
-                            .filters().entrySet().stream()
-                            .map(filter -> filter(filter.getKey(), filter.getValue()))
-                            .collect(toList())
-                    );
-
-                    if ( value instanceof Query ) {
-
-                        frame.set(field, query((Query<?>)value, filters));
-
-                    } else if ( value instanceof Collection ) {
-
-                        // !!! merge specs filters
-                        // !!! handles 0/1/multiple items
-
-                        throw new UnsupportedOperationException(";( be implemented"); // !!!
-
-                    } else if ( value != null ) {
-
-                        // !!! merge specs filters
-                        // !!! ignore? report?
-
-                        throw new UnsupportedOperationException(";( be implemented"); // !!!
-
-                    }
-
-                } else if ( model != null && !(value instanceof Query) ) { // merge specs to support virtual entities
-
-                    if (
-
-                            value instanceof Boolean && value.equals(false)
-                                    || value instanceof Number && ((Number)value).intValue() == 0
-                                    || value instanceof String && ((String)value).isBlank()
-                                    || value instanceof Collection && ((Collection<?>)value).isEmpty()
-
-                    ) {
-
-                        frame.set(field, model);
-
-                    }
-
-                }
-
-            });
-
-            return Optional.of(frame);
-
-        } else {
-
-            return Optional.empty();
-
-        }
-    }
-
-
-    private String decode(final String query) {
-        return query.startsWith("%7B") ? URLDecoder.decode(query, UTF_8)
-                // !!! Base64
-                // !!! form
-                : query;
 
     }
 
