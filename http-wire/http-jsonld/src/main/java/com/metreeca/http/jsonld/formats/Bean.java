@@ -109,8 +109,9 @@ public final class Bean<T> implements Format<T> {
      * <p><strong>Warning</strong> / Decoding is completely driven by the format: embedded {@code @context} objects are
      * ignored.</p>
      *
-     * @return the JSON-LD payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty optional
-     * if the {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
+     * @return the JSON-LD payload decoded from the raw {@code message} {@linkplain Message#input()} or an empty
+     * optional if the {@code "Content-Type"} {@code message} header is not empty and is not matched by
+     * {@link #MIMEPattern}
      */
     @Override public Optional<T> decode(final Message<?> message) throws FormatException {
         return message

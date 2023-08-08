@@ -34,16 +34,17 @@ import static java.lang.String.format;
  * Model-based validation.
  *
  * <p>{@linkplain Frame#validate() Validates} objects against their expected shape.</p>
+ *
+ * @param <T> the type of the object to be validated
  */
-public final class Validate implements Function<Object, Optional<Object>> {
+public final class Validate<T> implements Function<T, Optional<T>> {
 
     private final Logger logger=service(logger());
 
 
-    @Override public Optional<Object> apply(final Object object) {
+    @Override public Optional<T> apply(final T object) {
 
-
-        final Frame<Object> frame=frame(object);
+        final Frame<T> frame=frame(object);
 
         return frame.validate()
 
@@ -51,7 +52,7 @@ public final class Validate implements Function<Object, Optional<Object>> {
 
                     logger.warning(this, () -> format("%s %s", object, trace));
 
-                    return Optional.empty();
+                    return Optional.<T>empty();
 
                 })
 
