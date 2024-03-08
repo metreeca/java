@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@ package com.metreeca.http.jsonld.handlers;
 import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.link.Engine;
+import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
+import com.metreeca.link.Store;
 
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.Response.NoContent;
-import static com.metreeca.http.Response.NotFound;
-import static com.metreeca.http.jsonld.formats.Bean.engine;
-import static com.metreeca.link.Frame.frame;
+import static com.metreeca.http.jsonld.formats.JSONLD.store;
 
 /**
  * Model-driven resource deleter.
  *
  * <p>Handles deletion requests on the linked data resource identified by the request {@linkplain Request#item()
- * item}.</p>
+ * item}:</p>
  *
  * <ul>
- * <li>deletes the existing description of the resource matching the redacted request shape with the assistance of the
- * shared linked data {@linkplain Engine#delete(Object) engine}.</li>
+ *
+ * <li>deletes the existing description of the resource with the assistance of the shared linked data
+ * {@linkplain Store#create(Shape, Frame) storage engine}.</li>
  *
  * </ul>
  *
@@ -60,31 +60,34 @@ import static com.metreeca.link.Frame.frame;
  */
 public class Deleter implements Handler {
 
-    private final Class<?> type;
+    // private final Class<?> type;
 
-    private final Engine engine=service(engine());
+    private final Store store=service(store());
 
 
-    public Deleter(final Object model) {
-
-        if ( model == null ) {
-            throw new NullPointerException("null model");
-        }
-
-        this.type=model.getClass();
-    }
+    // public Deleter(final Object model) {
+    //
+    //     if ( model == null ) {
+    //         throw new NullPointerException("null model");
+    //     }
+    //
+    //     this.type=model.getClass();
+    // }
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        final String item=request.item();
+        throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-        return engine.delete(frame(type).id(item))
-
-                .map(frame -> request.reply(NoContent))
-
-                .orElseGet(() -> request.reply(NotFound));
-
+        //
+        //     final String item=request.item();
+        //
+        //     return engine.delete(frame(type).id(item))
+        //
+        //             .map(frame -> request.reply(NoContent))
+        //
+        //             .orElseGet(() -> request.reply(NotFound));
+        //
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,18 @@
 package com.metreeca.http.jsonld.handlers;
 
 import com.metreeca.http.Handler;
+import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.jsonld.formats.Bean;
-import com.metreeca.link.Engine;
+import com.metreeca.http.jsonld.formats.JSONLD;
 import com.metreeca.link.Frame;
-import com.metreeca.link.Trace;
+import com.metreeca.link.Shape;
+import com.metreeca.link.Store;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
-import static com.metreeca.http.Response.*;
-import static com.metreeca.http.jsonld.formats.Bean.engine;
-import static com.metreeca.link.Frame.frame;
-import static com.metreeca.link.Trace.trace;
-
-import static java.lang.String.format;
-import static java.util.function.Predicate.not;
+import static com.metreeca.http.jsonld.formats.JSONLD.store;
 
 /**
  * Model-driven resource updater.
@@ -44,12 +38,12 @@ import static java.util.function.Predicate.not;
  *
  * <ul>
  *
- * <li>validates the {@link Bean JSON-LD} request body against its expected shape; malformed or invalid
- * payloads are reported respectively with a {@value Response#BadRequest} or a {@value Response#UnprocessableEntity}
- * status code;</li>
+ * <li>validates the {@link JSONLD JSON-LD} request body against the request
+ * {@linkplain JSONLD#shape(Message) expected shape}; malformed or invalid payloads are reported respectively with a
+ * {@value Response#BadRequest} or a {@value Response#UnprocessableEntity} status code;</li>
  *
- * <li>updates the existing description of the resource matching the redacted request shape with the assistance of the
- * shared linked data {@linkplain Engine#update(Object) engine}.</li>
+ * <li>updates the existing description of the resource matching the request shape with the assistance of the
+ * shared linked data {@linkplain Store#create(Shape, Frame) storage engine}.</li>
  *
  * </ul>
  *
@@ -72,57 +66,59 @@ import static java.util.function.Predicate.not;
  */
 public class Updater implements Handler {
 
-    private final Class<?> type;
+    // private final Class<?> type;
 
-    private final Engine engine=service(engine());
+    private final Store store=service(store());
 
 
-    public Updater(final Object model) {
-
-        if ( model == null ) {
-            throw new NullPointerException("null model");
-        }
-
-        this.type=model.getClass();
-    }
+    // public Updater(final Object model) {
+    //
+    //     if ( model == null ) {
+    //         throw new NullPointerException("null model");
+    //     }
+    //
+    //     this.type=model.getClass();
+    // }
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        final Frame<?> body=frame(request.body(new Bean<>(type)));
+        throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-        final String expected=request.item();
-        final String provided=body.id(); // !!! resolve against request.base()
-
-        if ( Optional.ofNullable(provided)
-
-                .filter(not(String::isEmpty))
-                .filter(not(expected::equals))
-
-                .isPresent()
-
-        ) {
-
-            return request.reply(UnprocessableEntity)
-                    .body(new Bean<>(Trace.class), trace(format("mismatched id <%s>", provided)));
-
-        } else {
-
-            return body.validate()
-
-                    .map(trace -> request.reply(UnprocessableEntity)
-                            .body(new Bean<>(Trace.class), trace)
-                    )
-
-                    .orElseGet(() -> engine.update(body.id(expected))
-
-                            .map(frame -> request.reply(NoContent))
-
-                            .orElseGet(() -> request.reply(NotFound))
-
-                    );
-
-        }
+        // final Frame<?> body=frame(request.body(new JSONLD(type)));
+        //
+        // final String expected=request.item();
+        // final String provided=body.id(); // !!! resolve against request.base()
+        //
+        // if ( Optional.ofNullable(provided)
+        //
+        //         .filter(not(String::isEmpty))
+        //         .filter(not(expected::equals))
+        //
+        //         .isPresent()
+        //
+        // ) {
+        //
+        //     return request.reply(UnprocessableEntity)
+        //             .body(new JSONLD(Trace.class), trace(format("mismatched id <%s>", provided)));
+        //
+        // } else {
+        //
+        //     return body.validate()
+        //
+        //             .map(trace -> request.reply(UnprocessableEntity)
+        //                     .body(new JSONLD(Trace.class), trace)
+        //             )
+        //
+        //             .orElseGet(() -> engine.update(body.id(expected))
+        //
+        //                     .map(frame -> request.reply(NoContent))
+        //
+        //                     .orElseGet(() -> request.reply(NotFound))
+        //
+        //             );
+        //
+        // }
 
     }
 

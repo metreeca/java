@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.metreeca.http.jsonld.handlers;
 import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.jsonld.formats.Bean;
+import com.metreeca.http.jsonld.formats.JSONTrace;
 import com.metreeca.link.Trace;
 
 import java.util.Collection;
@@ -98,7 +98,7 @@ public final class Validator implements Handler {
                 .filter(trace -> !trace.empty())
 
                 .map(trace -> request.reply(UnprocessableEntity)
-                        .body(new Bean<>(Trace.class), trace)
+                        .body(new JSONTrace(), trace)
                 )
 
                 .orElseGet(() -> forward.apply(request));

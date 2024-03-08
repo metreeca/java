@@ -1,7 +1,7 @@
 
 
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,11 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
-import static com.metreeca.link.Frame.frame;
-
-import static java.lang.String.format;
 
 /**
  * Model-based validation.
  *
- * <p>{@linkplain Frame#validate() Validates} objects against their expected shape.</p>
+ * <p>{@linkplain com.metreeca.link.Shape#validate(Frame) Validates} objects against their expected shape.</p>
  *
  * @param <T> the type of the object to be validated
  */
@@ -44,25 +41,27 @@ public final class Validate<T> implements Function<T, Optional<T>> {
 
     @Override public Optional<T> apply(final T object) {
 
-        final Frame<T> frame=frame(object);
+        throw new UnsupportedOperationException(";( be implemented"); // !!!
 
-        return frame.validate()
-
-                .map(trace -> {
-
-                    logger.warning(this, () -> format("%s %s", object, trace));
-
-                    return Optional.<T>empty();
-
-                })
-
-                .orElseGet(() -> {
-
-                    logger.debug(this, () -> format("%s {}", frame.id()));
-
-                    return Optional.of(frame.value());
-
-                });
+        // final Frame<T> frame=frame(object);
+        //
+        // return frame.validate()
+        //
+        //         .map(trace -> {
+        //
+        //             logger.warning(this, () -> format("%s %s", object, trace));
+        //
+        //             return Optional.<T>empty();
+        //
+        //         })
+        //
+        //         .orElseGet(() -> {
+        //
+        //             logger.debug(this, () -> format("%s {}", frame.id()));
+        //
+        //             return Optional.of(frame.value());
+        //
+        //         });
     }
 
 }

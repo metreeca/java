@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,47 @@
 
 package com.metreeca.http.jsonld.handlers;
 
-import com.metreeca.http.Locator;
-import com.metreeca.link.Engine;
-
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static com.metreeca.http.jsonld.formats.Bean.engine;
-
-
 final class _OperatorTest {
 
-    private _OperatorTest() { }
-
-
-    static void exec(final Predicate<Object> success, final Runnable task) {
-        new Locator()
-                .set(engine(), () -> new MockEngine(success))
-                .exec(task)
-                .clear();
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private static final class MockEngine implements Engine {
-
-        private final Predicate<Object> success;
-
-
-        private MockEngine(final Predicate<Object> success) {
-            this.success=success;
-        }
-
-
-        @Override public <V> Optional<V> retrieve(final V v) {
-            return Optional.of(v).filter(success);
-        }
-
-        @Override public <V> Optional<V> create(final V v) {
-            return Optional.of(v).filter(success);
-        }
-
-        @Override public <V> Optional<V> update(final V v) {
-            return Optional.of(v).filter(success);
-        }
-
-        @Override public <V> Optional<V> delete(final V v) {
-            return Optional.of(v).filter(success);
-        }
-
-    }
+    // private _OperatorTest() { }
+    //
+    //
+    // static void exec(final Predicate<Object> success, final Runnable task) {
+    //     new Locator()
+    //             .set(store(), () -> new MockEngine(success))
+    //             .exec(task)
+    //             .clear();
+    // }
+    //
+    //
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // private static final class MockEngine implements Engine {
+    //
+    //     private final Predicate<Object> success;
+    //
+    //
+    //     private MockEngine(final Predicate<Object> success) {
+    //         this.success=success;
+    //     }
+    //
+    //
+    //     @Override public <V> Optional<V> retrieve(final V v) {
+    //         return Optional.of(v).filter(success);
+    //     }
+    //
+    //     @Override public <V> Optional<V> create(final V v) {
+    //         return Optional.of(v).filter(success);
+    //     }
+    //
+    //     @Override public <V> Optional<V> update(final V v) {
+    //         return Optional.of(v).filter(success);
+    //     }
+    //
+    //     @Override public <V> Optional<V> delete(final V v) {
+    //         return Optional.of(v).filter(success);
+    //     }
+    //
+    // }
 
 }
