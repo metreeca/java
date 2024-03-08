@@ -38,8 +38,8 @@ import static com.metreeca.http.jsonld.formats.JSONLD.store;
  *
  * <ul>
  *
- * <li>validates the {@link JSONLD JSON-LD} request body against the request
- * {@linkplain JSONLD#shape(Message) expected shape}; malformed or invalid payloads are reported respectively with a
+ * <li>validates the {@link JSONLD JSON-LD} request body against the request {@linkplain Shape shape}
+ * {@linkplain Message#attribute(Class) attribute}; malformed or invalid payloads are reported respectively with a
  * {@value Response#BadRequest} or a {@value Response#UnprocessableEntity} status code;</li>
  *
  * <li>updates the existing description of the resource matching the request shape with the assistance of the

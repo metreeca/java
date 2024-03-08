@@ -32,7 +32,6 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
-import static com.metreeca.http.jsonld.formats.JSONLD.shape;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
 import static com.metreeca.link.Frame.*;
 import static com.metreeca.link.json.JSON.json;
@@ -51,7 +50,8 @@ import static java.util.function.Predicate.not;
  * <li>extracts the expected response model from the request {@linkplain Request#query() query}, if one is provided,
  * and merges it with the provided default model;</li>
  *
- * <li>validates the merged model against the expected {@linkplain JSONLD#shape(Message) request shape};</li>
+ * <li>validates the merged model against the request {@linkplain Shape shape}
+ * {@linkplain Message#attribute(Class) attribute};</li>
  *
  * <li>retrieves the existing description of the resource matching the merged response model with the assistance of the
  * shared linked data {@linkplain Store#create(Shape, Frame) storage engine}.</li>
@@ -103,7 +103,7 @@ public class Relator implements Handler {
 
         try {
 
-            final Shape shape=shape(request);
+            final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
 
             final Frame model=Optional.of(request.query())
                     .filter(not(String::isEmpty))
@@ -115,7 +115,7 @@ public class Relator implements Handler {
             return store.retrieve(shape, model.set(frame(field(ID, iri(request.item())))))
 
                     .map(frame -> request.reply(OK)
-                            .map(r -> shape(r, shape))
+                            .attribute(Shape.class, shape)
                             .body(new JSONLD(), model.id().isPresent() ? frame : frame.set(frame(field(ID))))
                     )
 

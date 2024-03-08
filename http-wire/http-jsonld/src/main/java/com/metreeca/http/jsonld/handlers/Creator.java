@@ -40,8 +40,8 @@ import static com.metreeca.http.toolkits.Identifiers.md5;
  *
  * <ul>
  *
- * <li>validates the {@link JSONLD JSON-LD} request body against the request
- * {@linkplain JSONLD#shape(Message) expected shape}; malformed or invalid payloads are reported respectively with a
+ * <li>validates the {@link JSONLD JSON-LD} request body against the request {@linkplain Shape shape}
+ * {@linkplain Message#attribute(Class) attribute}; malformed or invalid payloads are reported respectively with a
  * {@value Response#BadRequest} or a {@value Response#UnprocessableEntity} status code;</li>
  *
  * <li>generates a unique IRI for the resource to be created on the basis on the stem of the the request IRI and

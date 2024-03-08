@@ -19,6 +19,7 @@ package com.metreeca.http.jsonld.formats;
 import com.metreeca.http.Format;
 import com.metreeca.http.FormatException;
 import com.metreeca.http.Message;
+import com.metreeca.link.Shape;
 import com.metreeca.link.Trace;
 
 import java.io.IOException;
@@ -30,7 +31,6 @@ import java.util.function.Consumer;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.jsonld.formats.JSONLD.codec;
-import static com.metreeca.http.jsonld.formats.JSONLD.shape;
 
 /**
  * JSON validation trace message format.
@@ -83,7 +83,7 @@ public final class JSONTrace implements Format<Trace> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        service(codec()).encode(writer, shape(message), value);
+                        service(codec()).encode(writer, message.attribute(Shape.class).orElseGet(Shape::shape), value);
 
                     } catch ( final IOException e ) {
 

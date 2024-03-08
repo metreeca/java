@@ -20,12 +20,9 @@ import com.metreeca.http.Handler;
 import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.http.jsonld.formats.JSONLD;
 import com.metreeca.link.Shape;
 
 import java.util.function.Function;
-
-import static com.metreeca.http.jsonld.formats.JSONLD.shape;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,18 +30,18 @@ import static java.util.Objects.requireNonNull;
 /**
  * Shape-based content driver.
  *
- * <p>Drives the lifecycle of linked data resources managed by wrapped handlers {@linkplain JSONLD#shape(Message)
- * associating} a {@linkplain #Driver(Shape) shape} to incoming requests</p>
+ * <p>Drives the lifecycle of linked data resources managed by wrapped handlers setting the {@linkplain Shape shape}
+ * {@linkplain Message#attribute(Class) attribute} of incoming requests</p>
  *
  * <p>Wrapped handlers are responsible for:</p>
  *
  * <ul>
  *
- * <li>validating incoming request according to the {@linkplain JSONLD#shape(Message) associated} shape and the
- * task to be performed;</li>
+ * <li>validating incoming request according to their {@linkplain Shape shape}
+ * {@linkplain Message#attribute(Class) attribute} and the task to be performed;</li>
  *
- * <li>{@linkplain JSONLD#shape(Message) associating} a shape to outgoing responses in order to drive further
- * processing (e.g. JSON body mapping).</li>
+ * <li>set the {@linkplain Shape shape} {@linkplain Message#attribute(Class) attribute} of outgoing responses
+ * to drive further processing (e.g. JSON body mapping).</li>
  *
  * </ul>
  */
@@ -87,7 +84,7 @@ public final class Driver implements Handler {
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
-        return forward.apply(shape(request, requireNonNull(factory.apply(request))));
+        return forward.apply(request.attribute(Shape.class, requireNonNull(factory.apply(request))));
     }
 
 }

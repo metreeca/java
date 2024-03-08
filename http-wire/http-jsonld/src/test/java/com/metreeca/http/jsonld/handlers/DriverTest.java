@@ -17,7 +17,6 @@
 package com.metreeca.http.jsonld.handlers;
 
 import com.metreeca.http.Request;
-import com.metreeca.http.jsonld.formats.JSONLD;
 import com.metreeca.link.Shape;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -41,7 +40,7 @@ final class DriverTest {
 
         handler(new Driver(test), (request, next) -> {
 
-            assertThat(JSONLD.shape(request).clazz()).contains(clazz);
+            assertThat(request.attribute(Shape.class).flatMap(Shape::clazz)).contains(clazz);
 
             return request.reply(OK);
 

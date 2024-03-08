@@ -78,49 +78,6 @@ public final class JSONLD implements Format<Frame> {
     }
 
 
-    /**
-     * Retrieves the JSON-LD shape of a message.
-     *
-     * @param message the message whose shape is to be retrieved
-     *
-     * @return the shape associated with {@code message} if one is found; an {@linkplain Shape#shape() () empty shape},
-     * that is a shape the always fails to validate, otherwise
-     *
-     * @throws NullPointerException if {@code message} is null
-     */
-    public static Shape shape(final Message<?> message) {
-
-        if ( message == null ) {
-            throw new NullPointerException("null message");
-        }
-
-        return message.attribute(Shape.class).orElseGet(Shape::shape);
-    }
-
-    /**
-     * Configures the JSON-LD shape of a message.
-     *
-     * @param message the message whose shape is to be configured
-     * @param shape   the shape to be associated with {@code message}
-     *
-     * @return the configured {@code message}
-     *
-     * @throws NullPointerException if either {@code message} or {@code shape} is null
-     */
-    public static <M extends Message<M>> M shape(final M message, final Shape shape) {
-
-        if ( message == null ) {
-            throw new NullPointerException("null message");
-        }
-
-        if ( shape == null ) {
-            throw new NullPointerException("null shape");
-        }
-
-        return message.attribute(Shape.class, shape);
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -140,8 +97,8 @@ public final class JSONLD implements Format<Frame> {
      * ignored.</p>
      *
      * @return the JSON-LD payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account
-     * its {@linkplain JSONLD#shape(Message) shape} or an empty optional if the {@code "Content-Type"} {@code message}
-     * header is not empty and is not matched by {@link #MIMEPattern}
+     * its {@linkplain Shape shape} {@linkplain Message#attribute(Class) attribute} or an empty optional if the
+     * {@code "Content-Type"} {@code message} header is not empty and is not matched by {@link #MIMEPattern}
      */
     @Override public Optional<Frame> decode(final Message<?> message) throws FormatException {
         return message
@@ -157,7 +114,7 @@ public final class JSONLD implements Format<Frame> {
                             final Reader reader=new InputStreamReader(input, message.charset())
                     ) {
 
-                        return service(codec()).decode(reader, shape(message));
+                        return service(codec()).decode(reader, message.attribute(Shape.class).orElseGet(Shape::shape));
 
                     } catch ( final UnsupportedEncodingException|JSONException e ) {
 
@@ -174,12 +131,13 @@ public final class JSONLD implements Format<Frame> {
 
     /**
      * <p><strong>Warning</strong> / {@code @context} objects generated from the {@code message}
-     * {@linkplain JSONLD#shape(Message) shape} are embedded only if {@code Content-Type} is {@value MIME}.</p>
+     * {@linkplain Shape shape} {@linkplain Message#attribute(Class) attribute} are embedded only if
+     * {@code Content-Type} is {@value MIME}.</p>
      *
      * @return the target {@code message} with its {@code "Content-Type"} header configured to {@value #MIME}, unless
      * already defined, and its raw {@linkplain Message#output(Consumer) output} configured to return the JSON-LD
      * representation of {@code value} generated taking into account the {@code message}
-     * {@linkplain JSONLD#shape(Message) shape}
+     * {@linkplain Shape shape} {@linkplain Message#attribute(Class) attribute}
      */
     @Override public <M extends Message<M>> M encode(final M message, final Frame value) throws FormatException {
 
@@ -217,7 +175,7 @@ public final class JSONLD implements Format<Frame> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        service(codec()).encode(writer, shape(message), value);
+                        service(codec()).encode(writer, message.attribute(Shape.class).orElseGet(Shape::shape), value);
 
                         // !!! mime.equals(MIME) // include context objects for application/ld+json
 
