@@ -115,6 +115,7 @@ public class Relator implements Handler {
             return store.retrieve(shape, model.set(frame(field(ID, iri(request.item())))))
 
                     .map(frame -> request.reply(OK)
+                            .map(r -> shape(r, shape))
                             .body(new JSONLD(), model.id().isPresent() ? frame : frame.set(frame(field(ID))))
                     )
 
