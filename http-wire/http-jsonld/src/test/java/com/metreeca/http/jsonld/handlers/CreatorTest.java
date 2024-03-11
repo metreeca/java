@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,76 @@
 
 package com.metreeca.http.jsonld.handlers;
 
+import com.metreeca.http.Request;
+import com.metreeca.http.jsonld.formats.JSONLD;
+import com.metreeca.link.Shape;
+
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
+
+import static com.metreeca.http.Response.Conflict;
+import static com.metreeca.http.Response.Created;
+import static com.metreeca.http.ResponseAssert.assertThat;
+import static com.metreeca.http.jsonld.handlers.OperatorTest.exec;
+import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Shape.property;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 final class CreatorTest {
 
-
     @Test void testCreateResource() {
-        //exec(
-        //
-        //		frame -> {
-        //
-        //			assertThat(frame.focus()).as("generated unique iri").isNotEqualTo(focus);
-        //			assertThat(frame.values(RDF.VALUE)).as("rewritten body").containsExactly(frame.focus());
-        //
-        //			return true;
-        //
-        //		},
-        //
-        //		() -> new Creator()
-        //
-        //				.handle(shape(new Request(), shape)
-        //								.body(new JSONLD(), frame(focus)
-        //										.value(RDF.VALUE, focus)
-        //								),
-        //						Request::reply
-        //				)
-        //
-        //				.map(response -> assertThat(response)
-        //						.hasStatus(Created)
-        //						.hasAttribute(Shape.class, shape -> assertThat(shape).isEqualTo(or()))
-        //						.doesNotHaveBody()
-        //				)
-        //
-        //);
+
+        final IRI id=iri("test:/path");
+
+        exec(
+
+                frame -> {
+
+                    assertThat(frame.id()).as("assign id").isPresent();
+                    assertThat(frame.id()).as("assign unique id").isNotIn(id);
+                    assertThat(frame.value(RDF.VALUE)).as("rewritten body").isEqualTo(frame.id());
+
+                    return true;
+
+                },
+
+                () -> new Creator()
+
+                        .handle(new Request()
+                                        .attribute(Shape.class, property(RDF.VALUE))
+                                        .base("test:/")
+                                        .path("/path")
+                                        .body(new JSONLD(), frame(
+                                                field(RDF.VALUE, id)
+                                        )),
+                                Request::reply
+                        )
+
+                        .map(response -> assertThat(response)
+                                .hasStatus(Created)
+                                .doesNotHaveAttribute(Shape.class)
+                                .doesNotHaveBody()
+                        )
+
+        );
     }
 
     @Test void testReportClash() {
-        //assertThatIllegalStateException().isThrownBy(() -> exec(frame -> false, () -> new Creator()
-        //
-        //		.handle(shape(new Request(), shape)
-        //						.body(new JSONLD(), frame(item("/"))),
-        //				Request::reply
-        //		)
-        //
-        //));
+        exec(frame -> false, () -> new Creator()
+
+                .handle(new Request()
+                                .body(new JSONLD(), frame()),
+                        Request::reply
+                )
+
+                .map(response -> assertThat(response)
+                        .hasStatus(Conflict)
+                        .doesNotHaveBody()
+                )
+
+        );
     }
 
 }

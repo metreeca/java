@@ -26,7 +26,10 @@ import com.metreeca.link.Store;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.NoContent;
+import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
+import static com.metreeca.link.Frame.*;
 
 /**
  * Model-driven resource deleter.
@@ -60,34 +63,16 @@ import static com.metreeca.http.jsonld.formats.JSONLD.store;
  */
 public class Deleter implements Handler {
 
-    // private final Class<?> type;
-
     private final Store store=service(store());
-
-
-    // public Deleter(final Object model) {
-    //
-    //     if ( model == null ) {
-    //         throw new NullPointerException("null model");
-    //     }
-    //
-    //     this.type=model.getClass();
-    // }
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        throw new UnsupportedOperationException(";( be implemented"); // !!!
+        final String item=request.item();
+        final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
 
-        //
-        //     final String item=request.item();
-        //
-        //     return engine.delete(frame(type).id(item))
-        //
-        //             .map(frame -> request.reply(NoContent))
-        //
-        //             .orElseGet(() -> request.reply(NotFound));
-        //
+        return request.reply(store.delete(shape, frame(field(ID, iri(item)))) ? NoContent : NotFound);
+
     }
 
 }

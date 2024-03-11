@@ -21,16 +21,30 @@ import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.JSONLD;
+import com.metreeca.http.jsonld.formats.JSONTrace;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
 
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+
 import java.net.URI;
+import java.util.Collection;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
+import static com.metreeca.http.toolkits.Identifiers.AbsoluteIRIPattern;
 import static com.metreeca.http.toolkits.Identifiers.md5;
+import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Trace.trace;
+
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Model-driven resource creator.
@@ -73,22 +87,10 @@ import static com.metreeca.http.toolkits.Identifiers.md5;
  */
 public class Creator implements Handler {
 
-    // private final Frame<Object> model;
-
     private Function<Request, String> slug=request -> URI.create(request.item()).resolve(md5()).toString();
 
     private final Store store=service(store());
 
-
-    // public Creator(final Object model) {
-    //
-    //     if ( model == null ) {
-    //         throw new NullPointerException("null model");
-    //     }
-    //
-    //     this.model=frame(model);
-    // }
-    //
 
     /**
      * Configures the slug generator.
@@ -116,50 +118,63 @@ public class Creator implements Handler {
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        throw new UnsupportedOperationException(";( be implemented"); // !!!
+        final String item=request.item();
+        final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
+        final Frame body=request.body(new JSONLD());
 
-        //
-        //     final Frame<?> body=frame(request.body(new JSONLD<>(model.value().getClass())));
-        //
-        //     final String expected=request.item();
-        //     final String provided=body.id(); // !!! resolve against request.base()
-        //
-        //     if ( Optional.ofNullable(provided)
-        //
-        //             .filter(not(String::isEmpty))
-        //             .filter(not(expected::equals))
-        //
-        //             .isPresent()
-        //
-        //     ) {
-        //
-        //         return request.reply(UnprocessableEntity)
-        //                 .body(new JSONLD<>(Trace.class), trace(format("mismatched id <%s>", provided)));
-        //
-        //     } else {
-        //
-        //         final String created=Objects.requireNonNull(slug.apply(request), "null generated slug");
-        //
-        //         if ( !AbsoluteIRIPattern.matcher(created).matches() ) {
-        //             throw new IllegalArgumentException(format("generated slug <%s> is not an absolute IRI", created));
-        //         }
-        //
-        //         return body.validate()
-        //
-        //                 .map(trace -> request.reply(UnprocessableEntity)
-        //                         .body(new JSONLD<>(Trace.class), trace)
-        //                 )
-        //
-        //                 .orElseGet(() -> engine.create(body.id(created))
-        //
-        //                         .map(frame -> request.reply(Created, URI.create(Identifiers.path(frame.id()))))
-        //
-        //                         .orElseGet(() -> request.reply(Conflict))
-        //
-        //                 );
-        //
-        //     }
-        //
+        return body.id()
+
+                .filter(not(id -> id.stringValue().matches(item)))
+
+                .map(id -> request.reply(UnprocessableEntity)
+                        .body(new JSONTrace(), trace(format("mismatched id <%s>", id)))
+                )
+
+                .orElseGet(() -> shape.validate(body)
+
+                        .map(trace -> request.reply(UnprocessableEntity)
+                                .body(new JSONTrace(), trace)
+                        )
+
+                        .orElseGet(() -> {
+
+                            final String id=requireNonNull(slug.apply(request), "null generated id");
+
+                            if ( !AbsoluteIRIPattern.matcher(id).matches() ) {
+                                throw new IllegalArgumentException(format(
+                                        "generated id <%s> is not an absolute IRI", id
+                                ));
+                            }
+
+                            final IRI current=iri(item);
+                            final IRI updated=iri(id);
+
+                            return store.create(shape, rewrite(body, current, updated).set(frame(field(ID, updated))))
+                                    ? request.reply(Created, URI.create(URI.create(id).getRawPath()))
+                                    : request.reply(Conflict);
+
+                        })
+                );
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private Frame rewrite(final Frame frame, final IRI current, final IRI updated) {
+        return frame(frame.fields().entrySet().stream()
+                .map(e -> field(e.getKey(), rewrite(e.getValue(), current, updated)))
+                .collect(toList())
+        );
+    }
+
+    private Collection<Value> rewrite(final Collection<Value> values, final IRI current, final IRI updated) {
+        return values.stream()
+                .map(value -> rewrite(value, current, updated))
+                .collect(toList());
+    }
+
+    private Value rewrite(final Value value, final IRI current, final IRI updated) {
+        return value.equals(current) ? updated : value;
     }
 
 }

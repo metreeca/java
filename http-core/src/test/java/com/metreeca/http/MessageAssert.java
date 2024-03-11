@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,20 @@ public abstract class MessageAssert<A extends MessageAssert<A, T>, T extends Mes
                 failWithMessage("expected message to have <%s> attribute", key)
         );
 
+        return myself;
+    }
+
+    public <V> A doesNotHaveAttribute(final Class<V> key) {
+
+        if ( key == null ) {
+            throw new NullPointerException("null key");
+        }
+
+        isNotNull();
+
+        actual.attribute(key).ifPresent(v ->
+                failWithMessage("expected message to have no <%s> attribute but has <%s>", key, v)
+        );
 
         return myself;
     }

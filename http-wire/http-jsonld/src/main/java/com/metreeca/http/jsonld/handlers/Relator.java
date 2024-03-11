@@ -21,6 +21,7 @@ import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.JSONLD;
+import com.metreeca.http.jsonld.formats.JSONTrace;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
@@ -34,8 +35,10 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
 import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Trace.trace;
 import static com.metreeca.link.json.JSON.json;
 
+import static java.lang.String.format;
 import static java.util.function.Predicate.not;
 
 
@@ -103,6 +106,7 @@ public class Relator implements Handler {
 
         try {
 
+            final String item=request.item();
             final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
 
             final Frame model=Optional.of(request.query())
@@ -110,16 +114,34 @@ public class Relator implements Handler {
                     .map(query -> json.decode(query, shape).merge(this.model))
                     .orElse(this.model);
 
-            // !!! validate model
+            return model.id()
 
-            return store.retrieve(shape, model.set(frame(field(ID, iri(request.item())))))
+                    .filter(not(id -> id.stringValue().matches(item)))
 
-                    .map(frame -> request.reply(OK)
-                            .attribute(Shape.class, shape)
-                            .body(new JSONLD(), model.id().isPresent() ? frame : frame.set(frame(field(ID))))
+                    .map(id -> request.reply(UnprocessableEntity)
+                            .body(new JSONTrace(), trace(format("mismatched id <%s>", id)))
                     )
 
-                    .orElseGet(() -> request.reply(NotFound));
+                    .orElseGet(() -> shape.validate(model)
+
+                            .map(trace -> request.reply(UnprocessableEntity)
+                                    .body(new JSONTrace(), trace)
+                            )
+
+                            .orElseGet(() -> store.retrieve(shape, model.set(frame(field(ID, iri(item)))))
+
+                                    .map(frame -> request.reply(OK)
+                                            .attribute(Shape.class, shape)
+                                            .body(new JSONLD(), model.id().isPresent()
+                                                    ? frame
+                                                    : frame.set(frame(field(ID)))
+                                            )
+                                    )
+
+                                    .orElseGet(() -> request.reply(NotFound))
+                            )
+
+                    );
 
         } catch ( final JSONException e ) {
 

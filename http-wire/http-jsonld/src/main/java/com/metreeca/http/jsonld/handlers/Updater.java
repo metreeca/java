@@ -21,6 +21,7 @@ import com.metreeca.http.Message;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.JSONLD;
+import com.metreeca.http.jsonld.formats.JSONTrace;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
@@ -28,7 +29,13 @@ import com.metreeca.link.Store;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
+import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
+import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Trace.trace;
+
+import static java.lang.String.format;
+import static java.util.function.Predicate.not;
 
 /**
  * Model-driven resource updater.
@@ -66,60 +73,34 @@ import static com.metreeca.http.jsonld.formats.JSONLD.store;
  */
 public class Updater implements Handler {
 
-    // private final Class<?> type;
-
     private final Store store=service(store());
-
-
-    // public Updater(final Object model) {
-    //
-    //     if ( model == null ) {
-    //         throw new NullPointerException("null model");
-    //     }
-    //
-    //     this.type=model.getClass();
-    // }
 
 
     @Override public Response handle(final Request request, final Function<Request, Response> forward) {
 
-        throw new UnsupportedOperationException(";( be implemented"); // !!!
+        final String item=request.item();
+        final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
+        final Frame body=request.body(new JSONLD());
 
-        // final Frame<?> body=frame(request.body(new JSONLD(type)));
-        //
-        // final String expected=request.item();
-        // final String provided=body.id(); // !!! resolve against request.base()
-        //
-        // if ( Optional.ofNullable(provided)
-        //
-        //         .filter(not(String::isEmpty))
-        //         .filter(not(expected::equals))
-        //
-        //         .isPresent()
-        //
-        // ) {
-        //
-        //     return request.reply(UnprocessableEntity)
-        //             .body(new JSONLD(Trace.class), trace(format("mismatched id <%s>", provided)));
-        //
-        // } else {
-        //
-        //     return body.validate()
-        //
-        //             .map(trace -> request.reply(UnprocessableEntity)
-        //                     .body(new JSONLD(Trace.class), trace)
-        //             )
-        //
-        //             .orElseGet(() -> engine.update(body.id(expected))
-        //
-        //                     .map(frame -> request.reply(NoContent))
-        //
-        //                     .orElseGet(() -> request.reply(NotFound))
-        //
-        //             );
-        //
-        // }
+        return body.id()
 
+                .filter(not(id -> id.stringValue().matches(item)))
+
+                .map(id -> request.reply(UnprocessableEntity)
+                        .body(new JSONTrace(), trace(format("mismatched id <%s>", id)))
+                )
+
+                .orElseGet(() -> shape.validate(body)
+
+                        .map(trace -> request.reply(UnprocessableEntity)
+                                .body(new JSONTrace(), trace)
+                        )
+
+                        .orElseGet(() -> request.reply(
+                                store.update(shape, body.set(frame(field(ID, iri(item))))) ? NoContent : NotFound
+                        ))
+
+                );
     }
 
 }

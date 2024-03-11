@@ -40,6 +40,7 @@ import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
 
 import static java.lang.String.format;
+import static java.util.function.Predicate.not;
 
 /**
  * JSON-LD message format.
@@ -143,7 +144,7 @@ public final class JSONLD implements Format<Frame> {
 
         final String item=message.item();
 
-        if ( value.id().map(Value::stringValue).filter(item::equals).isEmpty() ) {
+        if ( value.id().map(Value::stringValue).filter(not(item::equals)).isPresent() ) {
             throw new IllegalArgumentException(format(
                     "message item <%s> and frame id %s don't match", item, value.id()
             ));
