@@ -19,9 +19,10 @@ package com.metreeca.http.jsonld.handlers;
 import com.metreeca.http.Handler;
 import com.metreeca.http.Request;
 import com.metreeca.http.Response;
-import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
+
+import org.eclipse.rdf4j.model.IRI;
 
 import java.util.function.Function;
 
@@ -29,7 +30,7 @@ import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.NoContent;
 import static com.metreeca.http.Response.NotFound;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
-import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Frame.iri;
 
 /**
  * Model-driven resource deleter.
@@ -40,7 +41,7 @@ import static com.metreeca.link.Frame.*;
  * <ul>
  *
  * <li>deletes the existing description of the resource with the assistance of the shared linked data
- * {@linkplain Store#create(Shape, Frame) storage engine}.</li>
+ * {@linkplain Store#delete(IRI, Shape)}  storage engine}.</li>
  *
  * </ul>
  *
@@ -71,7 +72,7 @@ public class Deleter implements Handler {
         final String item=request.item();
         final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
 
-        return request.reply(store.delete(shape, frame(field(ID, iri(item)))) ? NoContent : NotFound);
+        return request.reply(store.delete(iri(item), shape) ? NoContent : NotFound);
 
     }
 

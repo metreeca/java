@@ -19,16 +19,13 @@ package com.metreeca.http.jsonld.formats;
 import com.metreeca.http.Format;
 import com.metreeca.http.FormatException;
 import com.metreeca.http.Message;
-import com.metreeca.link.Codec;
-import com.metreeca.link.Frame;
-import com.metreeca.link.Shape;
-import com.metreeca.link.Store;
+import com.metreeca.link.*;
 import com.metreeca.link.json.JSON;
-import com.metreeca.link.json.JSONException;
 
 import org.eclipse.rdf4j.model.Value;
 
 import java.io.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -115,9 +112,13 @@ public final class JSONLD implements Format<Frame> {
                             final Reader reader=new InputStreamReader(input, message.charset())
                     ) {
 
-                        return service(codec()).decode(reader, message.attribute(Shape.class).orElseGet(Shape::shape));
+                        return service(codec()).decode(
+                                URI.create(message.item()),
+                                reader,
+                                message.attribute(Shape.class).orElseGet(Shape::shape)
+                        );
 
-                    } catch ( final UnsupportedEncodingException|JSONException e ) {
+                    } catch ( final UnsupportedEncodingException|CodecException e ) {
 
                         throw new FormatException(BadRequest, e.getMessage());
 
@@ -176,7 +177,12 @@ public final class JSONLD implements Format<Frame> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        service(codec()).encode(writer, message.attribute(Shape.class).orElseGet(Shape::shape), value);
+                        service(codec()).encode(
+                                URI.create(message.item()),
+                                writer,
+                                message.attribute(Shape.class).orElseGet(Shape::shape),
+                                value
+                        );
 
                         // !!! mime.equals(MIME) // include context objects for application/ld+json
 

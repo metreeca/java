@@ -41,11 +41,10 @@ final class CreatorTest {
 
         exec(
 
-                frame -> {
+                (iri, frame) -> {
 
-                    assertThat(frame.id()).as("assign id").isPresent();
-                    assertThat(frame.id()).as("assign unique id").isNotIn(id);
-                    assertThat(frame.value(RDF.VALUE)).as("rewritten body").isEqualTo(frame.id());
+                    assertThat(iri).as("assign unique id").isNotIn(id);
+                    assertThat(frame.value(RDF.VALUE)).as("rewritten body").contains(iri);
 
                     return true;
 
@@ -73,7 +72,7 @@ final class CreatorTest {
     }
 
     @Test void testReportClash() {
-        exec(frame -> false, () -> new Creator()
+        exec((iri, frame) -> false, () -> new Creator()
 
                 .handle(new Request()
                                 .body(new JSONLD(), frame()),

@@ -62,7 +62,7 @@ import static java.util.stream.Collectors.toList;
  * the value of the {@code Slug} request header, if one is found, or a random id, otherwise;</li>
  *
  * <li>rewrites the request body to the assigned IRI and stores it with the assistance of the shared linked data
- * {@linkplain Store#create(Shape, Frame) storage engine}.</li>
+ * {@linkplain Store#create(IRI, Shape, Frame) storage engine}.</li>
  *
  * </ul>
  *
@@ -120,9 +120,9 @@ public class Creator implements Handler {
 
         final String item=request.item();
         final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
-        final Frame body=request.body(new JSONLD());
+        final Frame frame=request.body(new JSONLD());
 
-        return body.id()
+        return frame.id()
 
                 .filter(not(id -> id.stringValue().matches(item)))
 
@@ -130,7 +130,7 @@ public class Creator implements Handler {
                         .body(new JSONTrace(), trace(format("mismatched id <%s>", id)))
                 )
 
-                .orElseGet(() -> shape.validate(body)
+                .orElseGet(() -> shape.validate(frame)
 
                         .map(trace -> request.reply(UnprocessableEntity)
                                 .body(new JSONTrace(), trace)
@@ -149,7 +149,7 @@ public class Creator implements Handler {
                             final IRI current=iri(item);
                             final IRI updated=iri(id);
 
-                            return store.create(shape, rewrite(body, current, updated).set(frame(field(ID, updated))))
+                            return store.create(updated, shape, rewrite(frame, current, updated))
                                     ? request.reply(Created, URI.create(URI.create(id).getRawPath()))
                                     : request.reply(Conflict);
 

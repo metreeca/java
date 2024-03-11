@@ -22,19 +22,22 @@ import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.jsonld.formats.JSONLD;
 import com.metreeca.http.jsonld.formats.JSONTrace;
+import com.metreeca.link.CodecException;
 import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
 import com.metreeca.link.json.JSON;
-import com.metreeca.link.json.JSONException;
 
+import org.eclipse.rdf4j.model.IRI;
+
+import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
-import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Frame.iri;
 import static com.metreeca.link.Trace.trace;
 import static com.metreeca.link.json.JSON.json;
 
@@ -57,7 +60,7 @@ import static java.util.function.Predicate.not;
  * {@linkplain Message#attribute(Class) attribute};</li>
  *
  * <li>retrieves the existing description of the resource matching the merged response model with the assistance of the
- * shared linked data {@linkplain Store#create(Shape, Frame) storage engine}.</li>
+ * shared linked data {@linkplain Store#retrieve(IRI, Shape, Frame, String...) storage engine}.</li>
  *
  * </ul>
  *
@@ -109,12 +112,14 @@ public class Relator implements Handler {
             final String item=request.item();
             final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
 
-            final Frame model=Optional.of(request.query())
+            final Frame specs=Optional.of(request.query())
                     .filter(not(String::isEmpty))
-                    .map(query -> json.decode(query, shape).merge(this.model))
-                    .orElse(this.model);
+                    .map(query -> json.decode(URI.create(request.item()), query, shape))
+                    .orElseGet(Frame::frame);
 
-            return model.id()
+            final Frame model=specs.merge(this.model);
+
+            return specs.id()
 
                     .filter(not(id -> id.stringValue().matches(item)))
 
@@ -128,14 +133,11 @@ public class Relator implements Handler {
                                     .body(new JSONTrace(), trace)
                             )
 
-                            .orElseGet(() -> store.retrieve(shape, model.set(frame(field(ID, iri(item)))))
+                            .orElseGet(() -> store.retrieve(iri(item), shape, model, request.langs())
 
                                     .map(frame -> request.reply(OK)
                                             .attribute(Shape.class, shape)
-                                            .body(new JSONLD(), model.id().isPresent()
-                                                    ? frame
-                                                    : frame.set(frame(field(ID)))
-                                            )
+                                            .body(new JSONLD(), frame)
                                     )
 
                                     .orElseGet(() -> request.reply(NotFound))
@@ -143,7 +145,7 @@ public class Relator implements Handler {
 
                     );
 
-        } catch ( final JSONException e ) {
+        } catch ( final CodecException e ) {
 
             return request.reply(BadRequest, e.getMessage());
 

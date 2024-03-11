@@ -26,12 +26,14 @@ import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import java.util.function.Function;
 
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.Response.*;
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
-import static com.metreeca.link.Frame.*;
+import static com.metreeca.link.Frame.iri;
 import static com.metreeca.link.Trace.trace;
 
 import static java.lang.String.format;
@@ -50,7 +52,7 @@ import static java.util.function.Predicate.not;
  * {@value Response#BadRequest} or a {@value Response#UnprocessableEntity} status code;</li>
  *
  * <li>updates the existing description of the resource matching the request shape with the assistance of the
- * shared linked data {@linkplain Store#create(Shape, Frame) storage engine}.</li>
+ * shared linked data {@linkplain Store#update(IRI, Shape, Frame)}  storage engine}.</li>
  *
  * </ul>
  *
@@ -80,9 +82,9 @@ public class Updater implements Handler {
 
         final String item=request.item();
         final Shape shape=request.attribute(Shape.class).orElseGet(Shape::shape);
-        final Frame body=request.body(new JSONLD());
+        final Frame frame=request.body(new JSONLD());
 
-        return body.id()
+        return frame.id()
 
                 .filter(not(id -> id.stringValue().matches(item)))
 
@@ -90,14 +92,14 @@ public class Updater implements Handler {
                         .body(new JSONTrace(), trace(format("mismatched id <%s>", id)))
                 )
 
-                .orElseGet(() -> shape.validate(body)
+                .orElseGet(() -> shape.validate(frame)
 
                         .map(trace -> request.reply(UnprocessableEntity)
                                 .body(new JSONTrace(), trace)
                         )
 
                         .orElseGet(() -> request.reply(
-                                store.update(shape, body.set(frame(field(ID, iri(item))))) ? NoContent : NotFound
+                                store.update(iri(item), shape, frame) ? NoContent : NotFound
                         ))
 
                 );

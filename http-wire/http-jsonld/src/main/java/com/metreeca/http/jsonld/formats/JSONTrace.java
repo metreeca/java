@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.net.URI;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -83,7 +84,12 @@ public final class JSONTrace implements Format<Trace> {
 
                     try ( final Writer writer=new OutputStreamWriter(output, message.charset()) ) {
 
-                        service(codec()).encode(writer, message.attribute(Shape.class).orElseGet(Shape::shape), value);
+                        service(codec()).encode(
+                                URI.create(message.item()),
+                                writer,
+                                message.attribute(Shape.class).orElseGet(Shape::shape),
+                                value
+                        );
 
                     } catch ( final IOException e ) {
 

@@ -21,17 +21,21 @@ import com.metreeca.link.Frame;
 import com.metreeca.link.Shape;
 import com.metreeca.link.Store;
 
+import org.eclipse.rdf4j.model.IRI;
+
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 import static com.metreeca.http.jsonld.formats.JSONLD.store;
+import static com.metreeca.link.Frame.frame;
 
 final class OperatorTest {
 
     private OperatorTest() { }
 
 
-    static void exec(final Predicate<Frame> success, final Runnable task) {
+    static void exec(final BiPredicate<IRI, Frame> success, final Runnable task) {
         new Locator()
                 .set(store(), () -> new MockStore(success))
                 .exec(task)
@@ -43,28 +47,28 @@ final class OperatorTest {
 
     private static final class MockStore implements Store {
 
-        private final Predicate<Frame> success;
+        private final BiPredicate<IRI, Frame> success;
 
 
-        private MockStore(final Predicate<Frame> success) {
+        private MockStore(final BiPredicate<IRI, Frame> success) {
             this.success=success;
         }
 
 
-        @Override public Optional<Frame> retrieve(final Shape shape, final Frame model) {
-            return Optional.of(model).filter(success);
+        @Override public Optional<Frame> retrieve(final IRI id, final Shape shape, final Frame model, final List<String> langs) {
+            return success.test(id, model) ? Optional.of(model) : Optional.empty();
         }
 
-        @Override public boolean create(final Shape shape, final Frame frame) {
-            return success.test(frame);
+        @Override public boolean create(final IRI id, final Shape shape, final Frame state) {
+            return success.test(id, state);
         }
 
-        @Override public boolean update(final Shape shape, final Frame frame) {
-            return success.test(frame);
+        @Override public boolean update(final IRI id, final Shape shape, final Frame state) {
+            return success.test(id, state);
         }
 
-        @Override public boolean delete(final Shape shape, final Frame frame) {
-            return success.test(frame);
+        @Override public boolean delete(final IRI id, final Shape shape) {
+            return success.test(id, frame());
         }
 
     }
