@@ -15,10 +15,10 @@ jobs:
     steps:
 
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up java environment
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: temurin
@@ -31,8 +31,7 @@ jobs:
 
       - name: Convert trigger release branch name into a maven snapshot version
         id: revision
-        run: echo ::set-output
-          name=version::$(echo ${{ github.ref_name }} | sed -r 's:release/(.*):\1-SNAPSHOT:')
+        run: echo "version=$(echo ${{ github.ref_name }} | sed -r 's:release/(.*):\1-SNAPSHOT:')" >> $GITHUB_OUTPUT
 
       - name: Release snapshot version to ossrh
         env:
