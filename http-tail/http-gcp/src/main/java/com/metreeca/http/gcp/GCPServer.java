@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.metreeca.http.gcp;
 
 import com.metreeca.http.Handler;
 import com.metreeca.http.Locator;
-import com.metreeca.http.gcp.services.GCPStore;
+import com.metreeca.http.gcp.services.GCPStorage;
 import com.metreeca.http.gcp.services.GCPVault;
 import com.metreeca.http.jse.JSEServer;
 
@@ -31,7 +31,7 @@ import java.util.function.Function;
 
 import static com.metreeca.http.Locator.path;
 import static com.metreeca.http.Response.Forbidden;
-import static com.metreeca.http.services.Store.store;
+import static com.metreeca.http.services.Storage.storage;
 import static com.metreeca.http.services.Vault.vault;
 
 import static java.lang.String.format;
@@ -154,7 +154,7 @@ public final class GCPServer {
                 .set(path(), () -> Paths.get("/tmp"))
 
                 .set(vault(), production() ? GCPVault::new : vault())
-                .set(store(), production() ? GCPStore::new : store())
+                .set(storage(), production() ? GCPStorage::new : storage())
 
         ));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,19 @@ import static java.nio.file.StandardOpenOption.*;
 
 
 /**
- * Blob store.
+ * Blob storage.
  *
- * <p>Provides access to a dedicated system store for binary data blobs.</p>
+ * <p>Provides access to dedicated system storage for binary data blobs.</p>
  */
-public interface Store {
+public interface Storage {
 
     /**
-     * Retrieves the default store factory.
+     * Retrieves the default storage factory.
      *
-     * @return the default store factory, which creates {@link FileStore} instances
+     * @return the default storage factory, which creates {@link FileStorage} instances
      */
-    public static Supplier<Store> store() {
-        return FileStore::new;
+    public static Supplier<Storage> storage() {
+        return FileStorage::new;
     }
 
 
@@ -109,13 +109,13 @@ public interface Store {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * File-based blob store.
+     * File-based blob storage.
      *
-     * <p>Stores data blobs in the {@code store} folder under the {@linkplain Locator#path default base path}.</p>
+     * <p>Stores data blobs in the {@code blobs} folder under the {@linkplain Locator#path default base path}.</p>
      */
-    public static final class FileStore implements Store {
+    public static final class FileStorage implements Storage {
 
-        private final Path path=service(path()).resolve("store");
+        private final Path path=service(path()).resolve("blobs");
 
         @Override public boolean has(final String id) throws IOException {
             return Files.exists(path.resolve(id));

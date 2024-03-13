@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.metreeca.http.gcp.services;
 
-import com.metreeca.http.services.Store;
+import com.metreeca.http.services.Storage;
 
 import com.google.cloud.storage.*;
 
@@ -30,24 +30,25 @@ import java.util.regex.Pattern;
 
 
 /**
- * Google Cloud blob store.
+ * Google Cloud blob storage.
  *
- * <p>Retrieves blobs managed by the Google Cloud Storage service.</p>
+ * <p>Stores data blobs in the Google Cloud Storage service.</p>
  *
  * <p>For both {@linkplain #read(String) read} and {@linkplain #write(String) write} operations, blob identifiers not
- * matching a full GCS URI (i.e. {@code gs://{bucket}/{object}}) or link URL (i.e. {@code
- * https://storage.cloud.google.com/{bucket}/{object}}) are interpreted as object names in the default project bucket
- * (i.e. {@code {project}.appspot.com}).</p>
+ * matching a full GCS URI (i.e. {@code gs://{bucket}/{object}}) or link URL (i.e.
+ * {@code https://storage.cloud.google.com/{bucket}/{object}}) are interpreted as object names in the default project
+ * bucket (i.e. {@code {project}.appspot.com}).</p>
  *
  * @see <a href="https://cloud.google.com/storage/docs">Google Cloud Plaform - Storage</a>
  */
-public final class GCPStore implements Store {
+public final class GCPStorage implements Storage {
 
     private static final Pattern IdPattern=Pattern
             .compile("(?:https://storage\\.cloud\\.google\\.com/|gs://)(?<bucket>[^/]+)/(?<object>[^/]+)");
 
 
-    @FunctionalInterface private static interface Task<R> {
+    @FunctionalInterface
+    private static interface Task<R> {
 
         public R exec(final String bucket, final String object) throws IOException;
 
@@ -56,14 +57,14 @@ public final class GCPStore implements Store {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final Storage storage;
+    private final com.google.cloud.storage.Storage storage;
 
 
-    public GCPStore() {
+    public GCPStorage() {
         this(StorageOptions.getDefaultInstance());
     }
 
-    public GCPStore(final StorageOptions options) {
+    public GCPStorage(final StorageOptions options) {
 
         if ( options == null ) {
             throw new NullPointerException("null options");
