@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,38 +115,15 @@ public final class Values {
     /**
      * An IRI scheme for inverse predicates ({@value}).
      */
-    private static final String InverseScheme="inverse:";
+    private static final String ReverseScheme="reverse:";
 
 
-    /**
-     * Checks predicate direction.
-     *
-     * @param predicate the IRI identifying the predicate
-     *
-     * @return {@code true} if {@code predicate} identifies a direct predicate; {@code false} if {@code predicate}
-     * identifies an {@link #inverse(IRI) inverse} predicate
-     *
-     * @throws NullPointerException if {@code predicate} is null
-     */
-    public static boolean direct(final IRI predicate) {
-
-        if ( predicate == null ) {
-            throw new NullPointerException("null predicate");
-        }
-
-        return !predicate.stringValue().startsWith(InverseScheme);
+    public static boolean forward(final IRI predicate) {
+        return !predicate.stringValue().startsWith(ReverseScheme);
     }
 
-    /**
-     * Creates an inverse predicate.
-     *
-     * @param predicate the IRI identifying the predicate
-     *
-     * @return the inverse version of {@code predicate}
-     *
-     * @throws NullPointerException if {@code predicate} is null
-     */
-    public static IRI inverse(final IRI predicate) {
+
+    public static IRI reverse(final IRI predicate) {
 
         if ( predicate == null ) {
             throw new NullPointerException("null predicate");
@@ -154,24 +131,24 @@ public final class Values {
 
         final String label=predicate.stringValue();
 
-        return label.startsWith(InverseScheme)
-                ? iri(label.substring(InverseScheme.length()))
-                : iri(InverseScheme+label);
+        return label.startsWith(ReverseScheme)
+                ? iri(label.substring(ReverseScheme.length()))
+                : iri(ReverseScheme+label);
     }
 
     /**
      * Traverses a predicate.
      *
      * @param predicate the IRI identifying the predicate to be traversed
-     * @param direct    a predicate mapper to be executed if {@code predicate} is {@link #direct(IRI) direct}
-     * @param inverse   a predicate mapper to be executed if {@code predicate} is {@link #inverse(IRI) inverse}
+     * @param direct    a predicate mapper to be executed if {@code predicate} is {@link #forward(IRI) direct}
+     * @param reverse   a predicate mapper to be executed if {@code predicate} is {@link #reverse(IRI) reverse}
      * @param <V>       the type of the value returned by predicate mappers
      *
      * @return the value returned by the predicate mapper selected according to the direction of {@code predicate}
      *
      * @throws NullPointerException if any argument is null
      */
-    public static <V> V traverse(final IRI predicate, final Function<IRI, V> direct, final Function<IRI, V> inverse) {
+    public static <V> V traverse(final IRI predicate, final Function<IRI, V> direct, final Function<IRI, V> reverse) {
 
         if ( predicate == null ) {
             throw new NullPointerException("null predicate");
@@ -181,12 +158,12 @@ public final class Values {
             throw new NullPointerException("null direct");
         }
 
-        if ( inverse == null ) {
-            throw new NullPointerException("null inverse");
+        if ( reverse == null ) {
+            throw new NullPointerException("null reverse");
         }
 
-        return predicate.stringValue().startsWith(InverseScheme)
-                ? inverse.apply(iri(predicate.stringValue().substring(InverseScheme.length())))
+        return predicate.stringValue().startsWith(ReverseScheme)
+                ? reverse.apply(iri(predicate.stringValue().substring(ReverseScheme.length())))
                 : direct.apply(predicate);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,10 @@ final class FrameTest {
 
             final Frame frame=frame(x)
                     .value(RDF.VALUE, y)
-                    .value(inverse(RDF.VALUE), z);
+                    .value(reverse(RDF.VALUE), z);
 
             assertThat(frame.values(RDF.VALUE)).containsExactly(y);
-            assertThat(frame.values(inverse(RDF.VALUE))).containsExactly(z);
+            assertThat(frame.values(reverse(RDF.VALUE))).containsExactly(z);
         }
 
         @Test void testHandleNestedFrames() {
@@ -83,7 +83,7 @@ final class FrameTest {
 
             final Frame frame=frame(x);
 
-            FrameAssert.assertThat(frame.value(inverse(RDF.VALUE), literal(1)))
+            FrameAssert.assertThat(frame.value(reverse(RDF.VALUE), literal(1)))
                     .isEqualTo(frame);
         }
 
@@ -185,7 +185,7 @@ final class FrameTest {
         }
 
         @Test void testExportInverseStatements() {
-            FrameAssert.assertThat(frame(x).value(inverse(RDF.VALUE), y)
+            FrameAssert.assertThat(frame(x).value(reverse(RDF.VALUE), y)
 
 
             ).isIsomorphicTo(frame(x, singletonList(
