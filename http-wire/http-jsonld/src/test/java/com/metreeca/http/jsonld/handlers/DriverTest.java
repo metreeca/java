@@ -23,10 +23,12 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static com.metreeca.http.Handler.handler;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.ResponseAssert.assertThat;
-import static com.metreeca.link.Shape.clazz;
+import static com.metreeca.link.Shape.type;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,12 +37,12 @@ final class DriverTest {
 
     @Test void testConfigureRequestShape() {
 
-        final IRI clazz=RDFS.CONTAINER;
-        final Shape test=clazz(clazz);
+        final IRI type=RDFS.CONTAINER;
+        final Shape test=type(type);
 
         handler(new Driver(test), (request, next) -> {
 
-            assertThat(request.attribute(Shape.class).flatMap(Shape::clazz)).contains(clazz);
+            assertThat(request.attribute(Shape.class).flatMap(Shape::type)).contains(Set.of(type));
 
             return request.reply(OK);
 

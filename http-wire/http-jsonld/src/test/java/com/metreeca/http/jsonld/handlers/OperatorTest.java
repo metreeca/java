@@ -23,6 +23,7 @@ import com.metreeca.link.Store;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -69,6 +70,11 @@ final class OperatorTest {
 
         @Override public boolean delete(final IRI id, final Shape shape) {
             return success.test(id, frame());
+        }
+
+
+        @Override public Store validate(final Collection<Shape> shapes) {
+            return this;
         }
 
     }
