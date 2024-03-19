@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.metreeca.http.rdf.formats;
 import com.metreeca.http.Format;
 import com.metreeca.http.FormatException;
 import com.metreeca.http.Message;
-import com.metreeca.http.toolkits.Resources;
 
 import org.eclipse.rdf4j.common.lang.FileFormat;
 import org.eclipse.rdf4j.common.lang.service.FileFormatServiceRegistry;
@@ -35,8 +34,8 @@ import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -47,7 +46,6 @@ import java.util.stream.Stream;
 import static com.metreeca.http.Message.mimes;
 import static com.metreeca.http.Response.BadRequest;
 import static com.metreeca.http.rdf.Values.iri;
-import static com.metreeca.http.toolkits.Resources.resource;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
@@ -127,13 +125,117 @@ public final class RDF implements Format<Model> {
     /**
      * Parses an RDF document.
      *
+     * @param url  the URL of the document to be parsed
+     * @param base the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
+     *             {@code url}
+     *
+     * @return an unmodifiable RDF model parsed from {@code url}
+     *
+     * @throws NullPointerException     if {@code url} or {@code base} is null
+     * @throws IllegalArgumentException if {@code url} is malformed
+     * @throws FormatException          if {@code url} points to a malformed document
+     */
+    public static Model rdf(final URL url, final String base) throws FormatException {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
+        final RDFParserRegistry registry=RDFParserRegistry.getInstance();
+
+        final RDFParser parser=registry
+                .getFileFormatForFileName(url.getFile())
+                .flatMap(registry::get)
+                .orElseGet(TurtleParserFactory::new)
+                .getParser();
+
+        return rdf(url, base, parser);
+    }
+
+    /**
+     * Parses an RDF document.
+     *
+     * @param url    the URL of the document to be parsed
+     * @param base   the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
+     *               {@code url}
+     * @param parser the RDF parser
+     *
+     * @return an unmodifiable RDF model parsed from {@code reader}
+     *
+     * @throws NullPointerException if any parameter is null
+     * @throws FormatException      if {@code reader} contains a malformed documentthrows FormatException
+     */
+    public static Model rdf(final URL url, final String base, final RDFParser parser) throws FormatException {
+
+        if ( url == null ) {
+            throw new NullPointerException("null url");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
+        if ( parser == null ) {
+            throw new NullPointerException("null parser");
+        }
+
+        try ( final InputStream input=url.openConnection().getInputStream() ) {
+
+            return rdf(input, base.isEmpty() ? url.toString() : base, parser);
+
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+
+    /**
+     * Parses an RDF document.
+     *
+     * @param reader the reader the RDF document is to be parsed from
+     * @param base   the base IRI relative IRIs in {@code url} will be resolved against; may be empty
+     * @param parser the RDF parser
+     *
+     * @return an unmodifiable RDF model parsed from {@code reader}
+     *
+     * @throws NullPointerException if any parameter is null
+     * @throws FormatException      if {@code reader} contains a malformed documentthrows FormatException
+     */
+    public static Model rdf(final Reader reader, final String base, final RDFParser parser) {
+
+        if ( reader == null ) {
+            throw new NullPointerException("null reader");
+        }
+
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
+        if ( parser == null ) {
+            throw new NullPointerException("null parser");
+        }
+
+        return rdf(parser, p -> {
+
+            try { p.parse(reader, base); } catch ( final IOException e ) { throw new UncheckedIOException(e); }
+
+        });
+    }
+
+    /**
+     * Parses an RDF document.
+     *
      * @param input  the input stream the RDF document is to be parsed from
-     * @param base   the possibly null base URL for the RDF document to be parsed
+     * @param base   the base IRI relative IRIs in {@code url} will be resolved against; may be empty
      * @param parser the RDF parser
      *
      * @return an unmodifiable RDF model parsed from {@code input}
      *
-     * @throws NullPointerException if either {@code input} or {@code parser} is null
+     * @throws NullPointerException if any parameter is null
      * @throws FormatException      if {@code input} contains a malformed document
      */
     public static Model rdf(final InputStream input, final String base, final RDFParser parser) throws FormatException {
@@ -142,9 +244,23 @@ public final class RDF implements Format<Model> {
             throw new NullPointerException("null input");
         }
 
+        if ( base == null ) {
+            throw new NullPointerException("null base");
+        }
+
         if ( parser == null ) {
             throw new NullPointerException("null parser");
         }
+
+        return rdf(parser, p -> {
+
+            try { p.parse(input, base); } catch ( final IOException e ) { throw new UncheckedIOException(e); }
+
+        });
+    }
+
+
+    private static Model rdf(final RDFParser parser, final Consumer<RDFParser> processor) throws FormatException {
 
         final ParseErrorCollector errorCollector=new ParseErrorCollector();
 
@@ -166,17 +282,13 @@ public final class RDF implements Format<Model> {
 
         try {
 
-            parser.parse(input, base);
+            processor.accept(parser);
 
         } catch ( final RDFParseException e ) {
 
             if ( errorCollector.getFatalErrors().isEmpty() ) { // exception not always reported by parser…
                 errorCollector.fatalError(e.getMessage(), e.getLineNumber(), e.getColumnNumber());
             }
-
-        } catch ( final IOException e ) {
-
-            throw new UncheckedIOException(e);
 
         }
 
@@ -205,176 +317,6 @@ public final class RDF implements Format<Model> {
             );
 
         }
-    }
-
-
-    /**
-     * Parses an RDF document.
-     *
-     * @param url the URL of the document to be parsed
-     *
-     * @return an unmodifiable RDF model parsed from {@code url}
-     *
-     * @throws NullPointerException     if {@code url} or {@code parser} is null
-     * @throws IllegalArgumentException if {@code url} is malformed
-     * @throws FormatException           if {@code url} points to a malformed document
-     */
-    public static Model rdf(final String url) {
-
-        if ( url == null ) {
-            throw new NullPointerException("null url");
-        }
-
-        return rdf(url, "");
-    }
-
-    /**
-     * Parses an RDF document.
-     *
-     * @param url  the URL of the document to be parsed
-     * @param base the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
-     *             {@code url}
-     *
-     * @return an unmodifiable RDF model parsed from {@code url}
-     *
-     * @throws NullPointerException     if {@code url} or {@code base} is null
-     * @throws IllegalArgumentException if {@code url} is malformed
-     * @throws FormatException           if {@code url} points to a malformed document
-     */
-    public static Model rdf(final String url, final String base) {
-
-        if ( url == null ) {
-            throw new NullPointerException("null url");
-        }
-
-        try {
-
-            return rdf(new URL(url), base);
-
-        } catch ( final MalformedURLException e ) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
-    }
-
-    /**
-     * Parses an RDF document.
-     *
-     * @param url the URL of the document to be parsed
-     *
-     * @return an unmodifiable RDF model parsed from {@code url}
-     *
-     * @throws NullPointerException     if {@code url} or {@code parser} is null
-     * @throws IllegalArgumentException if {@code url} is malformed
-     * @throws FormatException           if {@code url} points to a malformed document
-     */
-    public static Model rdf(final URL url) {
-
-        if ( url == null ) {
-            throw new NullPointerException("null url");
-        }
-
-        return rdf(url, "");
-    }
-
-    /**
-     * Parses an RDF document.
-     *
-     * @param url  the URL of the document to be parsed
-     * @param base the base IRI relative IRIs in {@code url} will be resolved against; if empty, defaults to the
-     *             {@code url}
-     *
-     * @return an unmodifiable RDF model parsed from {@code url}
-     *
-     * @throws NullPointerException     if {@code url} or {@code base} is null
-     * @throws IllegalArgumentException if {@code url} is malformed
-     * @throws FormatException           if {@code url} points to a malformed document
-     */
-    public static Model rdf(final URL url, final String base) {
-
-        if ( url == null ) {
-            throw new NullPointerException("null url");
-        }
-
-        if ( base == null ) {
-            throw new NullPointerException("null base");
-        }
-
-        final RDFParserRegistry registry=RDFParserRegistry.getInstance();
-
-        final RDFParser parser=registry
-                .getFileFormatForFileName(url.getFile())
-                .flatMap(registry::get)
-                .orElseGet(TurtleParserFactory::new)
-                .getParser();
-
-        try ( final InputStream input=url.openConnection().getInputStream() ) {
-
-            return rdf(input, base.isEmpty() ? url.toString() : base, parser);
-
-        } catch ( final IOException e ) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-
-    /**
-     * Parses an RDF class {@linkplain Resources#resource(Object, String) resource}.
-     *
-     * @param master   the target class or an instance of the target class for the RDF resource to be parsed
-     * @param resource the path of the RDF resource to be parsed, relative to the target class
-     *
-     * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
-     * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
-     *
-     * @throws NullPointerException     if any argument is null
-     * @throws MissingResourceException if {@code resource} is not available
-     * @throws FormatException           if {@code resource} contains a malformed document
-     */
-    public static Model rdf(final Object master, final String resource) throws FormatException {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
-
-        if ( resource == null ) {
-            throw new NullPointerException("null resource");
-        }
-
-        return rdf(master, resource, "");
-    }
-
-    /**
-     * Parses an RDF class {@linkplain Resources#resource(Object, String) resource}.
-     *
-     * @param master   the target class or an instance of the target class for the RDF resource to be parsed
-     * @param resource the path of the RDF resource to be parsed, relative to the target class
-     * @param base     the base IRI relative IRIs in {@code resource} will be resolved against; if empty, defaults to the
-     *                 {@code resource} URL
-     *
-     * @return an unmodifiable RDF model parsed from {@code resource}; the format is guessed from the {@code resource}
-     * filename extension, defaulting to {@link RDFFormat#TURTLE Turtle}
-     *
-     * @throws NullPointerException     if any argument is null
-     * @throws MissingResourceException if {@code resource} is not available
-     * @throws FormatException           if {@code resource} contains a malformed document
-     */
-    public static Model rdf(final Object master, final String resource, final String base) throws FormatException {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
-
-        if ( resource == null ) {
-            throw new NullPointerException("null resource");
-        }
-
-        if ( base == null ) {
-            throw new NullPointerException("null base");
-        }
-
-        final URL url=resource(master, resource);
-
-        return rdf(url, base);
     }
 
 
@@ -423,8 +365,8 @@ public final class RDF implements Format<Model> {
 
     /**
      * @return the RDF payload decoded from the raw {@code message} {@linkplain Message#input()} taking into account the
-     * RDF serialization format defined by the  {@code "Content-Type"} {@code message} header or an empty optional if the
-     * {@code "Content-Type"} {@code message} is not empty and is not associated with an RDF format in the
+     * RDF serialization format defined by the  {@code "Content-Type"} {@code message} header or an empty optional if
+     * the {@code "Content-Type"} {@code message} is not empty and is not associated with an RDF format in the
      * {@link RDFParserRegistry}
      */
     @Override public Optional<Model> decode(final Message<?> message) {

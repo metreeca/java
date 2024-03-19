@@ -30,6 +30,7 @@ import static com.metreeca.http.ResponseAssert.assertThat;
 import static com.metreeca.http.jsonld.handlers.OperatorTest.exec;
 import static com.metreeca.link.Frame.*;
 import static com.metreeca.link.Shape.property;
+import static com.metreeca.link.Shape.shape;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,7 +54,7 @@ final class CreatorTest {
                 () -> new Creator()
 
                         .handle(new Request()
-                                        .attribute(Shape.class, property(RDF.VALUE))
+                                        .attribute(Shape.class, property(RDF.VALUE, shape()))
                                         .base("test:/")
                                         .path("/path")
                                         .body(new JSONLD(), frame(
