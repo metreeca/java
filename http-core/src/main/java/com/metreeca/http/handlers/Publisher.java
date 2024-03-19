@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import static com.metreeca.http.Request.HEAD;
 import static com.metreeca.http.Response.NotModified;
 import static com.metreeca.http.Response.OK;
 import static com.metreeca.http.toolkits.Resources.input;
+import static com.metreeca.http.toolkits.Resources.resource;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
@@ -66,7 +67,7 @@ public final class Publisher extends Delegator {
      */
     private static final Map<String, String> MIMETypes=unmodifiableMap(Stream
 
-            .of(input(Publisher.class, ".tsv"))
+            .of(input(resource(Publisher.class, ".tsv")))
 
             .flatMap(stream -> new BufferedReader(new InputStreamReader(stream, UTF_8)).lines())
 

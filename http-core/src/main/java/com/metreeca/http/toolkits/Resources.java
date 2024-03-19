@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.metreeca.http.toolkits;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.zip.GZIPInputStream;
@@ -25,18 +26,46 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Classpath resource utilities.
+ * Resource utilities.
  */
 public final class Resources {
 
     /**
-     * Retrieves a class resource.
+     * Locates a network resource.
      *
-     * @param master   the target class or an instance of the target class for the resource to be retrieved
-     * @param resource the path of the resource to be retrieved, relative to the target class
+     * @param resource the URL of the resource to be located
      *
-     * @return the URL of the given {@code resource}
+     * @return the URL of the located {@code resource}
      *
+     * @throws NullPointerException if {@code resource} is null
+     * @throws IllegalArgumentException if {@code resource} is malformed
+     */
+    public static URL resource(final String resource) {
+
+        if ( resource == null ) {
+            throw new NullPointerException("null resource");
+        }
+
+        try {
+
+            return new URL(resource);
+
+        } catch ( final MalformedURLException e ) {
+
+            throw new IllegalArgumentException(e.getMessage());
+
+        }
+    }
+
+    /**
+     * Locates a class resource.
+     *
+     * @param master   the target class or an instance of the target class for the resource to be located
+     * @param resource the path of the resource to be located, relative to the target class
+     *
+     * @return the URL of the located {@code resource}
+     *
+     * @throws NullPointerException if either {@code master} or {@code resource} is null
      * @throws MissingResourceException if {@code resource} is not available
      */
     public static URL resource(final Object master, final String resource) {
@@ -64,21 +93,16 @@ public final class Resources {
         return url;
     }
 
+
     /**
-     * Retrieves the input stream for a class resource.
+     * Retrieves the input stream for a resource.
      *
-     * @param master   the target class or an instance of the target class for the resource to be retrieved
-     * @param resource the path of the resource to be retrieved, relative to the target class
-     *
+     * @param resource the resource to be retrieved
      * @return the input stream for the given {@code resource}
      *
-     * @throws MissingResourceException if {@code resource} is not available
+     * @throws NullPointerException if {@code resource} is null
      */
-    public static InputStream input(final Object master, final String resource) {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
+    public static InputStream input(final URL resource) {
 
         if ( resource == null ) {
             throw new NullPointerException("null resource");
@@ -86,9 +110,9 @@ public final class Resources {
 
         try {
 
-            final InputStream input=resource(master, resource).openStream();
+            final InputStream input=resource.openStream();
 
-            return resource.endsWith(".gz") ? new GZIPInputStream(input) : input;
+            return resource.toExternalForm().endsWith(".gz") ? new GZIPInputStream(input) : input;
 
         } catch ( final IOException e ) {
             throw new UncheckedIOException(e);
@@ -96,49 +120,39 @@ public final class Resources {
     }
 
     /**
-     * Retrieves the reader for a class resource.
+     * Retrieves the reader for a resource.
      *
-     * @param master   the target class or an instance of the target class for the resource to be retrieved
-     * @param resource the path of the resource to be retrieved, relative to the target class
+     * @param resource the resource to be retrieved
      *
      * @return the {@code UTF-8} reader for the given {@code resource}
      *
-     * @throws MissingResourceException if {@code resource} is not available
+     * @throws NullPointerException if {@code resource} is null
      */
-    public static Reader reader(final Object master, final String resource) {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
+    public static Reader reader(final URL resource) {
 
         if ( resource == null ) {
             throw new NullPointerException("null resource");
         }
 
-        return new InputStreamReader(input(master, resource), UTF_8);
+        return new InputStreamReader(input(resource), UTF_8);
     }
 
     /**
-     * Retrieves the textual content of a class resource.
+     * Retrieves the textual content of a resource.
      *
-     * @param master   the target class or an instance of the target class for the resource to be retrieved
-     * @param resource the path of the resource to be retrieved, relative to the target class
+     * @param resource the resource to be retrieved
      *
      * @return the textual content of the given {@code resource}, read using the {@code UTF-8} charset
      *
-     * @throws MissingResourceException if {@code resource} is not available
+     * @throws NullPointerException if {@code resource} is null
      */
-    public static String text(final Object master, final String resource) {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
+    public static String text(final URL resource) {
 
         if ( resource == null ) {
             throw new NullPointerException("null resource");
         }
 
-        try ( final Reader reader=reader(master, resource) ) {
+        try ( final Reader reader=reader(resource) ) {
 
             return Feeds.text(reader);
 
@@ -148,27 +162,22 @@ public final class Resources {
     }
 
     /**
-     * Retrieves the binary content of a class resource.
+     * Retrieves the binary content of a resource.
      *
-     * @param master   the target class or an instance of the target class for the resource to be retrieved
-     * @param resource the path of the resource to be retrieved, relative to the target class
+     * @param resource the resource to be retrieved
      *
      * @return the binary content of the given {@code resource}
      *
-     * @throws MissingResourceException if {@code resource} is not available
+     * @throws NullPointerException if {@code resource} is null
      */
-    public static byte[] data(final Object master, final String resource) {
-
-        if ( master == null ) {
-            throw new NullPointerException("null master");
-        }
+    public static byte[] data(final URL resource) {
 
         if ( resource == null ) {
             throw new NullPointerException("null resource");
         }
 
         try (
-                final InputStream input=input(master, resource);
+                final InputStream input=input(resource);
                 final ByteArrayOutputStream output=new ByteArrayOutputStream()
         ) {
 
