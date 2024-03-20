@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2023 Metreeca srl
+ * Copyright © 2013-2024 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,11 @@ import com.metreeca.http.Request;
 import com.metreeca.http.Response;
 import com.metreeca.http.rdf.Frame;
 import com.metreeca.http.services.Logger;
+import com.metreeca.link._Report;
 
+import org.eclipse.rdf4j.common.exception.ValidationException;
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -32,8 +35,12 @@ import org.eclipse.rdf4j.query.Operation;
 import org.eclipse.rdf4j.query.Update;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 
+import java.io.StringWriter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -467,6 +474,29 @@ public final class Graph implements AutoCloseable {
                     if ( connection.isActive() ) { connection.commit(); }
 
                     return value;
+
+                } catch ( final RepositoryException e ) {
+
+                    if ( e.getCause() instanceof ValidationException ) {
+
+                        final ValidationException trace=(ValidationException)e.getCause();
+
+                        final Model model=trace.validationReportAsModel();
+                        final StringWriter writer=new StringWriter();
+
+                        Rio.write(model, writer, RDFFormat.TURTLE);
+
+                        service(logger())
+                                .warning(this, writer.toString())
+                                .warning(this, _Report.report(model).toString());
+
+                        throw (RuntimeException)trace; // ;(rdf4j) ValidationException is not an Exception…
+
+                    } else {
+
+                        throw e;
+
+                    }
 
                 } finally {
 
