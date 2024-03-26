@@ -20,6 +20,7 @@ package com.metreeca.http.jsonld.actions;
 
 import com.metreeca.http.services.Logger;
 import com.metreeca.link.Frame;
+import com.metreeca.link.Shape;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,41 +28,53 @@ import java.util.function.Function;
 import static com.metreeca.http.Locator.service;
 import static com.metreeca.http.services.Logger.logger;
 
+import static java.lang.String.format;
+
 /**
  * Model-based validation.
  *
- * <p>{@linkplain com.metreeca.link.Shape#validate(Frame) Validates} objects against their expected shape.</p>
- *
- * @param <T> the type of the object to be validated
+ * <p>{@linkplain Shape#validate(Frame) Validates} frames against their expected shape.</p>
  */
-public final class Validate<T> implements Function<T, Optional<T>> {
+public final class Validate implements Function<Frame, Optional<Frame>> {
+
+    private final Shape shape;
 
     private final Logger logger=service(logger());
 
 
-    @Override public Optional<T> apply(final T object) {
+    public Validate(final Shape shape) {
 
-        throw new UnsupportedOperationException(";( be implemented"); // !!!
+        if ( shape == null ) {
+            throw new NullPointerException("null shape");
+        }
 
-        // final Frame<T> frame=frame(object);
-        //
-        // return frame.validate()
-        //
-        //         .map(trace -> {
-        //
-        //             logger.warning(this, () -> format("%s %s", object, trace));
-        //
-        //             return Optional.<T>empty();
-        //
-        //         })
-        //
-        //         .orElseGet(() -> {
-        //
-        //             logger.debug(this, () -> format("%s {}", frame.id()));
-        //
-        //             return Optional.of(frame.value());
-        //
-        //         });
+        this.shape=shape;
+    }
+
+
+    @Override public Optional<Frame> apply(final Frame frame) {
+
+        if ( frame == null ) {
+            throw new NullPointerException("null frame");
+        }
+
+        return shape.validate(frame)
+
+                .map(trace -> {
+
+                    logger.warning(this, () -> format("%s %s", frame, trace));
+
+                    return Optional.<Frame>empty();
+
+                })
+
+                .orElseGet(() -> {
+
+                    logger.debug(this, () -> format("%s {}", frame.id()));
+
+                    return Optional.of(frame);
+
+                });
     }
 
 }
