@@ -26,7 +26,6 @@ import com.metreeca.link._Report;
 
 import org.eclipse.rdf4j.common.exception.ValidationException;
 import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -36,11 +35,8 @@ import org.eclipse.rdf4j.query.Update;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
-import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 
-import java.io.StringWriter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,9 +107,9 @@ public final class Graph implements AutoCloseable {
      * @param customizers optional custom configuration setters for the SPARQL query operation
      * @param <M>         the type of the target message for the new filter
      *
-     * @return a message filter executing the SPARQL graph {@code query} on target messages with {@linkplain
-     * #configure(Message, Operation, BiConsumer[]) standard bindings} and optional custom configurations; returns the
-     * input model extended with the statements returned by {@code query}
+     * @return a message filter executing the SPARQL graph {@code query} on target messages with
+     * {@linkplain #configure(Message, Operation, BiConsumer[]) standard bindings} and optional custom configurations;
+     * returns the input model extended with the statements returned by {@code query}
      *
      * @throws NullPointerException if any argument is null or if {@code customizers} contains null values
      */
@@ -165,9 +161,9 @@ public final class Graph implements AutoCloseable {
      * @param customizers optional custom configuration setters for the SPARQL update operation
      * @param <M>         the type of the target message for the new filter
      *
-     * @return a housekeeping task executing the SPARQL {@code update} script on target messages with {@linkplain
-     * #configure(Message, Operation, BiConsumer[]) standard bindings} and optional custom configurations; returns the
-     * input message without altering it
+     * @return a housekeeping task executing the SPARQL {@code update} script on target messages with
+     * {@linkplain #configure(Message, Operation, BiConsumer[]) standard bindings} and optional custom configurations;
+     * returns the input message without altering it
      *
      * @throws NullPointerException if any argument is null or if {@code customizers} contains null values
      */
@@ -416,7 +412,7 @@ public final class Graph implements AutoCloseable {
 
         final RepositoryConnection shared=context.get();
 
-        if ( shared != null ) { return query.apply(shared); } else {
+        if ( shared != null && shared.getRepository().equals(repository) ) { return query.apply(shared); } else {
 
             if ( !repository.isInitialized() ) { repository.init(); }
 
@@ -428,7 +424,7 @@ public final class Graph implements AutoCloseable {
 
             } finally {
 
-                context.remove();
+                context.set(shared);
 
             }
 
@@ -481,14 +477,9 @@ public final class Graph implements AutoCloseable {
 
                         final ValidationException trace=(ValidationException)e.getCause();
 
-                        final Model model=trace.validationReportAsModel();
-                        final StringWriter writer=new StringWriter();
-
-                        Rio.write(model, writer, RDFFormat.TURTLE);
-
-                        service(logger())
-                                .warning(this, writer.toString())
-                                .warning(this, _Report.report(model).toString());
+                        service(logger()).warning(this,
+                                _Report.report(trace.validationReportAsModel()).toString()
+                        );
 
                         throw (RuntimeException)trace; // ;(rdf4j) ValidationException is not an Exception…
 
